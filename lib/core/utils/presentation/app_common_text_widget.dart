@@ -1,0 +1,47 @@
+import 'package:clean_architecture/core/utils/presentation/app_text_style.dart';
+import 'package:clean_architecture/core/utils/constants/app_colors.dart';
+import 'package:flutter/material.dart';
+
+Widget textWidget({
+  required String text,
+  String highLightText = "",
+  Color colour = AppColors.black,
+  double fontSize = 14,
+  Color highLightColor = AppColors.black,
+  TextAlign alignment = TextAlign.start,
+  int? maxLine,
+  TextDecoration? textDecoration,
+  bool isHighLighted = false,
+  TextOverflow? textOverflow,
+  FontWeight fontWeight = FontWeight.normal,
+  FontStyle fontStyle = FontStyle.normal,
+  double height = 1.5,
+}) => isHighLighted
+    ? Text(
+        text,
+        textAlign: alignment,
+        maxLines: maxLine,
+        style: appTextStyle(
+          fontSize: fontSize,
+          fontWeight: fontWeight,
+          colour: colour,
+          height: height,
+          fontStyle: fontStyle,
+          textDecoration: textDecoration,
+          textOverflow: textOverflow,
+        ),
+      )
+    : Text(
+        text,
+        textAlign: alignment,
+        maxLines: maxLine,
+        style: appTextStyle(
+          fontSize: fontSize,
+          fontWeight: fontWeight,
+          colour: colour,
+          height: height,
+          fontStyle: fontStyle,
+          textDecoration: textDecoration,
+          textOverflow: textOverflow,
+        ),
+      );

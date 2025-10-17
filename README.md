@@ -18,3 +18,4 @@ To generate to/from JSON code for a class, JsonSerializable is used. You can pro
 
 For State Management, provider is used.
 
+# inspectConnect

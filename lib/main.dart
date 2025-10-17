@@ -2,8 +2,6 @@ import 'package:clean_architecture/core/di/app_component/app_component.dart';
 import 'package:clean_architecture/core/utils/auto_router_setup/auto_router.dart';
 import 'package:clean_architecture/core/utils/helpers/app_flavor_helper/app_flavors_helper.dart';
 import 'package:clean_architecture/core/utils/helpers/app_flavor_helper/environment_config.dart';
-import 'package:clean_architecture/features/weather_detail/presentation/add_new_city/add_new_city_viewmodel.dart';
-import 'package:clean_architecture/features/weather_detail/presentation/weather_details/weather_details_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -35,22 +33,44 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   final AppRouter _appRouter = AppRouter();
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
-
+  static const Color themeColor = Color(0xff1a2c47);
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider<WeatherDetailsViewModel>(
-          create: (BuildContext context) => locator<WeatherDetailsViewModel>(),
+    return MaterialApp.router(
+      routerConfig: _appRouter.config(),
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        primaryColor: themeColor,
+        scaffoldBackgroundColor: Colors.white,
+        colorScheme: ColorScheme.fromSwatch().copyWith(
+          primary: themeColor,
+          secondary: themeColor,
         ),
-        ChangeNotifierProvider<AddNewCityViewModel>(
-          create: (BuildContext context) => locator<AddNewCityViewModel>(),
+        appBarTheme: const AppBarTheme(
+          backgroundColor: themeColor,
+          foregroundColor: Colors.white,
         ),
-      ],
-      child: MaterialApp.router(
-        routerConfig: _appRouter.config(),
-        debugShowCheckedModeBanner: false,
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: themeColor,
+            foregroundColor: Colors.white,
+          ),
+        ),
       ),
     );
+
+
+
+    //  return MultiProvider(
+    //   providers: [
+    //     // ChangeNotifierProvider<OnBoardingProvider>(
+    //     //   create: (BuildContext context) => locator<OnBoardingProvider>(),
+    //     // ),
+    //   ],
+    //   child: MaterialApp.router(
+    //     routerConfig: _appRouter.config(),
+    //     debugShowCheckedModeBanner: false,
+    //   ),
+    // );
   }
 }

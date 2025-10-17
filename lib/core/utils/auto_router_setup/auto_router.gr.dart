@@ -11,72 +11,97 @@
 part of 'auto_router.dart';
 
 /// generated route for
-/// [AddNewCityView]
-class AddNewCityRoute extends PageRouteInfo<void> {
-  const AddNewCityRoute({List<PageRouteInfo>? children})
-    : super(AddNewCityRoute.name, initialChildren: children);
+/// [ClientAuthAutoWrapperView]
+class ClientAuthAutoWrapperRoute extends PageRouteInfo<void> {
+  const ClientAuthAutoWrapperRoute({List<PageRouteInfo>? children})
+    : super(ClientAuthAutoWrapperRoute.name, initialChildren: children);
 
-  static const String name = 'AddNewCityRoute';
+  static const String name = 'ClientAuthAutoWrapperRoute';
 
   static PageInfo page = PageInfo(
     name,
     builder: (data) {
-      return const AddNewCityView();
+      return WrappedRoute(child: const ClientAuthAutoWrapperView());
     },
   );
 }
 
 /// generated route for
-/// [WeatherDetailsView]
-class WeatherDetailsRoute extends PageRouteInfo<WeatherDetailsRouteArgs> {
-  WeatherDetailsRoute({
-    Key? key,
-    WeatherInfoEntity? weatherInfoEntity,
-    List<PageRouteInfo>? children,
-  }) : super(
-         WeatherDetailsRoute.name,
-         args: WeatherDetailsRouteArgs(
-           key: key,
-           weatherInfoEntity: weatherInfoEntity,
-         ),
-         initialChildren: children,
-       );
+/// [ClientForgotpPasswordView]
+class ClientForgotpPasswordRoute extends PageRouteInfo<void> {
+  const ClientForgotpPasswordRoute({List<PageRouteInfo>? children})
+    : super(ClientForgotpPasswordRoute.name, initialChildren: children);
 
-  static const String name = 'WeatherDetailsRoute';
+  static const String name = 'ClientForgotpPasswordRoute';
 
   static PageInfo page = PageInfo(
     name,
     builder: (data) {
-      final args = data.argsAs<WeatherDetailsRouteArgs>(
-        orElse: () => const WeatherDetailsRouteArgs(),
-      );
-      return WeatherDetailsView(
-        key: args.key,
-        weatherInfoEntity: args.weatherInfoEntity,
-      );
+      return const ClientForgotpPasswordView();
     },
   );
 }
 
-class WeatherDetailsRouteArgs {
-  const WeatherDetailsRouteArgs({this.key, this.weatherInfoEntity});
+/// generated route for
+/// [ClientOtpVerificationView]
+class ClientOtpVerificationRoute extends PageRouteInfo<void> {
+  const ClientOtpVerificationRoute({List<PageRouteInfo>? children})
+    : super(ClientOtpVerificationRoute.name, initialChildren: children);
 
-  final Key? key;
+  static const String name = 'ClientOtpVerificationRoute';
 
-  final WeatherInfoEntity? weatherInfoEntity;
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const ClientOtpVerificationView();
+    },
+  );
+}
 
-  @override
-  String toString() {
-    return 'WeatherDetailsRouteArgs{key: $key, weatherInfoEntity: $weatherInfoEntity}';
-  }
+/// generated route for
+/// [ClientSignInView]
+class ClientSignInRoute extends PageRouteInfo<void> {
+  const ClientSignInRoute({List<PageRouteInfo>? children})
+    : super(ClientSignInRoute.name, initialChildren: children);
 
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-    if (other is! WeatherDetailsRouteArgs) return false;
-    return key == other.key && weatherInfoEntity == other.weatherInfoEntity;
-  }
+  static const String name = 'ClientSignInRoute';
 
-  @override
-  int get hashCode => key.hashCode ^ weatherInfoEntity.hashCode;
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const ClientSignInView();
+    },
+  );
+}
+
+/// generated route for
+/// [ClientSignUpView]
+class ClientSignUpRoute extends PageRouteInfo<void> {
+  const ClientSignUpRoute({List<PageRouteInfo>? children})
+    : super(ClientSignUpRoute.name, initialChildren: children);
+
+  static const String name = 'ClientSignUpRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const ClientSignUpView();
+    },
+  );
+}
+
+/// generated route for
+/// [OnBoardingPage]
+class OnBoardingRoute extends PageRouteInfo<void> {
+  const OnBoardingRoute({List<PageRouteInfo>? children})
+    : super(OnBoardingRoute.name, initialChildren: children);
+
+  static const String name = 'OnBoardingRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const OnBoardingPage();
+    },
+  );
 }
