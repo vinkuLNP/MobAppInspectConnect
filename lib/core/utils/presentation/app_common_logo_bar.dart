@@ -4,13 +4,15 @@ import 'package:clean_architecture/core/utils/presentation/app_assets_widget.dar
 import 'package:clean_architecture/core/utils/presentation/app_common_text_widget.dart';
 import 'package:flutter/material.dart';
 
-Widget appCommonLogoBar({required double height}) => SizedBox(
+Widget appCommonLogoBar({
+  required double height,
+  MainAxisAlignment alignment = MainAxisAlignment.center,
+}) => SizedBox(
   height: height,
   child: Row(
-    mainAxisAlignment: MainAxisAlignment.center,
+    mainAxisAlignment: alignment,
     children: [
       SizedBox(width: 10),
-
       imageAsset(image: appLogo),
       SizedBox(width: 10),
       textWidget(

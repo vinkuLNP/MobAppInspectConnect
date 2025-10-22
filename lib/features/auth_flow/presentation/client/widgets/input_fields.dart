@@ -1,5 +1,6 @@
 import 'package:clean_architecture/core/utils/constants/app_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class AppInputField extends StatelessWidget {
   final String label;
@@ -7,13 +8,18 @@ class AppInputField extends StatelessWidget {
   final TextInputType keyboardType;
   final String? Function(String?)? validator;
   final String? hint;
+  final int? maxLength;
+
+  final List<TextInputFormatter>? inputFormatters;
 
   const AppInputField({
     required this.label,
     required this.controller,
     this.keyboardType = TextInputType.text,
     this.validator,
+    this.inputFormatters = const [],
     this.hint,
+    this.maxLength,
     super.key,
   });
 
@@ -30,22 +36,21 @@ class AppInputField extends StatelessWidget {
         TextFormField(
           controller: controller,
           keyboardType: keyboardType,
-
+          maxLength: maxLength,
           decoration: InputDecoration(
+            counterText: '',
             hintText: hint,
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: const BorderSide(
-                color: Colors.grey,
-              ), 
+              borderSide: const BorderSide(color: Colors.grey),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
               borderSide: const BorderSide(
                 color: AppColors.themeColor,
                 width: 2,
-              ), 
+              ),
             ),
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 16,
@@ -54,6 +59,7 @@ class AppInputField extends StatelessWidget {
           ),
 
           validator: validator,
+          inputFormatters: inputFormatters,
         ),
       ],
     );
@@ -95,16 +101,11 @@ class AppPasswordField extends StatelessWidget {
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: const BorderSide(
-                color: Colors.grey,
-              ), 
+              borderSide: const BorderSide(color: Colors.grey),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide:  BorderSide(
-                color: AppColors.themeColor,
-                width: 2,
-              ), 
+              borderSide: BorderSide(color: AppColors.themeColor, width: 2),
             ),
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 16,

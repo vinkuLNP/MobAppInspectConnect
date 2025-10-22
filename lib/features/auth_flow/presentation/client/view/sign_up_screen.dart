@@ -8,16 +8,25 @@ import 'package:clean_architecture/core/utils/presentation/app_common_text_widge
 import 'package:clean_architecture/features/auth_flow/presentation/client/client_view_model.dart';
 import 'package:clean_architecture/features/auth_flow/presentation/client/widgets/input_fields.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:provider/provider.dart';
 
 @RoutePage()
-class ClientSignUpView extends StatelessWidget {
+class ClientSignUpView extends StatefulWidget {
   const ClientSignUpView({super.key});
 
   @override
+  State<ClientSignUpView> createState() => _ClientSignUpViewState();
+}
+
+class _ClientSignUpViewState extends State<ClientSignUpView> {
+  final formKey = GlobalKey<FormState>();
+
+  @override
   Widget build(BuildContext context) {
-    final formKey = GlobalKey<FormState>();
-    final vm = context.watch<ClientViewModelProvider>();
+    // final vm = context.watch<ClientViewModelProvider>();
+    final vm = context.read<ClientViewModelProvider>();
 
     return BaseResponsiveWidget(
       initializeConfig: false,
@@ -30,8 +39,7 @@ class ClientSignUpView extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const SizedBox(height: 24),
-                  appCommonLogoBar(height: rc.screenHeight * 0.1),
+                  appCommonLogoBar(height: rc.screenHeight * 0.2),
                   Align(
                     alignment: Alignment.center,
                     child: textWidget(
@@ -40,7 +48,7 @@ class ClientSignUpView extends StatelessWidget {
                       fontWeight: FontWeight.w700,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  // const SizedBox(height: 8),
                   Align(
                     alignment: Alignment.center,
                     child: textWidget(
@@ -50,83 +58,163 @@ class ClientSignUpView extends StatelessWidget {
                       colour: Colors.black54,
                     ),
                   ),
-                  const SizedBox(height: 28),
+                  const SizedBox(height: 20),
 
-                  AppInputField(
-                    label: 'Full Name',
-                    controller: vm.fullNameCtrl,
-                    validator: vm.validateRequired,
+                  Consumer<ClientViewModelProvider>(
+                    builder: (_, vm, _) => AppInputField(
+                      label: 'Full Name',
+                      hint: 'Full Name',
+                      controller: vm.fullNameCtrl,
+                      validator: vm.validateRequired,
+                    ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 10),
+                  Text(
+                    'Phone Number',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w500,
+                      fontSize: 18,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
 
-                  AppInputField(
-                    label: 'Phone Number',
+                  IntlPhoneField(
                     controller: vm.phoneCtrl,
-                    keyboardType: TextInputType.phone,
-                    validator: vm.validatePhone,
+                    initialCountryCode: 'IN',
+                    decoration: InputDecoration(
+                      hintText: 'Phone Number',
+                      counterText: '',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: const BorderSide(color: Colors.grey),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: const BorderSide(
+                          color: AppColors.themeColor,
+                          width: 2,
+                        ),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 14,
+                      ),
+                    ),
+                    inputFormatters: [
+                      FilteringTextInputFormatter.digitsOnly,
+                      LengthLimitingTextInputFormatter(10),
+                    ],
+                    flagsButtonPadding: const EdgeInsets.only(left: 8),
+                    dropdownIconPosition: IconPosition.trailing,
+                    disableLengthCheck: true,
+
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+
+                    // validator: (p) {
+                    //   if (p == null || p.number.isEmpty) return 'Phone is required';
+                    //   if (p.number.length < 6) return 'Enter a valid phone';
+                    //   return null;
+                    // },
+                    onChanged: (phone) {
+                      vm.setPhoneParts(
+                        iso: phone.countryISOCode,
+                        dial: phone.countryCode,
+                        number: phone.number,
+                        e164: phone.completeNumber,
+                      );
+                    },
+                    onCountryChanged: (country) {
+                      vm.setPhoneParts(
+                        iso: country.code,
+                        dial: '+${country.dialCode}',
+                        number: vm.phoneRaw ?? '',
+                        e164: (vm.phoneRaw?.isNotEmpty ?? false)
+                            ? '+${country.dialCode}${vm.phoneRaw}'
+                            : '',
+                      );
+                    },
                   ),
-                  const SizedBox(height: 16),
 
-                  AppInputField(
-                    label: 'Email',
-                    controller: vm.emailCtrlSignUp,
-                    keyboardType: TextInputType.emailAddress,
-                    validator: vm.validateEmail,
+                  const SizedBox(height: 10),
+
+                  Consumer<ClientViewModelProvider>(
+                    builder: (_, vm, _) => AppInputField(
+                      label: 'Email',
+                      hint: 'Email ',
+
+                      controller: vm.emailCtrlSignUp,
+                      keyboardType: TextInputType.emailAddress,
+                      validator: vm.validateEmail,
+                    ),
                   ),
 
-                  const SizedBox(height: 16),
+                  // const SizedBox(height: 16),
 
-                  AppInputField(
-                    label: 'Mailing Address',
-                    controller: vm.addressCtrl,
-                    validator: vm.validateRequired,
-                  ),
+                  // AppInputField(
+                  //   label: 'Mailing Address',
+                  //   controller: vm.addressCtrl,
+                  //   validator: vm.validateRequired,
+                  // ),
+                  // const SizedBox(height: 10),
+                  // Consumer<ClientViewModelProvider>(
+                  //   builder: (_, vm, _) => AppPasswordField(
+                  //     label: 'Password',
+                  //     controller: vm.passwordCtrlSignUp,
+                  //     obscure: vm.obscurePassword,
+                  //     onToggle: vm.toggleObscurePassword,
+                  //     validator: vm.validatePassword,
+                  //   ),
+                  // ),
 
-                  const SizedBox(height: 16),
-                  AppPasswordField(
-                    label: 'Password',
-                    controller: vm.passwordCtrlSignUp,
-                    obscure: vm.obscurePassword,
-                    onToggle: vm.toggleObscurePassword,
-                    validator: vm.validatePassword,
-                  ),
+                  // const SizedBox(height: 10),
 
-                  const SizedBox(height: 16),
+                  // Consumer<ClientViewModelProvider>(
+                  //   builder: (_, vm, _) => AppPasswordField(
+                  //     label: 'Confirm Password',
+                  //     controller: vm.confirmPasswordCtrl,
+                  //     obscure: vm.obscureConfirm,
+                  //     onToggle: vm.toggleObscureConfirm,
+                  //     validator: vm.validateConfirmPassword,
+                  //   ),
+                  // ),
 
-                  AppPasswordField(
-                    label: 'Confirm Password',
-                    controller: vm.confirmPasswordCtrl,
-                    obscure: vm.obscureConfirm,
-                    onToggle: vm.toggleObscureConfirm,
-                    validator: vm.validateConfirmPassword,
-                  ),
+                  // const SizedBox(height: 20),
 
-                  const SizedBox(height: 20),
+                  // CheckboxListTile(
+                  //   value: vm.agreeTnC,
+                  //   onChanged: vm.setAgreeTnC,
+                  //   contentPadding: EdgeInsets.zero,
+                  //   title: const Text('I agree to the Terms and Conditions.'),
+                  //   controlAffinity: ListTileControlAffinity.leading,
+                  // ),
+                  // CheckboxListTile(
+                  //   value: vm.isTruthful,
+                  //   onChanged: vm.setIsTruthful,
+                  //   contentPadding: EdgeInsets.zero,
+                  //   title: const Text('I confirm all information is truthful.'),
+                  //   controlAffinity: ListTileControlAffinity.leading,
+                  // ),
+                  // const SizedBox(height: 20),
+                       SizedBox(height: (rc.screenHeight* 0.08).clamp(40.0, 80.0)),
 
-                  CheckboxListTile(
-                    value: vm.agreeTnC,
-                    onChanged: vm.setAgreeTnC,
-                    contentPadding: EdgeInsets.zero,
-                    title: const Text('I agree to the Terms and Conditions.'),
-                    controlAffinity: ListTileControlAffinity.leading,
-                  ),
-                  CheckboxListTile(
-                    value: vm.isTruthful,
-                    onChanged: vm.setIsTruthful,
-                    contentPadding: EdgeInsets.zero,
-                    title: const Text('I confirm all information is truthful.'),
-                    controlAffinity: ListTileControlAffinity.leading,
-                  ),
-                  const SizedBox(height: 20),
-
-                  // Submit
+                  // Consumer<ClientViewModelProvider>(
+                  //   builder: (_, vm, _) =>
                   SizedBox(
                     height: 54,
                     child: AppButton(
-                      onTap: () => vm.submitSignUp(formKey: formKey),
+                      buttonBackgroundColor: AppColors.themeColor,
+                      // vm.isTruthful && vm.agreeTnC
+                      //     ? AppColors.themeColor
+                      //     : Colors.grey,
+                      onTap: () =>
+                          vm.submitSignUp(formKey: formKey, context: context),
                       text: 'Sign Up',
                     ),
                   ),
+                  // ),
                   const SizedBox(height: 20),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -134,7 +222,7 @@ class ClientSignUpView extends StatelessWidget {
                       textWidget(text: "Already have an account?"),
                       GestureDetector(
                         onTap: () {
-                          context.pushRoute(const ClientSignUpRoute());
+                          context.pushRoute(const ClientSignInRoute());
                         },
                         child: textWidget(
                           text: 'Sign In',
@@ -153,5 +241,7 @@ class ClientSignUpView extends StatelessWidget {
       ),
     );
   }
-
 }
+
+
+

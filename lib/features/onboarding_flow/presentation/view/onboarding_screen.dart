@@ -47,27 +47,36 @@ class OnBoardingPage extends StatelessWidget {
                     physics: const BouncingScrollPhysics(),
                     child: Column(
                       children: [
-                        appCommonLogoBar(height: rc.screenHeight * 0.10),
+                        Container(
+                          margin: EdgeInsets.only(top: 20),
+                          child: appCommonLogoBar(
+                            height: rc.screenHeight * 0.08,
+                            alignment: MainAxisAlignment.start,
+                          ),
+                        ),
 
                         SizedBox(
-                          height: 360,
+                          height: 500,
                           child: PageView(
                             controller: provider.pageController,
                             onPageChanged: provider.onPageChanged,
                             physics: const BouncingScrollPhysics(),
                             scrollDirection: Axis.horizontal,
-                            children: const [
+                            children: [
                               OnBoardingWidget(
                                 image: onboardingFirstImg,
                                 title: "Welcome to Inspect Connect",
+                                subTitle: subs[0],
                               ),
                               OnBoardingWidget(
                                 image: onboardingSecondImg,
                                 title: "How it works? — Client",
+                                subTitle: subs[1],
                               ),
                               OnBoardingWidget(
                                 image: onboardingThirdImg,
                                 title: "How it works? — Inspector",
+                                subTitle: subs[2],
                               ),
                             ],
                           ),
@@ -77,24 +86,14 @@ class OnBoardingPage extends StatelessWidget {
                           padding: EdgeInsets.symmetric(horizontal: 24),
                           child: Column(
                             children: [
-                              SizedBox(
-                                height: 140,
-                                child: textWidget(
-                                  text: subs[provider.currentPage],
-                                  alignment: provider.currentPage == 0
-                                      ? TextAlign.center
-                                      : TextAlign.start,
-                                ),
-                              ),
-
-                              const SizedBox(height: 20),
+                              const SizedBox(height: 10),
 
                               TabPageSelector(
                                 controller: DefaultTabController.of(ctx),
                                 selectedColor: app.appTheme.primaryColor,
                               ),
 
-                              const SizedBox(height: 40),
+                              const SizedBox(height: 20),
 
                               textWidget(
                                 text: "Sign In As",
@@ -114,7 +113,14 @@ class OnBoardingPage extends StatelessWidget {
                               ),
                               const SizedBox(height: 12),
 
-                              AppButton(text: "INSPECTOR", onTap: () {}),
+                              AppButton(
+                                text: "INSPECTOR",
+                                onTap: () {
+                                  context.replaceRoute(
+                                    const ClientSignInRoute(),
+                                  );
+                                },
+                              ),
                             ],
                           ),
                         ),

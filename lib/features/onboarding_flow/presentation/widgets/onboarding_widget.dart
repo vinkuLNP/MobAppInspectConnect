@@ -7,15 +7,26 @@ class OnBoardingWidget extends StatelessWidget {
     super.key,
     required this.image,
     required this.title,
+    required this.subTitle,
   });
-  final String image, title;
+
+  final String image, title, subTitle;
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Image.asset(image, height: 246, fit: BoxFit.fitWidth),
-        const SizedBox(height: 54),
+        TweenAnimationBuilder<double>(
+          tween: Tween(begin: -4, end: 4),
+          duration: const Duration(seconds: 2),
+          curve: Curves.easeInOut,
+          onEnd: () {},
+          builder: (context, value, child) {
+            return Transform.translate(offset: Offset(0, value), child: child);
+          },
+          child: Image.asset(image, height: 246, fit: BoxFit.fitWidth),
+        ),
+        const SizedBox(height: 40),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 37),
           child: Column(
@@ -26,6 +37,26 @@ class OnBoardingWidget extends StatelessWidget {
                 fontWeight: FontWeight.bold,
                 fontSize: 20,
                 alignment: TextAlign.center,
+              ),
+              const SizedBox(height: 20),
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 350),
+                transitionBuilder: (child, anim) => FadeTransition(
+                  opacity: anim,
+                  child: SlideTransition(
+                    position: Tween<Offset>(
+                      begin: const Offset(0, 0.1),
+                      end: Offset.zero,
+                    ).animate(anim),
+                    child: child,
+                  ),
+                ),
+                child: SizedBox(
+                  child: textWidget(
+                    text: subTitle,
+                    alignment: TextAlign.center,
+                  ),
+                ),
               ),
             ],
           ),

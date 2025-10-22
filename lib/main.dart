@@ -3,7 +3,6 @@ import 'package:clean_architecture/core/utils/auto_router_setup/auto_router.dart
 import 'package:clean_architecture/core/utils/helpers/app_flavor_helper/app_flavors_helper.dart';
 import 'package:clean_architecture/core/utils/helpers/app_flavor_helper/environment_config.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 
 Future<void> main() async {

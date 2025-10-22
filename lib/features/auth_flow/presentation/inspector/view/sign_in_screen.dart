@@ -5,14 +5,14 @@ import 'package:clean_architecture/core/utils/constants/app_colors.dart';
 import 'package:clean_architecture/core/utils/presentation/app_common_button.dart';
 import 'package:clean_architecture/core/utils/presentation/app_common_logo_bar.dart';
 import 'package:clean_architecture/core/utils/presentation/app_common_text_widget.dart';
-import 'package:clean_architecture/features/auth_flow/presentation/client/client_view_model.dart';
 import 'package:clean_architecture/features/auth_flow/presentation/client/widgets/input_fields.dart';
+import 'package:clean_architecture/features/auth_flow/presentation/inspector/inspector_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 @RoutePage()
-class ClientSignInView extends StatelessWidget {
-  const ClientSignInView({super.key});
+class InspectorSignInView extends StatelessWidget {
+  const InspectorSignInView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +20,7 @@ class ClientSignInView extends StatelessWidget {
     return BaseResponsiveWidget(
       initializeConfig: false,
       buildWidget: (ctx, rc, app) {
-        final provider = ctx.watch<ClientViewModelProvider>();
+        final provider = ctx.watch<InspectorViewModelProvider>();
 
         return Scaffold(
           body: SingleChildScrollView(
@@ -118,7 +118,7 @@ class ClientSignInView extends StatelessWidget {
                         textWidget(text: "Don’t have an account? "),
                         GestureDetector(
                           onTap: () {
-                            context.pushRoute(const ClientSignUpRoute());
+                            context.pushRoute(const InspectorSignUpRoute());
                           },
                           child: textWidget(
                             text: 'Sign Up',
