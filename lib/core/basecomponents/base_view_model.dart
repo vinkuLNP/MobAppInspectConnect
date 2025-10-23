@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:clean_architecture/core/commondomain/entities/based_api_result/api_result_model.dart';
 import 'package:clean_architecture/core/commondomain/entities/based_api_result/api_result_state.dart';
 import 'package:clean_architecture/core/commondomain/entities/based_api_result/error_result_model.dart';

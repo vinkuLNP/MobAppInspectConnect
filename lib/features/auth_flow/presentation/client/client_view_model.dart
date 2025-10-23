@@ -1,8 +1,15 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:clean_architecture/core/basecomponents/base_view_model.dart';
+import 'package:clean_architecture/core/commondomain/entities/based_api_result/api_result_state.dart';
+import 'package:clean_architecture/core/di/app_component/app_component.dart';
 import 'package:clean_architecture/core/utils/auto_router_setup/auto_router.dart';
+import 'package:clean_architecture/core/utils/helpers/device_helper/device_helper.dart';
+import 'package:clean_architecture/features/auth_flow/domain/entities/auth_user.dart';
+import 'package:clean_architecture/features/auth_flow/domain/usecases/sign_in_usecase.dart';
+import 'package:clean_architecture/features/auth_flow/domain/usecases/sign_up_usecases.dart';
 import 'package:clean_architecture/features/auth_flow/utils/otp_enum.dart';
 import 'package:flutter/material.dart';
 
@@ -14,14 +21,27 @@ class ClientViewModelProvider extends BaseViewModel {
 
   bool _obscure = true;
   bool get obscure => _obscure;
+  bool _autoValidate = false;
+  bool get autoValidate => _autoValidate;
+
+  void enableAutoValidate() {
+    if (!_autoValidate) {
+      _autoValidate = true;
+      notifyListeners();
+    }
+  }
+
+  bool _isSigningIn = false;
+  bool get isSigningIn => _isSigningIn;
+
+  void setSigningIn(bool value) {
+    _isSigningIn = value;
+    notifyListeners();
+  }
 
   void toggleObscure() {
     _obscure = !_obscure;
     notifyListeners();
-  }
-
-  Future<void> signIn({required GlobalKey<FormState> formKey}) async {
-    if (!(formKey.currentState?.validate() ?? false)) return;
   }
 
   final fullNameCtrl = TextEditingController();
@@ -101,8 +121,11 @@ class ClientViewModelProvider extends BaseViewModel {
     //   return;
     // }
     startOtpFlow(OtpPurpose.signUp);
-
-    context.pushRoute(const OtpVerificationRoute());
+    // fullNameCtrl.clear();
+    // phoneCtrl.clear();
+    // emailCtrlSignUp.clear();
+    print(emailCtrlSignUp);
+    context.pushRoute(const ResetPasswordRoute());
   }
 
   @override
@@ -159,7 +182,8 @@ class ClientViewModelProvider extends BaseViewModel {
     //     context.router.replaceAll([const ClientSignInRoute()]);
     //     break;
     //   case OtpPurpose.forgotPassword:
-        context.router.replaceAll([const ResetPasswordRoute()]);
+    pinController.clear();
+    context.router.replaceAll([const ResetPasswordRoute()]);
     //     break;
     //   default:
     //     context.router.replaceAll([const ClientSignInRoute()]);
@@ -169,6 +193,7 @@ class ClientViewModelProvider extends BaseViewModel {
 
   Future<void> resend() async {
     if (!canResend) return;
+    pinController.clear();
     _startCooldown();
   }
 
@@ -226,11 +251,11 @@ class ClientViewModelProvider extends BaseViewModel {
     final eOk =
         email.isNotEmpty &&
         RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(email);
-    final pOk =
-        (phoneE164 != null &&
-        phoneE164!.isNotEmpty &&
-        (phoneRaw?.length ?? 0) >= 6);
-    if (!eOk && !pOk) return 'Enter a valid email or phone';
+    // final pOk =
+    //     (phoneE164 != null &&
+    //     phoneE164!.isNotEmpty &&
+    //     (phoneRaw?.length ?? 0) >= 6);
+    if (!eOk) return 'Enter a valid email ';
     return null;
   }
 
@@ -239,18 +264,21 @@ class ClientViewModelProvider extends BaseViewModel {
     required BuildContext context,
   }) async {
     if (!(formKey.currentState?.validate() ?? false)) return;
+    setSigningIn(true);
 
     _isSendingReset = true;
     notifyListeners();
 
     try {
       final email = resetEmailCtrl.text.trim();
-      final useEmail = email.isNotEmpty;
+      // final useEmail = email.isNotEmpty;
 
-      _resetTargetLabel = useEmail ? email : phoneE164;
+      _resetTargetLabel = email;
+      // useEmail ? email : phoneE164;
 
       // verifyInit();
       startOtpFlow(OtpPurpose.forgotPassword);
+      resetEmailCtrl.clear();
       context.pushRoute(const OtpVerificationRoute());
     } finally {
       _isSendingReset = false;
@@ -263,17 +291,67 @@ class ClientViewModelProvider extends BaseViewModel {
     required BuildContext context,
   }) async {
     if (!(formKey.currentState?.validate() ?? false)) return;
-    if (!canVerify) return;
+
+    // _isResetting = true;
+    // notifyListeners();
+
+    // try {
+    //   context.router.replaceAll([const ClientSignInRoute()]);
+    //   passwordCtrlSignUp.clear();
+    //   confirmPasswordCtrl.clear();
+    // } finally {
+    // _isResetting = false;
+    // notifyListeners();
+    // }
 
     _isResetting = true;
     notifyListeners();
-
+    setSigningIn(true);
     try {
-      final code = pinController.text.trim();
-      final newPwd = passwordCtrlSignUp.text.trim();
+      deviceToken = await DeviceInfoHelper.getDeviceToken();
+      deviceType = await DeviceInfoHelper.getDeviceType();
+      final useCase = locator<SignUpUseCase>();
 
-      context.router.replaceAll([const ClientSignInRoute()]);
+      final params = SignUpParams(
+        role: 1,
+        email: emailCtrlSignUp.text.trim(),
+        name: fullNameCtrl.text.trim(),
+        phoneNumber: phoneRaw ?? '',
+        countryCode: phoneDial ?? "91",
+        password: passwordCtrlSignUp.text.trim(),
+        deviceToken: deviceToken,
+        deviceType: deviceType,
+        mailingAddress: "456 Broadway, New York, NY 10001",
+        agreedToTerms: true,
+        isTruthfully: true,
+        location: {
+          "type": "Point",
+          "locationName": "Midtown",
+          "coordinates": [-73.9857, 40.7484],
+        },
+      );
+
+      final state = await executeParamsUseCase<AuthUser, SignUpParams>(
+        useCase: useCase,
+        query: params,
+        launchLoader: true,
+      );
+
+      state?.when(
+        data: (user) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text('Verify Your Otp Now')));
+          context.pushRoute(const OtpVerificationRoute());
+        },
+        error: (e) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(e.message ?? 'Signup failed')));
+        },
+      );
     } finally {
+      setSigningIn(false);
       _isResetting = false;
       notifyListeners();
     }
@@ -284,7 +362,183 @@ class ClientViewModelProvider extends BaseViewModel {
 
   void startOtpFlow(OtpPurpose purpose) {
     _otpPurpose = purpose;
-    verifyInit(); 
+    verifyInit();
     notifyListeners();
   }
+
+  String deviceToken = '';
+  String deviceType = 'windows';
+
+  Future<void> signIn({
+    required GlobalKey<FormState> formKey,
+    required BuildContext context,
+  }) async {
+    log('--login-- SignIn Info ----> token=$deviceToken type=$deviceType');
+
+    setSigningIn(true);
+
+    try {
+      deviceToken = await DeviceInfoHelper.getDeviceToken();
+      deviceType = await DeviceInfoHelper.getDeviceType();
+
+      final signInUseCase = locator<SignInUseCase>();
+      log('---- SignIn Info ----> token=$deviceToken type=$deviceType');
+
+      final state = await executeParamsUseCase<AuthUser, SignInParams>(
+        useCase: signInUseCase,
+        query: SignInParams(
+          email: emailCtrl.text.trim(),
+          password: passwordCtrl.text.trim(),
+          deviceToken: deviceToken,
+          deviceType: deviceType,
+        ),
+        launchLoader: true,
+      );
+
+      state?.when(
+        data: (user) async {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text('Sign-in successful')));
+          // context.router.replaceAll([const HomeRoute()]);
+        },
+        error: (e) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(e.message ?? 'Sign-in failed')),
+          );
+        },
+      );
+    } finally {
+      emailCtrl.clear();
+      passwordCtrl.clear();
+      setSigningIn(false); // ✅ unfreeze button
+    }
+  }
+
+  Future<void> signUp({required BuildContext context}) async {
+    setSigningIn(true);
+    try {
+      deviceToken = await DeviceInfoHelper.getDeviceToken();
+      deviceType = await DeviceInfoHelper.getDeviceType();
+      final useCase = locator<SignUpUseCase>();
+
+      final params = SignUpParams(
+        role: 1,
+        email: "test1232@yopmail.com",
+        name: fullNameCtrl.text.trim(),
+        phoneNumber: phoneRaw ?? '',
+        countryCode: phoneDial ?? "91",
+        password: "Test@123",
+        deviceToken: deviceToken,
+        deviceType: deviceType,
+        mailingAddress: "456 Broadway, New York, NY 10001",
+        agreedToTerms: true,
+        isTruthfully: true,
+        location: {
+          "type": "Point",
+          "locationName": "Midtown",
+          "coordinates": [-73.9857, 40.7484],
+        },
+      );
+
+      final state = await executeParamsUseCase<AuthUser, SignUpParams>(
+        useCase: useCase,
+        query: params,
+        launchLoader: true,
+      );
+
+      state?.when(
+        data: (user) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text('Signup successful')));
+        },
+        error: (e) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(e.message ?? 'Signup failed')));
+        },
+      );
+    } finally {
+      setSigningIn(false);
+    }
+  }
+
+  Future<void> forgotPasswordApi({
+    required GlobalKey<FormState> formKey,
+    required BuildContext context,
+  }) async {
+    log('--login-- SignIn Info ----> token=$deviceToken type=$deviceType');
+
+    setSigningIn(true);
+
+    try {
+      deviceToken = await DeviceInfoHelper.getDeviceToken();
+      deviceType = await DeviceInfoHelper.getDeviceType();
+
+      final signInUseCase = locator<SignInUseCase>();
+      log('---- SignIn Info ----> token=$deviceToken type=$deviceType');
+
+      final state = await executeParamsUseCase<AuthUser, SignInParams>(
+        useCase: signInUseCase,
+        query: SignInParams(
+          email: emailCtrl.text.trim(),
+          password: passwordCtrl.text.trim(),
+          deviceToken: deviceToken,
+          deviceType: deviceType,
+        ),
+        launchLoader: true,
+      );
+
+      state?.when(
+        data: (user) async {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text('Sign-in successful')));
+          // context.router.replaceAll([const HomeRoute()]);
+        },
+        error: (e) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(e.message ?? 'Sign-in failed')),
+          );
+        },
+      );
+    } finally {
+      emailCtrl.clear();
+      passwordCtrl.clear();
+      setSigningIn(false); // ✅ unfreeze button
+    }
+  }
+
+  // Future<void> signUp({
+  //   required GlobalKey<FormState> formKey,
+  //   required BuildContext context,
+  // }) async {
+  //   if (!(formKey.currentState?.validate() ?? false)) return;
+
+  //   final signUpUseCase = locator<SignUpUseCase>(); // Lazy load here
+
+  //   final state = await executeParamsUseCase<AuthUser, SignUpParams>(
+  //     useCase: signUpUseCase,
+  //     query: SignUpParams(
+  //       fullName: fullNameCtrl.text.trim(),
+  //       email: emailCtrlSignUp.text.trim(),
+  //       phoneE164: phoneE164 ?? '',
+  //     ),
+  //     launchLoader: true,
+  //   );
+
+  //   state?.when(
+  //     data: (user) async {
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(content: Text('Welcome ${user.fullName}!')),
+  //       );
+  //     },
+  //     error: (e) {
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(content: Text(e.errorResultModel.message ?? 'Sign-up failed')),
+  //       );
+  //     },
+  //   );
+  // }
 }

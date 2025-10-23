@@ -7,6 +7,7 @@ class AppInputField extends StatelessWidget {
   final TextEditingController controller;
   final TextInputType keyboardType;
   final String? Function(String?)? validator;
+  final Function(String?)? onChanged;
   final String? hint;
   final int? maxLength;
 
@@ -18,6 +19,7 @@ class AppInputField extends StatelessWidget {
     this.keyboardType = TextInputType.text,
     this.validator,
     this.inputFormatters = const [],
+    this.onChanged ,
     this.hint,
     this.maxLength,
     super.key,
@@ -37,6 +39,7 @@ class AppInputField extends StatelessWidget {
           controller: controller,
           keyboardType: keyboardType,
           maxLength: maxLength,
+          onChanged: onChanged,
           decoration: InputDecoration(
             counterText: '',
             hintText: hint,
@@ -72,13 +75,14 @@ class AppPasswordField extends StatelessWidget {
   final bool obscure;
   final VoidCallback onToggle;
   final String? Function(String?)? validator;
-
+  final Function(String?)? onChanged;
   const AppPasswordField({
     required this.label,
     required this.controller,
     required this.obscure,
     required this.onToggle,
     this.validator,
+    this.onChanged,
     super.key,
   });
 
@@ -95,6 +99,7 @@ class AppPasswordField extends StatelessWidget {
         TextFormField(
           controller: controller,
           obscureText: obscure,
+          onChanged: onChanged,
 
           decoration: InputDecoration(
             hintText: '******',

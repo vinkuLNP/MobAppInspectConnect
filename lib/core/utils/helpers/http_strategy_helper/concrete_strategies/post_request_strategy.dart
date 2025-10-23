@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:clean_architecture/core/commondomain/entities/based_api_result/api_result_model.dart';
 import 'package:clean_architecture/core/utils/constants/app_constants.dart';
@@ -13,6 +14,7 @@ class PostRequestStrategy implements HttpRequestStrategy {
     Map<String, dynamic> requestData = const <String, dynamic>{},
   }) async {
     final String encodedJson = json.encode(requestData);
+    log('--------->encoded json----->$encodedJson');
     final http.Response response = await http
         .post(
           Uri.parse(uri),
@@ -21,6 +23,8 @@ class PostRequestStrategy implements HttpRequestStrategy {
           encoding: utf8,
         )
         .timeout(timeOutDuration);
+    log('------------resosponse-----${response.body.toString()}');
+
     return response.performHttpRequest();
   }
 }

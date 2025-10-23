@@ -51,101 +51,49 @@ class ForgotpPasswordView extends StatelessWidget {
                     Align(
                       alignment: Alignment.center,
                       child: textWidget(
-                        text:
-                            'Enter your email or phone to receive a reset code',
+                        text: 'Enter your email to receive a reset code',
                         fontSize: 16,
                         colour: Colors.black54,
                       ),
                     ),
-                    SizedBox(height: (rc.screenHeight * 0.05).clamp(24.0, 40.0)),
+                    SizedBox(
+                      height: (rc.screenHeight * 0.05).clamp(24.0, 40.0),
+                    ),
 
                     // Email
                     Consumer<ClientViewModelProvider>(
-                      builder: (_, vm, __) => AppInputField(
+                      builder: (_, provider, __) => AppInputField(
                         label: 'Email ',
-                        controller: vm.resetEmailCtrl,
+                        hint: 'Email',
+                        controller: provider.resetEmailCtrl,
                         keyboardType: TextInputType.emailAddress,
-                        validator: (_) => vm.validateEmailOrIntlPhone(),
+                        validator: (_) => provider.validateEmailOrIntlPhone(),
+                         onChanged: (_) {
+                        if (provider.autoValidate) formKey.currentState?.validate();
+                      },
                       ),
                     ),
-                        SizedBox(height: (rc.screenHeight* 0.08).clamp(40.0, 80.0)),
-
-                    // Phone
-                    // textWidget(
-                    //   text: 'Phone Number (optional)',
-                    //   fontSize: 18,
-                    //   fontWeight: FontWeight.w500,
-                    // ),
-                    // const SizedBox(height: 8),
-                    // Consumer<ClientViewModelProvider>(
-                    //   builder: (_, vm, __) => IntlPhoneField(
-                    //     controller: vm.resetPhoneCtrl,
-                    //     initialCountryCode: 'IN',
-                    //     decoration: InputDecoration(
-                    //       hintText: 'Phone Number',
-                    //       counterText: '',
-                    //       border: OutlineInputBorder(
-                    //         borderRadius: BorderRadius.circular(10),
-                    //       ),
-                    //       enabledBorder: OutlineInputBorder(
-                    //         borderRadius: BorderRadius.circular(10),
-                    //         borderSide: const BorderSide(color: Colors.grey),
-                    //       ),
-                    //       focusedBorder: OutlineInputBorder(
-                    //         borderRadius: BorderRadius.circular(10),
-                    //         borderSide: const BorderSide(
-                    //           color: AppColors.themeColor,
-                    //           width: 2,
-                    //         ),
-                    //       ),
-                    //       contentPadding: const EdgeInsets.symmetric(
-                    //         horizontal: 16,
-                    //         vertical: 14,
-                    //       ),
-                    //     ),
-                    //     inputFormatters: [
-                    //       FilteringTextInputFormatter.digitsOnly,
-                    //       LengthLimitingTextInputFormatter(10),
-                    //     ],
-                    //     flagsButtonPadding: const EdgeInsets.only(left: 8),
-                    //     dropdownIconPosition: IconPosition.trailing,
-                    //     disableLengthCheck: true,
-                    //     autovalidateMode: AutovalidateMode.onUserInteraction,
-                    //     onChanged: (phone) {
-                    //       vm.setPhoneParts(
-                    //         iso: phone.countryISOCode,
-                    //         dial: phone.countryCode,
-                    //         number: phone.number,
-                    //         e164: phone.completeNumber,
-                    //       );
-                    //     },
-                    //     onCountryChanged: (country) {
-                    //       vm.setPhoneParts(
-                    //         iso: country.code,
-                    //         dial: '+${country.dialCode}',
-                    //         number: vm.phoneRaw ?? '',
-                    //         e164: (vm.phoneRaw?.isNotEmpty ?? false)
-                    //             ? '+${country.dialCode}${vm.phoneRaw}'
-                    //             : '',
-                    //       );
-                    //     },
-                    //   ),
-                    // ),
-
-                    // const SizedBox(height: 20),
-
+                    SizedBox(
+                      height: (rc.screenHeight * 0.08).clamp(40.0, 80.0),
+                    ),
                     Consumer<ClientViewModelProvider>(
-                      builder: (_, vm, __) => AppButton(
+                      builder: (_, provider, __) => AppButton(
                         buttonBackgroundColor: AppColors.themeColor,
-                        onTap: () {
-                          vm.isSendingReset
+                        onTap: () async {
+                          final isValid =
+                              formKey.currentState?.validate() ?? false;
+                          if (!isValid) {
+                            provider.enableAutoValidate();
+                            return;
+                          }
+                          provider.isSendingReset
                               ? null
-                              : vm.requestPasswordReset(
+                              : provider.requestPasswordReset(
                                   formKey: formKey,
                                   context: context,
                                 );
                         },
-                        text: vm.isSendingReset
+                        text: provider.isSendingReset
                             ? 'Sending...'
                             : 'Send Verification Code',
                       ),

@@ -12,7 +12,7 @@ enum ProductFlavor {
 
 extension ProductFlavorExtension on ProductFlavor? {
   String setBaseUrl() {
-    print('✅ AppFlavorsHelper configured with baseUrl = $devBaseUrl');
+    print('✅ AppFlavorsHelper configured with baseUrl $ProductFlavor = $devBaseUrl');
 
     switch (this) {
       case ProductFlavor.DEV:

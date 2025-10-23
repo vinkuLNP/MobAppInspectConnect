@@ -4,21 +4,20 @@ import 'package:clean_architecture/core/utils/helpers/app_flavor_helper/app_flav
 import 'package:clean_architecture/core/utils/helpers/app_flavor_helper/environment_config.dart';
 import 'package:flutter/material.dart';
 
-
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Initialize DI first
   await initAppComponentLocator();
-
+  setupLocator();
   // Then configure the flavor
   final AppFlavorsHelper configService = locator<AppFlavorsHelper>();
-  final ProductFlavor? _productFlavor =
-      EnvironmentConfig.BUILD_VARIANT.toProductFlavor();
+  final ProductFlavor? _productFlavor = EnvironmentConfig.BUILD_VARIANT
+      .toProductFlavor();
+  // prodEnvironmentString
   configService.configure(productFlavor: _productFlavor);
   print(' BUILD_VARIANT = ${EnvironmentConfig.BUILD_VARIANT}');
   print(' Base URL = ${configService.baseUrl}');
-
   runApp(const MyApp());
 }
 
@@ -57,8 +56,6 @@ class _MyAppState extends State<MyApp> {
         ),
       ),
     );
-
-
 
     //  return MultiProvider(
     //   providers: [

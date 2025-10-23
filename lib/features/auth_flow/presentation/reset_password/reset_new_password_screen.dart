@@ -11,7 +11,6 @@ import 'package:clean_architecture/features/auth_flow/utils/otp_enum.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-
 @RoutePage()
 class ResetPasswordView extends StatelessWidget {
   const ResetPasswordView({super.key});
@@ -19,36 +18,7 @@ class ResetPasswordView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final formKey = GlobalKey<FormState>();
-//     return const Placeholder();
-//   }
-// }
 
-// import 'package:auto_route/auto_route.dart';
-// import 'package:flutter/material.dart';
-// import 'package:flutter/services.dart';
-// import 'package:provider/provider.dart';
-
-// @RoutePage()
-// class ClientResetPasswordView extends StatefulWidget {
-//   const ClientResetPasswordView({super.key});
-
-//   @override
-//   State<ClientResetPasswordView> createState() => _ClientResetPasswordViewState();
-// }
-
-// class _ClientResetPasswordViewState extends State<ClientResetPasswordView> {
-//   final formKey = GlobalKey<FormState>();
-
-//   @override
-//   void initState() {
-//     super.initState();
-//     // ensure cooldown is running if user deep-linked here
-//     final vm = context.read<ClientViewModelProvider>();
-//     vm.verifyInit();
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
     return BaseResponsiveWidget(
       initializeConfig: false,
       buildWidget: (ctx, rc, app) => Scaffold(
@@ -61,19 +31,22 @@ class ResetPasswordView extends StatelessWidget {
                 builder: (_, vm, __) => Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                       const SizedBox(height: 24),
+                    const SizedBox(height: 24),
                     appCommonLogoBar(height: rc.screenHeight * 0.2),
                     Align(
                       alignment: Alignment.center,
                       child: textWidget(
-                        text:  vm.otpPurpose == OtpPurpose.forgotPassword ?  'Reset Password' : 'Set Your Password',
+                        text: vm.otpPurpose == OtpPurpose.forgotPassword
+                            ? 'Reset Password'
+                            : 'Set Your Password',
                         fontSize: 28,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
-               
 
-                  SizedBox(height: (rc.screenHeight * 0.05).clamp(24.0, 40.0)),
+                    SizedBox(
+                      height: (rc.screenHeight * 0.05).clamp(24.0, 40.0),
+                    ),
 
                     AppPasswordField(
                       label: 'New Password',
@@ -81,6 +54,9 @@ class ResetPasswordView extends StatelessWidget {
                       obscure: vm.obscurePassword,
                       onToggle: vm.toggleObscurePassword,
                       validator: vm.validatePassword,
+                      onChanged: (_) {
+                        if (vm.autoValidate) formKey.currentState?.validate();
+                      },
                     ),
                     const SizedBox(height: 20),
 
@@ -90,47 +66,68 @@ class ResetPasswordView extends StatelessWidget {
                       obscure: vm.obscureConfirm,
                       onToggle: vm.toggleObscureConfirm,
                       validator: vm.validateConfirmPassword,
+                      onChanged: (_) {
+                        if (vm.autoValidate) formKey.currentState?.validate();
+                      },
                     ),
 
-
-
-                     SizedBox(height: (rc.screenHeight* 0.08).clamp(40.0, 80.0)),
+                    SizedBox(
+                      height: (rc.screenHeight * 0.08).clamp(40.0, 80.0),
+                    ),
 
                     SizedBox(
                       height: 54,
                       child: AppButton(
                         buttonBackgroundColor: AppColors.themeColor,
-                        onTap: (){
-                             vm.isResetting
-                            ? null
-                            :  vm.resetPassword(formKey: formKey, context: context);
-                       
-                        }
-                        ,
-                      text: vm.isResetting ? 'Resetting...' :   vm.otpPurpose == OtpPurpose.forgotPassword ?  'Reset Password' : 'Set Your Password',
+                        onTap: () async{
+                          print('tapped');
+                          final isValid =
+                              formKey.currentState?.validate() ?? false;
+                          print('tapped 2');
+                              
+                          if (!isValid) {
+                            vm.enableAutoValidate();
+                          print('tapped 3');
+
+                            return;
+                          }
+                          print('tapped 4');
+
+                          // vm.isResetting
+                          //     ? null
+                          //     :
+                            await   
+                            vm.resetPassword(
+                                  formKey: formKey,
+                                  context: context,
+                                );
+                        },
+                        text: vm.isResetting
+                            ? 'Resetting...'
+                            : vm.otpPurpose == OtpPurpose.forgotPassword
+                            ? 'Reset Password'
+                            : 'Set Your Password',
                       ),
                     ),
 
                     const SizedBox(height: 20),
-                        Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      textWidget(text: "Already have an account?"),
-                      GestureDetector(
-                        onTap: () {
-                          context.pushRoute(const ClientSignInRoute());
-                        },
-                        child: textWidget(
-                          text: 'Sign In',
-                          fontWeight: FontWeight.w500,
-                          fontSize: 18,
-                          colour: AppColors.themeColor,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        textWidget(text: "Already have an account?"),
+                        GestureDetector(
+                          onTap: () {
+                            context.pushRoute(const ClientSignInRoute());
+                          },
+                          child: textWidget(
+                            text: 'Sign In',
+                            fontWeight: FontWeight.w500,
+                            fontSize: 18,
+                            colour: AppColors.themeColor,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-               
-                  
+                      ],
+                    ),
                   ],
                 ),
               ),
@@ -141,3 +138,6 @@ class ResetPasswordView extends StatelessWidget {
     );
   }
 }
+
+
+

@@ -28,14 +28,21 @@ const String contentMultipartTypeValue = 'multipart/form-data';
 const Duration timeOutDuration = Duration(seconds: 20);
 
 ///The app base Url should be provided in this value
-const String devBaseUrl = 'https://api.openweathermap.org/data/2.5';
-const String prodBaseUrl = 'https://api.openweathermap.org/data/2.5/prod';
-const String qaBaseUrl = 'https://api.openweathermap.org/data/2.5/qa';
-const String uatBaseUrl = 'https://api.openweathermap.org/data/2.5/uat';
+///
+///
+// const String devBaseUrl = 'http://localhost:5002/api/v1/';
+const String devBaseUrl = 'http://10.0.2.2:5002/api/v1/';
 
-/// getWeather details uri's and header keys
-const String getWeatherDetails = '/weather';
-const String appIdKey = 'appid';
+const String prodBaseUrl = '';
+const String qaBaseUrl = '';
+const String uatBaseUrl = '';
+
+/// api keys endpoints
+const String signInEndPoint = 'signIn';
+const String signUpEndPoint = 'signUp';
+const String verifyOtpndPoint = 'signUp';
+const String resendOtpEndPoint = 'signUp';
+
 const String appIdValue = '0ae6735afdc6f99d7af23db5d1bd1fbe';
 const String cityNameKey = 'q';
 const String latitudeKey = 'lat';

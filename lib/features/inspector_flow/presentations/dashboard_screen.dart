@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class ClientDashboardView extends StatelessWidget {
-  const ClientDashboardView({super.key});
+class InspectorDashboardView extends StatelessWidget {
+  const InspectorDashboardView({super.key});
 
   @override
   Widget build(BuildContext context) {
