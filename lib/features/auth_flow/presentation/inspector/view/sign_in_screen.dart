@@ -1,12 +1,12 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:clean_architecture/core/basecomponents/base_responsive_widget.dart';
-import 'package:clean_architecture/core/utils/auto_router_setup/auto_router.dart';
-import 'package:clean_architecture/core/utils/constants/app_colors.dart';
-import 'package:clean_architecture/core/utils/presentation/app_common_button.dart';
-import 'package:clean_architecture/core/utils/presentation/app_common_logo_bar.dart';
-import 'package:clean_architecture/core/utils/presentation/app_common_text_widget.dart';
-import 'package:clean_architecture/features/auth_flow/presentation/client/widgets/input_fields.dart';
-import 'package:clean_architecture/features/auth_flow/presentation/inspector/inspector_view_model.dart';
+import 'package:inspect_connect/core/basecomponents/base_responsive_widget.dart';
+import 'package:inspect_connect/core/utils/auto_router_setup/auto_router.dart';
+import 'package:inspect_connect/core/utils/constants/app_colors.dart';
+import 'package:inspect_connect/core/utils/presentation/app_common_button.dart';
+import 'package:inspect_connect/core/utils/presentation/app_common_logo_bar.dart';
+import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
+import 'package:inspect_connect/features/auth_flow/presentation/client/widgets/input_fields.dart';
+import 'package:inspect_connect/features/auth_flow/presentation/inspector/inspector_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

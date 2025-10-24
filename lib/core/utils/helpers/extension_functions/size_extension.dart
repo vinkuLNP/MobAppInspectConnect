@@ -1,6 +1,6 @@
 
-import 'package:clean_architecture/core/di/app_component/app_component.dart';
-import 'package:clean_architecture/core/utils/helpers/responsive_ui_helper/responsive_config.dart';
+import 'package:inspect_connect/core/di/app_component/app_component.dart';
+import 'package:inspect_connect/core/utils/helpers/responsive_ui_helper/responsive_config.dart';
 
 extension ExtensionsOnNum on num {
   static final ResponsiveUiConfig _responsiveUiConfig = locator<ResponsiveUiConfig>();

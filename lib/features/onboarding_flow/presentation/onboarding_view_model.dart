@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:clean_architecture/core/basecomponents/base_view_model.dart';
+import 'package:inspect_connect/core/basecomponents/base_view_model.dart';
 import 'package:flutter/material.dart';
 
 class OnBoardingProvider extends BaseViewModel {

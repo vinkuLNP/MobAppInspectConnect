@@ -1,8 +1,8 @@
 import 'dart:async';
-import 'package:clean_architecture/core/commondomain/entities/based_api_result/api_result_model.dart';
-import 'package:clean_architecture/core/commondomain/entities/based_api_result/api_result_state.dart';
-import 'package:clean_architecture/core/commondomain/entities/based_api_result/error_result_model.dart';
-import 'package:clean_architecture/core/commondomain/usecases/base_params_usecase.dart';
+import 'package:inspect_connect/core/commondomain/entities/based_api_result/api_result_model.dart';
+import 'package:inspect_connect/core/commondomain/entities/based_api_result/api_result_state.dart';
+import 'package:inspect_connect/core/commondomain/entities/based_api_result/error_result_model.dart';
+import 'package:inspect_connect/core/commondomain/usecases/base_params_usecase.dart';
 import 'package:flutter/cupertino.dart';
 
 class BaseViewModel extends ChangeNotifier {
@@ -17,8 +17,8 @@ class BaseViewModel extends ChangeNotifier {
     bool launchLoader = true,
   }) async {
     showLoadingIndicator(launchLoader);
-    final ApiResultModel<Type> _apiResult = await useCase(query);
-    return _apiResult.when(
+    final ApiResultModel<Type> apiResult = await useCase(query);
+    return apiResult.when(
       success: (Type data) {
         showLoadingIndicator(false);
         return ApiResultState<Type>.data(data: data);

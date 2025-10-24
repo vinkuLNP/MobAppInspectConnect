@@ -1,20 +1,20 @@
-import 'package:clean_architecture/core/basecomponents/base_responsive_widget.dart';
-import 'package:clean_architecture/core/basecomponents/base_view_model.dart';
-import 'package:clean_architecture/core/utils/constants/app_constants.dart';
-import 'package:clean_architecture/core/utils/helpers/app_configurations_helper/app_configurations_helper.dart';
-import 'package:clean_architecture/core/utils/helpers/connectivity_helper/connectivity_helper/connectivity_checker_helper.dart';
-import 'package:clean_architecture/core/utils/helpers/extension_functions/size_extension.dart';
-import 'package:clean_architecture/core/utils/helpers/responsive_ui_helper/responsive_config.dart';
+import 'package:inspect_connect/core/basecomponents/base_responsive_widget.dart';
+import 'package:inspect_connect/core/basecomponents/base_view_model.dart';
+import 'package:inspect_connect/core/utils/constants/app_constants.dart';
+import 'package:inspect_connect/core/utils/helpers/app_configurations_helper/app_configurations_helper.dart';
+import 'package:inspect_connect/core/utils/helpers/connectivity_helper/connectivity_helper/connectivity_checker_helper.dart';
+import 'package:inspect_connect/core/utils/helpers/extension_functions/size_extension.dart';
+import 'package:inspect_connect/core/utils/helpers/responsive_ui_helper/responsive_config.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class BaseViewModelView<T> extends StatefulWidget {
   const BaseViewModelView({
-    Key? key,
+    super.key,
     this.onInitState,
     required this.buildWidget,
-  }) : super(key: key);
+  });
   final void Function(T provider)? onInitState;
   final Widget Function(T provider) buildWidget;
 
@@ -28,11 +28,11 @@ class _BaseViewModelViewState<T> extends State<BaseViewModelView<T>> {
   @override
   void initState() {
     super.initState();
-    final T _provider = Provider.of<T>(context, listen: false);
+    final T provider = Provider.of<T>(context, listen: false);
     checkInternetAvailability();
-    toggleLoadingWidget(_provider);
+    toggleLoadingWidget(provider);
     if (widget.onInitState != null) {
-      widget.onInitState!(_provider);
+      widget.onInitState!(provider);
     }
   }
 

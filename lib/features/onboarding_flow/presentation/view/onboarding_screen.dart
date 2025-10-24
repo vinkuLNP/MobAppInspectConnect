@@ -1,12 +1,12 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:clean_architecture/core/basecomponents/base_responsive_widget.dart';
-import 'package:clean_architecture/core/utils/auto_router_setup/auto_router.dart';
-import 'package:clean_architecture/core/utils/constants/app_assets_constants.dart';
-import 'package:clean_architecture/core/utils/presentation/app_common_button.dart';
-import 'package:clean_architecture/core/utils/presentation/app_common_logo_bar.dart';
-import 'package:clean_architecture/core/utils/presentation/app_common_text_widget.dart';
-import 'package:clean_architecture/features/onboarding_flow/presentation/onboarding_view_model.dart';
-import 'package:clean_architecture/features/onboarding_flow/presentation/widgets/onboarding_widget.dart';
+import 'package:inspect_connect/core/basecomponents/base_responsive_widget.dart';
+import 'package:inspect_connect/core/utils/auto_router_setup/auto_router.dart';
+import 'package:inspect_connect/core/utils/constants/app_assets_constants.dart';
+import 'package:inspect_connect/core/utils/presentation/app_common_button.dart';
+import 'package:inspect_connect/core/utils/presentation/app_common_logo_bar.dart';
+import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
+import 'package:inspect_connect/features/onboarding_flow/presentation/onboarding_view_model.dart';
+import 'package:inspect_connect/features/onboarding_flow/presentation/widgets/onboarding_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -36,7 +36,7 @@ class OnBoardingPage extends StatelessWidget {
               builder: (ctx) {
                 final tabController = DefaultTabController.of(ctx);
                 WidgetsBinding.instance.addPostFrameCallback((_) {
-                  if (tabController != null &&
+                  if (
                       tabController.index != provider.currentPage) {
                     tabController.index = provider.currentPage;
                   }

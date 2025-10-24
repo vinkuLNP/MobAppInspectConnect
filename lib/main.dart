@@ -1,7 +1,7 @@
-import 'package:clean_architecture/core/di/app_component/app_component.dart';
-import 'package:clean_architecture/core/utils/auto_router_setup/auto_router.dart';
-import 'package:clean_architecture/core/utils/helpers/app_flavor_helper/app_flavors_helper.dart';
-import 'package:clean_architecture/core/utils/helpers/app_flavor_helper/environment_config.dart';
+import 'package:inspect_connect/core/di/app_component/app_component.dart';
+import 'package:inspect_connect/core/utils/auto_router_setup/auto_router.dart';
+import 'package:inspect_connect/core/utils/helpers/app_flavor_helper/app_flavors_helper.dart';
+import 'package:inspect_connect/core/utils/helpers/app_flavor_helper/environment_config.dart';
 import 'package:flutter/material.dart';
 
 Future<void> main() async {
@@ -27,6 +27,8 @@ class MyApp extends StatefulWidget {
   @override
   State<MyApp> createState() => _MyAppState();
 }
+
+
 
 class _MyAppState extends State<MyApp> {
   final AppRouter _appRouter = AppRouter();
@@ -70,3 +72,7 @@ class _MyAppState extends State<MyApp> {
     // );
   }
 }
+
+
+
+

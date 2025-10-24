@@ -1,14 +1,12 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:clean_architecture/core/basecomponents/base_responsive_widget.dart';
-import 'package:clean_architecture/core/utils/constants/app_colors.dart';
-import 'package:clean_architecture/core/utils/presentation/app_common_button.dart';
-import 'package:clean_architecture/core/utils/presentation/app_common_logo_bar.dart';
-import 'package:clean_architecture/core/utils/presentation/app_common_text_widget.dart';
-import 'package:clean_architecture/features/auth_flow/presentation/client/client_view_model.dart';
-import 'package:clean_architecture/features/auth_flow/presentation/client/widgets/input_fields.dart';
+import 'package:inspect_connect/core/basecomponents/base_responsive_widget.dart';
+import 'package:inspect_connect/core/utils/constants/app_colors.dart';
+import 'package:inspect_connect/core/utils/presentation/app_common_button.dart';
+import 'package:inspect_connect/core/utils/presentation/app_common_logo_bar.dart';
+import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
+import 'package:inspect_connect/features/auth_flow/presentation/client/client_view_model.dart';
+import 'package:inspect_connect/features/auth_flow/presentation/client/widgets/input_fields.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:provider/provider.dart';
 
 @RoutePage()
@@ -21,7 +19,6 @@ class ForgotpPasswordView extends StatelessWidget {
     return BaseResponsiveWidget(
       initializeConfig: false,
       buildWidget: (ctx, rc, app) {
-        final provider = ctx.watch<ClientViewModelProvider>();
 
         return Scaffold(
           body: SingleChildScrollView(
@@ -62,7 +59,7 @@ class ForgotpPasswordView extends StatelessWidget {
 
                     // Email
                     Consumer<ClientViewModelProvider>(
-                      builder: (_, provider, __) => AppInputField(
+                      builder: (_, provider, _) => AppInputField(
                         label: 'Email ',
                         hint: 'Email',
                         controller: provider.resetEmailCtrl,
@@ -77,7 +74,7 @@ class ForgotpPasswordView extends StatelessWidget {
                       height: (rc.screenHeight * 0.08).clamp(40.0, 80.0),
                     ),
                     Consumer<ClientViewModelProvider>(
-                      builder: (_, provider, __) => AppButton(
+                      builder: (_, provider, _) => AppButton(
                         buttonBackgroundColor: AppColors.themeColor,
                         onTap: () async {
                           final isValid =

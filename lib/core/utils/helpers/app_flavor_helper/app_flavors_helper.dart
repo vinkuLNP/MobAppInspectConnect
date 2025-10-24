@@ -1,4 +1,4 @@
-import 'package:clean_architecture/core/utils/constants/app_constants.dart';
+import 'package:inspect_connect/core/utils/constants/app_constants.dart';
 import 'package:injectable/injectable.dart';
 
 /// this enum will present the list of supported environments

@@ -1,5 +1,6 @@
-import 'package:clean_architecture/features/auth_flow/domain/entities/user_device_entity.dart';
-import 'package:clean_architecture/features/auth_flow/domain/entities/user_location_entity.dart';
+import 'package:inspect_connect/features/auth_flow/data/datasources/local_datasources/auth_user_local_entity.dart';
+import 'package:inspect_connect/features/auth_flow/domain/entities/user_device_entity.dart';
+import 'package:inspect_connect/features/auth_flow/domain/entities/user_location_entity.dart';
 
 class AuthUser {
   final String id;
@@ -37,4 +38,32 @@ class AuthUser {
     this.location,
     this.devices = const [],
   });
+
+
+  
+}
+
+
+
+extension AuthUserMapping on AuthUser {
+  AuthUserLocalEntity toLocalEntity() {
+    return AuthUserLocalEntity(
+      token: token,
+      name: fullName,
+      email: emailHashed,
+      phoneNumber: phoneNumber,
+      countryCode: countryCode,
+      role: role,
+      phoneOtpVerified: phoneOtpVerified,
+      emailOtpVerified: emailOtpVerified,
+      agreedToTerms: agreedToTerms,
+      isTruthfully: isTruthfully,
+      walletId: walletId,
+      stripeAccountId: stripeAccountId,
+      stripeCustomerId: stripeCustomerId,
+      locationName: location?.name,
+      latitude: location?.lat,
+      longitude: location?.lng,
+    );
+  }
 }

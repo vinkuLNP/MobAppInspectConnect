@@ -1,5 +1,5 @@
-import 'package:clean_architecture/core/utils/presentation/app_text_style.dart';
-import 'package:clean_architecture/core/utils/constants/app_colors.dart';
+import 'package:inspect_connect/core/utils/presentation/app_text_style.dart';
+import 'package:inspect_connect/core/utils/constants/app_colors.dart';
 import 'package:flutter/material.dart';
 
 Widget textWidget({

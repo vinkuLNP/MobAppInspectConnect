@@ -1,4 +1,4 @@
-import 'package:clean_architecture/core/commondomain/entities/based_api_result/error_result_model.dart';
+import 'package:inspect_connect/core/commondomain/entities/based_api_result/error_result_model.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'api_result_model.freezed.dart';

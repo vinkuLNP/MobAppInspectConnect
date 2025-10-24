@@ -1,4 +1,4 @@
-import 'package:clean_architecture/core/utils/constants/app_colors.dart';
+import 'package:inspect_connect/core/utils/constants/app_colors.dart';
 import 'package:flutter/material.dart';
 
 TextStyle appTextStyle({

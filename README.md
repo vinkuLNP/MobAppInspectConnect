@@ -1,4 +1,4 @@
-# clean_architecture
+# inspect_connect
 
 A new Flutter project.
 

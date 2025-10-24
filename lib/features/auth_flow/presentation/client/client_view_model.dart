@@ -2,15 +2,18 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:auto_route/auto_route.dart';
-import 'package:clean_architecture/core/basecomponents/base_view_model.dart';
-import 'package:clean_architecture/core/commondomain/entities/based_api_result/api_result_state.dart';
-import 'package:clean_architecture/core/di/app_component/app_component.dart';
-import 'package:clean_architecture/core/utils/auto_router_setup/auto_router.dart';
-import 'package:clean_architecture/core/utils/helpers/device_helper/device_helper.dart';
-import 'package:clean_architecture/features/auth_flow/domain/entities/auth_user.dart';
-import 'package:clean_architecture/features/auth_flow/domain/usecases/sign_in_usecase.dart';
-import 'package:clean_architecture/features/auth_flow/domain/usecases/sign_up_usecases.dart';
-import 'package:clean_architecture/features/auth_flow/utils/otp_enum.dart';
+import 'package:inspect_connect/core/basecomponents/base_view_model.dart';
+import 'package:inspect_connect/core/commondomain/entities/based_api_result/api_result_state.dart';
+import 'package:inspect_connect/core/di/app_component/app_component.dart';
+import 'package:inspect_connect/core/utils/auto_router_setup/auto_router.dart';
+import 'package:inspect_connect/core/utils/helpers/device_helper/device_helper.dart';
+import 'package:inspect_connect/features/auth_flow/data/datasources/local_datasources/auth_local_datasource.dart';
+import 'package:inspect_connect/features/auth_flow/domain/entities/auth_user.dart';
+import 'package:inspect_connect/features/auth_flow/domain/usecases/otp_verification_usecases.dart';
+import 'package:inspect_connect/features/auth_flow/domain/usecases/resend_otp_usecases.dart';
+import 'package:inspect_connect/features/auth_flow/domain/usecases/sign_in_usecase.dart';
+import 'package:inspect_connect/features/auth_flow/domain/usecases/sign_up_usecases.dart';
+import 'package:inspect_connect/features/auth_flow/utils/otp_enum.dart';
 import 'package:flutter/material.dart';
 
 class ClientViewModelProvider extends BaseViewModel {
@@ -124,7 +127,6 @@ class ClientViewModelProvider extends BaseViewModel {
     // fullNameCtrl.clear();
     // phoneCtrl.clear();
     // emailCtrlSignUp.clear();
-    print(emailCtrlSignUp);
     context.pushRoute(const ResetPasswordRoute());
   }
 
@@ -174,27 +176,90 @@ class ClientViewModelProvider extends BaseViewModel {
     });
   }
 
+
   Future<void> verify({required BuildContext context}) async {
     if (!canVerify) return;
-    final code = pinController.text.trim();
-    // switch (_otpPurpose) {
-    //   case OtpPurpose.signUp:
-    //     context.router.replaceAll([const ClientSignInRoute()]);
-    //     break;
-    //   case OtpPurpose.forgotPassword:
-    pinController.clear();
-    context.router.replaceAll([const ResetPasswordRoute()]);
-    //     break;
-    //   default:
-    //     context.router.replaceAll([const ClientSignInRoute()]);
-    //     break;
-    // }
+    try {
+        final user =await  locator<AuthLocalDataSource>().getUser();
+         if (user == null || user.token == null) {
+      throw Exception('User not found in local storage');
+    }
+    //  dto = dto.copyWith(
+    //   phoneNumber: user.phoneNumber ?? dto.phoneNumber,
+    //   countryCode: user.countryCode ?? dto.countryCode,
+    // );
+      final verifyOtpUseCase = locator<OtpVerificarionUseCase>();
+      final state = await executeParamsUseCase<AuthUser, OtpVerificationParams>(
+        useCase: verifyOtpUseCase,
+        
+        query: OtpVerificationParams(
+          phoneNumber:user.phoneNumber ?? emailCtrl.text.trim(),
+          countryCode: user.countryCode ?? passwordCtrl.text.trim(),
+          phoneOtp: pinController.text.trim(),
+        ),
+        launchLoader: true,
+      );
+
+      state?.when(
+        data: (user) async {
+           await locator<AuthLocalDataSource>().saveUser(user.toLocalEntity());
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text('Sign-in successful')));
+          pinController.clear();
+          context.router.replaceAll([const ClientDashboardRoute()]);
+        },
+        error: (e) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(e.message ?? 'Sign-in failed')),
+          );
+        },
+      );
+    } finally {
+      emailCtrl.clear();
+      passwordCtrl.clear();
+      // setSigningIn(false);
+    }
   }
 
-  Future<void> resend() async {
+  Future<void> resend({required BuildContext context}) async {
     if (!canResend) return;
-    pinController.clear();
-    _startCooldown();
+
+    try {
+        final user =await  locator<AuthLocalDataSource>().getUser();
+         if (user == null || user.token == null) {
+      throw Exception('User not found in local storage');
+    }
+      final resendOtpUseCase = locator<ResendOtpUseCase>();
+      final state = await executeParamsUseCase<AuthUser, ResendOtpParams>(
+        useCase: resendOtpUseCase,
+        query: ResendOtpParams(
+            phoneNumber:user.phoneNumber ?? emailCtrl.text.trim(),
+          countryCode: user.countryCode ?? passwordCtrl.text.trim(),
+        ),
+        launchLoader: true,
+      );
+
+      state?.when(
+        data: (user) async {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Resend Otp successful')),
+          );
+
+          pinController.clear();
+          _startCooldown();
+        },
+        error: (e) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(e.message ?? 'Sign-in failed')),
+          );
+        },
+      );
+    } finally {
+      emailCtrl.clear();
+      passwordCtrl.clear();
+      // setSigningIn(false);
+    }
   }
 
   void _startCooldown() {
@@ -338,7 +403,8 @@ class ClientViewModelProvider extends BaseViewModel {
       );
 
       state?.when(
-        data: (user) {
+        data: (user)async {
+           await locator<AuthLocalDataSource>().saveUser(user.toLocalEntity());
           ScaffoldMessenger.of(
             context,
           ).showSnackBar(const SnackBar(content: Text('Verify Your Otp Now')));
@@ -397,10 +463,11 @@ class ClientViewModelProvider extends BaseViewModel {
 
       state?.when(
         data: (user) async {
+           await locator<AuthLocalDataSource>().saveUser(user.toLocalEntity());
           ScaffoldMessenger.of(
             context,
           ).showSnackBar(const SnackBar(content: Text('Sign-in successful')));
-          // context.router.replaceAll([const HomeRoute()]);
+          context.router.replaceAll([const ClientDashboardRoute()]);
         },
         error: (e) {
           ScaffoldMessenger.of(context).showSnackBar(

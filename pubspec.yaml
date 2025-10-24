@@ -1,4 +1,4 @@
-name: clean_architecture
+name: inspect_connect
 description: "A new Flutter project."
 publish_to: 'none' 
 version: 1.0.0+1
@@ -48,12 +48,17 @@ dev_dependencies:
     sdk: flutter
 
   flutter_lints: ^6.0.0
+  
+
+
 
 flutter:
   uses-material-design: true
   assets:
     - assets/
     - assets/images/
+    - assets/images/app_logo.png
+
 fonts:
     - family: PoppinsBold
       fonts:

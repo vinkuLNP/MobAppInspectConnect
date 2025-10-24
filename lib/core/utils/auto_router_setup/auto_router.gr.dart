@@ -27,6 +27,22 @@ class ClientAuthAutoWrapperRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [ClientDashboardView]
+class ClientDashboardRoute extends PageRouteInfo<void> {
+  const ClientDashboardRoute({List<PageRouteInfo>? children})
+    : super(ClientDashboardRoute.name, initialChildren: children);
+
+  static const String name = 'ClientDashboardRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const ClientDashboardView();
+    },
+  );
+}
+
+/// generated route for
 /// [ClientSignInView]
 class ClientSignInRoute extends PageRouteInfo<void> {
   const ClientSignInRoute({List<PageRouteInfo>? children})
@@ -166,6 +182,22 @@ class ResetPasswordRoute extends PageRouteInfo<void> {
     name,
     builder: (data) {
       return const ResetPasswordView();
+    },
+  );
+}
+
+/// generated route for
+/// [SplashView]
+class SplashRoute extends PageRouteInfo<void> {
+  const SplashRoute({List<PageRouteInfo>? children})
+    : super(SplashRoute.name, initialChildren: children);
+
+  static const String name = 'SplashRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const SplashView();
     },
   );
 }

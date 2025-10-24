@@ -1,8 +1,8 @@
-import 'package:clean_architecture/features/auth_flow/data/models/device_dto.dart';
-import 'package:clean_architecture/features/auth_flow/data/models/location_dto.dart';
-import 'package:clean_architecture/features/auth_flow/domain/entities/auth_user.dart';
-import 'package:clean_architecture/features/auth_flow/domain/entities/user_device_entity.dart';
-import 'package:clean_architecture/features/auth_flow/domain/entities/user_location_entity.dart';
+import 'package:inspect_connect/features/auth_flow/data/models/device_dto.dart';
+import 'package:inspect_connect/features/auth_flow/data/models/location_dto.dart';
+import 'package:inspect_connect/features/auth_flow/domain/entities/auth_user.dart';
+import 'package:inspect_connect/features/auth_flow/domain/entities/user_device_entity.dart';
+import 'package:inspect_connect/features/auth_flow/domain/entities/user_location_entity.dart';
 
 class AuthUserDto {
   final String id;

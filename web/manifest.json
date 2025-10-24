@@ -1,6 +1,6 @@
 {
-    "name": "clean_architecture",
-    "short_name": "clean_architecture",
+    "name": "inspect_connect",
+    "short_name": "inspect_connect",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

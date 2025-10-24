@@ -1,16 +1,15 @@
 import 'dart:async';
 
 import 'package:auto_route/auto_route.dart';
-import 'package:clean_architecture/core/basecomponents/base_view_model.dart';
-import 'package:clean_architecture/core/utils/auto_router_setup/auto_router.dart';
-import 'package:clean_architecture/features/auth_flow/domain/entities/additional_details_entity.dart';
-import 'package:clean_architecture/features/auth_flow/domain/entities/personal_detail_entity.dart';
-import 'package:clean_architecture/features/auth_flow/domain/entities/professtional_detail_entity.dart';
-import 'package:clean_architecture/features/auth_flow/domain/entities/service_area_entity.dart';
-import 'package:clean_architecture/features/auth_flow/utils/otp_enum.dart';
+import 'package:inspect_connect/core/basecomponents/base_view_model.dart';
+import 'package:inspect_connect/core/utils/auto_router_setup/auto_router.dart';
+import 'package:inspect_connect/features/auth_flow/domain/entities/additional_details_entity.dart';
+import 'package:inspect_connect/features/auth_flow/domain/entities/personal_detail_entity.dart';
+import 'package:inspect_connect/features/auth_flow/domain/entities/professtional_detail_entity.dart';
+import 'package:inspect_connect/features/auth_flow/domain/entities/service_area_entity.dart';
+import 'package:inspect_connect/features/auth_flow/utils/otp_enum.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class InspectorViewModelProvider extends BaseViewModel {
   void init() {}
@@ -159,7 +158,6 @@ class InspectorViewModelProvider extends BaseViewModel {
 
   Future<void> verify({required BuildContext context}) async {
     if (!canVerify) return;
-    final code = pinController.text.trim();
     switch (_otpPurpose) {
       case OtpPurpose.signUp:
         context.router.replaceAll([const InspectorSignInRoute()]);
@@ -275,8 +273,6 @@ class InspectorViewModelProvider extends BaseViewModel {
     notifyListeners();
 
     try {
-      final code = pinController.text.trim();
-      final newPwd = passwordCtrlSignUp.text.trim();
 
       context.router.replaceAll([const ClientSignInRoute()]);
     } finally {

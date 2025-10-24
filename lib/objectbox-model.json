@@ -1,0 +1,209 @@
+{
+  "_note1": "KEEP THIS FILE! Check it into a version control system (VCS) like git.",
+  "_note2": "ObjectBox manages crucial IDs for your object model. See docs for details.",
+  "_note3": "If you have VCS merge conflicts, you must resolve them according to ObjectBox docs.",
+  "entities": [
+    {
+      "id": "1:5131635798235456301",
+      "lastPropertyId": "30:3271705913206409547",
+      "name": "AuthUserLocalEntity",
+      "properties": [
+        {
+          "id": "1:4611869412995201516",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:8272780988710511950",
+          "name": "token",
+          "type": 9
+        },
+        {
+          "id": "3:1482861332686892814",
+          "name": "name",
+          "type": 9
+        },
+        {
+          "id": "4:997857176921112707",
+          "name": "email",
+          "type": 9
+        },
+        {
+          "id": "5:3976464959677611987",
+          "name": "phoneNumber",
+          "type": 9
+        },
+        {
+          "id": "6:8134907860381373967",
+          "name": "countryCode",
+          "type": 9
+        },
+        {
+          "id": "7:607818520923023036",
+          "name": "mailingAddress",
+          "type": 9
+        },
+        {
+          "id": "8:5012892644845956447",
+          "name": "role",
+          "type": 6
+        },
+        {
+          "id": "9:2706555786363321275",
+          "name": "status",
+          "type": 6
+        },
+        {
+          "id": "10:5188505656236194826",
+          "name": "phoneOtpVerified",
+          "type": 1
+        },
+        {
+          "id": "11:3279684472998237889",
+          "name": "emailOtpVerified",
+          "type": 1
+        },
+        {
+          "id": "12:3139177082061344221",
+          "name": "agreedToTerms",
+          "type": 1
+        },
+        {
+          "id": "13:3448151157588637092",
+          "name": "isTruthfully",
+          "type": 1
+        },
+        {
+          "id": "14:132889661029488037",
+          "name": "approvalStatusByAdmin",
+          "type": 6
+        },
+        {
+          "id": "15:593940584799512486",
+          "name": "rejectedReason",
+          "type": 9
+        },
+        {
+          "id": "16:2148407587997559327",
+          "name": "stripeCustomerId",
+          "type": 9
+        },
+        {
+          "id": "17:1493272936218018139",
+          "name": "stripeAccountId",
+          "type": 9
+        },
+        {
+          "id": "18:4361464192518718559",
+          "name": "stripePayoutsEnabled",
+          "type": 1
+        },
+        {
+          "id": "19:3222730919390221459",
+          "name": "stripeTransfersActive",
+          "type": 1
+        },
+        {
+          "id": "20:3540610438679751168",
+          "name": "currentSubscriptionTrialDays",
+          "type": 6
+        },
+        {
+          "id": "21:2332234854265821318",
+          "name": "currentSubscriptionAutoRenew",
+          "type": 6
+        },
+        {
+          "id": "22:39882207688389351",
+          "name": "currentSubscriptionId",
+          "type": 9
+        },
+        {
+          "id": "23:4686123977379770666",
+          "name": "stripeSubscriptionStatus",
+          "type": 9
+        },
+        {
+          "id": "24:6140693525709463196",
+          "name": "walletId",
+          "type": 9
+        },
+        {
+          "id": "25:5796780863751892772",
+          "name": "locationName",
+          "type": 9
+        },
+        {
+          "id": "26:1498496296919574464",
+          "name": "latitude",
+          "type": 8
+        },
+        {
+          "id": "27:5584120390685559358",
+          "name": "longitude",
+          "type": 8
+        },
+        {
+          "id": "28:8462199880617792571",
+          "name": "createdAt",
+          "type": 10
+        },
+        {
+          "id": "29:6233394496800560090",
+          "name": "updatedAt",
+          "type": 10
+        },
+        {
+          "id": "30:3271705913206409547",
+          "name": "loginTime",
+          "type": 10
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "2:8224409923190584740",
+      "lastPropertyId": "4:2446156020687410148",
+      "name": "AuthUserDeviceEntity",
+      "properties": [
+        {
+          "id": "1:1201763598529109640",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:4991843973117758024",
+          "name": "deviceToken",
+          "type": 9
+        },
+        {
+          "id": "3:2587492729026246349",
+          "name": "deviceType",
+          "type": 9
+        },
+        {
+          "id": "4:2446156020687410148",
+          "name": "userId",
+          "indexId": "1:7489877441751012150",
+          "type": 11,
+          "flags": 520,
+          "relationTarget": "AuthUserLocalEntity"
+        }
+      ],
+      "relations": []
+    }
+  ],
+  "lastEntityId": "2:8224409923190584740",
+  "lastIndexId": "1:7489877441751012150",
+  "lastRelationId": "0:0",
+  "lastSequenceId": "0:0",
+  "modelVersion": 5,
+  "modelVersionParserMinimum": 5,
+  "retiredEntityUids": [],
+  "retiredIndexUids": [],
+  "retiredPropertyUids": [],
+  "retiredRelationUids": [],
+  "version": 1
+}

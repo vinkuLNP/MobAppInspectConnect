@@ -1,4 +1,4 @@
-import 'package:clean_architecture/core/utils/values/colors.dart';
+import 'package:inspect_connect/core/utils/values/colors.dart';
 import 'package:flutter/material.dart';
 
 TextStyle poppinsBold = TextStyle(

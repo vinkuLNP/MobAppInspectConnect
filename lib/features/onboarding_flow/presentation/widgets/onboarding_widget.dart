@@ -1,5 +1,5 @@
-import 'package:clean_architecture/core/utils/constants/app_colors.dart';
-import 'package:clean_architecture/core/utils/presentation/app_common_text_widget.dart';
+import 'package:inspect_connect/core/utils/constants/app_colors.dart';
+import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:flutter/material.dart';
 
 class OnBoardingWidget extends StatelessWidget {

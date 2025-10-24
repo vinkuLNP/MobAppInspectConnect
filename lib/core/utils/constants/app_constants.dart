@@ -40,8 +40,8 @@ const String uatBaseUrl = '';
 /// api keys endpoints
 const String signInEndPoint = 'signIn';
 const String signUpEndPoint = 'signUp';
-const String verifyOtpndPoint = 'signUp';
-const String resendOtpEndPoint = 'signUp';
+const String verifyOtpndPoint = 'verifyOtp';
+const String resendOtpEndPoint = 'resendOtp';
 
 const String appIdValue = '0ae6735afdc6f99d7af23db5d1bd1fbe';
 const String cityNameKey = 'q';

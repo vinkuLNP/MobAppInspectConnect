@@ -1,13 +1,13 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:clean_architecture/core/basecomponents/base_responsive_widget.dart';
-import 'package:clean_architecture/core/utils/auto_router_setup/auto_router.dart';
-import 'package:clean_architecture/core/utils/constants/app_colors.dart';
-import 'package:clean_architecture/core/utils/presentation/app_common_button.dart';
-import 'package:clean_architecture/core/utils/presentation/app_common_logo_bar.dart';
-import 'package:clean_architecture/core/utils/presentation/app_common_text_widget.dart';
-import 'package:clean_architecture/features/auth_flow/presentation/client/client_view_model.dart';
-import 'package:clean_architecture/features/auth_flow/presentation/client/widgets/otp_input_fields.dart';
-import 'package:clean_architecture/features/auth_flow/utils/otp_enum.dart';
+import 'package:inspect_connect/core/basecomponents/base_responsive_widget.dart';
+import 'package:inspect_connect/core/utils/auto_router_setup/auto_router.dart';
+import 'package:inspect_connect/core/utils/constants/app_colors.dart';
+import 'package:inspect_connect/core/utils/presentation/app_common_button.dart';
+import 'package:inspect_connect/core/utils/presentation/app_common_logo_bar.dart';
+import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
+import 'package:inspect_connect/features/auth_flow/presentation/client/client_view_model.dart';
+import 'package:inspect_connect/features/auth_flow/presentation/client/widgets/otp_input_fields.dart';
+import 'package:inspect_connect/features/auth_flow/utils/otp_enum.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -16,8 +16,7 @@ class OtpVerificationView extends StatefulWidget {
   const OtpVerificationView({super.key});
 
   @override
-  State<OtpVerificationView> createState() =>
-      _OtpVerificationViewState();
+  State<OtpVerificationView> createState() => _OtpVerificationViewState();
 }
 
 class _OtpVerificationViewState extends State<OtpVerificationView> {
@@ -55,7 +54,6 @@ class _OtpVerificationViewState extends State<OtpVerificationView> {
 
                   final double titleGap = (h * 0.015).clamp(8.0, 16.0);
                   final double pinputGap = (h * 0.05).clamp(24.0, 40.0);
-                  final double buttonTop = (h * 0.08).clamp(40.0, 80.0);
 
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -157,7 +155,9 @@ class _OtpVerificationViewState extends State<OtpVerificationView> {
                       const SizedBox(height: 6),
                       Center(
                         child: GestureDetector(
-                          onTap: vm.canResend ? vm.resend : null,
+                          onTap: vm.canResend
+                              ? () => vm.resend(context: context)
+                              : null,
                           child: Text(
                             vm.canResend
                                 ? "Resend code"
@@ -173,7 +173,9 @@ class _OtpVerificationViewState extends State<OtpVerificationView> {
                         ),
                       ),
 
-                      SizedBox(height: (rc.screenHeight* 0.08).clamp(40.0, 80.0)),
+                      SizedBox(
+                        height: (rc.screenHeight * 0.08).clamp(40.0, 80.0),
+                      ),
 
                       AppButton(
                         buttonBackgroundColor: vm.canVerify

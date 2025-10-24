@@ -1,8 +1,8 @@
 
-import 'package:clean_architecture/core/commondomain/entities/based_api_result/api_result_model.dart';
-import 'package:clean_architecture/core/commondomain/usecases/base_params_usecase.dart';
-import 'package:clean_architecture/features/auth_flow/domain/entities/auth_user.dart';
-import 'package:clean_architecture/features/auth_flow/domain/repositories/auth_repository.dart';
+import 'package:inspect_connect/core/commondomain/entities/based_api_result/api_result_model.dart';
+import 'package:inspect_connect/core/commondomain/usecases/base_params_usecase.dart';
+import 'package:inspect_connect/features/auth_flow/domain/entities/auth_user.dart';
+import 'package:inspect_connect/features/auth_flow/domain/repositories/auth_repository.dart';
 import 'package:equatable/equatable.dart';
 
 class OtpVerificationParams extends Equatable {

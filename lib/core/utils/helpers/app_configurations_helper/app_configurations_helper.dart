@@ -1,7 +1,7 @@
-import 'package:clean_architecture/core/di/app_component/app_component.dart';
-import 'package:clean_architecture/core/utils/helpers/app_flavor_helper/app_flavors_helper.dart';
-import 'package:clean_architecture/core/utils/helpers/app_theme_helper/custom_theme_data.dart';
-import 'package:clean_architecture/core/utils/values/colors.dart';
+import 'package:inspect_connect/core/di/app_component/app_component.dart';
+import 'package:inspect_connect/core/utils/helpers/app_flavor_helper/app_flavors_helper.dart';
+import 'package:inspect_connect/core/utils/helpers/app_theme_helper/custom_theme_data.dart';
+import 'package:inspect_connect/core/utils/values/colors.dart';
 import 'package:injectable/injectable.dart';
 
 @singleton

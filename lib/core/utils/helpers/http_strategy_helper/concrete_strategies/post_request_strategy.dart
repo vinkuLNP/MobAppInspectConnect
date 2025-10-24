@@ -1,10 +1,10 @@
 import 'dart:convert';
 import 'dart:developer';
 
-import 'package:clean_architecture/core/commondomain/entities/based_api_result/api_result_model.dart';
-import 'package:clean_architecture/core/utils/constants/app_constants.dart';
-import 'package:clean_architecture/core/utils/helpers/extension_functions/http_response_extensions.dart';
-import 'package:clean_architecture/core/utils/helpers/http_strategy_helper/http_request_strategy.dart';
+import 'package:inspect_connect/core/commondomain/entities/based_api_result/api_result_model.dart';
+import 'package:inspect_connect/core/utils/constants/app_constants.dart';
+import 'package:inspect_connect/core/utils/helpers/extension_functions/http_response_extensions.dart';
+import 'package:inspect_connect/core/utils/helpers/http_strategy_helper/http_request_strategy.dart';
 import 'package:http/http.dart' as http;
 class PostRequestStrategy implements HttpRequestStrategy {
   @override

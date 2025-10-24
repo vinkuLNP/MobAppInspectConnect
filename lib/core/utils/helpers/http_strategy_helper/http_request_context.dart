@@ -1,14 +1,14 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:clean_architecture/core/commondomain/entities/based_api_result/api_result_model.dart';
-import 'package:clean_architecture/core/commondomain/entities/based_api_result/error_result_model.dart';
-import 'package:clean_architecture/core/di/app_component/app_component.dart';
-import 'package:clean_architecture/core/utils/constants/app_constants.dart';
-import 'package:clean_architecture/core/utils/helpers/app_configurations_helper/app_configurations_helper.dart';
-import 'package:clean_architecture/core/utils/helpers/connectivity_helper/connectivity_helper/connectivity_checker_helper.dart';
-import 'package:clean_architecture/core/utils/helpers/custom_exceptions/custom_connection_exception.dart';
-import 'package:clean_architecture/core/utils/helpers/http_strategy_helper/http_request_strategy.dart';
+import 'package:inspect_connect/core/commondomain/entities/based_api_result/api_result_model.dart';
+import 'package:inspect_connect/core/commondomain/entities/based_api_result/error_result_model.dart';
+import 'package:inspect_connect/core/di/app_component/app_component.dart';
+import 'package:inspect_connect/core/utils/constants/app_constants.dart';
+import 'package:inspect_connect/core/utils/helpers/app_configurations_helper/app_configurations_helper.dart';
+import 'package:inspect_connect/core/utils/helpers/connectivity_helper/connectivity_helper/connectivity_checker_helper.dart';
+import 'package:inspect_connect/core/utils/helpers/custom_exceptions/custom_connection_exception.dart';
+import 'package:inspect_connect/core/utils/helpers/http_strategy_helper/http_request_strategy.dart';
 import 'package:http/http.dart' as http;
 import 'package:injectable/injectable.dart';
 
