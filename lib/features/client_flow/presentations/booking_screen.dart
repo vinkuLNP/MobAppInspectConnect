@@ -24,3 +24,5 @@ class BookingsScreen extends StatelessWidget {
     );
   }
 }
+
+

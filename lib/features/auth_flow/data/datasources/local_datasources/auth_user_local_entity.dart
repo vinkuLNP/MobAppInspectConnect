@@ -82,7 +82,39 @@ class AuthUserLocalEntity {
     this.updatedAt,
     this.loginTime,
   });
-
+  AuthUserLocalEntity copyWith({
+    String? name,
+    String? email,
+    String? token,
+    int? role,
+    String? phoneNumber,
+    String? countryCode,
+    bool? phoneOtpVerified,
+    bool? emailOtpVerified,
+    bool? agreedToTerms,
+    bool? isTruthfully,
+    String? walletId,
+    String? stripeAccountId,
+    String? stripeCustomerId,
+    UserLocation? location,
+    List<UserDevice>? devices,
+  }) {
+    return AuthUserLocalEntity(
+      name: name ?? this.name,
+      email: email ?? this.email,
+      token: token ?? this.token,
+      role: role ?? this.role,
+      phoneNumber: phoneNumber ?? this.phoneNumber,
+      countryCode: countryCode ?? this.countryCode,
+      phoneOtpVerified: phoneOtpVerified ?? this.phoneOtpVerified,
+      emailOtpVerified: emailOtpVerified ?? this.emailOtpVerified,
+      agreedToTerms: agreedToTerms ?? this.agreedToTerms,
+      isTruthfully: isTruthfully ?? this.isTruthfully,
+      walletId: walletId ?? this.walletId,
+      stripeAccountId: stripeAccountId ?? this.stripeAccountId,
+      stripeCustomerId: stripeCustomerId ?? this.stripeCustomerId,
+    );
+  }
   factory AuthUserLocalEntity.fromApiResponse(Map<String, dynamic> response) {
     Map<String, dynamic>? user = response['body']?['user'] ?? response['body'];
 

@@ -66,4 +66,42 @@ extension AuthUserMapping on AuthUser {
       longitude: location?.lng,
     );
   }
+
+    AuthUser copyWith({
+    String? id,
+    String? fullName,
+    String? emailHashed,
+    String? token,
+    int? role,
+    String? phoneNumber,
+    String? countryCode,
+    bool? phoneOtpVerified,
+    bool? emailOtpVerified,
+    bool? agreedToTerms,
+    bool? isTruthfully,
+    String? walletId,
+    String? stripeAccountId,
+    String? stripeCustomerId,
+    UserLocation? location,
+    List<UserDevice>? devices,
+  }) {
+    return AuthUser(
+      id: id ?? this.id,
+      fullName: fullName ?? this.fullName,
+      emailHashed: emailHashed ?? this.emailHashed,
+      token: token ?? this.token,
+      role: role ?? this.role,
+      phoneNumber: phoneNumber ?? this.phoneNumber,
+      countryCode: countryCode ?? this.countryCode,
+      phoneOtpVerified: phoneOtpVerified ?? this.phoneOtpVerified,
+      emailOtpVerified: emailOtpVerified ?? this.emailOtpVerified,
+      agreedToTerms: agreedToTerms ?? this.agreedToTerms,
+      isTruthfully: isTruthfully ?? this.isTruthfully,
+      walletId: walletId ?? this.walletId,
+      stripeAccountId: stripeAccountId ?? this.stripeAccountId,
+      stripeCustomerId: stripeCustomerId ?? this.stripeCustomerId,
+      location: location ?? this.location,
+      devices: devices ?? this.devices,
+    );
+  }
 }

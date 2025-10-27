@@ -67,14 +67,16 @@ class _ClientDashboardViewState extends State<ClientDashboardView> {
 
                     switch (index) {
                       case 0:
-                        iconData = Icons.dashboard_outlined;
-                        activeIconData = Icons.dashboard;
-                        label = 'Dashboard';
+                        // iconData = Icons.dashboard_outlined;
+                        iconData = Icons.add_box_outlined;
+
+                        activeIconData = Icons.add_box;
+                        label = 'Book Now';
                         break;
                       case 1:
                         iconData = Icons.assignment_outlined;
                         activeIconData = Icons.assignment;
-                        label = 'Bookings';
+                        label = 'My Bookings';
                         break;
                       default:
                         iconData = Icons.person_outline;

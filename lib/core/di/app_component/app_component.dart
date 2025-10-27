@@ -2,12 +2,19 @@ import 'package:inspect_connect/core/di/app_component/app_component.config.dart'
 import 'package:inspect_connect/features/auth_flow/data/datasources/remote_datasources/auth_remote_datasource.dart';
 import 'package:inspect_connect/features/auth_flow/data/repositories/auth_repository_impl.dart';
 import 'package:inspect_connect/features/auth_flow/domain/repositories/auth_repository.dart';
+import 'package:inspect_connect/features/auth_flow/domain/usecases/change_password_usecases.dart';
 import 'package:inspect_connect/features/auth_flow/domain/usecases/otp_verification_usecases.dart';
 import 'package:inspect_connect/features/auth_flow/domain/usecases/resend_otp_usecases.dart';
 import 'package:inspect_connect/features/auth_flow/domain/usecases/sign_in_usecase.dart';
 import 'package:inspect_connect/features/auth_flow/domain/usecases/sign_up_usecases.dart';
 import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
+import 'package:inspect_connect/features/client_flow/data/datasources/remote_datasource/client_api_datasource.dart';
+import 'package:inspect_connect/features/client_flow/data/repositories/client_repository_imp.dart';
+import 'package:inspect_connect/features/client_flow/domain/repositories/booking_repository.dart';
+import 'package:inspect_connect/features/client_flow/domain/usecases/create_booking_usecase.dart';
+import 'package:inspect_connect/features/client_flow/domain/usecases/get_certificate_subtype_usecase.dart';
+import 'package:inspect_connect/features/client_flow/domain/usecases/upload_image_usecase.dart';
 
 
 final GetIt locator = GetIt.I;
@@ -22,10 +29,22 @@ void setupLocator() {
       () => AuthRemoteDataSourceImpl(locator()));
   locator.registerLazySingleton<AuthRepository>(
       () => AuthRepositoryImpl(locator()));
+      locator.registerLazySingleton<ClientUserRepository>(
+      () => ClientUserRepositoryImpl(locator()));
+
+ locator.registerLazySingleton<BookingRemoteDataSource>(
+      () => BookingRemoteDataSourceImpl(locator()));
+      
   locator.registerLazySingleton(() => SignInUseCase(locator()));
   locator.registerLazySingleton(() => SignUpUseCase(locator()));
   locator.registerLazySingleton(() => OtpVerificarionUseCase(locator()));
   locator.registerLazySingleton(() => ResendOtpUseCase(locator()));
+  locator.registerLazySingleton(() => ChangePasswordUseCase(locator()));
+  locator.registerLazySingleton(() => GetCertificateSubTypesUseCase(locator()));
+  locator.registerLazySingleton(() => CreateBookingUseCase(locator()));
+  locator.registerLazySingleton(() => UploadImageUseCase(locator()));
+
+
 }
 
 

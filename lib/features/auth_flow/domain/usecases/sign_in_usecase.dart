@@ -33,3 +33,4 @@ class SignInUseCase extends BaseParamsUseCase<AuthUser, SignInParams> {
         deviceType: p.deviceType,
       );
 }
+

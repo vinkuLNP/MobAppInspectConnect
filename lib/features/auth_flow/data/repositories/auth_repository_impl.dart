@@ -1,6 +1,7 @@
 import 'package:inspect_connect/core/commondomain/entities/based_api_result/api_result_model.dart';
 import 'package:inspect_connect/core/commondomain/entities/based_api_result/error_result_model.dart';
 import 'package:inspect_connect/features/auth_flow/data/datasources/remote_datasources/auth_remote_datasource.dart';
+import 'package:inspect_connect/features/auth_flow/data/models/change_password_dto.dart';
 import 'package:inspect_connect/features/auth_flow/data/models/resend_otp_request_model.dart';
 import 'package:inspect_connect/features/auth_flow/data/models/signin_request_model.dart';
 import 'package:inspect_connect/features/auth_flow/data/models/signup_request_model.dart';
@@ -31,7 +32,9 @@ class AuthRepositoryImpl implements AuthRepository {
     return res.when(
        success: (data) {
         try {
-          return ApiResultModel.success(data: data.toEntity());
+            final user = data.toEntity(); 
+          return ApiResultModel<AuthUser>.success(data: user);
+          // return ApiResultModel.success(data: data.toEntity());
         } catch (e) {
           return const ApiResultModel.failure(
             errorResultEntity: ErrorResultModel(
@@ -162,6 +165,37 @@ Future<ApiResultModel<AuthUser>> signUp({
       failure: (err) => ApiResultModel<AuthUser>.failure(errorResultEntity: err),
     );
   }
+  
+  @override
+  Future<ApiResultModel<AuthUser>> changePassword({
+    required String currentPassword,
+     required String newPassword,
+  }) async {
+    final res = await _remote.changePassword(
+      ChangePasswordDto(
+        password: newPassword,
+        currentPassword :currentPassword
+      ),
+    );
 
+    return res.when(
+       success: (data) {
+        try {
+          return ApiResultModel.success(data: data.toEntity());
+        } catch (e) {
+          return const ApiResultModel.failure(
+            errorResultEntity: ErrorResultModel(
+              message: "Parsing error",
+              statusCode: 500,
+            ),
+          );
+        }
+      },
+      // success: (dto) => ApiResultModel<AuthUser>.success(data: dto.toEntity()),
+      failure: (err) => ApiResultModel<AuthUser>.failure(errorResultEntity: err),
+    );
+  }
+  
+  
 
 }

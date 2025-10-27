@@ -30,6 +30,7 @@ class AuthLocalDataSource {
   }
 
   Future<void> clearAllData() async {
+     _database.clear<AuthUserLocalEntity>();
     _database.clearAll();
   }
 

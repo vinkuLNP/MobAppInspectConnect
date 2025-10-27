@@ -3,6 +3,8 @@ import 'package:inspect_connect/core/utils/auto_router_setup/auto_router.dart';
 import 'package:inspect_connect/core/utils/helpers/app_flavor_helper/app_flavors_helper.dart';
 import 'package:inspect_connect/core/utils/helpers/app_flavor_helper/environment_config.dart';
 import 'package:flutter/material.dart';
+import 'package:inspect_connect/features/client_flow/presentations/providers/user_provider.dart';
+import 'package:provider/provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -36,24 +38,29 @@ class _MyAppState extends State<MyApp> {
   static const Color themeColor = Color(0xff1a2c47);
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      routerConfig: _appRouter.config(),
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primaryColor: themeColor,
-        scaffoldBackgroundColor: Colors.white,
-        colorScheme: ColorScheme.fromSwatch().copyWith(
-          primary: themeColor,
-          secondary: themeColor,
-        ),
-        appBarTheme: const AppBarTheme(
-          backgroundColor: themeColor,
-          foregroundColor: Colors.white,
-        ),
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
+ return   MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => UserProvider()),
+      ],
+      child: MaterialApp.router(
+        routerConfig: _appRouter.config(),
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          primaryColor: themeColor,
+          scaffoldBackgroundColor: Colors.white,
+          colorScheme: ColorScheme.fromSwatch().copyWith(
+            primary: themeColor,
+            secondary: themeColor,
+          ),
+          appBarTheme: const AppBarTheme(
             backgroundColor: themeColor,
             foregroundColor: Colors.white,
+          ),
+          elevatedButtonTheme: ElevatedButtonThemeData(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: themeColor,
+              foregroundColor: Colors.white,
+            ),
           ),
         ),
       ),

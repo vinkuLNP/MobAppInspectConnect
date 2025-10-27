@@ -42,6 +42,15 @@ const String signInEndPoint = 'signIn';
 const String signUpEndPoint = 'signUp';
 const String verifyOtpndPoint = 'verifyOtp';
 const String resendOtpEndPoint = 'resendOtp';
+const String changePasswordEndPoint = 'user/changePassword';
+const String updateUser = 'user';
+
+const String getCertificateSubTypesEndPoint = 'certificate/subTypes';
+const String createBookingEndPoint = 'bookings';
+const String uploadImageEndPoint = 'uploads';
+
+
+
 
 const String appIdValue = '0ae6735afdc6f99d7af23db5d1bd1fbe';
 const String cityNameKey = 'q';

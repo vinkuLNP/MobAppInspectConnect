@@ -464,9 +464,14 @@ class ClientViewModelProvider extends BaseViewModel {
       state?.when(
         data: (user) async {
            await locator<AuthLocalDataSource>().saveUser(user.toLocalEntity());
+              // final localUser = user.toLocalEntity();
+    // await context.read<UserProvider>().setUser(localUser);
+
           ScaffoldMessenger.of(
             context,
           ).showSnackBar(const SnackBar(content: Text('Sign-in successful')));
+            emailCtrl.clear();
+      passwordCtrl.clear();
           context.router.replaceAll([const ClientDashboardRoute()]);
         },
         error: (e) {
@@ -476,8 +481,7 @@ class ClientViewModelProvider extends BaseViewModel {
         },
       );
     } finally {
-      emailCtrl.clear();
-      passwordCtrl.clear();
+    
       setSigningIn(false); // ✅ unfreeze button
     }
   }
@@ -609,3 +613,4 @@ class ClientViewModelProvider extends BaseViewModel {
   //   );
   // }
 }
+

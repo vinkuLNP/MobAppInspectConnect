@@ -34,4 +34,9 @@ abstract class AuthRepository {
     required String countryCode,
   });
 
+       Future<ApiResultModel<AuthUser>>changePassword({
+    required String currentPassword,
+    required String newPassword,
+  });
+
 }
