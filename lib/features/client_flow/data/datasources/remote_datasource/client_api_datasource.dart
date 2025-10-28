@@ -5,11 +5,16 @@ import 'package:inspect_connect/core/commondomain/entities/based_api_result/api_
 import 'package:inspect_connect/core/commondomain/entities/based_api_result/error_result_model.dart';
 import 'package:inspect_connect/core/di/app_component/app_component.dart';
 import 'package:inspect_connect/core/utils/constants/app_constants.dart';
+import 'package:inspect_connect/core/utils/helpers/http_strategy_helper/concrete_strategies/delete_request_strategy.dart';
 import 'package:inspect_connect/core/utils/helpers/http_strategy_helper/concrete_strategies/get_request_strategy.dart';
+import 'package:inspect_connect/core/utils/helpers/http_strategy_helper/concrete_strategies/multipart_put_request_startegy.dart';
 import 'package:inspect_connect/core/utils/helpers/http_strategy_helper/concrete_strategies/multipart_request_strategy.dart';
 import 'package:inspect_connect/core/utils/helpers/http_strategy_helper/concrete_strategies/post_request_strategy.dart';
+import 'package:inspect_connect/core/utils/helpers/http_strategy_helper/concrete_strategies/put_request_strategy.dart';
 import 'package:inspect_connect/core/utils/helpers/http_strategy_helper/http_request_context.dart';
 import 'package:inspect_connect/features/auth_flow/data/datasources/local_datasources/auth_local_datasource.dart';
+import 'package:inspect_connect/features/client_flow/data/models/booking_detail_model.dart';
+import 'package:inspect_connect/features/client_flow/data/models/booking_list_response_model.dart';
 import 'package:inspect_connect/features/client_flow/data/models/booking_model.dart';
 import 'package:inspect_connect/features/client_flow/data/models/certificate_subtype_model.dart';
 import 'package:inspect_connect/features/client_flow/data/models/upload_image_model.dart';
@@ -17,21 +22,35 @@ import 'package:inspect_connect/features/client_flow/domain/entities/booking_ent
 import 'package:inspect_connect/features/client_flow/domain/entities/upload_image_dto.dart';
 
 abstract class BookingRemoteDataSource {
-  Future<ApiResultModel<List<CertificateSubTypeModel>>> getCertificateSubTypes();
-  Future<ApiResultModel<UploadImageResponseModel>>  uploadImage(UploadImageDto filePath);
-  Future<ApiResultModel<CreateBookingResponseModel>> createBooking( BookingEntity bookingEnity);
+  Future<ApiResultModel<List<CertificateSubTypeModel>>>
+  getCertificateSubTypes();
+  Future<ApiResultModel<UploadImageResponseModel>> uploadImage(
+    UploadImageDto filePath,
+  );
+  Future<ApiResultModel<CreateBookingResponseModel>> createBooking(
+    BookingEntity bookingEnity,
+  );
+  Future<ApiResultModel<List<BookingListModel>>> getBookingList({
+    required int page,
+    required int perPageLimit,
+    String? search,
+    String? sortBy,
+    String? sortOrder,
+    int? status,
+  });
+    Future<ApiResultModel<BookingDetailModel>> getBookingDetail(String bookingId);
+  Future<ApiResultModel<bool>> deleteBooking(String bookingId);
+  Future<ApiResultModel<BookingDetailModel>> updateBooking(String bookingId, BookingEntity bookingEntity);
+
 }
 
 class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
   BookingRemoteDataSourceImpl(this._ctx);
   final HttpRequestContext _ctx;
 
-
-
-
   @override
-
-  Future<ApiResultModel<List<CertificateSubTypeModel>>> getCertificateSubTypes() async {
+  Future<ApiResultModel<List<CertificateSubTypeModel>>>
+  getCertificateSubTypes() async {
     try {
       final ApiResultModel<http.Response> res = await _ctx.makeRequest(
         uri: getCertificateSubTypesEndPoint,
@@ -50,16 +69,20 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
           final Map<String, dynamic> body =
               (root['body'] as Map?)?.cast<String, dynamic>() ??
               <String, dynamic>{};
-                final List<dynamic> list = body['certificateSubTypes'] ?? [];
+          final List<dynamic> list = body['certificateSubTypes'] ?? [];
 
-        final List<CertificateSubTypeModel> dtoList = list
-            .map((e) => CertificateSubTypeModel.fromJson(e))
-            .toList();
+          final List<CertificateSubTypeModel> dtoList = list
+              .map((e) => CertificateSubTypeModel.fromJson(e))
+              .toList();
 
-          return ApiResultModel<List<CertificateSubTypeModel>>.success(data: dtoList);
+          return ApiResultModel<List<CertificateSubTypeModel>>.success(
+            data: dtoList,
+          );
         },
         failure: (ErrorResultModel e) =>
-            ApiResultModel<List<CertificateSubTypeModel>>.failure(errorResultEntity: e),
+            ApiResultModel<List<CertificateSubTypeModel>>.failure(
+              errorResultEntity: e,
+            ),
       );
     } catch (e) {
       log('autoremoteresopoonse------> $e');
@@ -72,24 +95,23 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
     }
   }
 
-
   @override
-  Future<ApiResultModel<UploadImageResponseModel>> uploadImage(UploadImageDto dto) async {
+  Future<ApiResultModel<UploadImageResponseModel>> uploadImage(
+    UploadImageDto dto,
+  ) async {
     try {
-         final user = await locator<AuthLocalDataSource>().getUser();
+      final user = await locator<AuthLocalDataSource>().getUser();
       if (user == null || user.token == null) {
         throw Exception('User not found in local storage');
       }
       final ApiResultModel<http.Response> res = await _ctx.makeRequest(
         uri: uploadImageEndPoint,
         httpRequestStrategy: MultipartPostRequestStrategy(),
-        // headers: const {'Content-Type': 'application/json', 'Accept': 'application/json'},
-        requestData: dto.toJson(),
-         headers: {
+        headers: {
           'Authorization': 'Bearer ${user.token}',
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
+          "Content-Type": "multipart/form-data",
         },
+        requestData: dto.toJson(),
       );
 
       return res.when(
@@ -106,7 +128,9 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
           return ApiResultModel<UploadImageResponseModel>.success(data: dto);
         },
         failure: (ErrorResultModel e) =>
-            ApiResultModel<UploadImageResponseModel>.failure(errorResultEntity: e),
+            ApiResultModel<UploadImageResponseModel>.failure(
+              errorResultEntity: e,
+            ),
       );
     } catch (e) {
       log('autoremoteresopoonse------> $e');
@@ -119,134 +143,231 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
     }
   }
 
-
-@override
-Future<ApiResultModel<CreateBookingResponseModel>> createBooking(BookingEntity dto) async {
-  try {
+  @override
+  Future<ApiResultModel<CreateBookingResponseModel>> createBooking(
+    BookingEntity dto,
+  ) async {
+    try {
       final user = await locator<AuthLocalDataSource>().getUser();
       if (user == null || user.token == null) {
         throw Exception('User not found in local storage');
       }
-    final ApiResultModel<http.Response> res = await _ctx.makeRequest(
-      uri: createBookingEndPoint,
-       headers: {
+      log(dto.certificateSubTypeId.toString());
+      final ApiResultModel<http.Response> res = await _ctx.makeRequest(
+        uri: createBookingEndPoint,
+        headers: {
           'Authorization': 'Bearer ${user.token}',
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
-      httpRequestStrategy: PostRequestStrategy(),
-      requestData: dto.toJson(),
+        httpRequestStrategy: PostRequestStrategy(),
+        requestData: dto.toJson(),
+      );
+
+      return res.when(
+        success: (http.Response response) {
+          final Map<String, dynamic> root = response.body.isEmpty
+              ? {}
+              : (jsonDecode(response.body) as Map<String, dynamic>);
+
+          final Map<String, dynamic> body =
+              (root['body'] as Map?)?.cast<String, dynamic>() ??
+              <String, dynamic>{};
+
+          final dto = CreateBookingResponseModel.fromJson(body);
+          return ApiResultModel<CreateBookingResponseModel>.success(data: dto);
+        },
+        failure: (ErrorResultModel e) =>
+            ApiResultModel<CreateBookingResponseModel>.failure(
+              errorResultEntity: e,
+            ),
+      );
+    } catch (e) {
+      log('createBooking error: $e');
+      return const ApiResultModel.failure(
+        errorResultEntity: ErrorResultModel(
+          message: "Network error occurred",
+          statusCode: 500,
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<ApiResultModel<List<BookingListModel>>> getBookingList({
+    required int page,
+    required int perPageLimit,
+    String? search,
+    String? sortBy,
+    String? sortOrder,
+    int? status,
+  }) async {
+    try {
+      final user = await locator<AuthLocalDataSource>().getUser();
+      if (user == null || user.token == null) {
+        throw Exception('User not found in local storage');
+      }
+      final queryParams = {
+        'page': page.toString(),
+        'perPageLimit': perPageLimit.toString(),
+        if (search != null && search.isNotEmpty) 'search': search,
+        if (sortBy != null && sortBy.isNotEmpty) 'sortBy': sortBy,
+        if (sortOrder != null && sortOrder.isNotEmpty) 'sortOrder': sortOrder,
+        if (status != null) 'status': status.toString(),
+      };
+      final uri = Uri.parse(
+        '$createBookingEndPoint',
+      ).replace(queryParameters: queryParams);
+
+      final ApiResultModel<http.Response> res = await _ctx.makeRequest(
+        uri: createBookingEndPoint,
+        requestData: queryParams,
+        httpRequestStrategy: GetRequestStrategy(),
+        headers: {
+          'Authorization': 'Bearer ${user.token}',
+          'Accept': 'application/json',
+        },
+      );
+
+      return res.when(
+        success: (http.Response response) {
+          final Map<String, dynamic> root = response.body.isEmpty
+              ? {}
+              : (jsonDecode(response.body) as Map<String, dynamic>);
+          // Backend shape:
+          // { "success": true, "message": "...", "body": { ... user object ... } }
+          final Map<String, dynamic> body =
+              (root['body'] as Map?)?.cast<String, dynamic>() ??
+              <String, dynamic>{};
+          final List<dynamic> list = body['users'] ?? [];
+
+          final List<BookingListModel> dtoList = list
+              .map((e) => BookingListModel.fromJson(e))
+              .toList();
+
+          return ApiResultModel<List<BookingListModel>>.success(data: dtoList);
+        },
+        failure: (ErrorResultModel e) =>
+            ApiResultModel<List<BookingListModel>>.failure(
+              errorResultEntity: e,
+            ),
+      );
+    } catch (e) {
+      log('autoremoteresopoonse------> $e');
+      return const ApiResultModel.failure(
+        errorResultEntity: ErrorResultModel(
+          message: "Network error occurred",
+          statusCode: 500,
+        ),
+      );
+    }
+  }
+
+  @override
+Future<ApiResultModel<BookingDetailModel>> getBookingDetail(String bookingId) async {
+  try {
+    final user = await locator<AuthLocalDataSource>().getUser();
+    if (user == null || user.token == null) {
+      throw Exception('User not found in local storage');
+    }
+
+    final ApiResultModel<http.Response> res = await _ctx.makeRequest(
+      uri: "$createBookingEndPoint/$bookingId",
+      httpRequestStrategy: GetRequestStrategy(),
+      headers: {
+        'Authorization': 'Bearer ${user.token}',
+        'Accept': 'application/json',
+      },
     );
 
     return res.when(
-      success: (http.Response response) {
+      success: (response) {
         final Map<String, dynamic> root = response.body.isEmpty
             ? {}
             : (jsonDecode(response.body) as Map<String, dynamic>);
-
         final Map<String, dynamic> body =
-            (root['body'] as Map?)?.cast<String, dynamic>() ??
-            <String, dynamic>{};
-
-        final dto = CreateBookingResponseModel.fromJson(body);
-        return ApiResultModel<CreateBookingResponseModel>.success(data: dto);
+            (root['body'] as Map?)?.cast<String, dynamic>() ?? {};
+        final model = BookingDetailModel.fromJson(body);
+        return ApiResultModel<BookingDetailModel>.success(data: model);
       },
-      failure: (ErrorResultModel e) =>
-          ApiResultModel<CreateBookingResponseModel>.failure(errorResultEntity: e),
+      failure: (e) => ApiResultModel<BookingDetailModel>.failure(errorResultEntity: e),
     );
   } catch (e) {
-    log('createBooking error: $e');
+    log('getBookingDetail error: $e');
     return const ApiResultModel.failure(
-      errorResultEntity: ErrorResultModel(
-        message: "Network error occurred",
-        statusCode: 500,
-      ),
+      errorResultEntity: ErrorResultModel(message: "Network error occurred", statusCode: 500),
     );
   }
 }
 
 
 
+@override
+Future<ApiResultModel<bool>> deleteBooking(String bookingId) async {
+  try {
+    final user = await locator<AuthLocalDataSource>().getUser();
+    if (user == null || user.token == null) {
+      throw Exception('User not found in local storage');
+    }
 
+    final ApiResultModel<http.Response> res = await _ctx.makeRequest(
+      uri: "$createBookingEndPoint/$bookingId",
+      httpRequestStrategy: DeleteRequestStrategy(),
+      headers: {
+        'Authorization': 'Bearer ${user.token}',
+        'Accept': 'application/json',
+      },
+    );
+
+    return res.when(
+      success: (response) => const ApiResultModel<bool>.success(data: true),
+      failure: (e) => ApiResultModel<bool>.failure(errorResultEntity: e),
+    );
+  } catch (e) {
+    log('deleteBooking error: $e');
+    return const ApiResultModel.failure(
+      errorResultEntity: ErrorResultModel(message: "Network error occurred", statusCode: 500),
+    );
+  }
 }
 
+@override
+Future<ApiResultModel<BookingDetailModel>> updateBooking(String bookingId, BookingEntity booking) async {
+  try {
+    final user = await locator<AuthLocalDataSource>().getUser();
+    if (user == null || user.token == null) {
+      throw Exception('User not found in local storage');
+    }
 
+    final ApiResultModel<http.Response> res = await _ctx.makeRequest(
+      uri: "$createBookingEndPoint/$bookingId",
+      httpRequestStrategy: MultipartPutRequestStrategy(),
+      headers: {
+        'Authorization': 'Bearer ${user.token}',
+        // 'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      requestData: booking.toJson(),
+    );
 
+    return res.when(
+      success: (response) {
+        final Map<String, dynamic> root = response.body.isEmpty
+            ? {}
+            : (jsonDecode(response.body) as Map<String, dynamic>);
+        final Map<String, dynamic> body =
+            (root['body'] as Map?)?.cast<String, dynamic>() ?? {};
+        final dto = BookingDetailModel.fromJson(body);
+        return ApiResultModel<BookingDetailModel>.success(data: dto);
+      },
+      failure: (e) => ApiResultModel<BookingDetailModel>.failure(errorResultEntity: e),
+    );
+  } catch (e) {
+    log('updateBooking error: $e');
+    return const ApiResultModel.failure(
+      errorResultEntity: ErrorResultModel(message: "Network error occurred", statusCode: 500),
+    );
+  }
+}
 
-  // @override
-  // Future<ApiResultState<String>> uploadImage(String filePath) async {
-  //   final request = http.MultipartRequest(
-  //     'POST',
-  //     Uri.parse('$baseUrl/api/v1/uploads'),
-  //   )
-  //     ..headers['Authorization'] = 'Bearer $token'
-  //     ..files.add(await http.MultipartFile.fromPath('file', filePath));
-
-  //   final response = await request.send();
-  //   final resBody = await response.stream.bytesToString();
-
-  //   if (response.statusCode == 200) {
-  //     final json = jsonDecode(resBody);
-  //     return json['body']['fileUrl'];
-  //   } else {
-  //     throw Exception('Image upload failed');
-  //   }
-  // }
-
-  // @override
-  // Future<ApiResultState<CreateBookingResponseModel>> createBooking (BookingEntity bookingEntity) async {
-  //   final response = await http.post(
-  //     Uri.parse('$baseUrl/api/v1/bookings'),
-  //     headers: {
-  //       'Authorization': 'Bearer $token',
-  //       'Content-Type': 'application/json',
-  //     },
-  //     body: jsonEncode(payload),
-  //   );
-
-  //   if (response.statusCode == 200) {
-  //     return ApiResultState.data(data: true);
-  //   } else {
-  //     throw Exception('Booking creation failed');
-  //   }
-  // }
-
-
-
-  // @override
-  // Future<ApiResultModel<CreateBookingResponseModel>> createBooking(BookingEntity dto) async {
-  //   try {
-  //     final ApiResultModel<http.Response> res = await _ctx.makeRequest(
-  //       uri: signInEndPoint,
-  //       httpRequestStrategy: PostRequestStrategy(),
-  //       // headers: const {'Content-Type': 'application/json', 'Accept': 'application/json'},
-  //       requestData: dto.toJson(),
-  //     );
-
-  //     return res.when(
-  //       success: (http.Response response) {
-  //         final Map<String, dynamic> root = response.body.isEmpty
-  //             ? {}
-  //             : (jsonDecode(response.body) as Map<String, dynamic>);
-  //         // Backend shape:
-  //         // { "success": true, "message": "...", "body": { ... user object ... } }
-  //         final Map<String, dynamic> body =
-  //             (root['body'] as Map?)?.cast<String, dynamic>() ??
-  //             <String, dynamic>{};
-  //         final dto = CreateBookingResponseModel.fromJson(body);
-  //         return ApiResultModel<CreateBookingResponseModel>.success(data: dto);
-  //       },
-  //       failure: (ErrorResultModel e) =>
-  //           ApiResultModel<CreateBookingResponseModel>.failure(errorResultEntity: e),
-  //     );
-  //   } catch (e) {
-  //     log('autoremoteresopoonse------> $e');
-  //     return const ApiResultModel.failure(
-  //       errorResultEntity: ErrorResultModel(
-  //         message: "Network error occurred",
-  //         statusCode: 500,
-  //       ),
-  //     );
-  //   }
-  // }
-
+}

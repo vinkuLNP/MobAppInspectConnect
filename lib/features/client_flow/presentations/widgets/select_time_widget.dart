@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 
 class SelectTimeWidget extends StatelessWidget {
-  const SelectTimeWidget({super.key, required this.onTimeSelected, this.initialTime});
+  const SelectTimeWidget({super.key, required this.onTimeSelected, 
+  this.initialTime  ,required this.selectedDate,});
 
   final TimeOfDay? initialTime;
   final ValueChanged<TimeOfDay> onTimeSelected;
-
+ final DateTime selectedDate;
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -21,12 +22,42 @@ class SelectTimeWidget extends StatelessWidget {
         const SizedBox(height: 8),
         GestureDetector(
           onTap: () async {
+            // final TimeOfDay? pickedTime = await showTimePicker(
+            //   context: context,
+            //   initialTime: initialTime ?? TimeOfDay.now(),
+            // );
+
+            // if (pickedTime != null) {
+            final now = DateTime.now();
+
             final TimeOfDay? pickedTime = await showTimePicker(
               context: context,
               initialTime: initialTime ?? TimeOfDay.now(),
             );
 
             if (pickedTime != null) {
+              final isToday = selectedDate.year == now.year &&
+                  selectedDate.month == now.month &&
+                  selectedDate.day == now.day;
+
+              if (isToday) {
+                final selectedDateTime = DateTime(
+                  selectedDate.year,
+                  selectedDate.month,
+                  selectedDate.day,
+                  pickedTime.hour,
+                  pickedTime.minute,
+                );
+
+                if (selectedDateTime.isBefore(now)) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Please select a time after the current time.'),
+                    ),
+                  );
+                  return; 
+                }
+              }
               onTimeSelected(pickedTime);
             }
           },

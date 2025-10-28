@@ -8,6 +8,6 @@ class UploadImageDto {
 
 
   Map<String, dynamic> toJson() => {
-        "file": filePath,
+        "filePath": filePath,
       };
 }

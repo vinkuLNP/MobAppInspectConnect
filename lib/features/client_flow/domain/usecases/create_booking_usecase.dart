@@ -27,3 +27,5 @@ class CreateBookingUseCase extends BaseParamsUseCase<CreateBookingResponseModel,
         booking: p!.bookingEntity
       );
 }
+
+

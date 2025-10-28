@@ -1,20 +1,28 @@
 import 'dart:developer';
 import 'dart:io';
-
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:inspect_connect/core/basecomponents/base_view_model.dart';
 import 'package:inspect_connect/core/commondomain/entities/based_api_result/api_result_state.dart';
 import 'package:inspect_connect/core/di/app_component/app_component.dart';
 import 'package:inspect_connect/features/auth_flow/data/datasources/local_datasources/auth_local_datasource.dart';
+import 'package:inspect_connect/features/client_flow/data/models/booking_detail_model.dart';
 import 'package:inspect_connect/features/client_flow/data/models/booking_model.dart';
 import 'package:inspect_connect/features/client_flow/data/models/upload_image_model.dart';
 import 'package:inspect_connect/features/client_flow/domain/entities/booking_entity.dart';
+import 'package:inspect_connect/features/client_flow/domain/entities/booking_list_entity.dart';
 import 'package:inspect_connect/features/client_flow/domain/entities/certificate_sub_type_entity.dart';
 import 'package:inspect_connect/features/client_flow/domain/entities/upload_image_dto.dart';
 import 'package:inspect_connect/features/client_flow/domain/usecases/create_booking_usecase.dart';
+import 'package:inspect_connect/features/client_flow/domain/usecases/delete_booking_usecase.dart';
+import 'package:inspect_connect/features/client_flow/domain/usecases/fetch_booking_list_usecase.dart';
+import 'package:inspect_connect/features/client_flow/domain/usecases/get_booking_Detail_usecase.dart';
 import 'package:inspect_connect/features/client_flow/domain/usecases/get_certificate_subtype_usecase.dart';
+import 'package:inspect_connect/features/client_flow/domain/usecases/update_booking_detail_usecase.dart';
 import 'package:inspect_connect/features/client_flow/domain/usecases/upload_image_usecase.dart';
+import 'package:inspect_connect/features/client_flow/presentations/screens/booking_edit_screen.dart';
+import 'package:intl/intl.dart';
 
 class BookingProvider extends BaseViewModel {
   DateTime _selectedDate = DateTime.now();
@@ -23,7 +31,8 @@ class BookingProvider extends BaseViewModel {
   String? _location;
   String description = '';
   final List<File> images = [];
-
+  final TextEditingController locationController = TextEditingController();
+  final TextEditingController descriptionController = TextEditingController();
   DateTime get selectedDate => _selectedDate;
   TimeOfDay? get selectedTime => _selectedTime;
   String? get inspectionType => _inspectionType;
@@ -31,6 +40,13 @@ class BookingProvider extends BaseViewModel {
 
   void setDate(DateTime d) {
     _selectedDate = DateTime(d.year, d.month, d.day);
+    notifyListeners();
+  }
+
+  List<String> existingImageUrls = [];
+
+  void removeExistingImageAt(int index) {
+    existingImageUrls.removeAt(index);
     notifyListeners();
   }
 
@@ -46,47 +62,21 @@ class BookingProvider extends BaseViewModel {
 
   void setLocation(String? l) {
     _location = l;
+    if (locationController.text != l) {
+      locationController.text = l ?? '';
+    }
     notifyListeners();
   }
 
   void setDescription(String v) {
     description = v;
+    if (descriptionController.text != v) {
+      descriptionController.text = v;
+    }
     notifyListeners();
   }
 
   final ImagePicker _picker = ImagePicker();
-
-  //   Future<void> addImage() async {
-  //   if (images.length >= 5) return;
-
-  //   final XFile? picked = await _picker.pickImage(
-  //     source: ImageSource.gallery,
-  //     imageQuality: 80,
-  //   );
-
-  //   if (picked == null) return;
-
-  //   final file = File(picked.path);
-
-  //   final allowedExtensions = ['jpg', 'jpeg', 'png', 'webp'];
-  //   final extension = picked.name.split('.').last.toLowerCase();
-
-  //   if (!allowedExtensions.contains(extension)) {
-  //     debugPrint('❌ Invalid file type: .$extension');
-  //     return;
-  //   }
-
-  //   final int fileSize = await file.length();
-  //   const int maxSize = 1 * 1024 * 1024;
-
-  //   if (fileSize > maxSize) {
-  //     debugPrint('❌ File too large: ${(fileSize / 1024).toStringAsFixed(1)} KB');
-  //     return;
-  //   }
-
-  //   images.add(file);
-  //   notifyListeners();
-  // }
 
   void removeImageAt(int idx) {
     if (idx >= 0 && idx < images.length) {
@@ -100,27 +90,32 @@ class BookingProvider extends BaseViewModel {
         _selectedTime != null &&
         _inspectionType != null &&
         _location != null &&
-        description != '';
+        description != '' &&
+        images.isNotEmpty &&
+        uploadedUrls.isNotEmpty &&
+        images != [] &&
+        uploadedUrls != [];
   }
 
   List<CertificateSubTypeEntity> subTypes = [];
+  BookingDetailModel? bookingDetailModel;
+
   bool isLoading = false;
 
   Future<void> init() async {
     isLoading = true;
     notifyListeners();
     fetchCertificateSubTypes();
-    // subTypes = await getSubTypesUseCase();
-    //   final result = await getSubTypesUseCase();
-
-    // if (result.) {
-    //   subTypes = result.data!;
-    // } else {
-    //   debugPrint('❌ ${result.error}');
-    // }
 
     isLoading = false;
     notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    locationController.dispose();
+    descriptionController.dispose();
+    super.dispose();
   }
 
   Future<void> createBooking({required BuildContext context}) async {
@@ -161,6 +156,7 @@ class BookingProvider extends BaseViewModel {
               ),
             ),
           );
+          clearBookingData();
         },
         error: (e) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -171,6 +167,142 @@ class BookingProvider extends BaseViewModel {
     } finally {
       // setSigningIn(false);
     }
+  }
+
+
+  Future<void> updateBooking({required BuildContext context, required String bookingId,}) async {
+    // if (!canVerify) return;
+    try {
+      final user = await locator<AuthLocalDataSource>().getUser();
+      if (user == null || user.token == null) {
+        throw Exception('User not found in local storage');
+      }
+      final booking = BookingEntity(
+        bookingDate: _selectedDate.toIso8601String().split('T').first,
+        bookingTime: '${_selectedTime!.hour}:${_selectedTime!.minute}',
+        bookingLocation: _location!,
+        certificateSubTypeId: _inspectionType!,
+        images: uploadedUrls,
+        description: description,
+      );
+      final updateBookingDetailUseCase = locator<UpdateBookingDetailUseCase>();
+      final state =
+          await executeParamsUseCase<
+            BookingDetailModel,
+            UpdateBookingDetailParams
+          >(
+            useCase: updateBookingDetailUseCase,
+
+            query: UpdateBookingDetailParams(bookingEntity: booking,bookingId: bookingId,),
+            launchLoader: true,
+          );
+
+      state?.when(
+        data: (response) async {
+          clearBookingDetail();
+          bookingDetailModel = response;
+           ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text( 'Booking Updated successfully.')),
+          );
+          Navigator.pop(context);
+          // clearBookingData();
+        },
+        error: (e) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(e.message ?? 'Booking creation failed')),
+          );
+        },
+      );
+    } finally {
+      // setSigningIn(false);
+    }
+  }
+
+  Future<void> getBookingDetail({
+    required BuildContext context,
+    required String bookingId,
+  }) async {
+    // if (!canVerify) return;
+    try {
+      final user = await locator<AuthLocalDataSource>().getUser();
+      if (user == null || user.token == null) {
+        throw Exception('User not found in local storage');
+      }
+
+      final getBookingDetailUseCase = locator<GetBookingDetailUseCase>();
+      final state =
+          await executeParamsUseCase<
+            BookingDetailModel,
+            GetBookingDetailParams
+          >(
+            useCase: getBookingDetailUseCase,
+
+            query: GetBookingDetailParams(bookingId: bookingId),
+            launchLoader: true,
+          );
+
+      state?.when(
+        data: (response) async {
+          clearBookingDetail();
+          bookingDetailModel = response;
+          Navigator.pop(context);
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => BookingEditScreen(booking: bookingDetailModel),
+            ),
+          );
+        },
+        error: (e) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(e.message ?? 'Fetching Booking Detail failed')),
+          );
+        },
+      );
+    } finally {
+      // setSigningIn(false);
+    }
+  }
+
+  Future<void> deleteBookingDetail({
+    required BuildContext context,
+    required String bookingId,
+  }) async {
+    // if (!canVerify) return;
+    try {
+      final user = await locator<AuthLocalDataSource>().getUser();
+      if (user == null || user.token == null) {
+        throw Exception('User not found in local storage');
+      }
+
+      final deleteBookingUseCase = locator<DeleteBookingDetailUseCase>();
+      final state = await executeParamsUseCase<bool, DeleteBookingDetailParams>(
+        useCase: deleteBookingUseCase,
+
+        query: DeleteBookingDetailParams(bookingId: bookingId),
+        launchLoader: true,
+      );
+
+      state?.when(
+        data: (response) async {
+          clearBookingDetail();
+          Navigator.pop(context);
+          fetchBookingsList();
+        },
+        error: (e) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(e.message ?? 'Booking Deletion failed')),
+          );
+        },
+      );
+    } finally {
+      // setSigningIn(false);
+    }
+  }
+
+  void clearBookingDetail() {
+    bookingDetailModel = null;
+    notifyListeners();
   }
 
   Future<void> fetchCertificateSubTypes() async {
@@ -205,57 +337,25 @@ class BookingProvider extends BaseViewModel {
     }
   }
 
-  // Future<void> addImage() async {
-  //   if (images.length >= 5) return;
-
-    // final XFile? picked = await _picker.pickImage(
-    //   source: ImageSource.gallery,
-    //   imageQuality: 80,
-    // );
-    // if (picked == null) return;
-
-  //   final file = File(picked.path);
-  //   final allowedExtensions = ['jpg', 'jpeg', 'png', 'webp'];
-  //   final extension = picked.name.split('.').last.toLowerCase();
-
-  //   if (!allowedExtensions.contains(extension)) return;
-  //   if (await file.length() > 1 * 1024 * 1024) return;
-
-  //   // upload to server
-  //   // final imageUrl = await uploadImageUseCase(file.path);
-  //   images.add(File(file.path));
-  //   // uploadedUrls.add(imageUrl);
-  //   //     final uploadResult = await uploadImageUseCase(file.path);
-  //   // if (uploadResult.isSuccess) {
-  //   //   uploadedUrls.add(uploadResult.data!);
-  //   //   images.add(file);
-  //   //   notifyListeners();
-  //   // } else {
-  //   //   debugPrint('❌ ${uploadResult.error}');
-  //   // }
-  //   notifyListeners();
-  // }
-
-  Future<void> uploadImage(BuildContext context,) async {
+  Future<void> uploadImage(BuildContext context) async {
     try {
       if (images.length >= 5) return;
-        final XFile? picked = await _picker.pickImage(
-      source: ImageSource.gallery,
-      imageQuality: 80,
-    );
-    if (picked == null) return;
+      final XFile? picked = await _picker.pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 80,
+      );
+      if (picked == null) return;
 
-      // validation
       final file = File(picked.path);
-      final allowedExtensions = ['jpg', 'jpeg', 'png', 'webp'];
-      final extension = picked.name.split('.').last.toLowerCase();
+      // final allowedExtensions = ['jpg', 'jpeg', 'png', 'webp'];
+      // final extension = picked.name.split('.').last.toLowerCase();
 
-      if (!allowedExtensions.contains(extension)) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Invalid image type')));
-        return;
-      }
+      // if (!allowedExtensions.contains(extension)) {
+      //   ScaffoldMessenger.of(
+      //     context,
+      //   ).showSnackBar(const SnackBar(content: Text('Invalid image type')));
+      //   return;
+      // }
       if (await file.length() > 1 * 1024 * 1024) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('File must be under 1 MB')),
@@ -295,39 +395,200 @@ class BookingProvider extends BaseViewModel {
     }
   }
 
-  // List<File> images = [];
   List<String> uploadedUrls = [];
 
-  // Future<void> createBooking() async {
-  //   final booking = BookingEntity(
-  //     bookingDate: _selectedDate.toIso8601String().split('T').first,
-  //     bookingTime: '${_selectedTime!.hour}:${_selectedTime!.minute}',
-  //     bookingLocation: _location!,
-  //     certificateSubTypeId: _inspectionType!,
-  //     images: uploadedUrls,
-  //     description: description,
-  //   );
+  void clearBookingData() {
+    log('🧹 Clearing booking data...');
+    _selectedDate = DateTime.now();
+    _selectedTime = null;
+    _location = null;
+    _inspectionType = null;
+    description = '';
+    uploadedUrls.clear();
+    images.clear();
+    locationController.clear();
+    descriptionController.clear();
 
-  //   await createBookingUseCase(booking);
-  // }
-}
+    notifyListeners();
+  }
 
-  // Future<void> createBooking() async {
-  //   if (_selectedTime == null || _inspectionType == null || _location == null || description.isEmpty) return;
+  List<BookingListEntity> bookings = [];
 
-  //   final booking = BookingEntity(
-  //     bookingDate: _selectedDate.toIso8601String().split('T').first,
-  //     bookingTime: '${_selectedTime!.hour}:${_selectedTime!.minute}',
-  //     bookingLocation: _location!,
-  //     certificateSubTypeId: _inspectionType!,
-  //     images: uploadedUrls,
-  //     description: description,
-  //   );
+  int _currentPage = 1;
+  int _totalPages = 1;
+  bool isFetchingBookings = false;
+  bool hasMoreBookings = true;
+  bool isLoadMoreRunning = false;
 
-  //   final result = await createBookingUseCase(booking);
-  //   if (result.isSuccess) {
-  //     debugPrint('✅ Booking created successfully');
-  //   } else {
-  //     debugPrint('❌ Booking failed: ${result.error}');
+  // Reset bookings data
+  void resetBookings() {
+    bookings.clear();
+    _currentPage = 1;
+    _totalPages = 1;
+    hasMoreBookings = true;
+    notifyListeners();
+  }
+
+  final int _perPageLimit = 10;
+
+  // Filters
+  String? _searchQuery;
+  String? _searchDate;
+  String? _status;
+  String _sortBy = 'createdAt';
+  String _sortOrder = 'desc';
+
+  /// Fetch initial or paginated booking list
+  Future<void> fetchBookingsList({
+    bool reset = false,
+    bool loadMore = false,
+  }) async {
+    try {
+      if (isFetchingBookings || isLoadMoreRunning) return;
+
+      if (reset) {
+        _currentPage = 1;
+        hasMoreBookings = true;
+        bookings = [];
+        notifyListeners();
+      }
+
+      if (!loadMore) {
+        isFetchingBookings = true;
+      } else {
+        isLoadMoreRunning = true;
+      }
+      notifyListeners();
+
+      final fetchBookingUsecase = locator<FetchBookingsUseCase>();
+
+      final params = FetchBookingsParams(
+        page: _currentPage,
+        perPageLimit: _perPageLimit,
+        search: _searchDate ?? _searchQuery ?? '', // can be text or date
+        sortBy: _sortBy,
+        sortOrder: _sortOrder,
+        // status: _status != null ? int.tryParse(_status!) ?? 0 : 0,
+        status: _status != null && _status!.isNotEmpty
+            ? int.tryParse(_status!)
+            : null,
+      );
+
+      final state =
+          await executeParamsUseCase<
+            List<BookingListEntity>,
+            FetchBookingsParams
+          >(useCase: fetchBookingUsecase, query: params, launchLoader: false);
+
+      state?.when(
+        data: (response) {
+          if (loadMore) {
+            bookings.addAll(response);
+            log('------<response------->$response');
+          } else {
+            bookings = response;
+            log('------<response------->$response');
+          }
+
+          if (response.length < _perPageLimit) {
+            hasMoreBookings = false;
+          } else {
+            _currentPage++;
+          }
+        },
+        error: (e) {
+          log("Error fetching bookings: ${e.message}");
+        },
+      );
+    } catch (e) {
+      log("❌ fetchBookingsList error: $e");
+    } finally {
+      isFetchingBookings = false;
+      isLoadMoreRunning = false;
+      notifyListeners();
+    }
+  }
+
+  void searchBookings(String query) {
+    _searchQuery = query.trim().isEmpty ? null : query.trim();
+    _searchDate = null;
+    _currentPage = 1;
+    fetchBookingsList(reset: true);
+  }
+
+  void searchBookingsByDate(String date) {
+    _searchDate = date;
+    _searchQuery = null;
+    _currentPage = 1;
+    fetchBookingsList(reset: true);
+  }
+
+  void filterByStatus(String? status) {
+    log("🔍 Filtering by status: $status");
+    if (_status == status) return;
+    _status = status;
+    _currentPage = 1;
+    fetchBookingsList(reset: true);
+  }
+
+  void clearFilters() {
+    _searchQuery = null;
+    _searchDate = null;
+    _status = null;
+    _currentPage = 1;
+    fetchBookingsList(reset: true);
+  }
+
+  /// ✅ Update booking (for Edit)
+  // Future<void> updateBooking({
+  //   required BuildContext context,
+  //   required String bookingId,
+  //   VoidCallback? onSuccess,
+  // }) async {
+  //   try {
+  //     final data = {
+  //       "bookingDate": selectedDate.toIso8601String(),
+  //       "bookingTime": _formatTime(selectedTime!),
+  //       "inspectionType": inspectionType,
+  //       "location": locationController.text.trim(),
+  //       "description": descriptionController.text.trim(),
+  //     };
+
+  //     // final res = await ApiClient.postMultipart(
+  //     //   endpoint: "/api/v1/bookings/update/$bookingId",
+  //     //   data: data,
+  //     //   files: images,
+  //     //   fileFieldName: "images",
+  //     // );
+
+  //     // if (res.success) {
+  //     //   ScaffoldMessenger.of(context).showSnackBar(
+  //     //     const SnackBar(content: Text('Booking updated successfully!')),
+  //     //   );
+  //     //   onSuccess?.call();
+  //     // } else {
+  //     //   _showError(context, res.message);
+  //     // }
+  //   } catch (e) {
+  //     _showError(context, e.toString());
   //   }
   // }
+
+  String _formatTime(TimeOfDay t) {
+    final dt = DateTime(0, 0, 0, t.hour, t.minute);
+    return DateFormat('HH:mm').format(dt);
+  }
+
+  TimeOfDay parseTime(String str) {
+    try {
+      final parts = str.split(':');
+      return TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
+    } catch (_) {
+      return const TimeOfDay(hour: 10, minute: 0);
+    }
+  }
+
+  void _showError(BuildContext context, String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+  }
+}

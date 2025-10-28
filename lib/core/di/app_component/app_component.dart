@@ -13,8 +13,14 @@ import 'package:inspect_connect/features/client_flow/data/datasources/remote_dat
 import 'package:inspect_connect/features/client_flow/data/repositories/client_repository_imp.dart';
 import 'package:inspect_connect/features/client_flow/domain/repositories/booking_repository.dart';
 import 'package:inspect_connect/features/client_flow/domain/usecases/create_booking_usecase.dart';
+import 'package:inspect_connect/features/client_flow/domain/usecases/delete_booking_usecase.dart';
+import 'package:inspect_connect/features/client_flow/domain/usecases/fetch_booking_list_usecase.dart';
+import 'package:inspect_connect/features/client_flow/domain/usecases/get_booking_Detail_usecase.dart';
 import 'package:inspect_connect/features/client_flow/domain/usecases/get_certificate_subtype_usecase.dart';
+import 'package:inspect_connect/features/client_flow/domain/usecases/update_booking_detail_usecase.dart';
 import 'package:inspect_connect/features/client_flow/domain/usecases/upload_image_usecase.dart';
+import 'package:inspect_connect/features/client_flow/presentations/providers/session_manager.dart';
+import 'package:inspect_connect/features/client_flow/presentations/providers/user_provider.dart';
 
 
 final GetIt locator = GetIt.I;
@@ -42,10 +48,17 @@ void setupLocator() {
   locator.registerLazySingleton(() => ChangePasswordUseCase(locator()));
   locator.registerLazySingleton(() => GetCertificateSubTypesUseCase(locator()));
   locator.registerLazySingleton(() => CreateBookingUseCase(locator()));
-  locator.registerLazySingleton(() => UploadImageUseCase(locator()));
+  locator.registerLazySingleton(() => GetBookingDetailUseCase(locator()));
+  locator.registerLazySingleton(() => UpdateBookingDetailUseCase(locator()));
+  locator.registerLazySingleton(() => DeleteBookingDetailUseCase(locator()));
 
+  
+  locator.registerLazySingleton(() => FetchBookingsUseCase(locator()));
+
+  locator.registerLazySingleton(() => UploadImageUseCase(locator()));
+locator.registerLazySingleton<UserProvider>(() => UserProvider());
+  locator.registerLazySingleton<SessionManager>(() => SessionManager());
 
 }
-
 
 

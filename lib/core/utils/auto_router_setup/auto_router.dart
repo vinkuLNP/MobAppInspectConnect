@@ -17,6 +17,7 @@ part 'auto_router.gr.dart';
 
 @AutoRouterConfig(replaceInRouteName: 'View|Page,Route')
 class AppRouter extends RootStackRouter {
+   AppRouter({super.navigatorKey});
   @override
   List<AutoRoute> get routes => <AutoRoute>[
     AutoRoute(page: SplashRoute.page, initial: true),
@@ -46,3 +47,5 @@ class AppRouter extends RootStackRouter {
 
   ];
 }
+
+

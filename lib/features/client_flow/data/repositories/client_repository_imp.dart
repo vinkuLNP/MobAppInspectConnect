@@ -1,5 +1,7 @@
 import 'package:inspect_connect/core/commondomain/entities/based_api_result/api_result_model.dart';
 import 'package:inspect_connect/features/client_flow/data/datasources/remote_datasource/client_api_datasource.dart';
+import 'package:inspect_connect/features/client_flow/data/models/booking_detail_model.dart';
+import 'package:inspect_connect/features/client_flow/data/models/booking_list_response_model.dart';
 import 'package:inspect_connect/features/client_flow/data/models/booking_model.dart';
 import 'package:inspect_connect/features/client_flow/data/models/upload_image_model.dart';
 import 'package:inspect_connect/features/client_flow/domain/entities/upload_image_dto.dart';
@@ -29,6 +31,40 @@ class ClientUserRepositoryImpl implements ClientUserRepository {
   Future<ApiResultModel<CreateBookingResponseModel>> createBooking({
     required BookingEntity booking,
   }) async {
-    return remote.createBooking( booking);
+    return remote.createBooking(booking);
   }
+
+  @override
+  Future<ApiResultModel<List<BookingListModel>>> fetchBookings({
+    required int page,
+    required int perPageLimit,
+    String? search,
+    String? sortBy,
+    String? sortOrder,
+    int? status,
+  }) {
+    return remote.getBookingList(
+      page: page,
+      perPageLimit: perPageLimit,
+      search: search,
+      sortBy: sortBy,
+      sortOrder: sortOrder,
+      status: status,
+    );
+  }
+  @override
+Future<ApiResultModel<BookingDetailModel>> getBookingDetail(String bookingId) {
+  return remote.getBookingDetail(bookingId);
+}
+
+@override
+Future<ApiResultModel<bool>> deleteBooking(String bookingId) {
+  return remote.deleteBooking(bookingId);
+}
+
+@override
+Future<ApiResultModel<BookingDetailModel>> updateBooking(String bookingId, BookingEntity booking) {
+  return remote.updateBooking(bookingId, booking);
+}
+
 }

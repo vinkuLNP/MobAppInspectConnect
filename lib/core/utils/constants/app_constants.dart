@@ -31,7 +31,10 @@ const Duration timeOutDuration = Duration(seconds: 20);
 ///
 ///
 // const String devBaseUrl = 'http://localhost:5002/api/v1/';
-const String devBaseUrl = 'http://10.0.2.2:5002/api/v1/';
+// const String devBaseUrl = 'http://10.0.2.2:5002/api/v1/';
+const String devBaseUrl = 'https://inspect-connect-api-auakczg0ave2bqex.westus2-01.azurewebsites.net/api/v1/';
+
+
 
 const String prodBaseUrl = '';
 const String qaBaseUrl = '';

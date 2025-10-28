@@ -20,7 +20,7 @@ class BookingEntity {
       "bookingDate": bookingDate,
       "bookingTime": bookingTime,
       "bookingLocation": bookingLocation,
-      "certificateSubTypeId": [certificateSubTypeId], 
+      "certificateSubTypeId": certificateSubTypeId, 
       "images": images,
       "description": description,
     };

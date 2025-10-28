@@ -3,6 +3,7 @@ import 'package:inspect_connect/core/di/app_component/app_component.dart';
 import 'package:inspect_connect/core/utils/auto_router_setup/auto_router.dart';
 import 'package:flutter/material.dart';
 import 'package:inspect_connect/features/auth_flow/data/datasources/local_datasources/auth_local_datasource.dart';
+import 'package:inspect_connect/features/client_flow/presentations/providers/booking_provider.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/user_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -23,6 +24,7 @@ class _SplashViewState extends State<SplashView> {
     final user = await locator<AuthLocalDataSource>().getUser();
     
        final userProvider = context.read<UserProvider>();
+        final bookingProvider = context.read<BookingProvider>();
        if(user != null){
     userProvider.setUser(user);
 
@@ -31,6 +33,7 @@ class _SplashViewState extends State<SplashView> {
     await userProvider.loadUser();
 
     if (userProvider.isLoggedIn) {
+        await bookingProvider.fetchBookingsList(); 
       context.router.replace(const ClientDashboardRoute());
     } else {
       context.router.replace(const OnBoardingRoute());
