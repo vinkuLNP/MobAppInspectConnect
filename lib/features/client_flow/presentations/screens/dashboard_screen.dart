@@ -1,9 +1,9 @@
 import 'dart:ui';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-import 'package:inspect_connect/features/client_flow/presentations/booking_screen.dart';
-import 'package:inspect_connect/features/client_flow/presentations/home_screen.dart';
-import 'package:inspect_connect/features/client_flow/presentations/profile_screen.dart';
+import 'package:inspect_connect/features/client_flow/presentations/screens/booking_screen.dart';
+import 'package:inspect_connect/features/client_flow/presentations/screens/home_screen.dart';
+import 'package:inspect_connect/features/client_flow/presentations/screens/profile_screen.dart';
 
 @RoutePage()
 class ClientDashboardView extends StatefulWidget {

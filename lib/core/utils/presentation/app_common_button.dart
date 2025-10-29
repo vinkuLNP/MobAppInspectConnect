@@ -123,7 +123,7 @@ class AppButton extends StatelessWidget {
     super.key,
     this.width = 500,
     this.height = 60,
-    this.borderRadius = 15,
+    this.borderRadius = 5,
     this.fontWeight = FontWeight.bold,
     this.textColor = AppColors.whiteColor,
     required this.text,

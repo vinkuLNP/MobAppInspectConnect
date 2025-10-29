@@ -98,3 +98,4 @@ class ChangePasswordViewModel extends BaseViewModel {
   }
 
 }
+

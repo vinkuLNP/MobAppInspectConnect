@@ -3,6 +3,8 @@ import 'package:inspect_connect/features/client_flow/data/models/booking_detail_
 import 'package:inspect_connect/features/client_flow/data/models/booking_list_response_model.dart';
 import 'package:inspect_connect/features/client_flow/data/models/booking_model.dart';
 import 'package:inspect_connect/features/client_flow/data/models/upload_image_model.dart';
+import 'package:inspect_connect/features/client_flow/data/models/user_payment_list_model.dart';
+import 'package:inspect_connect/features/client_flow/data/models/wallet_model.dart';
 import 'package:inspect_connect/features/client_flow/domain/entities/upload_image_dto.dart';
 import 'package:inspect_connect/features/client_flow/domain/entities/booking_entity.dart';
 import 'package:inspect_connect/features/client_flow/domain/entities/certificate_sub_type_entity.dart';
@@ -19,8 +21,17 @@ abstract class ClientUserRepository {
     String? sortOrder,
     int? status,
  });
+ Future<ApiResultModel<PaymentsBodyModel>>  getUserPaymentList({
+   required int page,
+    required int limit,
+    String? search,
+    String? sortBy,
+    String? sortOrder,
+ });
+ Future<ApiResultModel<WalletModel>>  getUserWalletAmount();
+
   Future<ApiResultModel<BookingDetailModel>> getBookingDetail(String bookingId);
 Future<ApiResultModel<bool>> deleteBooking(String bookingId);
-Future<ApiResultModel<BookingDetailModel>> updateBooking(String bookingId, BookingEntity booking);
+Future<ApiResultModel<BookingData>> updateBooking(String bookingId, BookingEntity booking);
 
 }

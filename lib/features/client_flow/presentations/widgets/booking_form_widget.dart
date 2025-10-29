@@ -1,7 +1,5 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:inspect_connect/features/client_flow/data/models/booking_detail_model.dart';
-import 'package:intl/intl.dart';
 import 'package:inspect_connect/features/client_flow/presentations/widgets/select_time_widget.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/booking_provider.dart';
 import 'package:provider/provider.dart';
@@ -34,6 +32,9 @@ class _BookingFormWidgetState extends State<BookingFormWidget> {
       if (widget.isEditing && widget.initialBooking != null) {
         final BookingDetailModel b = widget.initialBooking;
         provider.locationController.text = b.bookingLocation ?? '';
+        provider.location = b.bookingLocation ?? '';
+        provider.description = b.description ?? '';
+
         provider.descriptionController.text = b.description ?? '';
         provider.setDate(DateTime.parse(b.bookingDate!));
         provider.setTime(provider.parseTime(b.bookingTime ?? ''));
@@ -43,6 +44,7 @@ class _BookingFormWidgetState extends State<BookingFormWidget> {
 
         // 🖼️ Load existing image URLs if any
         if (b.images != null && b.images.isNotEmpty) {
+          provider.uploadedUrls = List<String>.from(b.images);
           provider.existingImageUrls = List<String>.from(b.images);
         }
       }
@@ -69,98 +71,117 @@ class _BookingFormWidgetState extends State<BookingFormWidget> {
           final dates = _generateDates();
           final controller = ScrollController();
 
-          return SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _datePicker(context, prov, dates, controller),
-                  const SizedBox(height: 20),
+          return Stack(
 
-                  SelectTimeWidget(
-                    initialTime: prov.selectedTime,
-                    onTimeSelected: (t) => prov.setTime(t),
-                    selectedDate: prov.selectedDate,
-                  ),
-                  const SizedBox(height: 20),
+            children: [
 
-                  const Text(
-                    'Inspection Type',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                  ),
-                  const SizedBox(height: 8),
-                  _inspectionTypeDropdown(prov),
 
-                  const SizedBox(height: 20),
-                  const Text(
-                    'Location',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                  ),
-                  const SizedBox(height: 8),
-                  TextFormField(
-                    controller: prov.locationController,
-                    decoration: _inputDecoration('Enter location'),
-                    onChanged: prov.setLocation,
-                  ),
-
-                  const SizedBox(height: 20),
-                  const Text(
-                    'Description',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                  ),
-                  const SizedBox(height: 8),
-                  TextFormField(
-                    controller: prov.descriptionController,
-                    maxLines: 4,
-                    decoration: _inputDecoration('Add details...'),
-                    onChanged: prov.setDescription,
-                  ),
-
-                  const SizedBox(height: 20),
-                  const Text(
-                    'Upload Images (max 5)',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                  ),
-                  const SizedBox(height: 8),
-                  _imageGrid(prov, context),
-
-                  const SizedBox(height: 24),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        if (!prov.validate()) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Please fill all fields'),
+              AbsorbPointer(
+ absorbing: prov.isProcessing,
+                child: Opacity(
+                  opacity: prov.isProcessing ? 0.6 : 1.0,
+                  child: SingleChildScrollView(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _datePicker(context, prov, dates, controller),
+                          const SizedBox(height: 20),
+                  
+                          SelectTimeWidget(
+                            initialTime: prov.selectedTime,
+                            onTimeSelected: (t) => prov.setTime(t),
+                            selectedDate: prov.selectedDate,
+                          ),
+                          const SizedBox(height: 20),
+                  
+                          const Text(
+                            'Inspection Type',
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                          ),
+                          const SizedBox(height: 8),
+                          _inspectionTypeDropdown(prov),
+                  
+                          const SizedBox(height: 20),
+                          const Text(
+                            'Location',
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                          ),
+                          const SizedBox(height: 8),
+                          TextFormField(
+                            controller: prov.locationController,
+                            decoration: _inputDecoration('Enter location'),
+                            onChanged: prov.setLocation,
+                          ),
+                  
+                          const SizedBox(height: 20),
+                          const Text(
+                            'Description',
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                          ),
+                          const SizedBox(height: 8),
+                          TextFormField(
+                            controller: prov.descriptionController,
+                            maxLines: 4,
+                            decoration: _inputDecoration('Add details...'),
+                            onChanged: prov.setDescription,
+                          ),
+                  
+                          const SizedBox(height: 20),
+                          const Text(
+                            'Upload Images (max 5)',
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                          ),
+                          const SizedBox(height: 8),
+                          _imageGrid(prov, context),
+                  
+                          const SizedBox(height: 24),
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              onPressed: prov.isProcessing
+                        ? null
+                        : () {
+                                if (!prov.validate()) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text('Please fill all fields'),
+                                    ),
+                                  );
+                                  return;
+                                }
+                  
+                                if (widget.isEditing) {
+                                  prov.updateBooking(
+                                    context: context,
+                                    bookingId: widget.initialBooking?.id,
+                                    // onSuccess: widget.onSubmitSuccess,
+                                  );
+                                } else {
+                                  prov.createBooking(context: context);
+                                }
+                              },
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 14),
+                                child: Text(
+                                  widget.isEditing ? 'Save Changes' : 'Confirm Booking',
+                                  style: const TextStyle(fontSize: 16),
+                                ),
+                              ),
                             ),
-                          );
-                          return;
-                        }
-
-                        if (widget.isEditing) {
-                          prov.updateBooking(
-                            context: context,
-                            bookingId: widget.initialBooking?.id,
-                            // onSuccess: widget.onSubmitSuccess,
-                          );
-                        } else {
-                          prov.createBooking(context: context);
-                        }
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        child: Text(
-                          widget.isEditing ? 'Save Changes' : 'Confirm Booking',
-                          style: const TextStyle(fontSize: 16),
-                        ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
-                ],
+                ),
               ),
-            ),
+              if (prov.isProcessing)
+      const Center(
+        child: CircularProgressIndicator(),
+      ),
+            ],
           );
         },
       ),
@@ -275,11 +296,9 @@ class _BookingFormWidgetState extends State<BookingFormWidget> {
   }
 
   Widget _inspectionTypeDropdown(BookingProvider prov) {
-    return prov.subTypes.isEmpty
-        ? const Center(child: CircularProgressIndicator())
-        : DropdownButtonFormField<String>(
+    return  DropdownButtonFormField<String>(
             decoration: _inputDecoration('Select inspection type'),
-            value: prov.inspectionType,
+            initialValue: prov.inspectionType,
             items: prov.subTypes
                 .map(
                   (subType) => DropdownMenuItem<String>(
@@ -293,8 +312,7 @@ class _BookingFormWidgetState extends State<BookingFormWidget> {
   }
 
   Widget _imageGrid(BookingProvider prov, BuildContext context) {
-    final totalImages =
-        prov.existingImageUrls.length + prov.images.length; // include old + new
+    final totalImages = prov.existingImageUrls.length + prov.images.length;
     final canAddMore = totalImages < 5;
 
     return GridView.builder(
@@ -307,7 +325,6 @@ class _BookingFormWidgetState extends State<BookingFormWidget> {
       ),
       itemCount: canAddMore ? totalImages + 1 : totalImages,
       itemBuilder: (ctx, i) {
-        // existing image URLs
         if (i < prov.existingImageUrls.length) {
           final url = prov.existingImageUrls[i];
           return Stack(
@@ -339,7 +356,6 @@ class _BookingFormWidgetState extends State<BookingFormWidget> {
           );
         }
 
-        // newly picked files
         final imgIndex = i - prov.existingImageUrls.length;
         if (imgIndex < prov.images.length) {
           return Stack(
@@ -376,7 +392,6 @@ class _BookingFormWidgetState extends State<BookingFormWidget> {
           );
         }
 
-        // add new image button
         return GestureDetector(
           onTap: () => prov.uploadImage(ctx),
           child: Container(

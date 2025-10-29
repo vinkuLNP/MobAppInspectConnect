@@ -8,7 +8,7 @@ import 'package:inspect_connect/features/auth_flow/presentation/client/widgets/c
 import 'package:inspect_connect/features/auth_flow/presentation/inspector/view/sign_in_screen.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/inspector/view/sign_up_screen.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/inspector/widgets/inspector_auth_wrapper.dart';
-import 'package:inspect_connect/features/client_flow/presentations/dashboard_screen.dart';
+import 'package:inspect_connect/features/client_flow/presentations/screens/dashboard_screen.dart';
 import 'package:inspect_connect/features/client_flow/presentations/screens/account_settings_screen.dart';
 import 'package:inspect_connect/features/client_flow/presentations/screens/change_password_screen.dart';
 import 'package:inspect_connect/features/onboarding_flow/presentation/view/onboarding_screen.dart';

@@ -1,11 +1,11 @@
 import 'dart:developer';
 import 'dart:io';
-import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:inspect_connect/core/basecomponents/base_view_model.dart';
 import 'package:inspect_connect/core/commondomain/entities/based_api_result/api_result_state.dart';
 import 'package:inspect_connect/core/di/app_component/app_component.dart';
+import 'package:inspect_connect/core/utils/constants/app_colors.dart';
 import 'package:inspect_connect/features/auth_flow/data/datasources/local_datasources/auth_local_datasource.dart';
 import 'package:inspect_connect/features/client_flow/data/models/booking_detail_model.dart';
 import 'package:inspect_connect/features/client_flow/data/models/booking_model.dart';
@@ -22,13 +22,16 @@ import 'package:inspect_connect/features/client_flow/domain/usecases/get_certifi
 import 'package:inspect_connect/features/client_flow/domain/usecases/update_booking_detail_usecase.dart';
 import 'package:inspect_connect/features/client_flow/domain/usecases/upload_image_usecase.dart';
 import 'package:inspect_connect/features/client_flow/presentations/screens/booking_edit_screen.dart';
+import 'package:inspect_connect/features/client_flow/presentations/screens/payment_screens/wallet_screen.dart';
 import 'package:intl/intl.dart';
 
 class BookingProvider extends BaseViewModel {
   DateTime _selectedDate = DateTime.now();
   TimeOfDay? _selectedTime;
+  String? formattedTime;
+
   String? _inspectionType;
-  String? _location;
+  String? location;
   String description = '';
   final List<File> images = [];
   final TextEditingController locationController = TextEditingController();
@@ -36,8 +39,7 @@ class BookingProvider extends BaseViewModel {
   DateTime get selectedDate => _selectedDate;
   TimeOfDay? get selectedTime => _selectedTime;
   String? get inspectionType => _inspectionType;
-  String? get location => _location;
-
+  String? get getLocation => location;
   void setDate(DateTime d) {
     _selectedDate = DateTime(d.year, d.month, d.day);
     notifyListeners();
@@ -47,11 +49,20 @@ class BookingProvider extends BaseViewModel {
 
   void removeExistingImageAt(int index) {
     existingImageUrls.removeAt(index);
+    uploadedUrls.removeAt(index);
+    notifyListeners();
+  }
+
+  bool isProcessing = false;
+
+  void setProcessing(bool value) {
+    isProcessing = value;
     notifyListeners();
   }
 
   void setTime(TimeOfDay t) {
     _selectedTime = t;
+    formattedTime = formatTimeForApi(_selectedTime!);
     notifyListeners();
   }
 
@@ -61,7 +72,7 @@ class BookingProvider extends BaseViewModel {
   }
 
   void setLocation(String? l) {
-    _location = l;
+    location = l;
     if (locationController.text != l) {
       locationController.text = l ?? '';
     }
@@ -86,18 +97,38 @@ class BookingProvider extends BaseViewModel {
   }
 
   bool validate() {
-    return _selectedDate != null &&
-        _selectedTime != null &&
-        _inspectionType != null &&
-        _location != null &&
-        description != '' &&
-        images.isNotEmpty &&
-        uploadedUrls.isNotEmpty &&
-        images != [] &&
-        uploadedUrls != [];
+    bool isValid = true;
+
+    if (_selectedTime == null) {
+      print("Please select a time");
+      isValid = false;
+    }
+
+    if (_inspectionType == null) {
+      print("Please select an inspection type");
+      isValid = false;
+    }
+
+    if (location == null) {
+      print("Please select a location");
+      isValid = false;
+    }
+
+    if (description == null || description.trim().isEmpty) {
+      print("Please enter a description");
+      isValid = false;
+    }
+
+    if (uploadedUrls.isEmpty) {
+      print("Please add at least one image");
+      isValid = false;
+    }
+
+    return isValid;
   }
 
   List<CertificateSubTypeEntity> subTypes = [];
+  BookingData? updatedBookingData;
   BookingDetailModel? bookingDetailModel;
 
   bool isLoading = false;
@@ -119,16 +150,16 @@ class BookingProvider extends BaseViewModel {
   }
 
   Future<void> createBooking({required BuildContext context}) async {
-    // if (!canVerify) return;
     try {
+      setProcessing(true);
       final user = await locator<AuthLocalDataSource>().getUser();
       if (user == null || user.token == null) {
         throw Exception('User not found in local storage');
       }
       final booking = BookingEntity(
         bookingDate: _selectedDate.toIso8601String().split('T').first,
-        bookingTime: '${_selectedTime!.hour}:${_selectedTime!.minute}',
-        bookingLocation: _location!,
+        bookingTime: formattedTime!,
+        bookingLocation: location!,
         certificateSubTypeId: _inspectionType!,
         images: uploadedUrls,
         description: description,
@@ -159,52 +190,65 @@ class BookingProvider extends BaseViewModel {
           clearBookingData();
         },
         error: (e) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(e.message ?? 'Booking creation failed')),
-          );
+          if (e.message!.toLowerCase().contains("insufficient")) {
+            // ScaffoldMessenger.of(context).showSnackBar(
+            //   SnackBar(content: Text('${e.message} Recharge Your Wallet Now')),
+            // );
+                 _showInsufficientFundsDialog(context, e.message!);
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(e.message ?? 'Booking creation failed')),
+            );
+          }
         },
       );
     } finally {
-      // setSigningIn(false);
+      setProcessing(false);
     }
   }
 
-
-  Future<void> updateBooking({required BuildContext context, required String bookingId,}) async {
-    // if (!canVerify) return;
+  Future<void> updateBooking({
+    required BuildContext context,
+    required String bookingId,
+  }) async {
     try {
+      setProcessing(true);
       final user = await locator<AuthLocalDataSource>().getUser();
       if (user == null || user.token == null) {
         throw Exception('User not found in local storage');
       }
+      log('-------> uploadurl------->$uploadedUrls');
       final booking = BookingEntity(
         bookingDate: _selectedDate.toIso8601String().split('T').first,
-        bookingTime: '${_selectedTime!.hour}:${_selectedTime!.minute}',
-        bookingLocation: _location!,
+        bookingTime: formattedTime!,
+        bookingLocation: location!,
         certificateSubTypeId: _inspectionType!,
         images: uploadedUrls,
         description: description,
       );
+      log('-------> booking------->$booking');
+
       final updateBookingDetailUseCase = locator<UpdateBookingDetailUseCase>();
       final state =
-          await executeParamsUseCase<
-            BookingDetailModel,
-            UpdateBookingDetailParams
-          >(
+          await executeParamsUseCase<BookingData, UpdateBookingDetailParams>(
             useCase: updateBookingDetailUseCase,
 
-            query: UpdateBookingDetailParams(bookingEntity: booking,bookingId: bookingId,),
+            query: UpdateBookingDetailParams(
+              bookingEntity: booking,
+              bookingId: bookingId,
+            ),
             launchLoader: true,
           );
 
       state?.when(
         data: (response) async {
           clearBookingDetail();
-          bookingDetailModel = response;
-           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text( 'Booking Updated successfully.')),
+          updatedBookingData = response;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Booking Updated successfully.')),
           );
-          Navigator.pop(context);
+          Navigator.pop(context, true);
+          clearFilters();
           // clearBookingData();
         },
         error: (e) {
@@ -214,7 +258,7 @@ class BookingProvider extends BaseViewModel {
         },
       );
     } finally {
-      // setSigningIn(false);
+      setProcessing(false);
     }
   }
 
@@ -222,7 +266,6 @@ class BookingProvider extends BaseViewModel {
     required BuildContext context,
     required String bookingId,
   }) async {
-    // if (!canVerify) return;
     try {
       final user = await locator<AuthLocalDataSource>().getUser();
       if (user == null || user.token == null) {
@@ -251,25 +294,29 @@ class BookingProvider extends BaseViewModel {
             MaterialPageRoute(
               builder: (_) => BookingEditScreen(booking: bookingDetailModel),
             ),
-          );
+          ).then((result) {
+            if (result == true) {
+              fetchBookingsList(reset: true);
+            }
+          });
         },
         error: (e) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(e.message ?? 'Fetching Booking Detail failed')),
+            SnackBar(
+              content: Text(e.message ?? 'Fetching Booking Detail failed'),
+            ),
           );
         },
       );
-    } finally {
-      // setSigningIn(false);
-    }
+    } finally {}
   }
 
   Future<void> deleteBookingDetail({
     required BuildContext context,
     required String bookingId,
   }) async {
-    // if (!canVerify) return;
     try {
+      setProcessing(true);
       final user = await locator<AuthLocalDataSource>().getUser();
       if (user == null || user.token == null) {
         throw Exception('User not found in local storage');
@@ -296,7 +343,7 @@ class BookingProvider extends BaseViewModel {
         },
       );
     } finally {
-      // setSigningIn(false);
+      setProcessing(false);
     }
   }
 
@@ -307,6 +354,7 @@ class BookingProvider extends BaseViewModel {
 
   Future<void> fetchCertificateSubTypes() async {
     try {
+      setProcessing(true);
       final getSubTypesUseCase = locator<GetCertificateSubTypesUseCase>();
       final state =
           await executeParamsUseCase<
@@ -318,28 +366,20 @@ class BookingProvider extends BaseViewModel {
         data: (response) {
           subTypes = response;
           notifyListeners();
-          // ScaffoldMessenger.of(context).showSnackBar(
-          //   const SnackBar(
-          //     content: Text('Certificate types loaded successfully'),
-          //   ),
-          // );
         },
-        error: (e) {
-          // ScaffoldMessenger.of(context).showSnackBar(
-          //   SnackBar(
-          //     content: Text(e.message ?? 'Failed to load certificate types'),
-          //   ),
-          // );
-        },
+        error: (e) {},
       );
     } catch (e) {
       log('fetchCertificateSubTypes error: $e');
+    } finally {
+      setProcessing(false);
     }
   }
 
   Future<void> uploadImage(BuildContext context) async {
     try {
       if (images.length >= 5) return;
+      setProcessing(true);
       final XFile? picked = await _picker.pickImage(
         source: ImageSource.gallery,
         imageQuality: 80,
@@ -347,15 +387,6 @@ class BookingProvider extends BaseViewModel {
       if (picked == null) return;
 
       final file = File(picked.path);
-      // final allowedExtensions = ['jpg', 'jpeg', 'png', 'webp'];
-      // final extension = picked.name.split('.').last.toLowerCase();
-
-      // if (!allowedExtensions.contains(extension)) {
-      //   ScaffoldMessenger.of(
-      //     context,
-      //   ).showSnackBar(const SnackBar(content: Text('Invalid image type')));
-      //   return;
-      // }
       if (await file.length() > 1 * 1024 * 1024) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('File must be under 1 MB')),
@@ -380,9 +411,6 @@ class BookingProvider extends BaseViewModel {
           uploadedUrls.add(response.fileUrl);
           images.add(file);
           notifyListeners();
-          // ScaffoldMessenger.of(context).showSnackBar(
-          //   SnackBar(content: Text(response.message.isNotEmpty ? response.message : 'Image uploaded successfully')),
-          // );
         },
         error: (e) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -392,6 +420,8 @@ class BookingProvider extends BaseViewModel {
       );
     } catch (e) {
       log('uploadImage error: $e');
+    } finally {
+      setProcessing(false);
     }
   }
 
@@ -401,7 +431,8 @@ class BookingProvider extends BaseViewModel {
     log('🧹 Clearing booking data...');
     _selectedDate = DateTime.now();
     _selectedTime = null;
-    _location = null;
+    formattedTime = null;
+    location = null;
     _inspectionType = null;
     description = '';
     uploadedUrls.clear();
@@ -420,7 +451,6 @@ class BookingProvider extends BaseViewModel {
   bool hasMoreBookings = true;
   bool isLoadMoreRunning = false;
 
-  // Reset bookings data
   void resetBookings() {
     bookings.clear();
     _currentPage = 1;
@@ -431,14 +461,12 @@ class BookingProvider extends BaseViewModel {
 
   final int _perPageLimit = 10;
 
-  // Filters
   String? _searchQuery;
   String? _searchDate;
   String? _status;
   String _sortBy = 'createdAt';
   String _sortOrder = 'desc';
 
-  /// Fetch initial or paginated booking list
   Future<void> fetchBookingsList({
     bool reset = false,
     bool loadMore = false,
@@ -465,10 +493,9 @@ class BookingProvider extends BaseViewModel {
       final params = FetchBookingsParams(
         page: _currentPage,
         perPageLimit: _perPageLimit,
-        search: _searchDate ?? _searchQuery ?? '', // can be text or date
+        search: _searchDate ?? _searchQuery ?? '',
         sortBy: _sortBy,
         sortOrder: _sortOrder,
-        // status: _status != null ? int.tryParse(_status!) ?? 0 : 0,
         status: _status != null && _status!.isNotEmpty
             ? int.tryParse(_status!)
             : null,
@@ -495,6 +522,7 @@ class BookingProvider extends BaseViewModel {
           } else {
             _currentPage++;
           }
+          notifyListeners();
         },
         error: (e) {
           log("Error fetching bookings: ${e.message}");
@@ -539,56 +567,72 @@ class BookingProvider extends BaseViewModel {
     fetchBookingsList(reset: true);
   }
 
-  /// ✅ Update booking (for Edit)
-  // Future<void> updateBooking({
-  //   required BuildContext context,
-  //   required String bookingId,
-  //   VoidCallback? onSuccess,
-  // }) async {
-  //   try {
-  //     final data = {
-  //       "bookingDate": selectedDate.toIso8601String(),
-  //       "bookingTime": _formatTime(selectedTime!),
-  //       "inspectionType": inspectionType,
-  //       "location": locationController.text.trim(),
-  //       "description": descriptionController.text.trim(),
-  //     };
-
-  //     // final res = await ApiClient.postMultipart(
-  //     //   endpoint: "/api/v1/bookings/update/$bookingId",
-  //     //   data: data,
-  //     //   files: images,
-  //     //   fileFieldName: "images",
-  //     // );
-
-  //     // if (res.success) {
-  //     //   ScaffoldMessenger.of(context).showSnackBar(
-  //     //     const SnackBar(content: Text('Booking updated successfully!')),
-  //     //   );
-  //     //   onSuccess?.call();
-  //     // } else {
-  //     //   _showError(context, res.message);
-  //     // }
-  //   } catch (e) {
-  //     _showError(context, e.toString());
-  //   }
-  // }
-
-  String _formatTime(TimeOfDay t) {
-    final dt = DateTime(0, 0, 0, t.hour, t.minute);
-    return DateFormat('HH:mm').format(dt);
-  }
-
   TimeOfDay parseTime(String str) {
     try {
-      final parts = str.split(':');
-      return TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
-    } catch (_) {
-      return const TimeOfDay(hour: 10, minute: 0);
+      final normalized = str.trim().toUpperCase().replaceAll('.', '');
+
+      if (normalized.contains('AM') || normalized.contains('PM')) {
+        final dt = DateFormat('h:mm a').parse(normalized);
+        return TimeOfDay(hour: dt.hour, minute: dt.minute);
+      }
+
+      final dt = DateFormat('HH:mm').parse(normalized);
+      return TimeOfDay(hour: dt.hour, minute: dt.minute);
+    } catch (e) {
+      return const TimeOfDay(hour: 10, minute: 0); // default fallback
     }
   }
 
-  void _showError(BuildContext context, String msg) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+  String formatTimeForApi(TimeOfDay t) {
+    final hour = t.hourOfPeriod == 0 ? 12 : t.hourOfPeriod;
+    final minute = t.minute.toString().padLeft(2, '0');
+    final period = t.period == DayPeriod.am ? 'AM' : 'PM';
+    return '$hour:$minute $period';
   }
+
+  void _showInsufficientFundsDialog(BuildContext context, String message) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text(
+          'Insufficient Funds',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        content: Text(
+          '$message\n\nYou don’t have sufficient funds in your wallet. Please recharge now to continue.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.themeColor,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            onPressed: () {
+              Navigator.pop(context); // Close dialog
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => WalletRechargeScreen(
+                    minAmount: 50,
+                    maxAmount: 5000,
+                  ),
+                ),
+              );
+            },
+            child: const Text('Recharge Now'),
+          ),
+        ],
+      );
+    },
+  );
+}
+
 }

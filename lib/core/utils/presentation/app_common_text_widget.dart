@@ -6,6 +6,8 @@ Widget textWidget({
   required String text,
   String highLightText = "",
   Color colour = AppColors.black,
+  Color textDecorationColor= AppColors.black,
+
   double fontSize = 14,
   Color highLightColor = AppColors.black,
   TextAlign alignment = TextAlign.start,
@@ -28,6 +30,7 @@ Widget textWidget({
           height: height,
           fontStyle: fontStyle,
           textDecoration: textDecoration,
+          textDecorationColor:textDecorationColor ,
           textOverflow: textOverflow,
         ),
       )
@@ -38,6 +41,7 @@ Widget textWidget({
         style: appTextStyle(
           fontSize: fontSize,
           fontWeight: fontWeight,
+          textDecorationColor:textDecorationColor ,
           colour: colour,
           height: height,
           fontStyle: fontStyle,

@@ -19,7 +19,7 @@ class ClientSignInView extends StatelessWidget {
     final formKey = GlobalKey<FormState>();
    
         return BaseResponsiveWidget(
-          initializeConfig: false,
+          initializeConfig: true,
           buildWidget: (ctx, rc, app) {
             final provider = ctx.watch<ClientViewModelProvider>();
 

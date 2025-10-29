@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/utils/constants/app_assets_constants.dart';
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
@@ -25,25 +24,21 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
-  gradient: LinearGradient(
-    colors: [
-         Color(0xFFBFD7FF),
-      Color(0xFF89AFFF), // sky blue
-    // light powder blue
-    ],
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-  ),
-  boxShadow: [
-    BoxShadow(
-      color: Colors.black26,
-      offset: Offset(0, 2),
-      blurRadius: 6,
-    ),
-  ],
-  borderRadius: BorderRadius.vertical(
-    bottom: Radius.circular(20),
-  ),
+        color: AppColors.whiteColor,
+        // gradient: LinearGradient(
+        //   colors: [
+
+        //     //    Color(0xFFBFD7FF),
+        //     // Color(0xFF89AFFF), // sky blue
+        //   // light powder blue
+        //   ],
+        // begin: Alignment.topLeft,
+        // end: Alignment.bottomRight,
+        // ),
+        boxShadow: [
+          BoxShadow(color: Colors.black26, offset: Offset(0, 2), blurRadius: 6),
+        ],
+        borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
 
         // gradient: LinearGradient(
         //   colors: [
@@ -69,29 +64,29 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
       child: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        
+
         centerTitle: true,
         automaticallyImplyLeading: false,
         leading: showBackButton
             ? IconButton(
-                icon: const Icon(Icons.arrow_back, color: AppColors.themeColor,),
+                icon: const Icon(Icons.arrow_back, color: AppColors.themeColor),
                 onPressed: onBack ?? () => Navigator.of(context).maybePop(),
               )
             : showLogo
-                ? Padding(
-                    padding: const EdgeInsets.only(left: 12),
-                    child: Image.asset(
-                    appLogo,
-                      height: 36,
-                      width: 36,
-                      // color: Colors.white, // make sure logo looks clean
-                    ),
-                  )
-                : null,
+            ? Padding(
+                padding: const EdgeInsets.only(left: 12),
+                child: Image.asset(
+                  appLogo,
+                  height: 36,
+                  width: 36,
+                  // color: Colors.white, // make sure logo looks clean
+                ),
+              )
+            : null,
         title: title != null
             ? Text(
                 title!,
-                style:  TextStyle(
+                style: TextStyle(
                   color: AppColors.themeColor,
                   fontWeight: FontWeight.w600,
                   fontSize: 18,
@@ -101,11 +96,15 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
         actions: [
           if (showNotification)
             IconButton(
-              icon: const Icon(Icons.notifications_none, color: AppColors.themeColor,),
-              onPressed: onNotificationTap ??
+              icon: const Icon(
+                Icons.notifications_none,
+                color: AppColors.themeColor,
+              ),
+              onPressed:
+                  onNotificationTap ??
                   () => ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Notifications tapped')),
-                      ),
+                    const SnackBar(content: Text('Notifications tapped')),
+                  ),
             ),
         ],
       ),

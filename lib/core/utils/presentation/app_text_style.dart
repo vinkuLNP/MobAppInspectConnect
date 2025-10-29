@@ -5,6 +5,7 @@ TextStyle appTextStyle({
   required double fontSize,
   bool isBold = false,
   Color? colour,
+  Color? textDecorationColor,
   FontWeight fontWeight = FontWeight.normal,
   FontStyle fontStyle = FontStyle.normal,
   TextDecoration? textDecoration,
@@ -12,6 +13,8 @@ TextStyle appTextStyle({
   double height = 0.0,
 }) => TextStyle(
   decoration: textDecoration,
+  decorationColor: textDecorationColor ?? AppColors.black,
+  // textDecoration,
   overflow: textOverflow,
   fontSize: fontSize,
   color: colour ?? AppColors.whiteColor,

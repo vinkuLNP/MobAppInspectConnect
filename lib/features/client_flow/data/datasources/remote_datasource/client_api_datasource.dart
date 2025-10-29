@@ -18,6 +18,8 @@ import 'package:inspect_connect/features/client_flow/data/models/booking_list_re
 import 'package:inspect_connect/features/client_flow/data/models/booking_model.dart';
 import 'package:inspect_connect/features/client_flow/data/models/certificate_subtype_model.dart';
 import 'package:inspect_connect/features/client_flow/data/models/upload_image_model.dart';
+import 'package:inspect_connect/features/client_flow/data/models/user_payment_list_model.dart';
+import 'package:inspect_connect/features/client_flow/data/models/wallet_model.dart';
 import 'package:inspect_connect/features/client_flow/domain/entities/booking_entity.dart';
 import 'package:inspect_connect/features/client_flow/domain/entities/upload_image_dto.dart';
 
@@ -38,9 +40,17 @@ abstract class BookingRemoteDataSource {
     String? sortOrder,
     int? status,
   });
+   Future<ApiResultModel<WalletModel>>  getUserWalletAmount();
+    Future<ApiResultModel<PaymentsBodyModel>>  getUserPaymentList({
+   required int page,
+    required int limit,
+    String? search,
+    String? sortBy,
+    String? sortOrder,
+ });
     Future<ApiResultModel<BookingDetailModel>> getBookingDetail(String bookingId);
   Future<ApiResultModel<bool>> deleteBooking(String bookingId);
-  Future<ApiResultModel<BookingDetailModel>> updateBooking(String bookingId, BookingEntity bookingEntity);
+  Future<ApiResultModel<BookingData>> updateBooking(String bookingId, BookingEntity bookingEntity);
 
 }
 
@@ -81,6 +91,119 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
         },
         failure: (ErrorResultModel e) =>
             ApiResultModel<List<CertificateSubTypeModel>>.failure(
+              errorResultEntity: e,
+            ),
+      );
+    } catch (e) {
+      log('autoremoteresopoonse------> $e');
+      return const ApiResultModel.failure(
+        errorResultEntity: ErrorResultModel(
+          message: "Network error occurred",
+          statusCode: 500,
+        ),
+      );
+    }
+  }
+
+
+  @override
+  Future<ApiResultModel<WalletModel>>
+  getUserWalletAmount() async {
+    try {
+       final user = await locator<AuthLocalDataSource>().getUser();
+      if (user == null || user.token == null) {
+        throw Exception('User not found in local storage');
+      }
+      final ApiResultModel<http.Response> res = await _ctx.makeRequest(
+        uri: getCertificateSubTypesEndPoint,
+        httpRequestStrategy: GetRequestStrategy(),
+         headers: {
+          'Authorization': 'Bearer ${user.token}',
+          "Content-Type": "multipart/form-data",
+        },
+      );
+
+      return res.when(
+        success: (http.Response response) {
+          final Map<String, dynamic> root = response.body.isEmpty
+              ? {}
+              : (jsonDecode(response.body) as Map<String, dynamic>);
+          // Backend shape:
+          // { "success": true, "message": "...", "body": { ... user object ... } }
+          final Map<String, dynamic> body =
+              (root['body'] as Map?)?.cast<String, dynamic>() ??
+              <String, dynamic>{};
+
+          final WalletModel data = WalletModel.fromJson(body);
+
+          return ApiResultModel<WalletModel>.success(
+            data: data,
+          );
+        },
+        failure: (ErrorResultModel e) =>
+            ApiResultModel<WalletModel>.failure(
+              errorResultEntity: e,
+            ),
+      );
+    } catch (e) {
+      log('autoremoteresopoonse------> $e');
+      return const ApiResultModel.failure(
+        errorResultEntity: ErrorResultModel(
+          message: "Network error occurred",
+          statusCode: 500,
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<ApiResultModel<PaymentsBodyModel>> getUserPaymentList({
+    required int page,
+    required int limit,
+    String? search,
+    String? sortBy,
+    String? sortOrder,
+    int? status,
+  }) async {
+    try {
+      final user = await locator<AuthLocalDataSource>().getUser();
+      if (user == null || user.token == null) {
+        throw Exception('User not found in local storage');
+      }
+      final queryParams = {
+        'page': page.toString(),
+        'limit': limit.toString(),
+        if (search != null && search.isNotEmpty) 'search': search,
+        if (sortBy != null && sortBy.isNotEmpty) 'sortBy': sortBy,
+        if (sortOrder != null && sortOrder.isNotEmpty) 'sortOrder': sortOrder,
+      };
+
+      final ApiResultModel<http.Response> res = await _ctx.makeRequest(
+        uri: createBookingEndPoint,
+        requestData: queryParams,
+        httpRequestStrategy: GetRequestStrategy(),
+        headers: {
+          'Authorization': 'Bearer ${user.token}',
+          'Accept': 'application/json',
+        },
+      );
+
+      return res.when(
+        success: (http.Response response) {
+          final Map<String, dynamic> root = response.body.isEmpty
+              ? {}
+              : (jsonDecode(response.body) as Map<String, dynamic>);
+          // Backend shape:
+          // { "success": true, "message": "...", "body": { ... user object ... } }
+          final Map<String, dynamic> body =
+              (root['body'] as Map?)?.cast<String, dynamic>() ??
+              <String, dynamic>{};
+            final dto = PaymentsBodyModel.fromJson(body);
+
+          return ApiResultModel<PaymentsBodyModel>.success(data: dto);
+        },
+        failure: (ErrorResultModel e) =>
+            ApiResultModel<PaymentsBodyModel>.failure(
               errorResultEntity: e,
             ),
       );
@@ -332,7 +455,7 @@ Future<ApiResultModel<bool>> deleteBooking(String bookingId) async {
 }
 
 @override
-Future<ApiResultModel<BookingDetailModel>> updateBooking(String bookingId, BookingEntity booking) async {
+Future<ApiResultModel<BookingData>> updateBooking(String bookingId, BookingEntity booking) async {
   try {
     final user = await locator<AuthLocalDataSource>().getUser();
     if (user == null || user.token == null) {
@@ -341,10 +464,10 @@ Future<ApiResultModel<BookingDetailModel>> updateBooking(String bookingId, Booki
 
     final ApiResultModel<http.Response> res = await _ctx.makeRequest(
       uri: "$createBookingEndPoint/$bookingId",
-      httpRequestStrategy: MultipartPutRequestStrategy(),
+      httpRequestStrategy: PutRequestStrategy(),
       headers: {
         'Authorization': 'Bearer ${user.token}',
-        // 'Content-Type': 'application/json',
+        'Content-Type': 'application/json',
         'Accept': 'application/json',
       },
       requestData: booking.toJson(),
@@ -357,10 +480,10 @@ Future<ApiResultModel<BookingDetailModel>> updateBooking(String bookingId, Booki
             : (jsonDecode(response.body) as Map<String, dynamic>);
         final Map<String, dynamic> body =
             (root['body'] as Map?)?.cast<String, dynamic>() ?? {};
-        final dto = BookingDetailModel.fromJson(body);
-        return ApiResultModel<BookingDetailModel>.success(data: dto);
+        final dto = BookingData.fromJson(body);
+        return ApiResultModel<BookingData>.success(data: dto);
       },
-      failure: (e) => ApiResultModel<BookingDetailModel>.failure(errorResultEntity: e),
+      failure: (e) => ApiResultModel<BookingData>.failure(errorResultEntity: e),
     );
   } catch (e) {
     log('updateBooking error: $e');

@@ -1,12 +1,24 @@
 import 'package:flutter/material.dart';
 
 class SelectTimeWidget extends StatelessWidget {
-  const SelectTimeWidget({super.key, required this.onTimeSelected, 
-  this.initialTime  ,required this.selectedDate,});
+  const SelectTimeWidget({
+    super.key,
+    required this.onTimeSelected,
+    this.initialTime,
+    required this.selectedDate,
+  });
 
   final TimeOfDay? initialTime;
   final ValueChanged<TimeOfDay> onTimeSelected;
- final DateTime selectedDate;
+  final DateTime selectedDate;
+
+  String _formatTime(TimeOfDay time) {
+    final hour = time.hourOfPeriod == 0 ? 12 : time.hourOfPeriod;
+    final minute = time.minute.toString().padLeft(2, '0');
+    final period = time.period == DayPeriod.am ? 'AM' : 'PM';
+    return '$hour:$minute $period';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -14,29 +26,35 @@ class SelectTimeWidget extends StatelessWidget {
       children: [
         const Text(
           'Select Time',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-          ),
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: 8),
         GestureDetector(
           onTap: () async {
-            // final TimeOfDay? pickedTime = await showTimePicker(
-            //   context: context,
-            //   initialTime: initialTime ?? TimeOfDay.now(),
-            // );
-
-            // if (pickedTime != null) {
             final now = DateTime.now();
 
             final TimeOfDay? pickedTime = await showTimePicker(
               context: context,
+
               initialTime: initialTime ?? TimeOfDay.now(),
+              builder: (BuildContext context, Widget? child) {
+                return Theme(
+                  data: Theme.of(context).copyWith(
+                    colorScheme: ColorScheme.light(
+                      primary: Theme.of(context).primaryColor,
+                      onPrimary: Colors.white,
+                      surface: Theme.of(context).colorScheme.surface,
+                      onSurface: Theme.of(context).primaryColor,
+                    ),
+                  ),
+                  child: child!,
+                );
+              },
             );
 
             if (pickedTime != null) {
-              final isToday = selectedDate.year == now.year &&
+              final isToday =
+                  selectedDate.year == now.year &&
                   selectedDate.month == now.month &&
                   selectedDate.day == now.day;
 
@@ -52,10 +70,12 @@ class SelectTimeWidget extends StatelessWidget {
                 if (selectedDateTime.isBefore(now)) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                      content: Text('Please select a time after the current time.'),
+                      content: Text(
+                        'Please select a time after the current time.',
+                      ),
                     ),
                   );
-                  return; 
+                  return;
                 }
               }
               onTimeSelected(pickedTime);
@@ -73,11 +93,14 @@ class SelectTimeWidget extends StatelessWidget {
               children: [
                 Text(
                   initialTime != null
-                      ? initialTime!.format(context)
+                      ? _formatTime(initialTime!)
+                      // initialTime!.format(context)
                       : 'Choose a time',
                   style: TextStyle(
                     fontSize: 15,
-                    color: initialTime != null ? Colors.black : Colors.grey.shade600,
+                    color: initialTime != null
+                        ? Colors.black
+                        : Colors.grey.shade600,
                   ),
                 ),
                 const Icon(Icons.access_time, color: Colors.grey),
