@@ -17,6 +17,8 @@ import 'package:inspect_connect/features/client_flow/domain/usecases/delete_book
 import 'package:inspect_connect/features/client_flow/domain/usecases/fetch_booking_list_usecase.dart';
 import 'package:inspect_connect/features/client_flow/domain/usecases/get_booking_Detail_usecase.dart';
 import 'package:inspect_connect/features/client_flow/domain/usecases/get_certificate_subtype_usecase.dart';
+import 'package:inspect_connect/features/client_flow/domain/usecases/get_user_payments_usecase.dart';
+import 'package:inspect_connect/features/client_flow/domain/usecases/get_user_wallet_amount_usecase.dart';
 import 'package:inspect_connect/features/client_flow/domain/usecases/update_booking_detail_usecase.dart';
 import 'package:inspect_connect/features/client_flow/domain/usecases/upload_image_usecase.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/session_manager.dart';
@@ -51,6 +53,9 @@ void setupLocator() {
   locator.registerLazySingleton(() => GetBookingDetailUseCase(locator()));
   locator.registerLazySingleton(() => UpdateBookingDetailUseCase(locator()));
   locator.registerLazySingleton(() => DeleteBookingDetailUseCase(locator()));
+  locator.registerLazySingleton(() => GetUserWalletAmountUseCase(locator()));
+  locator.registerLazySingleton(() => GetUserPaymentsListUseCase(locator()));
+
 
   
   locator.registerLazySingleton(() => FetchBookingsUseCase(locator()));

@@ -127,7 +127,7 @@ class ClientViewModelProvider extends BaseViewModel {
     // fullNameCtrl.clear();
     // phoneCtrl.clear();
     // emailCtrlSignUp.clear();
-    context.pushRoute(const ResetPasswordRoute());
+    context.pushRoute( ResetPasswordRoute(showBackButton: true));
   }
 
   @override
@@ -184,10 +184,6 @@ class ClientViewModelProvider extends BaseViewModel {
          if (user == null || user.token == null) {
       throw Exception('User not found in local storage');
     }
-    //  dto = dto.copyWith(
-    //   phoneNumber: user.phoneNumber ?? dto.phoneNumber,
-    //   countryCode: user.countryCode ?? dto.countryCode,
-    // );
       final verifyOtpUseCase = locator<OtpVerificarionUseCase>();
       final state = await executeParamsUseCase<AuthUser, OtpVerificationParams>(
         useCase: verifyOtpUseCase,
@@ -316,10 +312,6 @@ class ClientViewModelProvider extends BaseViewModel {
     final eOk =
         email.isNotEmpty &&
         RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(email);
-    // final pOk =
-    //     (phoneE164 != null &&
-    //     phoneE164!.isNotEmpty &&
-    //     (phoneRaw?.length ?? 0) >= 6);
     if (!eOk) return 'Enter a valid email ';
     return null;
   }
@@ -344,7 +336,7 @@ class ClientViewModelProvider extends BaseViewModel {
       // verifyInit();
       startOtpFlow(OtpPurpose.forgotPassword);
       resetEmailCtrl.clear();
-      context.pushRoute(const OtpVerificationRoute());
+      context.pushRoute( OtpVerificationRoute(addShowButton: true));
     } finally {
       _isSendingReset = false;
       notifyListeners();
@@ -356,18 +348,6 @@ class ClientViewModelProvider extends BaseViewModel {
     required BuildContext context,
   }) async {
     if (!(formKey.currentState?.validate() ?? false)) return;
-
-    // _isResetting = true;
-    // notifyListeners();
-
-    // try {
-    //   context.router.replaceAll([const ClientSignInRoute()]);
-    //   passwordCtrlSignUp.clear();
-    //   confirmPasswordCtrl.clear();
-    // } finally {
-    // _isResetting = false;
-    // notifyListeners();
-    // }
 
     _isResetting = true;
     notifyListeners();
@@ -408,7 +388,7 @@ class ClientViewModelProvider extends BaseViewModel {
           ScaffoldMessenger.of(
             context,
           ).showSnackBar(const SnackBar(content: Text('Verify Your Otp Now')));
-          context.pushRoute(const OtpVerificationRoute());
+          context.pushRoute( OtpVerificationRoute(addShowButton: true));
         },
         error: (e) {
           ScaffoldMessenger.of(
@@ -577,40 +557,7 @@ class ClientViewModelProvider extends BaseViewModel {
     } finally {
       emailCtrl.clear();
       passwordCtrl.clear();
-      setSigningIn(false); // ✅ unfreeze button
+      setSigningIn(false);
     }
   }
-
-  // Future<void> signUp({
-  //   required GlobalKey<FormState> formKey,
-  //   required BuildContext context,
-  // }) async {
-  //   if (!(formKey.currentState?.validate() ?? false)) return;
-
-  //   final signUpUseCase = locator<SignUpUseCase>(); // Lazy load here
-
-  //   final state = await executeParamsUseCase<AuthUser, SignUpParams>(
-  //     useCase: signUpUseCase,
-  //     query: SignUpParams(
-  //       fullName: fullNameCtrl.text.trim(),
-  //       email: emailCtrlSignUp.text.trim(),
-  //       phoneE164: phoneE164 ?? '',
-  //     ),
-  //     launchLoader: true,
-  //   );
-
-  //   state?.when(
-  //     data: (user) async {
-  //       ScaffoldMessenger.of(context).showSnackBar(
-  //         SnackBar(content: Text('Welcome ${user.fullName}!')),
-  //       );
-  //     },
-  //     error: (e) {
-  //       ScaffoldMessenger.of(context).showSnackBar(
-  //         SnackBar(content: Text(e.errorResultModel.message ?? 'Sign-up failed')),
-  //       );
-  //     },
-  //   );
-  // }
 }
-

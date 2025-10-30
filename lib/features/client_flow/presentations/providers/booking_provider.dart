@@ -21,9 +21,11 @@ import 'package:inspect_connect/features/client_flow/domain/usecases/get_booking
 import 'package:inspect_connect/features/client_flow/domain/usecases/get_certificate_subtype_usecase.dart';
 import 'package:inspect_connect/features/client_flow/domain/usecases/update_booking_detail_usecase.dart';
 import 'package:inspect_connect/features/client_flow/domain/usecases/upload_image_usecase.dart';
+import 'package:inspect_connect/features/client_flow/presentations/providers/wallet_provider.dart';
 import 'package:inspect_connect/features/client_flow/presentations/screens/booking_edit_screen.dart';
 import 'package:inspect_connect/features/client_flow/presentations/screens/payment_screens/wallet_screen.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class BookingProvider extends BaseViewModel {
   DateTime _selectedDate = DateTime.now();
@@ -194,7 +196,7 @@ class BookingProvider extends BaseViewModel {
             // ScaffoldMessenger.of(context).showSnackBar(
             //   SnackBar(content: Text('${e.message} Recharge Your Wallet Now')),
             // );
-                 _showInsufficientFundsDialog(context, e.message!);
+            _showInsufficientFundsDialog(context, e.message!);
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(e.message ?? 'Booking creation failed')),
@@ -446,7 +448,6 @@ class BookingProvider extends BaseViewModel {
   List<BookingListEntity> bookings = [];
 
   int _currentPage = 1;
-  int _totalPages = 1;
   bool isFetchingBookings = false;
   bool hasMoreBookings = true;
   bool isLoadMoreRunning = false;
@@ -454,7 +455,6 @@ class BookingProvider extends BaseViewModel {
   void resetBookings() {
     bookings.clear();
     _currentPage = 1;
-    _totalPages = 1;
     hasMoreBookings = true;
     notifyListeners();
   }
@@ -591,48 +591,53 @@ class BookingProvider extends BaseViewModel {
   }
 
   void _showInsufficientFundsDialog(BuildContext context, String message) {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text(
-          'Insufficient Funds',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        content: Text(
-          '$message\n\nYou don’t have sufficient funds in your wallet. Please recharge now to continue.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
           ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.themeColor,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
+          title: const Text(
+            'Insufficient Funds',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          content: Text(
+            '$message\n\nYou don’t have sufficient funds in your wallet. Please recharge now to continue.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
             ),
-            onPressed: () {
-              Navigator.pop(context); // Close dialog
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => WalletRechargeScreen(
-                    minAmount: 50,
-                    maxAmount: 5000,
-                  ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.themeColor,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
                 ),
-              );
-            },
-            child: const Text('Recharge Now'),
-          ),
-        ],
-      );
-    },
-  );
-}
-
+              ),
+              onPressed: () {
+                Navigator.pop(context); // Close dialog
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => ChangeNotifierProvider(
+                      create: (_) => WalletProvider(),
+                      child: const WalletScreen(),
+                    ),
+                    // WalletScreen(
+                    //                     // minAmount: 50,
+                    //                     // maxAmount: 5000,
+                    //                   ),
+                  ),
+                );
+              },
+              child: const Text('Recharge Now'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 }

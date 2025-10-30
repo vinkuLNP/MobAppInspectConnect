@@ -75,105 +75,6 @@ class SplashView extends StatefulWidget {
   @override
   State<SplashView> createState() => _SplashViewState();
 }
-
-// class _SplashViewState extends State<SplashView>
-//     with SingleTickerProviderStateMixin {
-//   late AnimationController _controller;
-//   late Animation<double> _scaleAnimation;
-//   late Animation<double> _fadeAnimation;
-
-//   @override
-//   void initState() {
-//     super.initState();
-//     log('SplashView init');
-
-//     // Animation controller
-//     _controller = AnimationController(
-//       vsync: this,
-//       duration: const Duration(milliseconds: 2000),
-//     );
-
-//     // Smooth scale-in logo animation
-//     _scaleAnimation = CurvedAnimation(
-//       parent: _controller,
-//       curve: Curves.easeOutBack,
-//     );
-
-//     // Smooth fade-in for text
-//     _fadeAnimation = Tween<double>(begin: 0, end: 1).animate(
-//       CurvedAnimation(
-//         parent: _controller,
-//         curve: const Interval(0.4, 1.0, curve: Curves.easeIn),
-//       ),
-//     );
-
-//     _controller.forward();
-
-//     // Run login/navigation logic after a few seconds
-//     Future.delayed(const Duration(seconds: 3), () async {
-//       final user = await locator<AuthLocalDataSource>().getUser();
-//       final userProvider = context.read<UserProvider>();
-//       final bookingProvider = context.read<BookingProvider>();
-
-//       if (user != null) userProvider.setUser(user);
-//       await userProvider.loadUser();
-
-//       if (userProvider.isLoggedIn) {
-//         await bookingProvider.fetchBookingsList();
-//         context.router.replace(const ClientDashboardRoute());
-//       } else {
-//         context.router.replace(const OnBoardingRoute());
-//       }
-//     });
-//   }
-
-//   @override
-//   void dispose() {
-//     _controller.dispose();
-//     super.dispose();
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     final size = MediaQuery.of(context).size;
-
-//     return Scaffold(
-//       backgroundColor: Colors.black,
-//       body: Center(
-//         child: Column(
-//           mainAxisAlignment: MainAxisAlignment.center,
-//           children: [
-//             // Animated logo
-//             ScaleTransition(
-//               scale: _scaleAnimation,
-//               child: Image.asset(
-//                 'assets/images/app_logo.png',
-//                 color: AppColors.whiteColor,
-//                 width: size.width * 0.35,
-//               ),
-//             ),
-//             const SizedBox(height: 24),
-//             // Animated text
-//             FadeTransition(
-//               opacity: _fadeAnimation,
-//               child: Text(
-//                 "Inspect Connect",
-//                 style: TextStyle(
-//                   fontSize: 24,
-//                   color: AppColors.whiteColor,
-//                   fontWeight: FontWeight.bold,
-//                   letterSpacing: 1.0,
-//                 ),
-//               ),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
-
-
 class _SplashViewState extends State<SplashView>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
@@ -192,13 +93,11 @@ class _SplashViewState extends State<SplashView>
       duration: const Duration(milliseconds: 2000),
     );
 
-    // Smooth scale-in logo
     _scaleAnimation = CurvedAnimation(
       parent: _controller,
       curve: Curves.easeOutBack,
     );
 
-    // Fade-in text
     _fadeAnimation = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(
         parent: _controller,
@@ -206,7 +105,6 @@ class _SplashViewState extends State<SplashView>
       ),
     );
 
-    // Jumping/bouncing logo effect
     _logoBounceAnimation = TweenSequence<Offset>([
       TweenSequenceItem(
           tween: Tween(begin: Offset(0, 0), end: Offset(0, -0.05))
@@ -218,7 +116,6 @@ class _SplashViewState extends State<SplashView>
           weight: 50),
     ]).animate(_controller);
 
-    // Text subtle jump
     _textBounceAnimation = TweenSequence<Offset>([
       TweenSequenceItem(
           tween: Tween(begin: Offset(0, 0.2), end: Offset(0, 0))
@@ -232,7 +129,6 @@ class _SplashViewState extends State<SplashView>
 
     _controller.forward();
 
-    // Navigation after delay
     Future.delayed(const Duration(seconds: 3), () async {
       final user = await locator<AuthLocalDataSource>().getUser();
       final userProvider = context.read<UserProvider>();

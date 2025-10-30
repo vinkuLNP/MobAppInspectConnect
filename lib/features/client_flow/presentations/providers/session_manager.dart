@@ -3,69 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/di/app_component/app_component.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/user_provider.dart';
 import 'package:inspect_connect/core/utils/auto_router_setup/auto_router.dart';
-
-// class SessionManager {
-//   static final SessionManager _instance = SessionManager._internal();
-//   factory SessionManager() => _instance;
-//   SessionManager._internal();
-
-
-//   GlobalKey<NavigatorState>? navigatorKey;
-//   bool _isDialogVisible = false;
-
-//   Future<void> logout({String? reason}) async {
-//     if (_isDialogVisible) return;
-//     _isDialogVisible = true;
-
-//     final navContext = navigatorKey?.currentContext;
-//     if (navContext == null) {
-//       await _performLogoutSilently();
-//       _isDialogVisible = false;
-//       return;
-//     }
-
-//      await showDialog(
-//       context: navContext,
-//       barrierDismissible: false,
-//       builder: (_) => AlertDialog(
-//         title: const Text('Session Expired'),
-//         content: Text(reason ?? 'Your session has expired. Please log in again.'),
-//         actions: [
-//           TextButton(
-//             onPressed: () async {
-//               Navigator.of(navContext).pop();
-//               await _performLogoutSilently();
-//             },
-//             child: const Text('OK'),
-//           ),
-//         ],
-//       ),
-//     );
-
-//     _isDialogVisible = false;
-//   }
-
-//   Future<void> _performLogoutSilently() async {
-//     try {
-//       final userProvider = locator<UserProvider>();
-//       await userProvider.clearUser();
-
-//       final navContext = navigatorKey?.currentContext;
-//       if (navContext != null && navContext.mounted) {
-//         navContext.router.replaceAll([const OnBoardingRoute()]);
-//       }
-//     } catch (e) {
-//       debugPrint('⚠️ Logout failed: $e');
-//     }
-//   }
-// }
-
-import 'package:auto_route/auto_route.dart';
-import 'package:flutter/material.dart';
-import 'package:inspect_connect/core/di/app_component/app_component.dart';
-import 'package:inspect_connect/features/client_flow/presentations/providers/user_provider.dart';
-import 'package:inspect_connect/core/utils/auto_router_setup/auto_router.dart';
-
 class SessionManager {
   static final SessionManager _instance = SessionManager._internal();
   factory SessionManager() => _instance;

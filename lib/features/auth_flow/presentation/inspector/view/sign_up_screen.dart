@@ -264,40 +264,6 @@ class _InspectorSignUpViewState extends State<InspectorSignUpView> {
     );
   }
 
-  // Widget buildProfessional(InspectorViewModelProvider p) {
-  //   return Column(
-  //     crossAxisAlignment: CrossAxisAlignment.start,
-  //     children: [
-  //       const SectionTitle('Professional Details'),
-  //       const SizedBox(height: 8),
-  //       TextFormField(
-  //         initialValue: p.professional.company,
-  //         decoration: const InputDecoration(labelText: 'Company'),
-  //         onSaved: (v) => p.professional.company = v?.trim() ?? '',
-  //       ),
-  //       const SizedBox(height: 12),
-  //       TextFormField(
-  //         initialValue: p.professional.designation,
-  //         decoration: const InputDecoration(labelText: 'Designation'),
-  //         onSaved: (v) => p.professional.designation = v?.trim() ?? '',
-  //       ),
-  //       const SizedBox(height: 12),
-  //       TextFormField(
-  //         initialValue: p.professional.experienceYears.toString(),
-  //         keyboardType: TextInputType.number,
-  //         decoration:
-  //             const InputDecoration(labelText: 'Years of Experience'),
-  //         validator: (v) {
-  //           if (v == null || v.isEmpty) return null;
-  //           final n = int.tryParse(v);
-  //           return (n == null || n < 0) ? 'Enter a valid number' : null;
-  //         },
-  //         onSaved: (v) =>
-  //             p.professional.experienceYears = int.tryParse(v ?? '0') ?? 0,
-  //       ),
-  //     ],
-  //   );
-  // }
 
 Widget buildProfessional(InspectorViewModelProvider p) {
   final theme = Theme.of(context);
@@ -311,7 +277,6 @@ Widget buildProfessional(InspectorViewModelProvider p) {
       const SectionTitle('Professional Details'),
       const SizedBox(height: 12),
 
-      // --- Certification Type (required) ---
       DropdownButtonFormField<String>(
         value: p.certificationType,
         items: p.certAuthorityByType.keys
@@ -326,7 +291,6 @@ Widget buildProfessional(InspectorViewModelProvider p) {
       ),
       const SizedBox(height: 12),
 
-      // --- Certifying (auto-filled, non-editable) ---
       TextFormField(
         enabled: false,
         initialValue: p.certifyingBody ?? '',
@@ -343,7 +307,6 @@ Widget buildProfessional(InspectorViewModelProvider p) {
       ),
       const SizedBox(height: 12),
 
-      // --- Expiration Date (calendar) ---
       FormField<String>(
         validator: p.validateExpiry,
         builder: (state) => Column(
@@ -371,7 +334,6 @@ Widget buildProfessional(InspectorViewModelProvider p) {
                   p.setExpirationDate(
                     DateTime(picked.year, picked.month, picked.day),
                   );
-                  // revalidate this FormField
                   state.didChange('set');
                 }
               },
@@ -389,7 +351,6 @@ Widget buildProfessional(InspectorViewModelProvider p) {
       ),
       const SizedBox(height: 16),
 
-      // --- Upload Certification Documents (required) ---
       FormField<bool>(
         validator: (_) =>
             p.uploadedCount == 0 ? 'Please upload at least one document' : null,
@@ -401,7 +362,7 @@ Widget buildProfessional(InspectorViewModelProvider p) {
               label: const Text('Upload Certification Documents'),
               onPressed: () async {
                 await p.pickCertificationFiles();
-                state.didChange(true); // triggers validation refresh
+                state.didChange(true); 
               },
               style: OutlinedButton.styleFrom(
                 padding:
@@ -426,10 +387,6 @@ Widget buildProfessional(InspectorViewModelProvider p) {
         ),
       ),
 
-      // (Optional) keep your older fields if needed:
-      // const SizedBox(height: 16),
-      // TextFormField( ... Company ... ),
-      // ...
     ],
   );
 }
@@ -487,7 +444,6 @@ Widget buildProfessional(InspectorViewModelProvider p) {
     );
   }
 
-  /// --- Step 4: Additional --- ///
   Widget buildAdditional(InspectorViewModelProvider p) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

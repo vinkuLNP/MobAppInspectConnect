@@ -1,60 +1,121 @@
+
 import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/basecomponents/base_view_model.dart';
 import 'package:inspect_connect/core/commondomain/entities/based_api_result/api_result_state.dart';
 import 'package:inspect_connect/core/di/app_component/app_component.dart';
 import 'package:inspect_connect/features/auth_flow/data/datasources/local_datasources/auth_local_datasource.dart';
-import 'package:inspect_connect/features/client_flow/data/models/booking_detail_model.dart';
-import 'package:inspect_connect/features/client_flow/domain/usecases/get_booking_Detail_usecase.dart';
-
-class BookingProvider extends BaseViewModel {
-
-
-  // Future<void> getBookingDetail({
-  //   required BuildContext context,
-  // }) async {
-  //   try {
-  //     final user = await locator<AuthLocalDataSource>().getUser();
-  //     if (user == null || user.token == null) {
-  //       throw Exception('User not found in local storage');
-  //     }
-
-  //     final getBookingDetailUseCase = locator<GetBookingDetailUseCase>();
-  //     final state =
-  //         await executeParamsUseCase<
-  //           BookingDetailModel,
-  //           GetBookingDetailParams
-  //         >(
-  //           useCase: getBookingDetailUseCase,
-
-  //           query: GetBookingDetailParams(bookingId: bookingId),
-  //           launchLoader: true,
-  //         );
-
-  //     state?.when(
-  //       data: (response) async {
-  //         bookingDetailModel = response;
-  //         Navigator.pop(context);
-  //         Navigator.push(
-  //           context,
-  //           MaterialPageRoute(
-  //             builder: (_) => BookingEditScreen(booking: bookingDetailModel),
-  //           ),
-  //         ).then((result) {
-  //           if (result == true) {
-  //             fetchBookingsList(reset: true);
-  //           }
-  //         });
-  //       },
-  //       error: (e) {
-  //         ScaffoldMessenger.of(context).showSnackBar(
-  //           SnackBar(
-  //             content: Text(e.message ?? 'Fetching Booking Detail failed'),
-  //           ),
-  //         );
-  //       },
-  //     );
-  //   } finally {}
-  // }
+import 'package:inspect_connect/features/client_flow/data/models/user_payment_list_model.dart';
+import 'package:inspect_connect/features/client_flow/data/models/wallet_model.dart';
+import 'package:inspect_connect/features/client_flow/domain/entities/payment_list_entity.dart';
+import 'package:inspect_connect/features/client_flow/domain/usecases/get_user_payments_usecase.dart';
+import 'package:inspect_connect/features/client_flow/domain/usecases/get_user_wallet_amount_usecase.dart';
 
 
+class WalletProvider extends BaseViewModel {
+  WalletModel? walletModel;
+  List<PaymentEntity> payments = [];
+   WalletState walletState = WalletState.idle;
+
+  int _currentPage = 1;
+  int _totalPages = 1;
+  bool isFetching = false;
+
+  final int _limit = 10;
+ String? errorMessage;
+ Future<void> init({required BuildContext context}) async {
+  try {
+    walletState = WalletState.loading;
+    notifyListeners();
+
+    await Future.wait([
+      getUserWallet(context: context),
+      getPaymentList(context: context, reset: true),
+    ]);
+
+    walletState = WalletState.loaded;
+  } catch (e) {
+    walletState = WalletState.error;
+    errorMessage = e.toString();
+  }
+  notifyListeners();
 }
+
+  Future<void> refreshAll(BuildContext context) async {
+    payments.clear();
+    _currentPage = 1;
+    _totalPages = 1;
+    await getUserWallet(context: context);
+    await getPaymentList(context: context, reset: true);
+  }
+
+  Future<void> getUserWallet({required BuildContext context}) async {
+    final user = await locator<AuthLocalDataSource>().getUser();
+    if (user?.token == null) return;
+
+    final useCase = locator<GetUserWalletAmountUseCase>();
+    final state = await executeParamsUseCase<WalletModel, GetUserWalletAmountParams>(
+      useCase: useCase,
+      query: GetUserWalletAmountParams(),
+      launchLoader: false,
+    );
+
+    state?.when(
+      data: (res) {
+        walletModel = res;
+        notifyListeners();
+      },
+      error: (e) => ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.message ?? 'Failed to fetch wallet')),
+      ),
+    );
+  }
+
+  Future<void> getPaymentList({
+    required BuildContext context,
+    bool reset = false,
+  }) async {
+    if (isFetching || (_currentPage > _totalPages && !reset)) return;
+
+    isFetching = true;
+    notifyListeners();
+
+    final user = await locator<AuthLocalDataSource>().getUser();
+    if (user?.token == null) return;
+
+    final useCase = locator<GetUserPaymentsListUseCase>();
+    final state = await executeParamsUseCase<PaymentsBodyModel, GetUserPaymentsListParams>(
+      useCase: useCase,
+      query: GetUserPaymentsListParams(
+        page: _currentPage,
+        limit: _limit,
+      ),
+      launchLoader: false,
+    );
+
+    state?.when(
+      data: (res) {
+        if (reset) payments.clear();
+        payments.addAll(res.payments);
+        _totalPages = res.totalPages;
+        _currentPage++;
+        notifyListeners();
+      },
+      error: (e) => ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.message ?? 'Failed to fetch payments')),
+      ),
+    );
+
+    isFetching = false;
+    notifyListeners();
+  }
+
+  Future<void> loadMorePayments(BuildContext context) async {
+    await getPaymentList(context: context);
+  }
+
+  
+}
+
+
+
+enum WalletState { idle, loading, loaded, error }

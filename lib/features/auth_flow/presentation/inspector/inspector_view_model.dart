@@ -107,7 +107,7 @@ class InspectorViewModelProvider extends BaseViewModel {
     // }
     startOtpFlow(OtpPurpose.signUp);
 
-    context.pushRoute(const OtpVerificationRoute());
+    context.pushRoute( OtpVerificationRoute(addShowButton: true));
   }
 
   @override
@@ -163,7 +163,7 @@ class InspectorViewModelProvider extends BaseViewModel {
         context.router.replaceAll([const InspectorSignInRoute()]);
         break;
       case OtpPurpose.forgotPassword:
-        context.router.replaceAll([const ResetPasswordRoute()]);
+        context.router.replaceAll([ ResetPasswordRoute(showBackButton: false)]);
         break;
       default:
         context.router.replaceAll([const InspectorSignInRoute()]);
@@ -255,7 +255,7 @@ class InspectorViewModelProvider extends BaseViewModel {
 
       // verifyInit();
       startOtpFlow(OtpPurpose.forgotPassword);
-      context.pushRoute(const OtpVerificationRoute());
+      context.pushRoute( OtpVerificationRoute(addShowButton: true));
     } finally {
       _isSendingReset = false;
       notifyListeners();
@@ -274,7 +274,7 @@ class InspectorViewModelProvider extends BaseViewModel {
 
     try {
 
-      context.router.replaceAll([const ClientSignInRoute()]);
+      context.router.replaceAll([ ClientSignInRoute(showBackButton: false)]);
     } finally {
       _isResetting = false;
       notifyListeners();

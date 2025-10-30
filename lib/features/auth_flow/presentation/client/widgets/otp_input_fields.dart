@@ -107,22 +107,6 @@ class _PerDigitOtpState extends State<PerDigitOtp> {
     );
   }
 
-  // void _handlePaste(int startIndex, String data) {
-  //   final digits = data.replaceAll(RegExp(r'\D'), '').split('');
-  //   var idx = startIndex;
-  //   for (final d in digits) {
-  //     if (idx >= _digits.length) break;
-  //     _digits[idx].text = d;
-  //     idx++;
-  //   }
-  //   if (idx < _nodes.length) {
-  //     _focusAt(idx);
-  //   } else {
-  //     _nodes.last.unfocus();
-  //   }
-  //   _syncToMaster();
-  // }
-
   @override
   void dispose() {
     for (final c in _digits) {

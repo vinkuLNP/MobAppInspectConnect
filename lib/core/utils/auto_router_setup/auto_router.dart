@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:flutter/material.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/forgot_password/forgot_password_screen.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/otp_verification/otp_verification.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/reset_password/reset_new_password_screen.dart';

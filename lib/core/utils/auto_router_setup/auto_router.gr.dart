@@ -76,50 +76,161 @@ class ClientDashboardRoute extends PageRouteInfo<void> {
 
 /// generated route for
 /// [ClientSignInView]
-class ClientSignInRoute extends PageRouteInfo<void> {
-  const ClientSignInRoute({List<PageRouteInfo>? children})
-    : super(ClientSignInRoute.name, initialChildren: children);
+class ClientSignInRoute extends PageRouteInfo<ClientSignInRouteArgs> {
+  ClientSignInRoute({
+    Key? key,
+    bool showBackButton = true,
+    List<PageRouteInfo>? children,
+  }) : super(
+         ClientSignInRoute.name,
+         args: ClientSignInRouteArgs(key: key, showBackButton: showBackButton),
+         initialChildren: children,
+       );
 
   static const String name = 'ClientSignInRoute';
 
   static PageInfo page = PageInfo(
     name,
     builder: (data) {
-      return const ClientSignInView();
+      final args = data.argsAs<ClientSignInRouteArgs>(
+        orElse: () => const ClientSignInRouteArgs(),
+      );
+      return ClientSignInView(
+        key: args.key,
+        showBackButton: args.showBackButton,
+      );
     },
   );
 }
 
+class ClientSignInRouteArgs {
+  const ClientSignInRouteArgs({this.key, this.showBackButton = true});
+
+  final Key? key;
+
+  final bool showBackButton;
+
+  @override
+  String toString() {
+    return 'ClientSignInRouteArgs{key: $key, showBackButton: $showBackButton}';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! ClientSignInRouteArgs) return false;
+    return key == other.key && showBackButton == other.showBackButton;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ showBackButton.hashCode;
+}
+
 /// generated route for
 /// [ClientSignUpView]
-class ClientSignUpRoute extends PageRouteInfo<void> {
-  const ClientSignUpRoute({List<PageRouteInfo>? children})
-    : super(ClientSignUpRoute.name, initialChildren: children);
+class ClientSignUpRoute extends PageRouteInfo<ClientSignUpRouteArgs> {
+  ClientSignUpRoute({
+    Key? key,
+    bool showBackButton = true,
+    List<PageRouteInfo>? children,
+  }) : super(
+         ClientSignUpRoute.name,
+         args: ClientSignUpRouteArgs(key: key, showBackButton: showBackButton),
+         initialChildren: children,
+       );
 
   static const String name = 'ClientSignUpRoute';
 
   static PageInfo page = PageInfo(
     name,
     builder: (data) {
-      return const ClientSignUpView();
+      final args = data.argsAs<ClientSignUpRouteArgs>(
+        orElse: () => const ClientSignUpRouteArgs(),
+      );
+      return ClientSignUpView(
+        key: args.key,
+        showBackButton: args.showBackButton,
+      );
     },
   );
 }
 
+class ClientSignUpRouteArgs {
+  const ClientSignUpRouteArgs({this.key, this.showBackButton = true});
+
+  final Key? key;
+
+  final bool showBackButton;
+
+  @override
+  String toString() {
+    return 'ClientSignUpRouteArgs{key: $key, showBackButton: $showBackButton}';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! ClientSignUpRouteArgs) return false;
+    return key == other.key && showBackButton == other.showBackButton;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ showBackButton.hashCode;
+}
+
 /// generated route for
 /// [ForgotpPasswordView]
-class ForgotpPasswordRoute extends PageRouteInfo<void> {
-  const ForgotpPasswordRoute({List<PageRouteInfo>? children})
-    : super(ForgotpPasswordRoute.name, initialChildren: children);
+class ForgotpPasswordRoute extends PageRouteInfo<ForgotpPasswordRouteArgs> {
+  ForgotpPasswordRoute({
+    Key? key,
+    bool showBackButton = true,
+    List<PageRouteInfo>? children,
+  }) : super(
+         ForgotpPasswordRoute.name,
+         args: ForgotpPasswordRouteArgs(
+           key: key,
+           showBackButton: showBackButton,
+         ),
+         initialChildren: children,
+       );
 
   static const String name = 'ForgotpPasswordRoute';
 
   static PageInfo page = PageInfo(
     name,
     builder: (data) {
-      return const ForgotpPasswordView();
+      final args = data.argsAs<ForgotpPasswordRouteArgs>(
+        orElse: () => const ForgotpPasswordRouteArgs(),
+      );
+      return ForgotpPasswordView(
+        key: args.key,
+        showBackButton: args.showBackButton,
+      );
     },
   );
+}
+
+class ForgotpPasswordRouteArgs {
+  const ForgotpPasswordRouteArgs({this.key, this.showBackButton = true});
+
+  final Key? key;
+
+  final bool showBackButton;
+
+  @override
+  String toString() {
+    return 'ForgotpPasswordRouteArgs{key: $key, showBackButton: $showBackButton}';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! ForgotpPasswordRouteArgs) return false;
+    return key == other.key && showBackButton == other.showBackButton;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ showBackButton.hashCode;
 }
 
 /// generated route for
@@ -188,34 +299,102 @@ class OnBoardingRoute extends PageRouteInfo<void> {
 
 /// generated route for
 /// [OtpVerificationView]
-class OtpVerificationRoute extends PageRouteInfo<void> {
-  const OtpVerificationRoute({List<PageRouteInfo>? children})
-    : super(OtpVerificationRoute.name, initialChildren: children);
+class OtpVerificationRoute extends PageRouteInfo<OtpVerificationRouteArgs> {
+  OtpVerificationRoute({
+    Key? key,
+    required bool addShowButton,
+    List<PageRouteInfo>? children,
+  }) : super(
+         OtpVerificationRoute.name,
+         args: OtpVerificationRouteArgs(key: key, addShowButton: addShowButton),
+         initialChildren: children,
+       );
 
   static const String name = 'OtpVerificationRoute';
 
   static PageInfo page = PageInfo(
     name,
     builder: (data) {
-      return const OtpVerificationView();
+      final args = data.argsAs<OtpVerificationRouteArgs>();
+      return OtpVerificationView(
+        key: args.key,
+        addShowButton: args.addShowButton,
+      );
     },
   );
 }
 
+class OtpVerificationRouteArgs {
+  const OtpVerificationRouteArgs({this.key, required this.addShowButton});
+
+  final Key? key;
+
+  final bool addShowButton;
+
+  @override
+  String toString() {
+    return 'OtpVerificationRouteArgs{key: $key, addShowButton: $addShowButton}';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! OtpVerificationRouteArgs) return false;
+    return key == other.key && addShowButton == other.addShowButton;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ addShowButton.hashCode;
+}
+
 /// generated route for
 /// [ResetPasswordView]
-class ResetPasswordRoute extends PageRouteInfo<void> {
-  const ResetPasswordRoute({List<PageRouteInfo>? children})
-    : super(ResetPasswordRoute.name, initialChildren: children);
+class ResetPasswordRoute extends PageRouteInfo<ResetPasswordRouteArgs> {
+  ResetPasswordRoute({
+    Key? key,
+    required bool showBackButton,
+    List<PageRouteInfo>? children,
+  }) : super(
+         ResetPasswordRoute.name,
+         args: ResetPasswordRouteArgs(key: key, showBackButton: showBackButton),
+         initialChildren: children,
+       );
 
   static const String name = 'ResetPasswordRoute';
 
   static PageInfo page = PageInfo(
     name,
     builder: (data) {
-      return const ResetPasswordView();
+      final args = data.argsAs<ResetPasswordRouteArgs>();
+      return ResetPasswordView(
+        key: args.key,
+        showBackButton: args.showBackButton,
+      );
     },
   );
+}
+
+class ResetPasswordRouteArgs {
+  const ResetPasswordRouteArgs({this.key, required this.showBackButton});
+
+  final Key? key;
+
+  final bool showBackButton;
+
+  @override
+  String toString() {
+    return 'ResetPasswordRouteArgs{key: $key, showBackButton: $showBackButton}';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! ResetPasswordRouteArgs) return false;
+    return key == other.key && showBackButton == other.showBackButton;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ showBackButton.hashCode;
 }
 
 /// generated route for

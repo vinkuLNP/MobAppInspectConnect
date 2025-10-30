@@ -34,7 +34,6 @@ class AuthRepositoryImpl implements AuthRepository {
         try {
             final user = data.toEntity(); 
           return ApiResultModel<AuthUser>.success(data: user);
-          // return ApiResultModel.success(data: data.toEntity());
         } catch (e) {
           return const ApiResultModel.failure(
             errorResultEntity: ErrorResultModel(
@@ -44,7 +43,6 @@ class AuthRepositoryImpl implements AuthRepository {
           );
         }
       },
-      // success: (dto) => ApiResultModel<AuthUser>.success(data: dto.toEntity()),
       failure: (err) => ApiResultModel<AuthUser>.failure(errorResultEntity: err),
     );
   }
@@ -129,7 +127,6 @@ Future<ApiResultModel<AuthUser>> signUp({
           );
         }
       },
-      // success: (dto) => ApiResultModel<AuthUser>.success(data: dto.toEntity()),
       failure: (err) => ApiResultModel<AuthUser>.failure(errorResultEntity: err),
     );
   }
@@ -161,7 +158,6 @@ Future<ApiResultModel<AuthUser>> signUp({
           );
         }
       },
-      // success: (dto) => ApiResultModel<AuthUser>.success(data: dto.toEntity()),
       failure: (err) => ApiResultModel<AuthUser>.failure(errorResultEntity: err),
     );
   }
@@ -191,7 +187,6 @@ Future<ApiResultModel<AuthUser>> signUp({
           );
         }
       },
-      // success: (dto) => ApiResultModel<AuthUser>.success(data: dto.toEntity()),
       failure: (err) => ApiResultModel<AuthUser>.failure(errorResultEntity: err),
     );
   }

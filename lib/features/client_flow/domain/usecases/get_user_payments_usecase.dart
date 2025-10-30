@@ -1,7 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:inspect_connect/core/commondomain/entities/based_api_result/api_result_model.dart';
 import 'package:inspect_connect/core/commondomain/usecases/base_params_usecase.dart';
-import 'package:inspect_connect/features/client_flow/data/models/booking_list_response_model.dart';
 import 'package:inspect_connect/features/client_flow/data/models/user_payment_list_model.dart';
 import 'package:inspect_connect/features/client_flow/domain/repositories/booking_repository.dart';
 

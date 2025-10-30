@@ -11,29 +11,15 @@ class UserProvider extends ChangeNotifier {
 
   bool get isLoggedIn => _user != null && _user?.token != null;
 
-  // void setUser(AuthUserLocalEntity? newUser) {
-  //   _user = newUser;
-  //   notifyListeners();
-  // }
-
-  // void clearUser() {
-  //   _user = null;
-  //   notifyListeners();
-  // }
-
   final AuthLocalDataSource _local = locator<AuthLocalDataSource>();
 
   Future<void> updateUserName(String name) async {
     if (_user == null) return;
 
-    // TODO: Call your Update Profile API here.
-    // Example placeholder:
-    // final result = await locator<UpdateUserUseCase>()(UpdateUserParams(name: name));
 
     _user = _user!.copyWith(name: name); // update local copy
     notifyListeners();
 
-    // Also update in ObjectBox local storage if needed
     await locator<AuthLocalDataSource>().saveUser(_user!);
   }
 

@@ -93,7 +93,7 @@ class InspectorSignInView extends StatelessWidget {
                       alignment: Alignment.centerRight,
                       child: TextButton(
                         onPressed: () {
-                          context.pushRoute(const ForgotpPasswordRoute());
+                          context.pushRoute( ForgotpPasswordRoute(showBackButton: true));
                         },
                         child: textWidget(
                           text: 'Forget Password?',

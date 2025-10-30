@@ -2,6 +2,8 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/utils/auto_router_setup/auto_router.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/user_provider.dart';
+import 'package:inspect_connect/features/client_flow/presentations/providers/wallet_provider.dart';
+import 'package:inspect_connect/features/client_flow/presentations/screens/payment_screens/wallet_screen.dart';
 import 'package:inspect_connect/features/client_flow/presentations/widgets/common_app_bar.dart';
 import 'package:provider/provider.dart';
 
@@ -61,6 +63,19 @@ class ProfileScreen extends StatelessWidget {
               title: const Text('Account Settings'),
               onTap: () => context.router.push(const AccountSettingsRoute()),
             ),
+              ListTile(
+              leading: const Icon(Icons.wallet),
+              title: const Text('Payments'),
+              onTap:()=>  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (_) => ChangeNotifierProvider(
+        create: (_) => WalletProvider(),
+        child: const WalletScreen(),
+      ),
+    ),
+  ),
+            ),
             ListTile(
               leading: const Icon(Icons.lock),
               title: const Text('Change Password'),
@@ -75,7 +90,6 @@ class ProfileScreen extends StatelessWidget {
                   ScaffoldMessenger.of(
                     context,
                   ).showSnackBar(const SnackBar(content: Text('Logged out')));
-                  // Navigate to login
                   context.router.replaceAll([const OnBoardingRoute()]);
                 }
               },

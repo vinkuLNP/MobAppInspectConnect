@@ -6,19 +6,19 @@ import 'package:flutter/material.dart';
 
 Widget appCommonLogoBar({
   required double height,
-  MainAxisAlignment alignment = MainAxisAlignment.center,
+  MainAxisAlignment alignment = MainAxisAlignment.start,
 }) => SizedBox(
   height: height,
   child: Row(
     mainAxisAlignment: alignment,
     children: [
-      SizedBox(width: 10),
-      imageAsset(image: appLogo),
+      // SizedBox(width: 10),
+      imageAsset(image: appLogo,color: AppColors.whiteColor,height: 30,width: 30,),
       SizedBox(width: 10),
       textWidget(
         text: "InspectConnect",
-        colour: AppColors.themeColor,
-        fontSize: 20,
+        colour: AppColors.whiteColor,
+        fontSize: 16,
         fontWeight: FontWeight.bold,
       ),
     ],

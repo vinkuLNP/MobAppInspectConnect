@@ -1,3 +1,4 @@
+import 'package:google_fonts/google_fonts.dart';
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
 import 'package:flutter/material.dart';
 
@@ -11,13 +12,13 @@ TextStyle appTextStyle({
   TextDecoration? textDecoration,
   TextOverflow? textOverflow,
   double height = 0.0,
-}) => TextStyle(
+}) => GoogleFonts.poppins(
   decoration: textDecoration,
   decorationColor: textDecorationColor ?? AppColors.black,
-  // textDecoration,
-  overflow: textOverflow,
+
+  // overflow: textOverflow,
   fontSize: fontSize,
-  color: colour ?? AppColors.whiteColor,
+  color: colour ?? AppColors.black,
   fontStyle: fontStyle,
   height: height,
   fontWeight: isBold == true ? FontWeight.bold : fontWeight,

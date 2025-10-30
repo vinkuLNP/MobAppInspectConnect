@@ -31,13 +31,13 @@ class _BookingFormWidgetState extends State<BookingFormWidget> {
     provider.init().then((_) {
       if (widget.isEditing && widget.initialBooking != null) {
         final BookingDetailModel b = widget.initialBooking;
-        provider.locationController.text = b.bookingLocation ?? '';
-        provider.location = b.bookingLocation ?? '';
-        provider.description = b.description ?? '';
+        provider.locationController.text = b.bookingLocation ;
+        provider.location = b.bookingLocation ;
+        provider.description = b.description ;
 
-        provider.descriptionController.text = b.description ?? '';
-        provider.setDate(DateTime.parse(b.bookingDate!));
-        provider.setTime(provider.parseTime(b.bookingTime ?? ''));
+        provider.descriptionController.text = b.description ;
+        provider.setDate(DateTime.parse(b.bookingDate));
+        provider.setTime(provider.parseTime(b.bookingTime ));
         provider.setInspectionType(
           b.inspector != null ? b.inspector!.name : null,
         );

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:inspect_connect/features/client_flow/domain/entities/booking_list_entity.dart';
-import 'package:inspect_connect/features/client_flow/presentations/screens/booking_edit_screen.dart';
 import 'package:intl/intl.dart';
 import 'package:inspect_connect/core/basecomponents/base_responsive_widget.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/booking_provider.dart';
@@ -18,7 +17,7 @@ class _BookingsScreenState extends State<BookingsScreen> {
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _searchController = TextEditingController();
   DateTime? _selectedDate;
-  String? _selectedStatus;
+  String? selectedStatus;
 
   @override
   void initState() {
@@ -130,8 +129,7 @@ class _BookingsScreenState extends State<BookingsScreen> {
                                           children: [
                                             Expanded(
                                               child: Text(
-                                                booking.bookingLocation ??
-                                                    'Unknown Location',
+                                                booking.bookingLocation ,
                                                 style: const TextStyle(
                                                   fontSize: 16,
                                                   fontWeight: FontWeight.w600,
@@ -163,7 +161,7 @@ class _BookingsScreenState extends State<BookingsScreen> {
                                             Text(
                                               DateFormat('dd MMM yyyy').format(
                                                 DateTime.parse(
-                                                  booking.bookingDate!,
+                                                  booking.bookingDate,
                                                 ),
                                               ),
                                               style: const TextStyle(
@@ -178,7 +176,7 @@ class _BookingsScreenState extends State<BookingsScreen> {
                                             ),
                                             const SizedBox(width: 4),
                                             Text(
-                                              booking.bookingTime ?? '',
+                                              booking.bookingTime ,
                                               style: const TextStyle(
                                                 color: Colors.grey,
                                               ),
@@ -186,10 +184,10 @@ class _BookingsScreenState extends State<BookingsScreen> {
                                           ],
                                         ),
                                         const SizedBox(height: 6),
-                                        if (booking.description != null &&
-                                            booking.description!.isNotEmpty)
+                                        if (booking.description != '' &&
+                                            booking.description.isNotEmpty)
                                           Text(
-                                            booking.description!,
+                                            booking.description,
                                             maxLines: 2,
                                             overflow: TextOverflow.ellipsis,
                                             style: const TextStyle(
@@ -274,7 +272,7 @@ class _BookingsScreenState extends State<BookingsScreen> {
           icon: Icon(Icons.filter_list, color: primaryColor),
           tooltip: "Filter by status",
           onSelected: (value) {
-            setState(() => _selectedStatus = value);
+            setState(() => selectedStatus = value);
             context.read<BookingProvider>().filterByStatus(value);
           },
           itemBuilder: (context) => [
@@ -289,7 +287,7 @@ class _BookingsScreenState extends State<BookingsScreen> {
           onPressed: () {
             setState(() {
               _selectedDate = null;
-              _selectedStatus = null;
+              selectedStatus = null;
               _searchController.clear();
             });
             context.read<BookingProvider>().clearFilters();
@@ -331,7 +329,7 @@ class _BookingsScreenState extends State<BookingsScreen> {
                 ),
               ),
               Text(
-                booking.bookingLocation ?? 'Unknown Location',
+                booking.bookingLocation ,
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -339,11 +337,11 @@ class _BookingsScreenState extends State<BookingsScreen> {
               ),
               const SizedBox(height: 12),
               Text(
-                "Date: ${DateFormat('dd MMM yyyy').format(DateTime.parse(booking.bookingDate!))}",
+                "Date: ${DateFormat('dd MMM yyyy').format(DateTime.parse(booking.bookingDate))}",
               ),
-              Text("Time: ${booking.bookingTime ?? ''}"),
+              Text("Time: ${booking.bookingTime }"),
               const SizedBox(height: 12),
-              Text("Description: ${booking.description ?? 'N/A'}"),
+              Text("Description: ${booking.description }"),
               const SizedBox(height: 24),
               if (isPending) ...[
                 ElevatedButton.icon(
@@ -450,93 +448,3 @@ class _BookingsScreenState extends State<BookingsScreen> {
 
 
 
-
-/*
-  // Widget _buildFilterBar(BuildContext context) {
-  //   return Row(
-  //     children: [
-  //       Expanded(
-  //         child: TextField(
-  //           controller: _searchController,
-  //           decoration: InputDecoration(
-  //             hintText: 'Search',
-  //             prefixIcon: const Icon(Icons.search),
-  //             suffixIcon:
-  //             IconButton(
-  //   icon: const Icon(Icons.cancel),
-  //   tooltip: "Clear",
-  //   onPressed: () {
-  //     // final query = _searchController.text.trim();
-  //     // context.read<BookingProvider>().searchBookings(query);
-  //     _searchController.clear();
-  //      context.read<BookingProvider>().clearFilters();
-  //   },
-  // ),
-
-  //             //  IconButton(
-  //             //   icon: const Icon(Icons.send),
-  //             //   tooltip: 'Submit search',
-  //             //   onPressed: () {
-  //             //     final query = _searchController.text.trim();
-  //             //     context.read<BookingProvider>().searchBookings(query);
-  //             //   },
-  //             // ),
-  //             border: OutlineInputBorder(
-  //               borderRadius: BorderRadius.circular(12),
-  //             ),
-  //             filled: true,
-  //             fillColor: Colors.white,
-  //           ),
-  //           onSubmitted: (value) {
-  //             final query = value.trim();
-  //             context.read<BookingProvider>().searchBookings(query);
-  //           },
-  //         ),
-  //       ),
-  //       // const SizedBox(width: 8),
-  //       IconButton(
-  //         icon: const Icon(Icons.date_range),
-  //         tooltip: "Filter by date",
-  //         onPressed: () => _pickDate(context),
-  //       ),
-  //       PopupMenuButton<String>(
-  //         icon: const Icon(Icons.filter_list),
-  //         tooltip: "Filter by status",
-  //         onSelected: (value) {
-  //           setState(() => _selectedStatus = value);
-  //           context.read<BookingProvider>().filterByStatus(value);
-  //         },
-  //         itemBuilder: (context) => [
-  //           const PopupMenuItem(value: '0', child: Text('Pending')),
-  //           const PopupMenuItem(value: '1', child: Text('Approved')),
-  //           const PopupMenuItem(value: '2', child: Text('Rejected')),
-  //         ],
-  //       ),
-  //       // IconButton(
-  //       //   icon: const Icon(Icons.delete),
-  //       //   tooltip: "Clear all filters",
-  //       //   onPressed: () {
-  //           // setState(() {
-  //           //   _selectedDate = null;
-  //           //   _selectedStatus = null;
-  //           //   _searchController.clear();
-  //           // });
-  //           // context.read<BookingProvider>().clearFilters();
-  //       //   },
-  //       // ),
-  //       TextButton(
-
-  //         onPressed: (){
-  //  setState(() {
-  //             _selectedDate = null;
-  //             _selectedStatus = null;
-  //             _searchController.clear();
-  //           });
-  //           context.read<BookingProvider>().clearFilters();
-  //       }, child: Text("Cancel"))
-  //     ],
-  //   );
-  // }
-*/
-  
-  
