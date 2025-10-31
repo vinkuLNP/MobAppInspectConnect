@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:auto_route/auto_route.dart';
 import 'package:inspect_connect/core/basecomponents/base_responsive_widget.dart';
 import 'package:inspect_connect/core/utils/auto_router_setup/auto_router.dart';
@@ -169,8 +171,8 @@ import 'package:provider/provider.dart';
 
 @RoutePage()
 class ClientSignInView extends StatelessWidget {
-   final bool showBackButton;
-  const ClientSignInView({super.key, this.showBackButton = true});
+  final bool showBackButton;
+  const ClientSignInView({super.key, required this.showBackButton});
 
   @override
   Widget build(BuildContext context) {
@@ -184,7 +186,7 @@ class ClientSignInView extends StatelessWidget {
         return CommonAuthBar(
           title: 'Sign in',
           subtitle: 'Welcome Back',
-          showBackButton: false,
+          showBackButton: showBackButton,
           image: finalImage,
           rc: rc,
           form: Form(
@@ -218,13 +220,15 @@ class ClientSignInView extends StatelessWidget {
                   alignment: Alignment.centerRight,
                   child: TextButton(
                     onPressed: () {
-                      context.pushRoute( ForgotpPasswordRoute(showBackButton: true));
+                      context.pushRoute(
+                        ForgotpPasswordRoute(showBackButton: true),
+                      );
                     },
                     child: textWidget(
                       text: 'Forget Password?',
                       fontWeight: FontWeight.w400,
                       fontSize: 14,
-                      colour: AppColors.authThemeLightColor,
+                      color: AppColors.authThemeLightColor,
                     ),
                   ),
                 ),
@@ -247,15 +251,33 @@ class ClientSignInView extends StatelessWidget {
                     }
                   },
                 ),
-                const SizedBox(height: 16),
                 AuthFormSwitchRow(
                   question: "Don’t have an account? ",
                   actionText: "Sign Up",
                   onTap: () {
                     provider.passwordCtrl.clear();
                     provider.emailCtrl.clear();
-                    context.pushRoute( ClientSignUpRoute(showBackButton: true));
-                  },
+final stackString = context.router.stack.toString();
+                    log('stack raw: $stackString');
+
+                    final names = RegExp(r'\"([^\"]+)\"')
+                        .allMatches(stackString)
+                        .map((m) => m.group(1))
+                        .whereType<String>()
+                        .toList();
+
+                    log('extracted route names: $names');
+
+                    final hasSignIn = names.contains(ClientSignUpRoute.name);
+                    if (hasSignIn) {
+                      context.router.replaceAll([
+                        ClientSignUpRoute(showBackButton: false),
+                      ]);
+                    } else {
+                      context.pushRoute(
+                        ClientSignUpRoute(showBackButton: true),
+                      );
+                  }},
                   actionColor: AppColors.authThemeLightColor,
                 ),
               ],

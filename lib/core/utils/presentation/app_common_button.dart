@@ -35,7 +35,7 @@ class AppButton extends StatelessWidget {
     this.fontSize = 14,
     this.iconLeftMargin = 0,
     this.borderColor = AppColors.whiteColor,
-    this.buttonBackgroundColor = AppColors.themeColor,
+    this.buttonBackgroundColor = AppColors.authThemeColor,
     this.isLoading = false,
     this.isDisabled = false,
   });
@@ -103,7 +103,7 @@ class AppButton extends StatelessWidget {
                     text.isNotEmpty
                         ? textWidget(
                             text: text,
-                            colour: textColor,
+                            color: textColor,
                             fontSize: fontSize,
                             fontWeight: fontWeight,
                           )

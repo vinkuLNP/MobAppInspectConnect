@@ -79,7 +79,7 @@ class ClientDashboardRoute extends PageRouteInfo<void> {
 class ClientSignInRoute extends PageRouteInfo<ClientSignInRouteArgs> {
   ClientSignInRoute({
     Key? key,
-    bool showBackButton = true,
+    required bool showBackButton,
     List<PageRouteInfo>? children,
   }) : super(
          ClientSignInRoute.name,
@@ -92,9 +92,7 @@ class ClientSignInRoute extends PageRouteInfo<ClientSignInRouteArgs> {
   static PageInfo page = PageInfo(
     name,
     builder: (data) {
-      final args = data.argsAs<ClientSignInRouteArgs>(
-        orElse: () => const ClientSignInRouteArgs(),
-      );
+      final args = data.argsAs<ClientSignInRouteArgs>();
       return ClientSignInView(
         key: args.key,
         showBackButton: args.showBackButton,
@@ -104,7 +102,7 @@ class ClientSignInRoute extends PageRouteInfo<ClientSignInRouteArgs> {
 }
 
 class ClientSignInRouteArgs {
-  const ClientSignInRouteArgs({this.key, this.showBackButton = true});
+  const ClientSignInRouteArgs({this.key, required this.showBackButton});
 
   final Key? key;
 
@@ -131,7 +129,7 @@ class ClientSignInRouteArgs {
 class ClientSignUpRoute extends PageRouteInfo<ClientSignUpRouteArgs> {
   ClientSignUpRoute({
     Key? key,
-    bool showBackButton = true,
+    required bool showBackButton,
     List<PageRouteInfo>? children,
   }) : super(
          ClientSignUpRoute.name,
@@ -144,9 +142,7 @@ class ClientSignUpRoute extends PageRouteInfo<ClientSignUpRouteArgs> {
   static PageInfo page = PageInfo(
     name,
     builder: (data) {
-      final args = data.argsAs<ClientSignUpRouteArgs>(
-        orElse: () => const ClientSignUpRouteArgs(),
-      );
+      final args = data.argsAs<ClientSignUpRouteArgs>();
       return ClientSignUpView(
         key: args.key,
         showBackButton: args.showBackButton,
@@ -156,7 +152,7 @@ class ClientSignUpRoute extends PageRouteInfo<ClientSignUpRouteArgs> {
 }
 
 class ClientSignUpRouteArgs {
-  const ClientSignUpRouteArgs({this.key, this.showBackButton = true});
+  const ClientSignUpRouteArgs({this.key, required this.showBackButton});
 
   final Key? key;
 
@@ -183,7 +179,7 @@ class ClientSignUpRouteArgs {
 class ForgotpPasswordRoute extends PageRouteInfo<ForgotpPasswordRouteArgs> {
   ForgotpPasswordRoute({
     Key? key,
-    bool showBackButton = true,
+    required bool showBackButton,
     List<PageRouteInfo>? children,
   }) : super(
          ForgotpPasswordRoute.name,
@@ -199,9 +195,7 @@ class ForgotpPasswordRoute extends PageRouteInfo<ForgotpPasswordRouteArgs> {
   static PageInfo page = PageInfo(
     name,
     builder: (data) {
-      final args = data.argsAs<ForgotpPasswordRouteArgs>(
-        orElse: () => const ForgotpPasswordRouteArgs(),
-      );
+      final args = data.argsAs<ForgotpPasswordRouteArgs>();
       return ForgotpPasswordView(
         key: args.key,
         showBackButton: args.showBackButton,
@@ -211,7 +205,7 @@ class ForgotpPasswordRoute extends PageRouteInfo<ForgotpPasswordRouteArgs> {
 }
 
 class ForgotpPasswordRouteArgs {
-  const ForgotpPasswordRouteArgs({this.key, this.showBackButton = true});
+  const ForgotpPasswordRouteArgs({this.key, required this.showBackButton});
 
   final Key? key;
 

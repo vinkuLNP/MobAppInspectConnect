@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 Widget textWidget({
   required String text,
   String highLightText = "",
-  Color colour = AppColors.black,
+  Color color = AppColors.black,
   Color textDecorationColor= AppColors.black,
 
   double fontSize = 14,
@@ -26,7 +26,7 @@ Widget textWidget({
         style: appTextStyle(
           fontSize: fontSize,
           fontWeight: fontWeight,
-          colour: colour,
+          color: color,
           height: height,
           fontStyle: fontStyle,
           textDecoration: textDecoration,
@@ -42,7 +42,7 @@ Widget textWidget({
           fontSize: fontSize,
           fontWeight: fontWeight,
           textDecorationColor:textDecorationColor ,
-          colour: colour,
+          color: color,
           height: height,
           fontStyle: fontStyle,
           textDecoration: textDecoration,

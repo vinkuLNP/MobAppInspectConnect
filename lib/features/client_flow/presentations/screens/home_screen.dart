@@ -8,10 +8,12 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey[200],
       appBar: const CommonAppBar(title: 'Book Inspection'),
       body: const SafeArea(
+        
         child: Padding(
-          padding: EdgeInsets.all(16),
+          padding: EdgeInsets.symmetric(horizontal: 8),
           child: BookingFormWidget(isEditing: false),
         ),
       ),

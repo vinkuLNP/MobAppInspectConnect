@@ -44,8 +44,8 @@ class AppInputField extends StatelessWidget {
           decoration: InputDecoration(
             counterText: '',
             hintText: hint,
-            errorStyle: appTextStyle(fontSize: 12, colour: Colors.red),
-            hintStyle: appTextStyle(fontSize: 12,colour: Colors.grey),
+            errorStyle: appTextStyle(fontSize: 12, color: Colors.red),
+            hintStyle: appTextStyle(fontSize: 12,color: Colors.grey),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
@@ -104,8 +104,8 @@ class AppPasswordField extends StatelessWidget {
           style: appTextStyle(fontSize: 12),
           decoration: InputDecoration(
             hintText: '******',
-            hintStyle: appTextStyle(fontSize: 12,colour: Colors.grey),
-            errorStyle: appTextStyle(fontSize: 12, colour: Colors.red),
+            hintStyle: appTextStyle(fontSize: 12,color: Colors.grey),
+            errorStyle: appTextStyle(fontSize: 12, color: Colors.red),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),

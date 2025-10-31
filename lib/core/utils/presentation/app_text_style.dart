@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 TextStyle appTextStyle({
   required double fontSize,
   bool isBold = false,
-  Color? colour,
+  Color? color,
   Color? textDecorationColor,
   FontWeight fontWeight = FontWeight.normal,
   FontStyle fontStyle = FontStyle.normal,
@@ -18,7 +18,7 @@ TextStyle appTextStyle({
 
   // overflow: textOverflow,
   fontSize: fontSize,
-  color: colour ?? AppColors.black,
+  color: color ?? AppColors.black,
   fontStyle: fontStyle,
   height: height,
   fontWeight: isBold == true ? FontWeight.bold : fontWeight,

@@ -56,29 +56,34 @@ class CommonAuthBar extends StatelessWidget {
                 ),
                 Positioned(
                   left: 24,
-                  top: 80,
+                  top: showBackButton ? 26 : 80,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // appCommonLogoBar(height: 50),
-                 showBackButton ?      IconButton(icon: Icon( Icons.arrow_back),color: Colors.white,onPressed: (){
-                        Navigator.pop(context);
-                      },) : SizedBox(),
-                      SizedBox(height: 10,),
-                       textWidget( 
+                      showBackButton
+                          ? IconButton(
+                              icon: Icon(Icons.arrow_back),
+                              color: Colors.white,
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                            )
+                          : SizedBox(),
+                      SizedBox(height: 4),
+                      textWidget(
                         text: subtitle,
                         fontSize: 14,
-                        colour: Colors.white70,
+                        color: Colors.white70,
                       ),
-                      // const SizedBox(height: 2),
 
+                      // const SizedBox(height: 2),
                       textWidget(
                         text: title,
                         fontSize: 22,
                         fontWeight: FontWeight.w500,
-                        colour: Colors.white,
+                        color: Colors.white,
                       ),
-                     
                     ],
                   ),
                 ),

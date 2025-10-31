@@ -233,7 +233,7 @@ class _OtpVerificationViewState extends State<OtpVerificationView> {
         final double pinputGap = (rc.screenHeight * 0.05).clamp(24.0, 40.0);
 
         return CommonAuthBar(
-          showBackButton:false,
+          showBackButton:widget.addShowButton,
           title: 'Verify Code',
           subtitle: vm.otpPurpose == OtpPurpose.forgotPassword
               ? (vm.resetTargetLabel == null
@@ -276,37 +276,38 @@ class _OtpVerificationViewState extends State<OtpVerificationView> {
                     ),
                   ),
                 ),
-                SizedBox(height: pinputGap),
+                SizedBox(height: 28),
 
-                /// Resend OTP Section
-                Center(
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    textWidget(
+                      text: "Didn’t receive OTP?",
+                      color: Colors.black,
+                      fontSize: 14,
+                    ),
+                const SizedBox(width: 4),
+
+                    GestureDetector(
+                  onTap: vm.canResend
+                      ? () => vm.resend(context: context)
+                      : null,
                   child: textWidget(
-                    text: "Didn’t receive OTP?",
-                    colour: Colors.black,
+                    text: vm.canResend
+                        ? "Resend code"
+                        : "Resend in ${vm.secondsLeft}s",
+                    fontWeight: FontWeight.w600,
+                    color: vm.canResend
+                        ? AppColors.authThemeColor
+                        : Colors.black38,
                     fontSize: 14,
                   ),
                 ),
-                const SizedBox(height: 6),
-                Center(
-                  child: GestureDetector(
-                    onTap: vm.canResend
-                        ? () => vm.resend(context: context)
-                        : null,
-                    child: textWidget(
-                      text: vm.canResend
-                          ? "Resend code"
-                          : "Resend in ${vm.secondsLeft}s",
-                      fontWeight: FontWeight.w600,
-                      colour: vm.canResend
-                          ? AppColors.authThemeColor
-                          : Colors.black38,
-                      fontSize: 14,
-                    ),
-                  ),
+                  ],
                 ),
-                SizedBox(height: (rc.screenHeight * 0.08).clamp(40.0, 80.0)),
+            
+                SizedBox(height: 28),
 
-                /// Verify Button
                 AppButton(
                   text: 'Verify',
                   buttonBackgroundColor: vm.canVerify
@@ -319,12 +320,11 @@ class _OtpVerificationViewState extends State<OtpVerificationView> {
                   onTap: () =>
                       vm.canVerify ? vm.verify(context: context) : null,
                 ),
-                const SizedBox(height: 28),
 
                 AuthFormSwitchRow(
                   question: "Already have an account? ",
                   actionText: "Sign In",
-                  onTap: () => context.replaceRoute( ClientSignInRoute(showBackButton: false)),
+                  onTap: () => context.router.replaceAll([ ClientSignInRoute(showBackButton: false)]),
                   actionColor: AppColors.authThemeLightColor,
                 ),
               ],

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:auto_route/auto_route.dart';
 import 'package:inspect_connect/core/basecomponents/base_responsive_widget.dart';
 import 'package:inspect_connect/core/utils/auto_router_setup/auto_router.dart';
@@ -253,8 +255,8 @@ import 'package:provider/provider.dart';
 
 @RoutePage()
 class ClientSignUpView extends StatelessWidget {
-   final bool showBackButton;
-  const ClientSignUpView({super.key, this.showBackButton = true});
+  final bool showBackButton;
+  const ClientSignUpView({super.key, required this.showBackButton});
 
   @override
   Widget build(BuildContext context) {
@@ -267,7 +269,7 @@ class ClientSignUpView extends StatelessWidget {
 
         return CommonAuthBar(
           title: 'Sign Up',
-           showBackButton: true,
+          showBackButton: showBackButton,
           subtitle: 'Create Your Account!',
           image: finalImage,
           rc: rc,
@@ -288,7 +290,7 @@ class ClientSignUpView extends StatelessWidget {
                     if (vm.autoValidate) formKey.currentState?.validate();
                   },
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 14),
                 textWidget(text: 'Phone Number', fontWeight: FontWeight.w400),
                 const SizedBox(height: 8),
 
@@ -309,6 +311,7 @@ class ClientSignUpView extends StatelessWidget {
                         children: [
                           IntlPhoneField(
                             controller: vm.phoneCtrl,
+
                             style: appTextStyle(fontSize: 12),
                             initialCountryCode: 'IN',
                             decoration: InputDecoration(
@@ -316,12 +319,17 @@ class ClientSignUpView extends StatelessWidget {
                               counterText: '',
                               errorStyle: appTextStyle(
                                 fontSize: 12,
-                                colour: Colors.red,
+                                color: Colors.red,
                               ),
-                              hintStyle: appTextStyle(fontSize: 12,colour: Colors.grey),
+                              hintStyle: appTextStyle(
+                                fontSize: 12,
+                                color: Colors.grey,
+                              ),
+
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10),
                               ),
+
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10),
                                 borderSide: const BorderSide(
@@ -331,7 +339,7 @@ class ClientSignUpView extends StatelessWidget {
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10),
                                 borderSide: const BorderSide(
-                                  color: AppColors.themeColor,
+                                  color: AppColors.authThemeColor,
                                   width: 2,
                                 ),
                               ),
@@ -340,6 +348,8 @@ class ClientSignUpView extends StatelessWidget {
                                 vertical: 14,
                               ),
                             ),
+                            showDropdownIcon: true,
+
                             inputFormatters: [
                               FilteringTextInputFormatter.digitsOnly,
                               LengthLimitingTextInputFormatter(10),
@@ -378,7 +388,7 @@ class ClientSignUpView extends StatelessWidget {
                             textWidget(
                               text: "    ${state.errorText!}",
                               fontSize: 12,
-                              colour: Colors.red,
+                              color: Colors.red,
                             ),
                           ],
                         ],
@@ -387,7 +397,7 @@ class ClientSignUpView extends StatelessWidget {
                   ),
                 ),
 
-                const SizedBox(height: 12),
+                const SizedBox(height: 14),
                 AppInputField(
                   label: 'Email',
                   hint: 'Email',
@@ -412,7 +422,6 @@ class ClientSignUpView extends StatelessWidget {
                   },
                   text: 'Sign Up',
                 ),
-                const SizedBox(height: 20),
 
                 AuthFormSwitchRow(
                   question: "Already have an account?",
@@ -421,7 +430,28 @@ class ClientSignUpView extends StatelessWidget {
                     vm.emailCtrlSignUp.clear();
                     vm.phoneCtrl.clear();
                     vm.fullNameCtrl.clear();
-                    context.pushRoute( ClientSignInRoute(showBackButton: true));
+
+                    final stackString = context.router.stack.toString();
+                    log('stack raw: $stackString');
+
+                    final names = RegExp(r'\"([^\"]+)\"')
+                        .allMatches(stackString)
+                        .map((m) => m.group(1))
+                        .whereType<String>()
+                        .toList();
+
+                    log('extracted route names: $names');
+
+                    final hasSignIn = names.contains(ClientSignInRoute.name);
+                    if (hasSignIn) {
+                      context.router.replaceAll([
+                        ClientSignInRoute(showBackButton: false),
+                      ]);
+                    } else {
+                      context.pushRoute(
+                        ClientSignInRoute(showBackButton: true),
+                      );
+                    }
                   },
                   actionColor: AppColors.authThemeLightColor,
                 ),

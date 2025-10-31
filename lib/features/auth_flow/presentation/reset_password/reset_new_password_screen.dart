@@ -156,13 +156,13 @@ class ResetPasswordView extends StatelessWidget {
         final vm = ctx.watch<ClientViewModelProvider>();
 
         return CommonAuthBar(
-           showBackButton: false,
+           showBackButton: showBackButton,
           title: vm.otpPurpose == OtpPurpose.forgotPassword
               ? 'Reset Password'
-              : 'Set Password',
+              : 'Create Password',
           subtitle: vm.otpPurpose == OtpPurpose.forgotPassword
               ? 'Enter your new password'
-              : 'Set your password to continue',
+              : 'Create your password to continue',
           image: finalImage,
           rc: rc,
           form: Form(
@@ -180,7 +180,7 @@ class ResetPasswordView extends StatelessWidget {
                     if (vm.autoValidate) formKey.currentState?.validate();
                   },
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 14),
 
                 AppPasswordField(
                   label: 'Confirm New Password',
@@ -192,7 +192,7 @@ class ResetPasswordView extends StatelessWidget {
                     if (vm.autoValidate) formKey.currentState?.validate();
                   },
                 ),
-                const SizedBox(height: 40),
+                const SizedBox(height: 28),
 
                 AppButton(
                   text: vm.isResetting
@@ -214,13 +214,12 @@ class ResetPasswordView extends StatelessWidget {
                     await vm.resetPassword(formKey: formKey, context: context);
                   },
                 ),
-                const SizedBox(height: 28),
 
                 AuthFormSwitchRow(
                   question: "Already have an account? ",
                   actionText: "Sign In",
                   onTap: () {
-                    context.pushRoute( ClientSignInRoute(showBackButton: false));
+                    context.router.replaceAll([ ClientSignInRoute(showBackButton: false)]);
                   },
                   actionColor: AppColors.authThemeLightColor,
                 ),

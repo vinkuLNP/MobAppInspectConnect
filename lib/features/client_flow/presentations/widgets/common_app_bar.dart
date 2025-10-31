@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/utils/constants/app_assets_constants.dart';
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
+import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 
 class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool showLogo;
@@ -24,7 +25,8 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
-        color: AppColors.whiteColor,
+        color: AppColors.authThemeColor,
+
         // gradient: LinearGradient(
         //   colors: [
 
@@ -35,28 +37,25 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
         // begin: Alignment.topLeft,
         // end: Alignment.bottomRight,
         // ),
+        // boxShadow: [
+        //   BoxShadow(color: Colors.black26, offset: Offset(0, 2), blurRadius: 6),
+        // ],
+        // borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
+        gradient: LinearGradient(
+          colors: [
+            Color(0xFF1B90FF), // Muted navy blue
+            Color(0xFF0070F2), // Deep navy
+
+            Color(0xFF002A86), // Softer blue tone
+
+            // Color(0xFF00144A), // Muted navy blue
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.topRight,
+        ),
         boxShadow: [
           BoxShadow(color: Colors.black26, offset: Offset(0, 2), blurRadius: 6),
         ],
-        borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
-
-        // gradient: LinearGradient(
-        //   colors: [
-        //     Color(0xFF415A77), // Softer blue tone
-        //     Color(0xFF1B263B), // Muted navy blue
-
-        //     Color(0xFF0D1B2A), // Deep navy
-        //   ],
-        //   begin: Alignment.topLeft,
-        //   end: Alignment.bottomRight,
-        // ),
-        // boxShadow: [
-        //   BoxShadow(
-        //     color: Colors.black26,
-        //     offset: Offset(0, 2),
-        //     blurRadius: 6,
-        //   ),
-        // ],
         // borderRadius: BorderRadius.vertical(
         //   bottom: Radius.circular(20),
         // ),
@@ -72,38 +71,51 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
                 icon: const Icon(Icons.arrow_back, color: AppColors.themeColor),
                 onPressed: onBack ?? () => Navigator.of(context).maybePop(),
               )
-            : showLogo
-            ? Padding(
-                padding: const EdgeInsets.only(left: 12),
-                child: Image.asset(
-                  appLogo,
-                  height: 36,
-                  width: 36,
-                  // color: Colors.white, // make sure logo looks clean
-                ),
-              )
             : null,
-        title: title != null
-            ? Text(
-                title!,
-                style: TextStyle(
-                  color: AppColors.themeColor,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 18,
-                ),
-              )
-            : null,
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+
+          children: [
+            showLogo
+                ? Row(
+                    children: [
+                      SizedBox(
+                        height: 30,
+                        width: 30,
+                        child: Image.asset(
+                          appLogo,
+                          height: 30,
+                          width: 30,
+                          fit: BoxFit.contain,
+                          color: Colors.white,
+                        ),
+                      ),
+                      SizedBox(width: 120),
+                    ],
+                  )
+                : SizedBox(),
+
+            title != null
+                ? textWidget(
+                    text: title!,
+                    color: AppColors.whiteColor,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                  )
+                : SizedBox(),
+          ],
+        ),
         actions: [
           if (showNotification)
             IconButton(
               icon: const Icon(
                 Icons.notifications_none,
-                color: AppColors.themeColor,
+                color: AppColors.whiteColor,
               ),
               onPressed:
                   onNotificationTap ??
                   () => ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Notifications tapped')),
+                    SnackBar(content: textWidget(text: 'Notifications tapped')),
                   ),
             ),
         ],
@@ -112,5 +124,5 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight + 8);
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }

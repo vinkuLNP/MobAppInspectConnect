@@ -327,7 +327,7 @@ class _OnBoardingPageState extends State<OnBoardingPage>
                       padding: const EdgeInsets.symmetric(horizontal: 12),
                       child: textWidget(
                         text: _getHeadline(),
-                        colour: Colors.white,
+                        color: Colors.white,
                         fontSize: 23,
                         fontWeight: FontWeight.bold,
                         alignment: TextAlign.center,
@@ -420,7 +420,7 @@ class _OnBoardingPageState extends State<OnBoardingPage>
                             children: [
                               textWidget(
                                 text: "Already have an account? ",
-                                colour: AppColors.whiteColor,
+                                color: AppColors.whiteColor,
                               ),
                               GestureDetector(
                                 onTap: () {
@@ -435,7 +435,7 @@ class _OnBoardingPageState extends State<OnBoardingPage>
                                   textDecorationColor: AppColors.whiteColor,
                                   textDecoration: TextDecoration.underline,
 
-                                  colour: AppColors.whiteColor,
+                                  color: AppColors.whiteColor,
                                 ),
                               ),
                             ],

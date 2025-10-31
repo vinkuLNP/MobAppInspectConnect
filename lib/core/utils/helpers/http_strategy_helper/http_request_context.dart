@@ -21,12 +21,11 @@ class HttpRequestContext {
 
   Map<String, String> _sharedDefaultHeader = <String, String>{};
 
-  Future<void> initSharedDefaultHeader(
-      [String contentValue = contentTypeValue]) async {
+  Future<void> initSharedDefaultHeader([
+    String contentValue = contentTypeValue,
+  ]) async {
     _sharedDefaultHeader = <String, String>{};
-    _sharedDefaultHeader.addAll(<String, String>{
-      contentTypeKey: contentValue,
-    });
+    _sharedDefaultHeader.addAll(<String, String>{contentTypeKey: contentValue});
   }
 
   Future<bool> _getConnectionState() async {
@@ -76,5 +75,3 @@ class HttpRequestContext {
     }
   }
 }
-
-

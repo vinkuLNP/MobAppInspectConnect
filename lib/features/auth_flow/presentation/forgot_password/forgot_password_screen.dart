@@ -126,12 +126,10 @@ import 'package:provider/provider.dart';
 //   }
 // }
 
-
-
 @RoutePage()
 class ForgotpPasswordView extends StatelessWidget {
-     final bool showBackButton;
-  const ForgotpPasswordView({super.key, this.showBackButton = true});
+  final bool showBackButton;
+  const ForgotpPasswordView({super.key, required this.showBackButton});
 
   @override
   Widget build(BuildContext context) {
@@ -144,7 +142,7 @@ class ForgotpPasswordView extends StatelessWidget {
 
         return CommonAuthBar(
           title: 'Forgot Password?',
- showBackButton: false,
+          showBackButton: showBackButton,
           subtitle: 'Enter your email \nto receive a reset code',
           image: finalImage,
           rc: rc,
@@ -156,7 +154,6 @@ class ForgotpPasswordView extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-
                 AppInputField(
                   label: 'Email',
                   hint: 'example@gmail.com',
@@ -170,9 +167,8 @@ class ForgotpPasswordView extends StatelessWidget {
 
                 const SizedBox(height: 28),
 
-                /// Send Code Button
                 AppButton(
-                      buttonBackgroundColor: AppColors.authThemeColor,
+                  buttonBackgroundColor: AppColors.authThemeColor,
                   borderColor: AppColors.authThemeColor,
                   text: provider.isSendingReset
                       ? 'Sending...'
@@ -191,8 +187,6 @@ class ForgotpPasswordView extends StatelessWidget {
                     }
                   },
                 ),
-
-                const SizedBox(height: 28),
 
                 AuthFormSwitchRow(
                   question: "Remember your password? ",

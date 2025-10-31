@@ -17,7 +17,7 @@ Widget appCommonLogoBar({
       SizedBox(width: 10),
       textWidget(
         text: "InspectConnect",
-        colour: AppColors.whiteColor,
+        color: AppColors.whiteColor,
         fontSize: 16,
         fontWeight: FontWeight.bold,
       ),

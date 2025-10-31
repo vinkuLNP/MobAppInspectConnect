@@ -476,7 +476,9 @@ class BookingProvider extends BaseViewModel {
 
       if (reset) {
         _currentPage = 1;
-        hasMoreBookings = true;
+
+        isFetchingBookings = true;
+        // _bookings = [];
         bookings = [];
         notifyListeners();
       }
@@ -553,10 +555,19 @@ class BookingProvider extends BaseViewModel {
 
   void filterByStatus(String? status) {
     log("🔍 Filtering by status: $status");
-    if (_status == status) return;
+    if (_status == "status") return;
     _status = status;
     _currentPage = 1;
     fetchBookingsList(reset: true);
+  }
+
+  void sortBookingsByDate({bool ascending = true}) {
+    bookings.sort((a, b) {
+      final dateA = DateTime.parse(a.bookingDate);
+      final dateB = DateTime.parse(b.bookingDate);
+      return ascending ? dateA.compareTo(dateB) : dateB.compareTo(dateA);
+    });
+    notifyListeners();
   }
 
   void clearFilters() {
@@ -640,4 +651,6 @@ class BookingProvider extends BaseViewModel {
       },
     );
   }
+
+
 }

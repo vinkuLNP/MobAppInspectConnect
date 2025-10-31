@@ -57,7 +57,7 @@ class _MyAppState extends State<MyApp> {
   GlobalKey<NavigatorState>();
   // SessionManager().navigatorKey = navigatorKey;
 
-  static const Color themeColor = Color(0xff1a2c47);
+  static const Color themeColor = Color(0xFF002A86);
   @override
   Widget build(BuildContext context) {
  return   MultiProvider(
