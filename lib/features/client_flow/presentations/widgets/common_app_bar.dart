@@ -6,7 +6,7 @@ import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.d
 class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool showLogo;
   final bool showBackButton;
-  final bool showNotification;
+  final bool showNotification,showBookButton;
   final String? title;
   final VoidCallback? onBack;
   final VoidCallback? onNotificationTap;
@@ -15,6 +15,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
     super.key,
     this.showLogo = true,
     this.showBackButton = false,
+    this.showBookButton = false,
     this.showNotification = true,
     this.title,
     this.onBack,
@@ -68,12 +69,13 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
         automaticallyImplyLeading: false,
         leading: showBackButton
             ? IconButton(
-                icon: const Icon(Icons.arrow_back, color: AppColors.themeColor),
+                icon: const Icon(Icons.arrow_back, color: AppColors.whiteColor),
                 onPressed: onBack ?? () => Navigator.of(context).maybePop(),
               )
             : null,
         title: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisAlignment:  showLogo
+                ?  MainAxisAlignment.start : MainAxisAlignment.center,
 
           children: [
             showLogo
@@ -110,6 +112,18 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
             IconButton(
               icon: const Icon(
                 Icons.notifications_none,
+                color: AppColors.whiteColor,
+              ),
+              onPressed:
+                  onNotificationTap ??
+                  () => ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: textWidget(text: 'Notifications tapped')),
+                  ),
+            ),
+             if (showBookButton)
+            IconButton(
+              icon: const Icon(
+                Icons.my_library_books_outlined,
                 color: AppColors.whiteColor,
               ),
               onPressed:

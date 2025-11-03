@@ -1,3 +1,6 @@
+import 'package:inspect_connect/features/client_flow/data/models/certificate_subtype_model.dart';
+import 'package:inspect_connect/features/client_flow/domain/entities/certificate_sub_type_entity.dart';
+
 import '../../domain/entities/booking_detail_entity.dart';
 
 class BookingDetailModel extends BookingDetailEntity {
@@ -97,27 +100,5 @@ class ClientInfoModel extends ClientInfoEntity {
         'name': name,
         'phoneNumber': phoneNumber,
         'countryCode': countryCode,
-      };
-}
-
-class CertificateSubTypeModelData extends CertificateSubTypeEntity {
-  CertificateSubTypeModelData({
-    required super.id,
-    required super.name,
-    required super.status,
-  });
-
-  factory CertificateSubTypeModelData.fromJson(Map<String, dynamic> json) {
-    return CertificateSubTypeModelData(
-      id: json['_id'] ?? '',
-      name: json['name'] ?? '',
-      status: json['status'] ?? 0,
-    );
-  }
-
-  Map<String, dynamic> toJson() => {
-        '_id': id,
-        'name': name,
-        'status': status,
       };
 }

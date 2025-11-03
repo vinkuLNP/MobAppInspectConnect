@@ -5,8 +5,10 @@ import 'package:inspect_connect/features/auth_flow/data/models/change_password_d
 import 'package:inspect_connect/features/auth_flow/data/models/resend_otp_request_model.dart';
 import 'package:inspect_connect/features/auth_flow/data/models/signin_request_model.dart';
 import 'package:inspect_connect/features/auth_flow/data/models/signup_request_model.dart';
+import 'package:inspect_connect/features/auth_flow/data/models/user_detail_dto.dart';
 import 'package:inspect_connect/features/auth_flow/data/models/verify_otp_request_model.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/auth_user.dart';
+import 'package:inspect_connect/features/auth_flow/domain/entities/user_detail.dart';
 import 'package:inspect_connect/features/auth_flow/domain/repositories/auth_repository.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
@@ -191,6 +193,32 @@ Future<ApiResultModel<AuthUser>> signUp({
     );
   }
   
+    @override
+  Future<ApiResultModel<UserDetail>> fetchUserDetail({
+     required String userId,
+  }) async {
+    final res = await _remote.fetchUserDetail(
+      UserDetailDto(
+        userID: userId,
+      ),
+    );
+
+    return res.when(
+       success: (data) {
+        try {
+          return ApiResultModel.success(data: data);
+        } catch (e) {
+          return const ApiResultModel.failure(
+            errorResultEntity: ErrorResultModel(
+              message: "Parsing error",
+              statusCode: 500,
+            ),
+          );
+        }
+      },
+      failure: (err) => ApiResultModel<UserDetail>.failure(errorResultEntity: err),
+    );
+  }
   
 
 }

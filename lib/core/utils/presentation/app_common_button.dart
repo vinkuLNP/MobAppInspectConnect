@@ -15,7 +15,8 @@ class AppButton extends StatelessWidget {
   final String text, image;
   final Function()? onTap;
   final FontWeight fontWeight;
-  final bool isElevation, isSvg, isBorder, isLoading, isDisabled;
+  final Icon? icon;
+  final bool isElevation, isSvg, isBorder, isLoading, isDisabled, showIcon;
 
   const AppButton({
     super.key,
@@ -38,6 +39,8 @@ class AppButton extends StatelessWidget {
     this.buttonBackgroundColor = AppColors.authThemeColor,
     this.isLoading = false,
     this.isDisabled = false,
+    this.showIcon = false,
+    this.icon,
   });
 
   @override
@@ -59,8 +62,8 @@ class AppButton extends StatelessWidget {
             color: isBorder
                 ? null
                 : buttonBackgroundColor == AppColors.transparent
-                    ? null
-                    : buttonBackgroundColor,
+                ? null
+                : buttonBackgroundColor,
             borderRadius: BorderRadius.circular(borderRadius),
             boxShadow: isElevation
                 ? kElevationToShadow[1]
@@ -97,7 +100,11 @@ class AppButton extends StatelessWidget {
                                     height: imageSize,
                                   ),
                           ),
-                    image == "" || text.isEmpty
+                    showIcon ? Container(
+                            margin: EdgeInsets.only(right: iconLeftMargin),
+                            child: icon!) : SizedBox(),
+
+                    image == "" || text.isEmpty || !showIcon
                         ? const SizedBox()
                         : const SizedBox(width: 8),
                     text.isNotEmpty

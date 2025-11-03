@@ -33,9 +33,9 @@ static Future<AppLocalDatabase> create() async {
 
 
   void clearAll<T>() {
-    // final box = _store!.box<T>();
-    // box.removeAll();
-    _store?.close();
+    final box = _store!.box<T>();
+    box.removeAll();
+    // _store?.close();
   }
 }
 

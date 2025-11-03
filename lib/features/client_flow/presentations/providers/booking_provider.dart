@@ -32,7 +32,7 @@ class BookingProvider extends BaseViewModel {
   TimeOfDay? _selectedTime;
   String? formattedTime;
 
-  String? _inspectionType;
+  CertificateSubTypeEntity? _inspectionType;
   String? location;
   String description = '';
   final List<File> images = [];
@@ -40,8 +40,11 @@ class BookingProvider extends BaseViewModel {
   final TextEditingController descriptionController = TextEditingController();
   DateTime get selectedDate => _selectedDate;
   TimeOfDay? get selectedTime => _selectedTime;
-  String? get inspectionType => _inspectionType;
+  CertificateSubTypeEntity? get inspectionType => _inspectionType;
   String? get getLocation => location;
+bool isLoadingBookingDetail = false;
+
+  
   void setDate(DateTime d) {
     _selectedDate = DateTime(d.year, d.month, d.day);
     notifyListeners();
@@ -68,8 +71,12 @@ class BookingProvider extends BaseViewModel {
     notifyListeners();
   }
 
-  void setInspectionType(String? t) {
+  void setInspectionType(CertificateSubTypeEntity? t) {
+    log('---------<t $t');
+
     _inspectionType = t;
+    log('-----_inspectionType----<t $_inspectionType');
+
     notifyListeners();
   }
 
@@ -162,7 +169,7 @@ class BookingProvider extends BaseViewModel {
         bookingDate: _selectedDate.toIso8601String().split('T').first,
         bookingTime: formattedTime!,
         bookingLocation: location!,
-        certificateSubTypeId: _inspectionType!,
+        certificateSubTypeId: _inspectionType!.id,
         images: uploadedUrls,
         description: description,
       );
@@ -224,7 +231,7 @@ class BookingProvider extends BaseViewModel {
         bookingDate: _selectedDate.toIso8601String().split('T').first,
         bookingTime: formattedTime!,
         bookingLocation: location!,
-        certificateSubTypeId: _inspectionType!,
+        certificateSubTypeId: _inspectionType!.id,
         images: uploadedUrls,
         description: description,
       );
@@ -267,8 +274,11 @@ class BookingProvider extends BaseViewModel {
   Future<void> getBookingDetail({
     required BuildContext context,
     required String bookingId,
+    required bool isEditable,
   }) async {
     try {
+       isLoadingBookingDetail = true;
+    notifyListeners();
       final user = await locator<AuthLocalDataSource>().getUser();
       if (user == null || user.token == null) {
         throw Exception('User not found in local storage');
@@ -290,11 +300,17 @@ class BookingProvider extends BaseViewModel {
         data: (response) async {
           clearBookingDetail();
           bookingDetailModel = response;
-          Navigator.pop(context);
+
+          log(response.bookingLocation);
+          // Navigator.pop(context);
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) => BookingEditScreen(booking: bookingDetailModel),
+              builder: (_) => BookingEditScreen(
+                booking: bookingDetailModel,
+                isEdiatble: isEditable,
+                isReadOnly: !isEditable,
+              ),
             ),
           ).then((result) {
             if (result == true) {
@@ -310,7 +326,8 @@ class BookingProvider extends BaseViewModel {
           );
         },
       );
-    } finally {}
+    } finally {isLoadingBookingDetail = false;
+    notifyListeners();}
   }
 
   Future<void> deleteBookingDetail({
@@ -367,6 +384,8 @@ class BookingProvider extends BaseViewModel {
       state?.when(
         data: (response) {
           subTypes = response;
+          log(subTypes[0].name);
+        setInspectionType(subTypes[0]);
           notifyListeners();
         },
         error: (e) {},
@@ -651,6 +670,4 @@ class BookingProvider extends BaseViewModel {
       },
     );
   }
-
-
 }

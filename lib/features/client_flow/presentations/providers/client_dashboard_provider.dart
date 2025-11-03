@@ -77,7 +77,6 @@ class ChangePasswordViewModel extends BaseViewModel {
     notifyListeners();
   }
 
-
   bool _autoValidate = false;
   bool get autoValidate => _autoValidate;
   void enableAutoValidate() {
@@ -85,17 +84,21 @@ class ChangePasswordViewModel extends BaseViewModel {
     notifyListeners();
   }
 
-  // ✅ Password validation like signup/reset
   String? validatePassword(String? value) {
     if (value == null || value.isEmpty) return 'Required';
     if (value.length < 6) return 'Minimum 6 characters required';
-    final regex =
-        RegExp(r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{6,}$');
+    final regex = RegExp(
+      r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{6,}$',
+    );
     if (!regex.hasMatch(value)) {
       return 'Include upper, lower, number & symbol';
     }
     return null;
   }
 
+  String? validateConfirmPassword(String? v) {
+    if (v == null || v.isEmpty) return 'Confirm your password';
+    if (v != newPasswordCtrl.text) return 'Passwords do not match';
+    return null;
+  }
 }
-

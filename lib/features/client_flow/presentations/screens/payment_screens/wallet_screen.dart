@@ -1,456 +1,17 @@
-// import 'package:flutter/material.dart';
-// import 'package:inspect_connect/features/client_flow/domain/entities/payment_list_entity.dart';
-// import 'package:inspect_connect/features/client_flow/presentations/providers/wallet_provider.dart';
-// import 'package:inspect_connect/features/client_flow/presentations/widgets/common_app_bar.dart';
-// import 'package:provider/provider.dart';
-// import 'package:inspect_connect/core/utils/constants/app_colors.dart';
-
-// class WalletScreen extends StatefulWidget {
-//   const WalletScreen({super.key});
-
-//   @override
-//   State<WalletScreen> createState() => _WalletScreenState();
-// }
-
-// class _WalletScreenState extends State<WalletScreen> {
-//   final ScrollController _scrollController = ScrollController();
-
-//   @override
-//   void initState() {
-//     super.initState();
-//     _fetchWalletData();
-
-//     _scrollController.addListener(() {
-//       final provider = context.read<WalletProvider>();
-//       if (_scrollController.position.pixels >=
-//           _scrollController.position.maxScrollExtent - 100) {
-//         provider.loadMorePayments(context);
-//       }
-//     });
-//   }
-
-//   Future<void> _fetchWalletData() async {
-//     final provider = context.read<WalletProvider>();
-//     await provider.refreshAll(context);
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Consumer<WalletProvider>(
-//       builder: (context, provider, _) {
-//         final wallet = provider.walletModel;
-//         final payments = provider.payments;
-
-//         return Scaffold(
-//           backgroundColor: AppColors.whiteColor.withOpacity(0.9),
-//           appBar: CommonAppBar(showBackButton: true, title: "My Wallet"),
-//           body: RefreshIndicator(
-//             onRefresh: _fetchWalletData,
-//             child: ListView(
-//               controller: _scrollController,
-//               padding: const EdgeInsets.all(16),
-//               children: [
-//                 _WalletBalanceCard(
-//                   balance: wallet?.available ?? 0,
-//                   pending: wallet?.pending ?? 0,
-//                   onRechargeTap: () {},
-//                 ),
-//                 const SizedBox(height: 24),
-//                 Text(
-//                   "Transaction History",
-//                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-//                     fontWeight: FontWeight.w600,
-//                   ),
-//                 ),
-//                 const SizedBox(height: 8),
-
-//                 if (payments.isEmpty)
-//                   const Center(
-//                     child: Padding(
-//                       padding: EdgeInsets.only(top: 50),
-//                       child: Text(
-//                         "No transactions yet",
-//                         style: TextStyle(fontSize: 16, color: Colors.grey),
-//                       ),
-//                     ),
-//                   )
-//                 else
-//                   ...payments.map(
-//                     (txn) => _PaymentTile(
-//                       txn: txn,
-//                       // title: txn.billingReason,
-//                       // subtitle: txn.type.toUpperCase(),
-//                       // date: txn.createdAt != null
-//                       //     ? "${txn.createdAt!.day}/${txn.createdAt!.month}/${txn.createdAt!.year}"
-//                       //     : "N/A",
-//                       // amount: txn.amount,
-//                       // isCredit: txn.isAdded,
-//                     ),
-//                   ),
-
-//                 if (provider.isFetching)
-//                   const Padding(
-//                     padding: EdgeInsets.symmetric(vertical: 16),
-//                     child: Center(child: CircularProgressIndicator()),
-//                   ),
-//               ],
-//             ),
-//           ),
-//         );
-//       },
-//     );
-//   }
-// }
-
-// class _WalletBalanceCard extends StatelessWidget {
-//   final double balance;
-//   final double pending;
-//   final VoidCallback onRechargeTap;
-
-//   const _WalletBalanceCard({
-//     required this.balance,
-//     required this.pending,
-//     required this.onRechargeTap,
-//   });
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Card(
-//       color: AppColors.themeColor,
-//       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-//       elevation: 4,
-//       child: Padding(
-//         padding: const EdgeInsets.all(20),
-//         child: Column(
-//           crossAxisAlignment: CrossAxisAlignment.start,
-//           children: [
-//             const Text(
-//               "Available Balance",
-//               style: TextStyle(color: Colors.white70, fontSize: 16),
-//             ),
-//             const SizedBox(height: 8),
-//             Text(
-//               "\$${balance.toStringAsFixed(2)}",
-//               style: const TextStyle(
-//                 fontSize: 32,
-//                 fontWeight: FontWeight.bold,
-//                 color: Colors.white,
-//               ),
-//             ),
-
-//             const SizedBox(height: 16),
-//             ElevatedButton.icon(
-//               onPressed: onRechargeTap,
-//               style: ElevatedButton.styleFrom(
-//                 backgroundColor: Colors.white,
-//                 foregroundColor: AppColors.themeColor,
-//                 shape: RoundedRectangleBorder(
-//                   borderRadius: BorderRadius.circular(12),
-//                 ),
-//               ),
-//               icon: const Icon(Icons.add_circle_outline),
-//               label: const Text("Add Funds"),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
-
-// class _PaymentTile extends StatelessWidget {
-//   final PaymentEntity txn;
-
-//   const _PaymentTile({required this.txn});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     final isCredit = txn.isAdded;
-//     final color = txn.statusColor;
-
-//     return Card(
-//       margin: const EdgeInsets.only(bottom: 10),
-//       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-//       child: ListTile(
-//         leading: CircleAvatar(
-//           backgroundColor: color.withOpacity(0.15),
-//           child: Icon(
-//             isCredit ? Icons.arrow_downward : Icons.arrow_upward,
-//             color: color,
-//           ),
-//         ),
-//         title: Text(
-//           txn.billingReason.isEmpty ? "Payment" : txn.billingReason,
-//           style: const TextStyle(fontWeight: FontWeight.w600),
-//         ),
-//         subtitle: Text("${txn.statusLabel} • ${txn.createdAt != null
-//             ? "${txn.createdAt!.day}/${txn.createdAt!.month}/${txn.createdAt!.year}"
-//             : "N/A"}"),
-//         trailing: Text(
-//           "${isCredit ? '+' : '-'}\$${txn.amount.toStringAsFixed(2)}",
-//           style: TextStyle(
-//             color: color,
-//             fontWeight: FontWeight.w700,
-//             fontSize: 16,
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-// }
-
 import 'dart:convert';
 import 'dart:developer';
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:http/http.dart' as http;
+import 'package:inspect_connect/core/utils/presentation/app_common_button.dart';
+import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
+import 'package:inspect_connect/features/client_flow/presentations/widgets/common_app_bar.dart';
 import 'package:provider/provider.dart';
-import 'package:inspect_connect/features/client_flow/presentations/providers/wallet_provider.dart';
-import 'package:inspect_connect/features/client_flow/domain/entities/payment_list_entity.dart';
-import 'package:inspect_connect/features/client_flow/data/models/wallet_model.dart';
+import 'package:inspect_connect/core/di/app_component/app_component.dart';
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
-
-// class WalletScreen extends StatefulWidget {
-//   const WalletScreen({super.key});
-
-//   @override
-//   State<WalletScreen> createState() => _WalletScreenState();
-// }
-
-// class _WalletScreenState extends State<WalletScreen> {
-//   @override
-//   void initState() {
-//     super.initState();
-//     Future.microtask(
-//       () => context.read<WalletProvider>().init(context: context),
-//     );
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       backgroundColor: AppColors.whiteColor.withOpacity(0.95),
-//       body: Consumer<WalletProvider>(
-//         builder: (context, provider, _) {
-//           switch (provider.walletState) {
-//             case WalletState.loading:
-//               return const Center(child: CircularProgressIndicator());
-
-//             case WalletState.error:
-//               return Center(
-//                 child: Column(
-//                   mainAxisAlignment: MainAxisAlignment.center,
-//                   children: [
-//                     const Icon(
-//                       Icons.error_outline,
-//                       color: Colors.red,
-//                       size: 40,
-//                     ),
-//                     const SizedBox(height: 8),
-//                     Text(provider.errorMessage ?? "Something went wrong"),
-//                     const SizedBox(height: 12),
-//                     ElevatedButton(
-//                       onPressed: () => provider.refreshAll(context),
-//                       child: const Text("Retry"),
-//                     ),
-//                   ],
-//                 ),
-//               );
-
-//             case WalletState.loaded:
-//               final wallet = provider.walletModel;
-//               final payments = provider.payments;
-
-//               return RefreshIndicator(
-//                 onRefresh: () => provider.refreshAll(context),
-//                 child: CustomScrollView(
-//                   slivers: [
-//                     SliverAppBar(
-//                       backgroundColor: AppColors.themeColor,
-//                       pinned: true,
-//                       expandedHeight: 200,
-//                       flexibleSpace: FlexibleSpaceBar(
-//                         title: const Text(
-//                           "My Wallet",
-//                           style: TextStyle(color: Colors.white),
-//                         ),
-//                         background: Container(
-//                           decoration: BoxDecoration(
-//                             gradient: LinearGradient(
-//                               colors: [
-//                                 AppColors.themeColor,
-//                                 AppColors.themeColor.withOpacity(0.8),
-//                               ],
-//                               begin: Alignment.topLeft,
-//                               end: Alignment.bottomRight,
-//                             ),
-//                           ),
-//                           child: wallet == null
-//                               ? const Center(
-//                                   child: CircularProgressIndicator(
-//                                     color: Colors.white,
-//                                   ),
-//                                 )
-//                               : _WalletHeader(wallet: wallet),
-//                         ),
-//                       ),
-//                     ),
-//                     SliverPadding(
-//                       padding: const EdgeInsets.all(16),
-//                       sliver: SliverList(
-//                         delegate: SliverChildListDelegate([
-//                           const SizedBox(height: 8),
-//                           Text(
-//                             "Transaction History",
-//                             style: Theme.of(context).textTheme.titleMedium
-//                                 ?.copyWith(fontWeight: FontWeight.w700),
-//                           ),
-//                           const SizedBox(height: 8),
-//                           if (payments.isEmpty)
-//                             const Padding(
-//                               padding: EdgeInsets.only(top: 50),
-//                               child: Center(
-//                                 child: Text(
-//                                   "No transactions yet",
-//                                   style: TextStyle(
-//                                     fontSize: 16,
-//                                     color: Colors.grey,
-//                                   ),
-//                                 ),
-//                               ),
-//                             )
-//                           else
-//                             ...payments
-//                                 .map((txn) => _PaymentTile(txn: txn))
-//                                 .toList(),
-//                           if (provider.isFetching)
-//                             const Padding(
-//                               padding: EdgeInsets.symmetric(vertical: 16),
-//                               child: Center(child: CircularProgressIndicator()),
-//                             ),
-//                         ]),
-//                       ),
-//                     ),
-//                   ],
-//                 ),
-//               );
-
-//             default:
-//               return const SizedBox();
-//           }
-//         },
-//       ),
-//     );
-//   }
-// }
-
-// class _WalletHeader extends StatelessWidget {
-//   final WalletModel wallet;
-//   const _WalletHeader({required this.wallet});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Padding(
-//       padding: const EdgeInsets.all(24),
-//       child: Column(
-//         mainAxisAlignment: MainAxisAlignment.end,
-//         crossAxisAlignment: CrossAxisAlignment.start,
-//         children: [
-//           const Text(
-//             "Available Balance",
-//             style: TextStyle(color: Colors.white70, fontSize: 16),
-//           ),
-//           const SizedBox(height: 8),
-//           Text(
-//             "\$${wallet.available.toStringAsFixed(2)}",
-//             style: const TextStyle(
-//               fontSize: 36,
-//               fontWeight: FontWeight.bold,
-//               color: Colors.white,
-//             ),
-//           ),
-//           const SizedBox(height: 12),
-//           Row(
-//             children: [
-//               ElevatedButton.icon(
-//                 onPressed: () {},
-//                 style: ElevatedButton.styleFrom(
-//                   backgroundColor: Colors.white,
-//                   foregroundColor: AppColors.themeColor,
-//                   shape: RoundedRectangleBorder(
-//                     borderRadius: BorderRadius.circular(12),
-//                   ),
-//                 ),
-//                 icon: const Icon(Icons.add_circle_outline),
-//                 label: const Text("Add Funds"),
-//               ),
-//               const SizedBox(width: 12),
-//               Text(
-//                 "Pending: \$${wallet.pending.toStringAsFixed(2)}",
-//                 style: const TextStyle(color: Colors.white70, fontSize: 14),
-//               ),
-//             ],
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }
-
-// class _PaymentTile extends StatelessWidget {
-//   final PaymentEntity txn;
-//   const _PaymentTile({required this.txn});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     final color = txn.statusColor;
-//     final isCredit = txn.isAdded;
-
-//     return Container(
-//       margin: const EdgeInsets.only(bottom: 10),
-//       decoration: BoxDecoration(
-//         color: Colors.white,
-//         borderRadius: BorderRadius.circular(16),
-//         boxShadow: [
-//           BoxShadow(
-//             color: Colors.grey.shade200,
-//             blurRadius: 6,
-//             spreadRadius: 1,
-//             offset: const Offset(0, 2),
-//           ),
-//         ],
-//       ),
-//       child: ListTile(
-//         leading: CircleAvatar(
-//           backgroundColor: color.withOpacity(0.15),
-//           child: Icon(
-//             isCredit ? Icons.arrow_downward : Icons.arrow_upward,
-//             color: color,
-//           ),
-//         ),
-//         title: Text(
-//           txn.billingReason.isEmpty ? "Payment" : txn.billingReason,
-//           style: const TextStyle(fontWeight: FontWeight.w600),
-//         ),
-//         subtitle: Text(
-//           "${txn.statusLabel} • ${txn.createdAt != null ? "${txn.createdAt!.day}/${txn.createdAt!.month}/${txn.createdAt!.year}" : "N/A"}",
-//           style: TextStyle(color: txn.statusColor.withOpacity(0.7)),
-//         ),
-//         trailing: Text(
-//           "${isCredit ? '+' : '-'}\$${txn.amount.toStringAsFixed(2)}",
-//           style: TextStyle(
-//             color: color,
-//             fontWeight: FontWeight.bold,
-//             fontSize: 16,
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-// }
+import 'package:inspect_connect/features/auth_flow/data/datasources/local_datasources/auth_local_datasource.dart';
+import 'package:inspect_connect/features/client_flow/domain/entities/payment_list_entity.dart';
+import '../../providers/wallet_provider.dart';
 
 class WalletScreen extends StatefulWidget {
   const WalletScreen({super.key});
@@ -460,7 +21,8 @@ class WalletScreen extends StatefulWidget {
 }
 
 class _WalletScreenState extends State<WalletScreen> {
-    Map<String, dynamic>? paymentIntent;
+  Map<String, dynamic>? paymentIntent;
+
   @override
   void initState() {
     super.initState();
@@ -471,481 +33,662 @@ class _WalletScreenState extends State<WalletScreen> {
 
   @override
   Widget build(BuildContext context) {
-  
+    final provider = context.watch<WalletProvider>();
+
     return Scaffold(
-      backgroundColor: AppColors.whiteColor.withOpacity(0.98),
-      body: Consumer<WalletProvider>(
-        builder: (context, provider, _) {
-          switch (provider.walletState) {
-            case WalletState.loading:
-              return const Center(child: CircularProgressIndicator());
-
-            case WalletState.error:
-              return _ErrorView(
-                message: provider.errorMessage ?? "Something went wrong",
-                onRetry: () => provider.refreshAll(context),
-              );
-
-            case WalletState.loaded:
-              final wallet = provider.walletModel;
-              final payments = provider.payments;
-
-              return RefreshIndicator(
-                onRefresh: () => provider.refreshAll(context),
-                child: CustomScrollView(
-                  physics: const BouncingScrollPhysics(),
-                  slivers: [
-                    SliverAppBar(
-                      expandedHeight: 220,
-                      pinned: true,
-                      automaticallyImplyLeading: false,
-                      backgroundColor: AppColors.themeColor,
-                      elevation: 0,
-                      shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.vertical(
-                          bottom: Radius.circular(28),
-                        ),
-                      ),
-                      flexibleSpace:  FlexibleSpaceBar(
-                        titlePadding: EdgeInsetsDirectional.only(
-                          start: 20,
-                          bottom: 12,
-                        ),
-                        // title: Text("Wallet", style: TextStyle(color: Colors.white)),
-                        background: _WalletHeader(onAddMoney:()=>  makePayment()),
-                      ),
-                    ),
-                    SliverToBoxAdapter(
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(22),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.05),
-                                blurRadius: 18,
-                                offset: const Offset(0, 10),
-                              ),
-                            ],
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.fromLTRB(16, 18, 16, 8),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  "Recent Transactions",
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                                const SizedBox(height: 10),
-                                if (payments.isEmpty)
-                                  const Padding(
-                                    padding: EdgeInsets.symmetric(vertical: 40),
-                                    child: Center(
-                                      child: Text(
-                                        "No transactions yet",
-                                        style: TextStyle(
-                                          fontSize: 15,
-                                          color: Colors.grey,
-                                        ),
-                                      ),
-                                    ),
-                                  )
-                                else
-                                  ...payments.map(
-                                    (txn) => _PaymentTile(txn: txn),
-                                  ),
-                                if (provider.isFetching)
-                                  const Padding(
-                                    padding: EdgeInsets.symmetric(vertical: 16),
-                                    child: Center(
-                                      child: CircularProgressIndicator(),
-                                    ),
-                                  ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              );
-
-            default:
-              return const SizedBox();
-          }
-        },
+      backgroundColor: Colors.grey[200],
+      appBar: CommonAppBar(
+        showBackButton: true,
+        title: "Wallet",
+        showLogo: false,
+      ),
+      body: RefreshIndicator(
+        onRefresh: () => provider.refreshAll(context),
+        child: _buildBody(provider),
       ),
     );
-    
   }
 
-  // Future<void> makePayment() async {
-  //   try {
-  //      paymentIntent = await createPaymentIntent('100', 'USD');
+  Widget _buildBody(WalletProvider provider) {
+    switch (provider.walletState) {
+      case WalletState.loading:
+        return const Center(child: CircularProgressIndicator());
+      case WalletState.error:
+        return _ErrorView(
+          message: provider.errorMessage ?? "Something went wrong",
+          onRetry: () => provider.refreshAll(context),
+        );
+      case WalletState.loaded:
+        return _WalletView(provider: provider, onAddMoney: _showAddMoneyDialog);
+      default:
+        return const SizedBox.shrink();
+    }
+  }
 
-  //     //STEP 2: Initialize Payment Sheet
-  //     await Stripe.instance
-  //         .initPaymentSheet(
-  //           paymentSheetParameters: SetupPaymentSheetParameters(
-  //             paymentIntentClientSecret:
-  //                 paymentIntent!['client_secret'], //Gotten from payment intent
-  //             style: ThemeMode.dark,
-  //             merchantDisplayName: 'Ikay',
-  //           ),
-  //         )
-  //         .then((value) {});
-
-  //     //STEP 3: Display Payment sheet
-  //     displayPaymentSheet();
-  //   } catch (err) {
-  //     throw Exception(err);
-  //   }
-  // }
-
-  // displayPaymentSheet() async {
-  //   try {
-  //     await Stripe.instance
-  //         .presentPaymentSheet()
-  //         .then((value) {
-  //           showDialog(
-  //             context: context,
-  //             builder: (_) => AlertDialog(
-  //               content: Column(
-  //                 mainAxisSize: MainAxisSize.min,
-  //                 children: [
-  //                   Icon(Icons.check_circle, color: Colors.green, size: 100.0),
-  //                   SizedBox(height: 10.0),
-  //                   Text("Payment Successful!"),
-  //                 ],
+  // Future<void> _showAddMoneyDialog() async {
+  //   final controller = TextEditingController();
+  //   await showDialog(
+  //     context: context,
+  //     builder: (_) => Dialog(
+  //       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+  //       insetPadding: const EdgeInsets.symmetric(horizontal: 24),
+  //       child: Padding(
+  //         padding: const EdgeInsets.all(20),
+  //         child: Column(
+  //           mainAxisSize: MainAxisSize.min,
+  //           children: [
+  //             textWidget(
+  //               text: "Add Money",
+  //               fontWeight: FontWeight.bold,
+  //               fontSize: 16,
+  //             ),
+  //             const SizedBox(height: 12),
+  //             TextField(
+  //               controller: controller,
+  //               keyboardType: TextInputType.number,
+  //               decoration: InputDecoration(
+  //                 hintText: "Enter amount (e.g. 50)",
+  //                 filled: true,
+  //                 fillColor: Colors.grey[100],
+  //                 border: OutlineInputBorder(
+  //                   borderRadius: BorderRadius.circular(12),
+  //                   borderSide: BorderSide(color: Colors.grey.shade300),
+  //                 ),
   //               ),
   //             ),
-  //           );
-
-  //           paymentIntent = null;
-  //         })
-  //         .onError((error, stackTrace) {
-  //           throw Exception(error);
-  //         });
-  //   } on StripeException catch (e) {
-  //     log('Error is:---> $e');
-  //     AlertDialog(
-  //       content: Column(
-  //         mainAxisSize: MainAxisSize.min,
-  //         children: [
-  //           Row(
-  //             children: const [
-  //               Icon(Icons.cancel, color: Colors.red),
-  //               Text("Payment Failed"),
-  //             ],
-  //           ),
-  //         ],
+  //             const SizedBox(height: 20),
+  //             AppButton(
+  //               text: "Proceed to Pay",
+  //               onTap: () {
+  //                 final amount = controller.text.trim();
+  //                 if (amount.isEmpty ||
+  //                     double.tryParse(amount) == null ||
+  //                     double.tryParse(amount)! < 50.0 ||
+  //                     double.tryParse(amount)! > 100000) {
+  //                   ScaffoldMessenger.of(context).showSnackBar(
+  //                     const SnackBar(
+  //                       content: Text("Please enter a valid amount"),
+  //                     ),
+  //                   );
+  //                   return;
+  //                 }
+  //                 Navigator.pop(context);
+  //                 makePayment(amount);
+  //               },
+  //             ),
+  //           ],
+  //         ),
   //       ),
-  //     );
-  //   } catch (e) {
-  //     print('$e');
-  //   }
+  //     ),
+  //   );
   // }
 
-  // createPaymentIntent(String amount, String currency) async {
-  //   try {
-  //     //Request body
-  //     Map<String, dynamic> body = {
-  //       'amount': calculateAmount(amount),
-  //       'currency': currency,
-  //     };
+  Future<void> _showAddMoneyDialog() async {
+    final controller = TextEditingController();
 
-  //     //Make post request to Stripe
-  //     var response = await http.post(
-  //       Uri.parse('https://api.stripe.com/v1/payment_intents'),
-  //       headers: {
-  //         'Authorization': 'Bearer ${dotenv.env['STRIPE_SECRET']}',
-  //         'Content-Type': 'application/x-www-form-urlencoded',
-  //       },
-  //       body: body,
-  //     );
-  //     return json.decode(response.body);
-  //   } catch (err) {
-  //     throw Exception(err.toString());
-  //   }
-  // }
-
-  // calculateAmount(String amount) {
-  //   final calculatedAmout = (int.parse(amount)) * 100;
-  //   return calculatedAmout.toString();
-  // }
-  Future<void> makePayment() async {
-  try {
-    log("🔹 Step 1: Creating Payment Intent...");
-    paymentIntent = await createPaymentIntent('100', 'USD');
-    log("✅ Payment Intent created successfully: $paymentIntent");
-
-    log("🔹 Step 2: Initializing Payment Sheet...");
-    await Stripe.instance
-        .initPaymentSheet(
-          paymentSheetParameters: SetupPaymentSheetParameters(
-            paymentIntentClientSecret:
-                paymentIntent!['client_secret'], 
-            style: ThemeMode.dark,
-            merchantDisplayName: 'Ikay',
+    await showDialog(
+      context: context,
+      builder: (_) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        insetPadding: const EdgeInsets.symmetric(horizontal: 24),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              textWidget(
+                text: "Add Money",
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: controller,
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+                decoration: InputDecoration(
+                  prefixIcon: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: Text(
+                      "\$",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.grey[800],
+                      ),
+                    ),
+                  ),
+                  prefixIconConstraints: const BoxConstraints(
+                    minWidth: 0,
+                    minHeight: 0,
+                  ),
+                  hintText: "Enter amount (e.g. 50)",
+                  filled: true,
+                  fillColor: Colors.grey[100],
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.grey.shade300),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              AppButton(
+                text: "Proceed to Pay",
+                onTap: () {
+                  final amount = controller.text.trim();
+                  if (amount.isEmpty ||
+                      double.tryParse(amount) == null ||
+                      double.tryParse(amount)! < 50.0 ||
+                      double.tryParse(amount)! > 100000) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                          "Please enter a valid amount - min \$50 AND max -\$100000",
+                        ),
+                      ),
+                    );
+                    return;
+                  }
+                  Navigator.pop(context);
+                  makePayment(amount);
+                },
+              ),
+            ],
           ),
-        )
-        .then((value) {
-      log("✅ Payment sheet initialized.");
-    });
-
-    log("🔹 Step 3: Displaying Payment Sheet...");
-    displayPaymentSheet();
-  } catch (err, stackTrace) {
-    log("❌ makePayment() error: $err");
-    log("🧩 Stack Trace: $stackTrace");
-    throw Exception(err);
+        ),
+      ),
+    );
   }
+
+  Future<void> makePayment(String amount) async {
+    try {
+      final intentResponse = await createPaymentIntent(amount, 'USD');
+      final body = intentResponse['body'];
+      final clientSecret = body?['clientSecret'];
+
+      if (clientSecret == null) {
+        throw Exception('Missing clientSecret in payment intent response.');
+      }
+
+      // ✅ Open your custom card entry modal
+      await _showCardPaymentSheet(clientSecret, amount);
+    } catch (e, st) {
+      log("❌ makePayment error: $e\n$st");
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Payment failed: $e')));
+    }
+  }
+
+  Future<void> _showCardPaymentSheet(String clientSecret, String amount) async {
+    bool isProcessing = false;
+
+    await showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      backgroundColor: Colors.white,
+      builder: (context) {
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+            left: 20,
+            right: 20,
+            top: 24,
+          ),
+          child: StatefulBuilder(
+            builder: (context, setState) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 5,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[300],
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  textWidget(
+                    text: "Pay with Card",
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Stripe card input field
+                  CardField(
+                    enablePostalCode: false,
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    style: const TextStyle(fontSize: 16),
+                    onCardChanged: (card) {
+                      log('Card changed: $card');
+                    },
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  AppButton(
+                    isLoading: isProcessing,
+                    text: isProcessing
+                        ? "Processing..."
+                        : "Pay \$${amount.toString()}",
+
+                    onTap: isProcessing
+                        ? null
+                        : () async {
+                            setState(() => isProcessing = true);
+                            try {
+                              await Stripe.instance.confirmPayment(
+                                paymentIntentClientSecret: clientSecret,
+                                data: const PaymentMethodParams.card(
+                                  paymentMethodData: PaymentMethodData(),
+                                ),
+                              );
+
+                              Navigator.pop(context);
+                              _showPaymentSuccess();
+                            } on StripeException catch (e) {
+                              log("⚠️ Stripe error: $e");
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Payment canceled'),
+                                ),
+                              );
+                            } catch (e) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Payment failed: $e')),
+                              );
+                            } finally {
+                              setState(() => isProcessing = false);
+                            }
+                          },
+                  ),
+
+                  const SizedBox(height: 12),
+                  Center(
+                    child: GestureDetector(
+                      onTap: isProcessing ? null : () => Navigator.pop(context),
+                      child: textWidget(
+                        text: "Cancel",
+                        color: Colors.grey[600]!,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                ],
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
+
+void _showPaymentSuccess() {
+  final walletContext = context;
+
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (_) => Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      backgroundColor: Colors.white,
+      child: StatefulBuilder(
+        builder: (context, setState) {
+          bool showCheck = false;
+
+          Future.delayed(const Duration(milliseconds: 150), () {
+            setState(() => showCheck = true);
+          });
+
+          return Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                AnimatedScale(
+                  scale: showCheck ? 1.0 : 0.4,
+                  duration: const Duration(milliseconds: 500),
+                  curve: Curves.easeOutBack,
+                  child: AnimatedOpacity(
+                    duration: const Duration(milliseconds: 400),
+                    opacity: showCheck ? 1 : 0,
+                    child: Container(
+                      width: 90,
+                      height: 90,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFD1FADF),
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Color(0xAA4CAF50),
+                            blurRadius: 18,
+                            spreadRadius: 4,
+                          ),
+                        ],
+                      ),
+                      child: const Icon(
+                        Icons.check_rounded,
+                        color: Colors.green,
+                        size: 55,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 22),
+                textWidget(
+                  text: "Payment Successful!",
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+                const SizedBox(height: 8),
+                textWidget(
+                  text: "Your wallet balance has been updated successfully.",
+                  color: Colors.grey[700]!,
+                  fontSize: 14,
+                  alignment: TextAlign.center,
+                ),
+                const SizedBox(height: 26),
+                AppButton(
+                  text: "Continue",
+                  onTap: () {
+                    // use the parent context, not the dialog context
+                    walletContext.read<WalletProvider>().refreshAll(walletContext);
+
+                    Navigator.pop(context);
+                  },
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    ),
+  );
 }
 
-Future<void> displayPaymentSheet() async {
-  try {
-    log("💳 Presenting payment sheet...");
-    await Stripe.instance.presentPaymentSheet().then((value) {
-      log("✅ Payment successful!");
+  Future<void> displayPaymentSheet() async {
+    try {
+      await Stripe.instance.presentPaymentSheet();
 
       showDialog(
         context: context,
         builder: (_) => AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: const [
-              Icon(Icons.check_circle, color: Colors.green, size: 100.0),
-              SizedBox(height: 10.0),
+              Icon(Icons.check_circle, color: Colors.green, size: 80),
+              SizedBox(height: 10),
               Text("Payment Successful!"),
             ],
           ),
         ),
       );
-
-      paymentIntent = null;
-    }).onError((error, stackTrace) {
-      log("❌ Error presenting payment sheet: $error");
+    } on StripeException catch (e) {
+      log("⚠️ StripeException: $e");
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Payment canceled')));
+    } catch (e, stackTrace) {
+      log("❌ Unexpected error: $e");
       log("🧩 Stack Trace: $stackTrace");
-      throw Exception(error);
-    });
-  } on StripeException catch (e) {
-    log("⚠️ StripeException caught: $e");
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: const [
-            Icon(Icons.cancel, color: Colors.red),
-            SizedBox(width: 10),
-            Text("Payment Failed"),
+    }
+  }
+
+  Future<Map<String, dynamic>> createPaymentIntent(
+    String amount,
+    String currency,
+  ) async {
+    try {
+      final user = await locator<AuthLocalDataSource>().getUser();
+      if (user == null || user.token == null) {
+        throw Exception('User not found in local storage');
+      }
+
+      log("💰 Creating payment intent for amount: $amount $currency");
+      final body = {
+        'totalAmount': amount,
+        'type': '0',
+        'paymentType': 'payment-plain',
+      };
+
+      final url = Uri.parse(
+        'http://10.0.2.2:5002/api/v1/payments/paymentIntent',
+      );
+      final response = await http.post(
+        url,
+        headers: {'Authorization': 'Bearer ${user.token}'},
+        body: body,
+      );
+
+      final decoded = json.decode(response.body);
+      log("📩 Stripe Response: $decoded");
+      return decoded;
+    } catch (err, stackTrace) {
+      log("❌ Error creating payment intent: $err");
+      log("🧩 Stack Trace: $stackTrace");
+      throw Exception(err.toString());
+    }
+  }
+}
+
+class _WalletView extends StatelessWidget {
+  final WalletProvider provider;
+  final VoidCallback onAddMoney;
+
+  const _WalletView({required this.provider, required this.onAddMoney});
+
+  @override
+  Widget build(BuildContext context) {
+    final wallet = provider.walletModel;
+    final payments = provider.payments;
+
+    return SingleChildScrollView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+        child: Column(
+          children: [
+            _WalletHeaderCard(
+              balance: wallet?.available ?? 0,
+              pending: wallet?.pending ?? 0,
+              onAddMoney: onAddMoney,
+            ),
+            const SizedBox(height: 24),
+            _RecentTransactions(
+              payments: payments,
+              isFetching: provider.isFetching,
+            ),
           ],
         ),
       ),
     );
-  } catch (e, stackTrace) {
-    log("❌ Unexpected error in displayPaymentSheet(): $e");
-    log("🧩 Stack Trace: $stackTrace");
   }
 }
 
-Future<Map<String, dynamic>> createPaymentIntent(
-    String amount, String currency) async {
-  try {
-    log("💰 Creating payment intent for amount: $amount $currency");
-    Map<String, dynamic> body = {
-      'amount': calculateAmount(amount),
-      'currency': currency,
-    };
-    log("📦 Request body: $body");
+class _WalletHeaderCard extends StatelessWidget {
+  final double balance;
+  final double pending;
+  final VoidCallback onAddMoney;
 
-    var response = await http.post(
-      Uri.parse('https://api.stripe.com/v1/payment_intents'),
-      headers: {
-        'Authorization': 'Bearer ${dotenv.env['STRIPE_SECRET']}',
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: body,
-    );
-
-    log("📩 Stripe Response Status: ${response.statusCode}");
-    log("📄 Stripe Response Body: ${response.body}");
-
-    return json.decode(response.body);
-  } catch (err, stackTrace) {
-    log("❌ Error creating payment intent: $err");
-    log("🧩 Stack Trace: $stackTrace");
-    throw Exception(err.toString());
-  }
-}
-
-String calculateAmount(String amount) {
-  final calculatedAmount = (int.parse(amount)) * 100;
-  log("💲 Calculated Stripe amount (in cents): $calculatedAmount");
-  return calculatedAmount.toString();
-}
-
-
-
-}
-
-class _WalletHeader extends StatelessWidget {
-    final VoidCallback onAddMoney; 
-  const _WalletHeader({required this.onAddMoney});
+  const _WalletHeaderCard({
+    required this.balance,
+    required this.pending,
+    required this.onAddMoney,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final wallet = context.read<WalletProvider>().walletModel;
-    final available = wallet?.available ?? 0;
-    final pending = wallet?.pending ?? 0;
-
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                AppColors.themeColor,
-                AppColors.themeColor.withOpacity(0.85),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: AppColors.authThemeColor.withOpacity(0.9),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.themeColor.withOpacity(0.2),
+            blurRadius: 8,
+            offset: const Offset(0, 6),
           ),
-        ),
-        Positioned(
-          right: -40,
-          top: -20,
-          child: Container(
-            width: 220,
-            height: 220,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.white.withOpacity(0.07),
-            ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          textWidget(
+            text: "Available Balance",
+            color: Colors.white70,
+            fontSize: 13,
           ),
-        ),
-        Positioned(
-          right: 30,
-          top: 35,
-          child: Container(
-            width: 160,
-            height: 160,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.white.withOpacity(0.07),
-            ),
+          const SizedBox(height: 6),
+          textWidget(
+            text: "\$${balance.toStringAsFixed(2)}",
+            color: Colors.white,
+            fontSize: 28,
+            fontWeight: FontWeight.w800,
           ),
-        ),
-        Align(
-          alignment: Alignment.bottomCenter,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(22),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
-                  margin: EdgeInsets.only(top: 10),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.18),
-                    borderRadius: BorderRadius.circular(22),
-                    border: Border.all(color: Colors.white.withOpacity(0.25)),
+          const SizedBox(height: 18),
+          Row(
+            children: [
+              Expanded(
+                child: AppButton(
+                  text: "Add Money",
+                  onTap: onAddMoney,
+                  buttonBackgroundColor: AppColors.backgroundColor.withOpacity(
+                    0.9,
                   ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          IconButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            icon: Icon(Icons.arrow_back, color: Colors.white),
-                          ),
-                          const Text(
-                            "Wallet Balance",
-                            style: TextStyle(
-                              color: Colors.white70,
-                              fontSize: 13,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        "\$${available.toStringAsFixed(2)}",
-                        style: const TextStyle(
-                          fontSize: 32,
-                          fontWeight: FontWeight.w800,
-                          color: Colors.white,
-                          letterSpacing: 0.2,
-                        ),
-                      ),
-                      const SizedBox(height: 14),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: ElevatedButton(
-                              onPressed: onAddMoney,
-                              style: ElevatedButton.styleFrom(
-                                elevation: 0,
-                                backgroundColor: Colors.white,
-                                foregroundColor: AppColors.themeColor,
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 12,
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(14),
-                                ),
-                              ),
-                              child: const Text("Add Money"),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: ElevatedButton(
-                              onPressed: () {},
-                              style: ElevatedButton.styleFrom(
-                                elevation: 0,
-                                backgroundColor: Colors.white.withOpacity(0.14),
-                                foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 12,
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(14),
-                                  side: BorderSide(
-                                    color: Colors.white.withOpacity(0.35),
-                                  ),
-                                ),
-                              ),
-                              child: const Text("Withdraw"),
-                            ),
-                          ),
-                          const SizedBox(width: 6),
-                        ],
-                      ),
-                    ],
-                  ),
+                  textColor: AppColors.authThemeColor,
                 ),
               ),
-            ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: AppButton(
+                  text: "Withdraw",
+                  buttonBackgroundColor: Colors.white.withOpacity(0.7),
+                  textColor: AppColors.authThemeColor,
+                  onTap: () {},
+                ),
+              ),
+            ],
           ),
-        ),
-      ],
+        ],
+      ),
+    );
+  }
+}
+
+class _RecentTransactions extends StatefulWidget {
+  final List<PaymentEntity> payments;
+  final bool isFetching;
+
+  const _RecentTransactions({required this.payments, required this.isFetching});
+
+  @override
+  State<_RecentTransactions> createState() => _RecentTransactionsState();
+}
+
+class _RecentTransactionsState extends State<_RecentTransactions> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 100) {
+      final provider = context.read<WalletProvider>();
+      if (!provider.isFetching) {
+        provider.loadMorePayments(context);
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final provider = context.watch<WalletProvider>();
+    final payments = provider.payments;
+
+    return Container(
+      padding: const EdgeInsets.fromLTRB(18, 16, 18, 8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(22),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          textWidget(
+            text: "Recent Transactions",
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+          ),
+          const SizedBox(height: 12),
+          if (payments.isEmpty && !provider.isFetching)
+            const Center(
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 32),
+                child: Text(
+                  "No transactions yet",
+                  style: TextStyle(color: Colors.grey),
+                ),
+              ),
+            )
+          else
+            SizedBox(
+              height: MediaQuery.of(context).size.height / 1.7,
+              child: ListView.builder(
+                controller: _scrollController,
+                physics: const AlwaysScrollableScrollPhysics(),
+                itemCount: payments.length + 1,
+                itemBuilder: (context, index) {
+                  if (index < payments.length) {
+                    return _PaymentTile(txn: payments[index]);
+                  } else if (provider.isFetching) {
+                    return const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 16),
+                      child: Center(child: CircularProgressIndicator()),
+                    );
+                  } else {
+                    return const SizedBox.shrink();
+                  }
+                },
+              ),
+            ),
+        ],
+      ),
     );
   }
 }
@@ -957,24 +700,23 @@ class _PaymentTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isCredit = txn.isAdded;
-    final color = isCredit ? const Color(0xFF11A75C) : const Color(0xFFE23B3B);
+    final color = isCredit ? Colors.green : Colors.red;
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 6),
-      padding: const EdgeInsets.symmetric(horizontal: 6),
       child: Row(
         children: [
           Container(
             width: 42,
             height: 42,
             decoration: BoxDecoration(
-              color: color.withOpacity(0.14),
+              color: color.withOpacity(0.12),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
               isCredit ? Icons.south_west : Icons.north_east,
-              size: 20,
               color: color,
+              size: 20,
             ),
           ),
           const SizedBox(width: 12),
@@ -982,30 +724,26 @@ class _PaymentTile extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  isCredit ? "Deposit" : "Withdrawal",
-                  style: const TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w700,
-                  ),
+                textWidget(
+                  text: isCredit ? "Deposit" : "Withdrawal",
+                  fontWeight: FontWeight.w500,
+                  fontSize: 14,
                 ),
                 const SizedBox(height: 2),
                 Text(
                   txn.createdAt != null
                       ? "${txn.createdAt!.day}/${txn.createdAt!.month}/${txn.createdAt!.year}"
                       : "N/A",
-                  style: TextStyle(fontSize: 12.5, color: Colors.grey.shade600),
+                  style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
                 ),
               ],
             ),
           ),
-          Text(
-            "${isCredit ? '+' : '-'}\$${txn.amount.toStringAsFixed(2)}",
-            style: TextStyle(
-              fontWeight: FontWeight.w800,
-              fontSize: 16,
-              color: color,
-            ),
+          textWidget(
+            text: "${isCredit ? '+' : '-'}\$${txn.amount.toStringAsFixed(2)}",
+            color: color,
+            fontWeight: FontWeight.w600,
+            fontSize: 14,
           ),
         ],
       ),
@@ -1022,38 +760,23 @@ class _ErrorView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24),
+        padding: const EdgeInsets.all(24),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Icon(Icons.error_outline, color: Colors.red, size: 50),
             const SizedBox(height: 16),
-            Text(
-              message,
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 16, color: Colors.black87),
+            textWidget(
+              text: message,
+              fontSize: 15,
+              color: Colors.black87,
+              alignment: TextAlign.center,
             ),
             const SizedBox(height: 16),
-            ElevatedButton.icon(
-              onPressed: onRetry,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.themeColor,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 10,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              icon: const Icon(Icons.refresh),
-              label: const Text("Retry"),
-            ),
+            AppButton(text: "Retry", onTap: onRetry),
           ],
         ),
       ),
     );
   }
 }
-

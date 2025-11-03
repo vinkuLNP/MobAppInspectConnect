@@ -17,7 +17,7 @@ class UserProvider extends ChangeNotifier {
     if (_user == null) return;
 
 
-    _user = _user!.copyWith(name: name); // update local copy
+    _user = _user!.copyWith(name: name); 
     notifyListeners();
 
     await locator<AuthLocalDataSource>().saveUser(_user!);

@@ -9,12 +9,16 @@ import 'package:inspect_connect/core/utils/auto_router_setup/auto_router.dart';
 import 'package:inspect_connect/core/utils/helpers/device_helper/device_helper.dart';
 import 'package:inspect_connect/features/auth_flow/data/datasources/local_datasources/auth_local_datasource.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/auth_user.dart';
+import 'package:inspect_connect/features/auth_flow/domain/entities/user_detail.dart';
+import 'package:inspect_connect/features/auth_flow/domain/usecases/get_user__usercase.dart';
 import 'package:inspect_connect/features/auth_flow/domain/usecases/otp_verification_usecases.dart';
 import 'package:inspect_connect/features/auth_flow/domain/usecases/resend_otp_usecases.dart';
 import 'package:inspect_connect/features/auth_flow/domain/usecases/sign_in_usecase.dart';
 import 'package:inspect_connect/features/auth_flow/domain/usecases/sign_up_usecases.dart';
 import 'package:inspect_connect/features/auth_flow/utils/otp_enum.dart';
 import 'package:flutter/material.dart';
+import 'package:inspect_connect/features/client_flow/presentations/providers/user_provider.dart';
+import 'package:provider/provider.dart';
 
 class ClientViewModelProvider extends BaseViewModel {
   void init() {}
@@ -127,7 +131,7 @@ class ClientViewModelProvider extends BaseViewModel {
     // fullNameCtrl.clear();
     // phoneCtrl.clear();
     // emailCtrlSignUp.clear();
-    context.pushRoute( ResetPasswordRoute(showBackButton: true));
+    context.pushRoute(ResetPasswordRoute(showBackButton: true));
   }
 
   @override
@@ -176,20 +180,19 @@ class ClientViewModelProvider extends BaseViewModel {
     });
   }
 
-
   Future<void> verify({required BuildContext context}) async {
     if (!canVerify) return;
     try {
-        final user =await  locator<AuthLocalDataSource>().getUser();
-         if (user == null || user.token == null) {
-      throw Exception('User not found in local storage');
-    }
+      final user = await locator<AuthLocalDataSource>().getUser();
+      if (user == null || user.token == null) {
+        throw Exception('User not found in local storage');
+      }
       final verifyOtpUseCase = locator<OtpVerificarionUseCase>();
       final state = await executeParamsUseCase<AuthUser, OtpVerificationParams>(
         useCase: verifyOtpUseCase,
-        
+
         query: OtpVerificationParams(
-          phoneNumber:user.phoneNumber ?? emailCtrl.text.trim(),
+          phoneNumber: user.phoneNumber ?? emailCtrl.text.trim(),
           countryCode: user.countryCode ?? passwordCtrl.text.trim(),
           phoneOtp: pinController.text.trim(),
         ),
@@ -198,7 +201,7 @@ class ClientViewModelProvider extends BaseViewModel {
 
       state?.when(
         data: (user) async {
-           await locator<AuthLocalDataSource>().saveUser(user.toLocalEntity());
+          await locator<AuthLocalDataSource>().saveUser(user.toLocalEntity());
           ScaffoldMessenger.of(
             context,
           ).showSnackBar(const SnackBar(content: Text('Sign-in successful')));
@@ -222,15 +225,15 @@ class ClientViewModelProvider extends BaseViewModel {
     if (!canResend) return;
 
     try {
-        final user =await  locator<AuthLocalDataSource>().getUser();
-         if (user == null || user.token == null) {
-      throw Exception('User not found in local storage');
-    }
+      final user = await locator<AuthLocalDataSource>().getUser();
+      if (user == null || user.token == null) {
+        throw Exception('User not found in local storage');
+      }
       final resendOtpUseCase = locator<ResendOtpUseCase>();
       final state = await executeParamsUseCase<AuthUser, ResendOtpParams>(
         useCase: resendOtpUseCase,
         query: ResendOtpParams(
-            phoneNumber:user.phoneNumber ?? emailCtrl.text.trim(),
+          phoneNumber: user.phoneNumber ?? emailCtrl.text.trim(),
           countryCode: user.countryCode ?? passwordCtrl.text.trim(),
         ),
         launchLoader: true,
@@ -336,7 +339,7 @@ class ClientViewModelProvider extends BaseViewModel {
       // verifyInit();
       startOtpFlow(OtpPurpose.forgotPassword);
       resetEmailCtrl.clear();
-      context.pushRoute( OtpVerificationRoute(addShowButton: true));
+      context.pushRoute(OtpVerificationRoute(addShowButton: true));
     } finally {
       _isSendingReset = false;
       notifyListeners();
@@ -383,12 +386,12 @@ class ClientViewModelProvider extends BaseViewModel {
       );
 
       state?.when(
-        data: (user)async {
-           await locator<AuthLocalDataSource>().saveUser(user.toLocalEntity());
+        data: (user) async {
+          await locator<AuthLocalDataSource>().saveUser(user.toLocalEntity());
           ScaffoldMessenger.of(
             context,
           ).showSnackBar(const SnackBar(content: Text('Verify Your Otp Now')));
-          context.pushRoute( OtpVerificationRoute(addShowButton: true));
+          context.pushRoute(OtpVerificationRoute(addShowButton: true));
         },
         error: (e) {
           ScaffoldMessenger.of(
@@ -443,16 +446,40 @@ class ClientViewModelProvider extends BaseViewModel {
 
       state?.when(
         data: (user) async {
-           await locator<AuthLocalDataSource>().saveUser(user.toLocalEntity());
-              // final localUser = user.toLocalEntity();
-    // await context.read<UserProvider>().setUser(localUser);
+          final localUser = user.toLocalEntity();
+          await locator<AuthLocalDataSource>().saveUser(localUser);
+          final userProvider = context.read<UserProvider>();
+          await userProvider.setUser(localUser);
 
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(const SnackBar(content: Text('Sign-in successful')));
-            emailCtrl.clear();
-      passwordCtrl.clear();
-          context.router.replaceAll([const ClientDashboardRoute()]);
+          await userProvider.loadUser();
+          log(user.id);
+          log(user.token);
+
+          final fetchUserUseCase = locator<GetUserUseCase>();
+          final userState =
+              await executeParamsUseCase<UserDetail, GetUserParams>(
+                useCase: fetchUserUseCase,
+                query: GetUserParams(userId: user.id),
+                launchLoader: true,
+              );
+          userState?.when(
+            data: (userData) async {
+              final mergedUser = localUser.mergeWithUserDetail(userData);
+              await locator<AuthLocalDataSource>().saveUser(mergedUser);
+
+              await userProvider.setUser(mergedUser);
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Sign-in successful')),
+              );
+              emailCtrl.clear();
+              passwordCtrl.clear();
+              context.router.replaceAll([const ClientDashboardRoute()]);
+            },
+            error: (e) {
+              context.router.replaceAll([const ClientDashboardRoute()]);
+            },
+          );
         },
         error: (e) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -461,8 +488,7 @@ class ClientViewModelProvider extends BaseViewModel {
         },
       );
     } finally {
-    
-      setSigningIn(false); // ✅ unfreeze button
+      setSigningIn(false); 
     }
   }
 

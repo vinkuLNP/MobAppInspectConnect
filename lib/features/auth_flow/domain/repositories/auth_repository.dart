@@ -1,5 +1,6 @@
 import 'package:inspect_connect/core/commondomain/entities/based_api_result/api_result_model.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/auth_user.dart';
+import 'package:inspect_connect/features/auth_flow/domain/entities/user_detail.dart';
 
 abstract class AuthRepository {
   Future<ApiResultModel<AuthUser>> signIn({
@@ -37,6 +38,10 @@ abstract class AuthRepository {
        Future<ApiResultModel<AuthUser>>changePassword({
     required String currentPassword,
     required String newPassword,
+  });
+
+       Future<ApiResultModel<UserDetail>>fetchUserDetail({
+    required String userId,
   });
 
 }

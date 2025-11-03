@@ -257,7 +257,7 @@ class ClientSignInView extends StatelessWidget {
                   onTap: () {
                     provider.passwordCtrl.clear();
                     provider.emailCtrl.clear();
-final stackString = context.router.stack.toString();
+                    final stackString = context.router.stack.toString();
                     log('stack raw: $stackString');
 
                     final names = RegExp(r'\"([^\"]+)\"')
@@ -277,7 +277,8 @@ final stackString = context.router.stack.toString();
                       context.pushRoute(
                         ClientSignUpRoute(showBackButton: true),
                       );
-                  }},
+                    }
+                  },
                   actionColor: AppColors.authThemeLightColor,
                 ),
               ],

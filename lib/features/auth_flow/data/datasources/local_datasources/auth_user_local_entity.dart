@@ -1,4 +1,3 @@
-
 import 'package:inspect_connect/features/auth_flow/domain/entities/auth_user.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/user_device_entity.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/user_location_entity.dart';
@@ -115,11 +114,13 @@ class AuthUserLocalEntity {
       stripeCustomerId: stripeCustomerId ?? this.stripeCustomerId,
     );
   }
+
   factory AuthUserLocalEntity.fromApiResponse(Map<String, dynamic> response) {
     Map<String, dynamic>? user = response['body']?['user'] ?? response['body'];
 
     // Extract token
-    String? authToken = response['body']?['authToken'] ??
+    String? authToken =
+        response['body']?['authToken'] ??
         response['body']?['user']?['authToken'];
 
     // Extract location
@@ -184,7 +185,6 @@ class AuthUserDeviceEntity {
   AuthUserDeviceEntity({this.deviceToken, this.deviceType});
 }
 
-
 extension AuthUserLocalMapping on AuthUserLocalEntity {
   AuthUser toDomainEntity() {
     return AuthUser(
@@ -213,11 +213,9 @@ extension AuthUserLocalMapping on AuthUserLocalEntity {
     );
   }
 }
+
 extension AuthUserDeviceMapping on AuthUserDeviceEntity {
   UserDevice toDomainEntity() {
-    return UserDevice(
-      token: deviceToken,
-      type: deviceType,
-    );
+    return UserDevice(token: deviceToken, type: deviceType);
   }
 }

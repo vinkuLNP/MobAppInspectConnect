@@ -5,6 +5,7 @@ import 'package:inspect_connect/core/commondomain/entities/based_api_result/api_
 import 'package:inspect_connect/core/commondomain/entities/based_api_result/error_result_model.dart';
 import 'package:inspect_connect/core/di/app_component/app_component.dart';
 import 'package:inspect_connect/core/utils/constants/app_constants.dart';
+import 'package:inspect_connect/core/utils/helpers/http_strategy_helper/concrete_strategies/get_request_strategy.dart';
 import 'package:inspect_connect/core/utils/helpers/http_strategy_helper/concrete_strategies/post_request_strategy.dart';
 import 'package:inspect_connect/core/utils/helpers/http_strategy_helper/concrete_strategies/put_request_strategy.dart';
 import 'package:inspect_connect/core/utils/helpers/http_strategy_helper/http_request_context.dart';
@@ -15,8 +16,10 @@ import 'package:inspect_connect/features/auth_flow/data/models/change_password_d
 import 'package:inspect_connect/features/auth_flow/data/models/resend_otp_request_model.dart';
 import 'package:inspect_connect/features/auth_flow/data/models/signin_request_model.dart';
 import 'package:inspect_connect/features/auth_flow/data/models/signup_request_model.dart';
+import 'package:inspect_connect/features/auth_flow/data/models/user_detail_dto.dart';
 import 'package:inspect_connect/features/auth_flow/data/models/verify_otp_request_model.dart';
 import 'package:http/http.dart' as http;
+import 'package:inspect_connect/features/auth_flow/domain/entities/user_detail.dart';
 
 abstract class AuthRemoteDataSource {
   Future<ApiResultModel<AuthUserDto>> signIn(SignInRequestDto dto);
@@ -24,6 +27,8 @@ abstract class AuthRemoteDataSource {
   Future<ApiResultModel<AuthUserDto>> verifyOtp(VerifyOtpRequestDto dto);
   Future<ApiResultModel<AuthUserDto>> resendOtp(ResendOtpRequestDto dto);
   Future<ApiResultModel<AuthUserDto>> changePassword(ChangePasswordDto dto);
+  Future<ApiResultModel<UserDetail>> fetchUserDetail(UserDetailDto dto);
+
 
 }
 
@@ -147,6 +152,55 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         },
         failure: (ErrorResultModel e) =>
             ApiResultModel<AuthUserDto>.failure(errorResultEntity: e),
+      );
+    } catch (e) {
+      log('autoremoteresopoonse------> $e');
+      return const ApiResultModel.failure(
+        errorResultEntity: ErrorResultModel(
+          message: "Network error occurred",
+          statusCode: 500,
+        ),
+      );
+    }
+  }
+
+
+  @override
+  Future<ApiResultModel<UserDetail>> fetchUserDetail(UserDetailDto dto) async {
+    try {
+      final user = await locator<AuthLocalDataSource>().getUser();
+      if (user == null || user.token == null) {
+        throw Exception('User not found in local storage');
+      }
+      log('------>user------------->$user');
+      log('------>user-------token------>${user.token}');
+      log('------>user-------phone------>${user.phoneNumber}');
+      log('------>user-------code------>${user.countryCode}');
+
+      final ApiResultModel<http.Response> res = await _ctx.makeRequest(
+        uri: updateUser,
+        httpRequestStrategy: GetRequestStrategy(),
+        headers: {
+          'Authorization': 'Bearer ${user.token}',
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        requestData: dto.toJson(),
+      );
+
+      return res.when(
+        success: (http.Response response) {
+          final Map<String, dynamic> root = response.body.isEmpty
+              ? {}
+              : (jsonDecode(response.body) as Map<String, dynamic>);
+          final Map<String, dynamic> body =
+              (root['body'] as Map?)?.cast<String, dynamic>() ??
+              <String, dynamic>{};
+          final dto = UserDetail.fromJson(body);
+          return ApiResultModel<UserDetail>.success(data: dto);
+        },
+        failure: (ErrorResultModel e) =>
+            ApiResultModel<UserDetail>.failure(errorResultEntity: e),
       );
     } catch (e) {
       log('autoremoteresopoonse------> $e');

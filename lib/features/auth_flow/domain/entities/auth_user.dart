@@ -1,4 +1,5 @@
 import 'package:inspect_connect/features/auth_flow/data/datasources/local_datasources/auth_user_local_entity.dart';
+import 'package:inspect_connect/features/auth_flow/domain/entities/user_detail.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/user_device_entity.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/user_location_entity.dart';
 
@@ -102,6 +103,41 @@ extension AuthUserMapping on AuthUser {
       stripeCustomerId: stripeCustomerId ?? this.stripeCustomerId,
       location: location ?? this.location,
       devices: devices ?? this.devices,
+    );
+  }
+}
+extension AuthUserLocalEntityMerge on AuthUserLocalEntity {
+  AuthUserLocalEntity mergeWithUserDetail(UserDetail detail) {
+    return AuthUserLocalEntity(
+      token: token,
+      name: detail.fullName.isNotEmpty ? detail.fullName : name,
+      email: detail.email.isNotEmpty ? detail.email : email,
+      phoneNumber: detail.phoneNumber ?? phoneNumber,
+      countryCode: detail.countryCode ?? countryCode,
+      mailingAddress: detail.mailingAddress ?? mailingAddress,
+      role: role,
+      status: detail.status ?? status,
+      phoneOtpVerified: phoneOtpVerified,
+      emailOtpVerified: emailOtpVerified,
+      agreedToTerms: agreedToTerms,
+      isTruthfully: isTruthfully,
+      approvalStatusByAdmin: approvalStatusByAdmin,
+      rejectedReason: rejectedReason,
+      stripeCustomerId: stripeCustomerId,
+      stripeAccountId: stripeAccountId,
+      stripePayoutsEnabled: stripePayoutsEnabled,
+      stripeTransfersActive: stripeTransfersActive,
+      currentSubscriptionTrialDays: currentSubscriptionTrialDays,
+      currentSubscriptionAutoRenew: currentSubscriptionAutoRenew,
+      currentSubscriptionId: currentSubscriptionId,
+      stripeSubscriptionStatus: stripeSubscriptionStatus,
+      walletId: walletId,
+      locationName: locationName,
+      latitude: latitude,
+      longitude: longitude,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
+      loginTime: loginTime,
     );
   }
 }

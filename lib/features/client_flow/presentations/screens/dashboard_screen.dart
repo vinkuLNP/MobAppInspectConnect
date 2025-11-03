@@ -1,144 +1,6 @@
-// import 'dart:ui';
-// import 'package:auto_route/auto_route.dart';
-// import 'package:flutter/material.dart';
-// import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
-// import 'package:inspect_connect/features/client_flow/presentations/screens/booking_screen.dart';
-// import 'package:inspect_connect/features/client_flow/presentations/screens/home_screen.dart';
-// import 'package:inspect_connect/features/client_flow/presentations/screens/profile_screen.dart';
-
-// @RoutePage()
-// class ClientDashboardView extends StatefulWidget {
-//   const ClientDashboardView({super.key});
-
-//   @override
-//   State<ClientDashboardView> createState() => _ClientDashboardViewState();
-// }
-
-// class _ClientDashboardViewState extends State<ClientDashboardView> {
-//   int _selectedIndex = 0;
-
-//   final List<Widget> _pages = const [
-//     HomeScreen(),
-//     BookingsScreen(),
-//     ProfileScreen(),
-//   ];
-
-//   void _onItemTapped(int index) {
-//     if (index == _selectedIndex) return;
-//     setState(() => _selectedIndex = index);
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     final theme = Theme.of(context);
-//     final primary = theme.colorScheme.primary;
-
-//     return Scaffold(
-//       extendBody: true,
-//       body: _pages[_selectedIndex],
-//       bottomNavigationBar: Padding(
-//         padding: const EdgeInsets.all(12),
-//         child: ClipRRect(
-//           borderRadius: BorderRadius.circular(30),
-//           child: BackdropFilter(
-//             filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-//             child: Container(
-//               decoration: BoxDecoration(
-//                 color: Colors.white.withOpacity(0.85),
-//                 borderRadius: BorderRadius.circular(30),
-//                 border: Border.all(
-//                   color: Colors.grey.withOpacity(0.2),
-//                   width: 1,
-//                 ),
-//                 boxShadow: [
-//                   BoxShadow(
-//                     color: Colors.black12.withOpacity(0.05),
-//                     blurRadius: 12,
-//                     offset: const Offset(0, 4),
-//                   ),
-//                 ],
-//               ),
-//               child: Padding(
-//                 padding: const EdgeInsets.symmetric(vertical: 8),
-//                 child: Row(
-//                   mainAxisAlignment: MainAxisAlignment.spaceAround,
-//                   children: List.generate(_pages.length, (index) {
-//                     final isSelected = _selectedIndex == index;
-
-//                     IconData iconData;
-//                     IconData activeIconData;
-//                     String label;
-
-//                     switch (index) {
-//                       case 0:
-//                         iconData = Icons.add_box_outlined;
-//                         activeIconData = Icons.add_box;
-//                         label = 'Book Now';
-//                         break;
-//                       case 1:
-//                         iconData = Icons.assignment_outlined;
-//                         activeIconData = Icons.assignment;
-//                         label = 'My Bookings';
-//                         break;
-//                       default:
-//                         iconData = Icons.person_outline;
-//                         activeIconData = Icons.person;
-//                         label = 'Profile';
-//                     }
-
-//                     return Material(
-//                       color: Colors.transparent,
-//                       child: InkWell(
-//                         borderRadius: BorderRadius.circular(20),
-//                         splashColor: primary.withOpacity(0.2),
-//                         highlightColor: primary.withOpacity(0.1),
-//                         onTap: () => _onItemTapped(index),
-//                         child: Padding(
-//                           padding: const EdgeInsets.symmetric(
-//                             vertical: 6,
-//                             horizontal: 12,
-//                           ),
-//                           child: Column(
-//                             mainAxisSize: MainAxisSize.min,
-//                             children: [
-//                               AnimatedScale(
-//                                 scale: isSelected ? 1.15 : 1.0,
-//                                 duration: const Duration(milliseconds: 300),
-//                                 curve: Curves.elasticOut,
-//                                 child: Icon(
-//                                   isSelected ? activeIconData : iconData,
-//                                   color: isSelected ? primary : Colors.grey,
-//                                   size: 28,
-//                                 ),
-//                               ),
-//                               const SizedBox(height: 4),
-//                               textWidget(
-//                                 text: label,
-//                                 fontSize: isSelected ? 13 : 12,
-//                                 fontWeight: isSelected
-//                                     ? FontWeight.w600
-//                                     : FontWeight.w400,
-//                                 color: isSelected ? primary : Colors.grey,
-//                               ),
-//                             ],
-//                           ),
-//                         ),
-//                       ),
-//                     );
-//                   }),
-//                 ),
-//               ),
-//             ),
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-// }
 import 'dart:ui';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-import 'package:inspect_connect/core/utils/constants/app_colors.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/features/client_flow/presentations/screens/booking_screen.dart';
 import 'package:inspect_connect/features/client_flow/presentations/screens/home_screen.dart';
@@ -155,13 +17,6 @@ class ClientDashboardView extends StatefulWidget {
 class _ClientDashboardViewState extends State<ClientDashboardView> {
   int _selectedIndex = 0;
   late List<Widget> _pages;
-  // final List<Widget> _pages =  [
-  //   HomeScreen(),
-  //   BookingsScreen( onBookNowTapped: () {
-  //     _onItemTapped(0); // switch to index 0
-  //   },),
-  //   ProfileScreen(),
-  // ];
 
   @override
   void initState() {
@@ -170,12 +25,13 @@ class _ClientDashboardViewState extends State<ClientDashboardView> {
       HomeScreen(),
       BookingsScreen(
         onBookNowTapped: () {
-          _onItemTapped(0); // switch to index 0
+          _onItemTapped(0);
         },
       ),
       ProfileScreen(),
     ];
   }
+
   void _onItemTapped(int index) {
     if (index == _selectedIndex) return;
     setState(() => _selectedIndex = index);
@@ -189,86 +45,101 @@ class _ClientDashboardViewState extends State<ClientDashboardView> {
       backgroundColor: Colors.grey,
       extendBody: true,
       body: _pages[_selectedIndex],
-      bottomNavigationBar: SizedBox(
-        height: 100,
+          bottomNavigationBar: SizedBox(
+        height: 95,
         child: Stack(
           clipBehavior: Clip.none,
-          alignment: Alignment.center,
+          alignment: Alignment.bottomCenter,
           children: [
-            Positioned(
-              bottom: 0,
-              left: 0,
-              right: 0,
-              child: ClipRRect(
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-                  child: Container(
-                    height: 70,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
-                          blurRadius: 12,
-                          offset: const Offset(0, 4),
-                        ),
+            ClipRRect(
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+                child: Container(
+                  height: 70,
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [
+                        Color(0xFF1B90FF),
+                        Color(0xFF0070F2),
+                        Color(0xFF002A86),
                       ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.topRight,
                     ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        _buildNavItem(
-                          icon: Icons.assignment_outlined,
-                          activeIcon: Icons.assignment,
-                          label: 'My Bookings',
-                          index: 1,
-                          primary: primary,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Align(
+                          alignment: Alignment.center,
+                          child: _buildNavItem(
+                            icon: Icons.assignment_outlined,
+                            activeIcon: Icons.assignment,
+                            label: 'My Bookings',
+                            index: 1,
+                            primary: primary,
+                          ),
                         ),
-                        const SizedBox(width: 60),
-                        _buildNavItem(
-                          icon: Icons.person_outline,
-                          activeIcon: Icons.person,
-                          label: 'Profile',
-                          index: 2,
-                          primary: primary,
+                      ),
+
+                      const SizedBox(width: 60),
+
+                      Expanded(
+                        child: Align(
+                          alignment: Alignment.center,
+                          child: _buildNavItem(
+                            icon: Icons.person_outline,
+                            activeIcon: Icons.person,
+                            label: 'Profile',
+                            index: 2,
+                            primary: primary,
+                          ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ),
             ),
 
             Positioned(
-              top: -2,
+              top: -10,
               child: GestureDetector(
                 onTap: () => _onItemTapped(0),
                 child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 220),
-                  height: 60,
-                  width: 60,
+                  duration: const Duration(milliseconds: 200),
+                  curve: Curves.easeOutBack,
+                  width: 65,
+                  height: 65,
                   decoration: BoxDecoration(
-                    color: _selectedIndex == 0
-                        ? AppColors.authThemeColor
-                        : AppColors.authThemeColor.withOpacity(0.5),
-                    borderRadius: BorderRadius.circular(10),
+                    shape: BoxShape.circle,
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFF00C6FF), Color(0xFF0072FF)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
                     boxShadow: [
                       BoxShadow(
-                        color: (_selectedIndex == 0
-                            ? AppColors.authThemeLightColor.withOpacity(0.4)
-                            : AppColors.whiteColor.withOpacity(0.4)),
-                        blurRadius: 18,
-                        spreadRadius: 2,
-                        offset: const Offset(0, 6),
+                        color: Colors.black.withOpacity(0.2),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
                       ),
                     ],
                   ),
-                  child: Center(
-                    child: Icon(
-                      Icons.add,
-                      size: 34,
-                      color: AppColors.whiteColor,
-                    ),
+                  child: Icon(
+                    Icons.add,
+                    size: 32,
+                    color: _selectedIndex == 0
+                        ? Colors.white
+                        : Colors.white.withOpacity(0.9),
                   ),
                 ),
               ),
@@ -276,20 +147,96 @@ class _ClientDashboardViewState extends State<ClientDashboardView> {
 
             Positioned(
               bottom: 20,
-              child: Center(
-                child: textWidget(
-                  text: 'Book Now',
-                  fontSize: 12,
-                  fontWeight: _selectedIndex == 0
-                      ? FontWeight.w600
-                      : FontWeight.w400,
-                  color: _selectedIndex == 0 ? primary : Colors.grey,
-                ),
+              child: textWidget(
+                text: 'Book Now',
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: _selectedIndex == 0
+                    ? Colors.white
+                    : Colors.white.withOpacity(0.8),
               ),
             ),
           ],
         ),
       ),
+
+      // bottomNavigationBar: SizedBox(
+      //   height: 90,
+      //   child: Stack(
+      //     alignment: Alignment.bottomCenter,
+      //     children: [
+      //       ClipRRect(
+      //         child: BackdropFilter(
+      //           filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+      //           child: Container(
+      //             height: 70,
+      //             decoration: BoxDecoration(
+      //               gradient: const LinearGradient(
+      //                 colors: [
+      //                   Color(0xFF1B90FF),
+      //                   Color(0xFF0070F2),
+      //                   Color(0xFF002A86),
+      //                 ],
+      //                 begin: Alignment.topLeft,
+      //                 end: Alignment.topRight,
+      //               ),
+      //               boxShadow: [
+      //                 BoxShadow(
+      //                   color: Colors.black.withOpacity(0.05),
+      //                   blurRadius: 12,
+      //                   offset: Offset(0, 4),
+      //                 ),
+      //               ],
+      //             ),
+      //             child: Row(
+      //               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      //               children: [
+      //                 Expanded(
+      //                   child: Align(
+      //                     alignment: Alignment.center,
+      //                     child: _buildNavItem(
+      //                       icon: Icons.assignment_outlined,
+      //                       activeIcon: Icons.assignment,
+      //                       label: 'My Bookings',
+      //                       index: 1,
+      //                       primary: primary,
+      //                     ),
+      //                   ),
+      //                 ),
+
+      //                 Expanded(
+      //                   child: Align(
+      //                     alignment: Alignment.center,
+      //                     child: _buildNavItem(
+      //                       icon: Icons.add_outlined,
+      //                       activeIcon: Icons.add,
+      //                       label: 'Book Now',
+      //                       index: 0,
+      //                       primary: primary,
+      //                     ),
+      //                   ),
+      //                 ),
+
+      //                 Expanded(
+      //                   child: Align(
+      //                     alignment: Alignment.center,
+      //                     child: _buildNavItem(
+      //                       icon: Icons.person_outline,
+      //                       activeIcon: Icons.person,
+      //                       label: 'Profile',
+      //                       index: 2,
+      //                       primary: primary,
+      //                     ),
+      //                   ),
+      //                 ),
+      //               ],
+      //             ),
+      //           ),
+      //         ),
+      //       ),
+      //     ],
+      //   ),
+      // ),
     );
   }
 
@@ -299,14 +246,13 @@ class _ClientDashboardViewState extends State<ClientDashboardView> {
     required String label,
     required int index,
     required Color primary,
-    bool showDot = false,
   }) {
     final isSelected = _selectedIndex == index;
 
     final iconWidget = Icon(
       isSelected ? activeIcon : icon,
       size: 26,
-      color: isSelected ? primary : Colors.grey,
+      color: isSelected ? Colors.white : Colors.white.withOpacity(0.8),
     );
 
     return InkWell(
@@ -316,7 +262,7 @@ class _ClientDashboardViewState extends State<ClientDashboardView> {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         curve: Curves.easeOut,
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 0),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -336,7 +282,7 @@ class _ClientDashboardViewState extends State<ClientDashboardView> {
               text: label,
               fontSize: 12,
               fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-              color: isSelected ? primary : Colors.grey,
+              color: isSelected ? Colors.white : Colors.white.withOpacity(0.8),
             ),
           ],
         ),

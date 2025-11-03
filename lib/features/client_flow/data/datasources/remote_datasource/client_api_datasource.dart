@@ -23,7 +23,7 @@ import 'package:inspect_connect/features/client_flow/domain/entities/booking_ent
 import 'package:inspect_connect/features/client_flow/domain/entities/upload_image_dto.dart';
 
 abstract class BookingRemoteDataSource {
-  Future<ApiResultModel<List<CertificateSubTypeModel>>>
+  Future<ApiResultModel<List<CertificateSubTypeModelData>>>
   getCertificateSubTypes();
   Future<ApiResultModel<UploadImageResponseModel>> uploadImage(
     UploadImageDto filePath,
@@ -60,7 +60,7 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
   final HttpRequestContext _ctx;
 
   @override
-  Future<ApiResultModel<List<CertificateSubTypeModel>>>
+  Future<ApiResultModel<List<CertificateSubTypeModelData>>>
   getCertificateSubTypes() async {
     try {
       final ApiResultModel<http.Response> res = await _ctx.makeRequest(
@@ -82,16 +82,16 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
               <String, dynamic>{};
           final List<dynamic> list = body['certificateSubTypes'] ?? [];
 
-          final List<CertificateSubTypeModel> dtoList = list
-              .map((e) => CertificateSubTypeModel.fromJson(e))
+          final List<CertificateSubTypeModelData> dtoList = list
+              .map((e) => CertificateSubTypeModelData.fromJson(e))
               .toList();
 
-          return ApiResultModel<List<CertificateSubTypeModel>>.success(
+          return ApiResultModel<List<CertificateSubTypeModelData>>.success(
             data: dtoList,
           );
         },
         failure: (ErrorResultModel e) =>
-            ApiResultModel<List<CertificateSubTypeModel>>.failure(
+            ApiResultModel<List<CertificateSubTypeModelData>>.failure(
               errorResultEntity: e,
             ),
       );

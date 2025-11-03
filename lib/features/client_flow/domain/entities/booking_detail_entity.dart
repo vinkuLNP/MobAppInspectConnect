@@ -1,3 +1,5 @@
+import 'package:inspect_connect/features/client_flow/domain/entities/certificate_sub_type_entity.dart';
+
 class BookingDetailEntity {
   final String id;
   final ClientInfoEntity client;
@@ -54,14 +56,14 @@ class ClientInfoEntity {
   });
 }
 
-class CertificateSubTypeEntity {
-  final String id;
-  final String name;
-  final int status;
+// class CertificateSubTypeEntity {
+//   final String id;
+//   final String name;
+//   final int status;
 
-  CertificateSubTypeEntity({
-    required this.id,
-    required this.name,
-    required this.status,
-  });
-}
+//   CertificateSubTypeEntity({
+//     required this.id,
+//     required this.name,
+//     required this.status,
+//   });
+// }

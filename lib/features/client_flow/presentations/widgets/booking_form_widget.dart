@@ -1,346 +1,26 @@
-// import 'package:flutter/material.dart';
-// import 'package:inspect_connect/features/client_flow/data/models/booking_detail_model.dart';
-// import 'package:inspect_connect/features/client_flow/presentations/widgets/select_time_widget.dart';
-// import 'package:inspect_connect/features/client_flow/presentations/providers/booking_provider.dart';
-// import 'package:provider/provider.dart';
-
-// class BookingFormWidget extends StatefulWidget {
-//   final bool isEditing;
-//   final dynamic initialBooking;
-//   final VoidCallback? onSubmitSuccess;
-
-//   const BookingFormWidget({
-//     super.key,
-//     this.isEditing = false,
-//     this.initialBooking,
-//     this.onSubmitSuccess,
-//   });
-
-//   @override
-//   State<BookingFormWidget> createState() => _BookingFormWidgetState();
-// }
-
-// class _BookingFormWidgetState extends State<BookingFormWidget> {
-//   late BookingProvider provider;
-
-//   @override
-//   void initState() {
-//     super.initState();
-//     provider = BookingProvider();
-
-//     provider.init().then((_) {
-//       if (widget.isEditing && widget.initialBooking != null) {
-//         final BookingDetailModel b = widget.initialBooking;
-//         provider.locationController.text = b.bookingLocation;
-//         provider.location = b.bookingLocation;
-//         provider.description = b.description;
-
-//         provider.descriptionController.text = b.description;
-//         provider.setDate(DateTime.parse(b.bookingDate));
-//         provider.setTime(provider.parseTime(b.bookingTime));
-//         provider.setInspectionType(
-//           b.inspector != null ? b.inspector!.name : null,
-//         );
-
-//         if (b.images != [] && b.images.isNotEmpty) {
-//           provider.uploadedUrls = List<String>.from(b.images);
-//           provider.existingImageUrls = List<String>.from(b.images);
-//         }
-//       }
-//     });
-//   }
-
-//   InputDecoration _inputDecoration(String hint) => InputDecoration(
-//     border: const OutlineInputBorder(),
-//     enabledBorder: const OutlineInputBorder(
-//       borderSide: BorderSide(color: Colors.grey),
-//     ),
-//     focusedBorder: const OutlineInputBorder(
-//       borderSide: BorderSide(color: Colors.blue),
-//     ),
-//     hintText: hint,
-//   );
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return ChangeNotifierProvider.value(
-//       value: provider,
-//       child: Consumer<BookingProvider>(
-//         builder: (context, prov, _) {
-
-//           return Stack(
-//             children: [
-//               AbsorbPointer(
-//                 absorbing: prov.isProcessing,
-//                 child: Opacity(
-//                   opacity: prov.isProcessing ? 0.6 : 1.0,
-//                   child: SingleChildScrollView(
-//                     child: Padding(
-//                       padding: const EdgeInsets.all(16.0),
-//                       child: Column(
-//                         crossAxisAlignment: CrossAxisAlignment.start,
-//                         children: [
-//                           DateTimePickerWidget(
-//                             initialDateTime: prov.selectedDate.add(
-//                               Duration(
-//                                 hours:
-//                                     prov.selectedTime?.hour ??
-//                                     TimeOfDay.now().hour,
-//                                 minutes:
-//                                     prov.selectedTime?.minute ??
-//                                     TimeOfDay.now().minute,
-//                               ),
-//                             ),
-//                             onDateTimeSelected: (dt) {
-//                               prov.setDate(dt);
-//                               prov.setTime(TimeOfDay.fromDateTime(dt));
-//                             },
-//                           ),
-
-//                           const SizedBox(height: 20),
-
-//                           const SizedBox(height: 20),
-
-//                           const Text(
-//                             'Inspection Type',
-//                             style: TextStyle(
-//                               fontSize: 16,
-//                               fontWeight: FontWeight.w600,
-//                             ),
-//                           ),
-//                           const SizedBox(height: 8),
-//                           _inspectionTypeDropdown(prov),
-
-//                           const SizedBox(height: 20),
-//                           const Text(
-//                             'Location',
-//                             style: TextStyle(
-//                               fontSize: 16,
-//                               fontWeight: FontWeight.w600,
-//                             ),
-//                           ),
-//                           const SizedBox(height: 8),
-//                           TextFormField(
-//                             controller: prov.locationController,
-//                             decoration: _inputDecoration('Enter location'),
-//                             onChanged: prov.setLocation,
-//                           ),
-
-//                           const SizedBox(height: 20),
-//                           const Text(
-//                             'Description',
-//                             style: TextStyle(
-//                               fontSize: 16,
-//                               fontWeight: FontWeight.w600,
-//                             ),
-//                           ),
-//                           const SizedBox(height: 8),
-//                           TextFormField(
-//                             controller: prov.descriptionController,
-//                             maxLines: 4,
-//                             decoration: _inputDecoration('Add details...'),
-//                             onChanged: prov.setDescription,
-//                           ),
-
-//                           const SizedBox(height: 20),
-//                           const Text(
-//                             'Upload Images (max 5)',
-//                             style: TextStyle(
-//                               fontSize: 16,
-//                               fontWeight: FontWeight.w600,
-//                             ),
-//                           ),
-//                           const SizedBox(height: 8),
-//                           _imageGrid(prov, context),
-
-//                           const SizedBox(height: 24),
-//                           SizedBox(
-//                             width: double.infinity,
-//                             child: ElevatedButton(
-//                               onPressed: prov.isProcessing
-//                                   ? null
-//                                   : () {
-//                                       if (!prov.validate()) {
-//                                         ScaffoldMessenger.of(
-//                                           context,
-//                                         ).showSnackBar(
-//                                           const SnackBar(
-//                                             content: Text(
-//                                               'Please fill all fields',
-//                                             ),
-//                                           ),
-//                                         );
-//                                         return;
-//                                       }
-
-//                                       if (widget.isEditing) {
-//                                         prov.updateBooking(
-//                                           context: context,
-//                                           bookingId: widget.initialBooking?.id,
-//                                           // onSuccess: widget.onSubmitSuccess,
-//                                         );
-//                                       } else {
-//                                         prov.createBooking(context: context);
-//                                       }
-//                                     },
-//                               child: Padding(
-//                                 padding: const EdgeInsets.symmetric(
-//                                   vertical: 14,
-//                                 ),
-//                                 child: Text(
-//                                   widget.isEditing
-//                                       ? 'Save Changes'
-//                                       : 'Confirm Booking',
-//                                   style: const TextStyle(fontSize: 16),
-//                                 ),
-//                               ),
-//                             ),
-//                           ),
-//                         ],
-//                       ),
-//                     ),
-//                   ),
-//                 ),
-//               ),
-//               if (prov.isProcessing)
-//                 const Center(child: CircularProgressIndicator()),
-//             ],
-//           );
-//         },
-//       ),
-//     );
-//   }
-
-//   Widget _inspectionTypeDropdown(BookingProvider prov) {
-//     return DropdownButtonFormField<String>(
-//       decoration: _inputDecoration('Select inspection type'),
-//       initialValue: prov.inspectionType,
-//       items: prov.subTypes
-//           .map(
-//             (subType) => DropdownMenuItem<String>(
-//               value: subType.id,
-//               child: Text(subType.name),
-//             ),
-//           )
-//           .toList(),
-//       onChanged: prov.setInspectionType,
-//     );
-//   }
-
-//   Widget _imageGrid(BookingProvider prov, BuildContext context) {
-//     final totalImages = prov.existingImageUrls.length + prov.images.length;
-//     final canAddMore = totalImages < 5;
-
-//     return GridView.builder(
-//       shrinkWrap: true,
-//       physics: const NeverScrollableScrollPhysics(),
-//       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-//         crossAxisCount: 4,
-//         mainAxisSpacing: 8,
-//         crossAxisSpacing: 8,
-//       ),
-//       itemCount: canAddMore ? totalImages + 1 : totalImages,
-//       itemBuilder: (ctx, i) {
-//         if (i < prov.existingImageUrls.length) {
-//           final url = prov.existingImageUrls[i];
-//           return Stack(
-//             children: [
-//               ClipRRect(
-//                 borderRadius: BorderRadius.circular(8),
-//                 child: Image.network(url, fit: BoxFit.cover),
-//               ),
-//               Positioned(
-//                 top: 2,
-//                 right: 2,
-//                 child: GestureDetector(
-//                   onTap: () => prov.removeExistingImageAt(i),
-//                   child: Container(
-//                     padding: const EdgeInsets.all(4),
-//                     decoration: const BoxDecoration(
-//                       color: Colors.black54,
-//                       shape: BoxShape.circle,
-//                     ),
-//                     child: const Icon(
-//                       Icons.close,
-//                       size: 16,
-//                       color: Colors.white,
-//                     ),
-//                   ),
-//                 ),
-//               ),
-//             ],
-//           );
-//         }
-
-//         final imgIndex = i - prov.existingImageUrls.length;
-//         if (imgIndex < prov.images.length) {
-//           return Stack(
-//             children: [
-//               ClipRRect(
-//                 borderRadius: BorderRadius.circular(8),
-//                 child: Image.file(
-//                   prov.images[imgIndex],
-//                   fit: BoxFit.cover,
-//                   width: double.infinity,
-//                   height: double.infinity,
-//                 ),
-//               ),
-//               Positioned(
-//                 top: 2,
-//                 right: 2,
-//                 child: GestureDetector(
-//                   onTap: () => prov.removeImageAt(imgIndex),
-//                   child: Container(
-//                     padding: const EdgeInsets.all(4),
-//                     decoration: const BoxDecoration(
-//                       color: Colors.black54,
-//                       shape: BoxShape.circle,
-//                     ),
-//                     child: const Icon(
-//                       Icons.close,
-//                       size: 16,
-//                       color: Colors.white,
-//                     ),
-//                   ),
-//                 ),
-//               ),
-//             ],
-//           );
-//         }
-
-//         return GestureDetector(
-//           onTap: () => prov.uploadImage(ctx),
-//           child: Container(
-//             decoration: BoxDecoration(
-//               borderRadius: BorderRadius.circular(8),
-//               border: Border.all(color: Colors.grey.shade400),
-//             ),
-//             child: const Center(child: Icon(Icons.add_a_photo)),
-//           ),
-//         );
-//       },
-//     );
-//   }
-// }
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_button.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/core/utils/presentation/app_text_style.dart';
+import 'package:inspect_connect/features/client_flow/domain/entities/certificate_sub_type_entity.dart';
 import 'package:provider/provider.dart';
 import 'package:inspect_connect/features/client_flow/data/models/booking_detail_model.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/booking_provider.dart';
 import 'package:inspect_connect/features/client_flow/presentations/widgets/select_time_widget.dart';
 
 class BookingFormWidget extends StatefulWidget {
-  final bool isEditing;
+  final bool isEditing, isReadOnly;
   final dynamic initialBooking;
   final VoidCallback? onSubmitSuccess;
 
   const BookingFormWidget({
     super.key,
     this.isEditing = false,
+    this.isReadOnly = false,
+
     this.initialBooking,
     this.onSubmitSuccess,
   });
@@ -360,6 +40,8 @@ class _BookingFormWidgetState extends State<BookingFormWidget> {
     provider.init().then((_) {
       if (widget.isEditing && widget.initialBooking != null) {
         final BookingDetailModel b = widget.initialBooking;
+        log(b.images.toString());
+
         provider.locationController.text = b.bookingLocation;
         provider.location = b.bookingLocation;
         provider.description = b.description;
@@ -367,12 +49,16 @@ class _BookingFormWidgetState extends State<BookingFormWidget> {
         provider.setDate(DateTime.parse(b.bookingDate));
         provider.setTime(provider.parseTime(b.bookingTime));
         provider.setInspectionType(
-          b.inspector != null ? b.inspector!.name : null,
+          (b.certificateSubTypes != [] ? b.certificateSubTypes[0] : null)
+              as CertificateSubTypeEntity?,
         );
 
         if (b.images != [] && b.images.isNotEmpty) {
           provider.uploadedUrls = List<String>.from(b.images);
           provider.existingImageUrls = List<String>.from(b.images);
+        log('--------->provider.uploadedUrls ${provider.uploadedUrls.toString()}');
+        log('--------->provider.existingImageUrls ${provider.existingImageUrls.toString()}');
+
         }
       }
     });
@@ -432,21 +118,24 @@ class _BookingFormWidgetState extends State<BookingFormWidget> {
                         children: [
                           _section(
                             title: 'Select Date & Time',
-                            child: DateTimePickerWidget(
-                              initialDateTime: prov.selectedDate.add(
-                                Duration(
-                                  hours:
-                                      prov.selectedTime?.hour ??
-                                      TimeOfDay.now().hour,
-                                  minutes:
-                                      prov.selectedTime?.minute ??
-                                      TimeOfDay.now().minute,
+                            child: IgnorePointer(
+                              ignoring: widget.isReadOnly,
+                              child: DateTimePickerWidget(
+                                initialDateTime: prov.selectedDate.add(
+                                  Duration(
+                                    hours:
+                                        prov.selectedTime?.hour ??
+                                        TimeOfDay.now().hour,
+                                    minutes:
+                                        prov.selectedTime?.minute ??
+                                        TimeOfDay.now().minute,
+                                  ),
                                 ),
+                                onDateTimeSelected: (dt) {
+                                  prov.setDate(dt);
+                                  prov.setTime(TimeOfDay.fromDateTime(dt));
+                                },
                               ),
-                              onDateTimeSelected: (dt) {
-                                prov.setDate(dt);
-                                prov.setTime(TimeOfDay.fromDateTime(dt));
-                              },
                             ),
                           ),
 
@@ -459,9 +148,14 @@ class _BookingFormWidgetState extends State<BookingFormWidget> {
                             title: 'Location',
                             child: TextFormField(
                               style: appTextStyle(fontSize: 12),
+                              enabled: !widget.isReadOnly,
+                              readOnly: widget.isReadOnly,
+                              onChanged: widget.isReadOnly
+                                  ? null
+                                  : prov.setLocation,
+
                               controller: prov.locationController,
                               decoration: _inputDecoration('Enter location'),
-                              onChanged: prov.setLocation,
                             ),
                           ),
 
@@ -472,7 +166,11 @@ class _BookingFormWidgetState extends State<BookingFormWidget> {
                               maxLines: 4,
                               style: appTextStyle(fontSize: 12),
                               decoration: _inputDecoration('Add details...'),
-                              onChanged: prov.setDescription,
+                              enabled: !widget.isReadOnly,
+                              readOnly: widget.isReadOnly,
+                              onChanged: widget.isReadOnly
+                                  ? null
+                                  : prov.setDescription,
                             ),
                           ),
 
@@ -481,42 +179,43 @@ class _BookingFormWidgetState extends State<BookingFormWidget> {
                             child: _imageGrid(prov, context),
                           ),
                           const SizedBox(height: 24),
-
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16.0,
-                            ),
-                            child: AppButton(
-                              text: widget.isEditing
-                                  ? 'Save Changes'
-                                  : 'Confirm Booking',
-                              onTap: prov.isProcessing
-                                  ? null
-                                  : () {
-                                      if (!prov.validate()) {
-                                        ScaffoldMessenger.of(
-                                          context,
-                                        ).showSnackBar(
-                                          SnackBar(
-                                            content: textWidget(
-                                              text: 'Please fill all fields',
+                          if (!widget.isReadOnly)
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16.0,
+                              ),
+                              child: AppButton(
+                                text: widget.isEditing
+                                    ? 'Save Changes'
+                                    : 'Confirm Booking',
+                                onTap: prov.isProcessing
+                                    ? null
+                                    : () {
+                                        if (!prov.validate()) {
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            SnackBar(
+                                              content: textWidget(
+                                                text: 'Please fill all fields',
+                                              ),
                                             ),
-                                          ),
-                                        );
-                                        return;
-                                      }
+                                          );
+                                          return;
+                                        }
 
-                                      if (widget.isEditing) {
-                                        prov.updateBooking(
-                                          context: context,
-                                          bookingId: widget.initialBooking?.id,
-                                        );
-                                      } else {
-                                        prov.createBooking(context: context);
-                                      }
-                                    },
+                                        if (widget.isEditing) {
+                                          prov.updateBooking(
+                                            context: context,
+                                            bookingId:
+                                                widget.initialBooking?.id,
+                                          );
+                                        } else {
+                                          prov.createBooking(context: context);
+                                        }
+                                      },
+                              ),
                             ),
-                          ),
                         ],
                       ),
                     ),
@@ -547,19 +246,19 @@ class _BookingFormWidgetState extends State<BookingFormWidget> {
   }
 
   Widget _inspectionTypeDropdown(BookingProvider prov) {
-    return DropdownButtonFormField<String>(
+    return DropdownButtonFormField<CertificateSubTypeEntity>(
       decoration: _inputDecoration('Select inspection type'),
       initialValue: prov.inspectionType,
       style: appTextStyle(fontSize: 12),
       items: prov.subTypes
           .map(
-            (subType) => DropdownMenuItem<String>(
-              value: subType.id,
+            (subType) => DropdownMenuItem<CertificateSubTypeEntity>(
+              value: subType,
               child: textWidget(text: subType.name, fontSize: 12),
             ),
           )
           .toList(),
-      onChanged: prov.setInspectionType,
+      onChanged: widget.isReadOnly ? null : prov.setInspectionType,
     );
   }
 
@@ -567,7 +266,7 @@ class _BookingFormWidgetState extends State<BookingFormWidget> {
     final totalImages = prov.existingImageUrls.length + prov.images.length;
     final canAddMore = totalImages < 5;
 
-    if (totalImages == 0) {
+    if (totalImages == 0 && !widget.isReadOnly) {
       return GestureDetector(
         onTap: () => prov.uploadImage(context),
         child: Container(
@@ -608,25 +307,26 @@ class _BookingFormWidgetState extends State<BookingFormWidget> {
                 borderRadius: BorderRadius.circular(12),
                 child: Image.network(url, fit: BoxFit.cover),
               ),
-              Positioned(
-                top: 2,
-                right: 2,
-                child: GestureDetector(
-                  onTap: () => prov.removeExistingImageAt(i),
-                  child: Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: const BoxDecoration(
-                      color: Colors.black54,
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.close,
-                      size: 16,
-                      color: Colors.white,
+              if (!widget.isReadOnly)
+                Positioned(
+                  top: 2,
+                  right: 2,
+                  child: GestureDetector(
+                    onTap: () => prov.removeExistingImageAt(i),
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: const BoxDecoration(
+                        color: Colors.black54,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.close,
+                        size: 16,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),
-              ),
             ],
           );
         }
@@ -644,40 +344,43 @@ class _BookingFormWidgetState extends State<BookingFormWidget> {
                   height: double.infinity,
                 ),
               ),
-              Positioned(
-                top: 2,
-                right: 2,
-                child: GestureDetector(
-                  onTap: () => prov.removeImageAt(imgIndex),
-                  child: Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: const BoxDecoration(
-                      color: Colors.black54,
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.close,
-                      size: 16,
-                      color: Colors.white,
+              if (!widget.isReadOnly)
+                Positioned(
+                  top: 2,
+                  right: 2,
+                  child: GestureDetector(
+                    onTap: () => prov.removeImageAt(imgIndex),
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: const BoxDecoration(
+                        color: Colors.black54,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.close,
+                        size: 16,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),
-              ),
             ],
           );
         }
-
-        return GestureDetector(
-          onTap: () => prov.uploadImage(ctx),
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.grey.shade300),
-              color: Colors.grey.shade50,
+        if (!widget.isReadOnly) {
+          return GestureDetector(
+            onTap: () => prov.uploadImage(ctx),
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.grey.shade300),
+                color: Colors.grey.shade50,
+              ),
+              child: const Center(child: Icon(Icons.add_a_photo)),
             ),
-            child: const Center(child: Icon(Icons.add_a_photo)),
-          ),
-        );
+          );
+        }
+        return const SizedBox.shrink();
       },
     );
   }

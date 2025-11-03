@@ -1,4 +1,3 @@
-import 'package:google_fonts/google_fonts.dart';
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -13,7 +12,7 @@ class AppInputField extends StatelessWidget {
   final Function(String?)? onChanged;
   final String? hint;
   final int? maxLength;
-
+final bool? readOnly;
   final List<TextInputFormatter>? inputFormatters;
 
   const AppInputField({
@@ -23,6 +22,7 @@ class AppInputField extends StatelessWidget {
     this.validator,
     this.inputFormatters = const [],
     this.onChanged,
+    this.readOnly = false,
     this.hint,
     this.maxLength,
     super.key,
@@ -39,11 +39,15 @@ class AppInputField extends StatelessWidget {
           controller: controller,
           style: appTextStyle(fontSize: 12),
           keyboardType: keyboardType,
+          readOnly: readOnly!,
           maxLength: maxLength,
+          
           onChanged: onChanged,
           decoration: InputDecoration(
             counterText: '',
             hintText: hint,
+            filled: readOnly,
+            fillColor: readOnly! ? Colors.grey.shade300 : Colors.white,
             errorStyle: appTextStyle(fontSize: 12, color: Colors.red),
             hintStyle: appTextStyle(fontSize: 12,color: Colors.grey),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),

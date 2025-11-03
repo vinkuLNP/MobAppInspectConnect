@@ -8,14 +8,17 @@ class AuthLocalDataSource {
 
   AuthLocalDataSource(this._database);
 
-  // void saveUser(AuthUserLocalEntity user) {
-  //   _database.insert(user);
-  // }
 
-  Future<void> saveUser(AuthUserLocalEntity user) async {
-    user.id = 0;
-    _database.insert(user);
+Future<void> saveUser(AuthUserLocalEntity user) async {
+  final existingUsers = await _database.getAll<AuthUserLocalEntity>();
+
+  if (existingUsers != null && existingUsers.isNotEmpty) {
+    user.id = existingUsers.first.id;
   }
+
+  _database.insert(user); 
+}
+
 
   Future<AuthUserLocalEntity?> getUser() async {
     final users = await _database.getAll<AuthUserLocalEntity>();
@@ -31,7 +34,7 @@ class AuthLocalDataSource {
 
   Future<void> clearAllData() async {
      _database.clear<AuthUserLocalEntity>();
-    _database.clearAll();
+    _database.clearAll<AuthUserLocalEntity>();
   }
 
   Future<String?> getUserToken() async {
