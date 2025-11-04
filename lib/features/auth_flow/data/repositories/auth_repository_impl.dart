@@ -2,6 +2,7 @@ import 'package:inspect_connect/core/commondomain/entities/based_api_result/api_
 import 'package:inspect_connect/core/commondomain/entities/based_api_result/error_result_model.dart';
 import 'package:inspect_connect/features/auth_flow/data/datasources/remote_datasources/auth_remote_datasource.dart';
 import 'package:inspect_connect/features/auth_flow/data/models/change_password_dto.dart';
+import 'package:inspect_connect/features/auth_flow/data/models/profile_update_dto.dart';
 import 'package:inspect_connect/features/auth_flow/data/models/resend_otp_request_model.dart';
 import 'package:inspect_connect/features/auth_flow/data/models/signin_request_model.dart';
 import 'package:inspect_connect/features/auth_flow/data/models/signup_request_model.dart';
@@ -10,6 +11,7 @@ import 'package:inspect_connect/features/auth_flow/data/models/verify_otp_reques
 import 'package:inspect_connect/features/auth_flow/domain/entities/auth_user.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/user_detail.dart';
 import 'package:inspect_connect/features/auth_flow/domain/repositories/auth_repository.dart';
+import 'package:inspect_connect/features/auth_flow/domain/usecases/update_profile_usecase.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDataSource _remote;
@@ -193,6 +195,36 @@ Future<ApiResultModel<AuthUser>> signUp({
     );
   }
   
+
+    @override
+  Future<ApiResultModel<AuthUser>> updateProfile({
+    required String name,
+  }) async {
+    final res = await _remote.updateProfile(
+      ProfileUpdateDto(
+        name: name,
+      ),
+    );
+
+    return res.when(
+       success: (data) {
+        try {
+          return ApiResultModel.success(data: data.toEntity());
+        } catch (e) {
+          return const ApiResultModel.failure(
+            errorResultEntity: ErrorResultModel(
+              message: "Parsing error",
+              statusCode: 500,
+            ),
+          );
+        }
+      },
+      failure: (err) => ApiResultModel<AuthUser>.failure(errorResultEntity: err),
+    );
+  }
+  
+
+
     @override
   Future<ApiResultModel<UserDetail>> fetchUserDetail({
      required String userId,

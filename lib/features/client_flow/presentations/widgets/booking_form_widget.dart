@@ -191,16 +191,8 @@ class _BookingFormWidgetState extends State<BookingFormWidget> {
                                 onTap: prov.isProcessing
                                     ? null
                                     : () {
-                                        if (!prov.validate()) {
-                                          ScaffoldMessenger.of(
-                                            context,
-                                          ).showSnackBar(
-                                            SnackBar(
-                                              content: textWidget(
-                                                text: 'Please fill all fields',
-                                              ),
-                                            ),
-                                          );
+                                        if (!prov.validate(cntx: context)) {
+                                          
                                           return;
                                         }
 

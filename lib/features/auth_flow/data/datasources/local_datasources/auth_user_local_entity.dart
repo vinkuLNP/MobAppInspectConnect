@@ -6,16 +6,12 @@ import 'package:objectbox/objectbox.dart';
 @Entity()
 class AuthUserLocalEntity {
   int id = 0;
-
-  // Basic info
   String? token;
   String? name;
   String? email;
   String? phoneNumber;
   String? countryCode;
   String? mailingAddress;
-
-  // Status info
   int? role;
   int? status;
   bool? phoneOtpVerified;
@@ -24,8 +20,6 @@ class AuthUserLocalEntity {
   bool? isTruthfully;
   int? approvalStatusByAdmin;
   String? rejectedReason;
-
-  // Subscription / Stripe
   String? stripeCustomerId;
   String? stripeAccountId;
   bool? stripePayoutsEnabled;
@@ -35,18 +29,12 @@ class AuthUserLocalEntity {
   String? currentSubscriptionId;
   String? stripeSubscriptionStatus;
   String? walletId;
-
-  // Location
   String? locationName;
   double? latitude;
   double? longitude;
-
-  // Timestamps
   DateTime? createdAt;
   DateTime? updatedAt;
   DateTime? loginTime;
-
-  // Devices
   @Backlink()
   final devices = ToMany<AuthUserDeviceEntity>();
 
@@ -87,6 +75,7 @@ class AuthUserLocalEntity {
     String? token,
     int? role,
     String? phoneNumber,
+    String? mailingAddress,
     String? countryCode,
     bool? phoneOtpVerified,
     bool? emailOtpVerified,
@@ -112,18 +101,15 @@ class AuthUserLocalEntity {
       walletId: walletId ?? this.walletId,
       stripeAccountId: stripeAccountId ?? this.stripeAccountId,
       stripeCustomerId: stripeCustomerId ?? this.stripeCustomerId,
+      mailingAddress: mailingAddress ?? this.mailingAddress,
     );
   }
 
   factory AuthUserLocalEntity.fromApiResponse(Map<String, dynamic> response) {
     Map<String, dynamic>? user = response['body']?['user'] ?? response['body'];
-
-    // Extract token
     String? authToken =
         response['body']?['authToken'] ??
         response['body']?['user']?['authToken'];
-
-    // Extract location
     Map<String, dynamic>? location = user?['location'];
     double? latitude;
     double? longitude;
@@ -217,5 +203,57 @@ extension AuthUserLocalMapping on AuthUserLocalEntity {
 extension AuthUserDeviceMapping on AuthUserDeviceEntity {
   UserDevice toDomainEntity() {
     return UserDevice(token: deviceToken, type: deviceType);
+  }
+}
+
+extension AuthUserLocalEntityMergeData on AuthUserLocalEntity {
+  AuthUserLocalEntity mergeWithNewData(AuthUserLocalEntity newUser) {
+    final merged =
+        AuthUserLocalEntity(
+            name: newUser.name ?? name,
+            email: newUser.email ?? email,
+            phoneNumber: newUser.phoneNumber ?? phoneNumber,
+            countryCode: newUser.countryCode ?? countryCode,
+            role: newUser.role ?? role,
+            token: (newUser.token?.isNotEmpty ?? false) ? newUser.token : token,
+            agreedToTerms: newUser.agreedToTerms ?? agreedToTerms,
+            isTruthfully: newUser.isTruthfully ?? isTruthfully,
+            mailingAddress: newUser.mailingAddress ?? mailingAddress,
+            status: newUser.status ?? status,
+            phoneOtpVerified: newUser.phoneOtpVerified ?? phoneOtpVerified,
+            emailOtpVerified: newUser.emailOtpVerified ?? emailOtpVerified,
+            approvalStatusByAdmin:
+                newUser.approvalStatusByAdmin ?? approvalStatusByAdmin,
+            rejectedReason: newUser.rejectedReason ?? rejectedReason,
+            stripeCustomerId: newUser.stripeCustomerId ?? stripeCustomerId,
+            stripeAccountId: newUser.stripeAccountId ?? stripeAccountId,
+            stripePayoutsEnabled:
+                newUser.stripePayoutsEnabled ?? stripePayoutsEnabled,
+            stripeTransfersActive:
+                newUser.stripeTransfersActive ?? stripeTransfersActive,
+            currentSubscriptionTrialDays:
+                newUser.currentSubscriptionTrialDays ??
+                currentSubscriptionTrialDays,
+            currentSubscriptionAutoRenew:
+                newUser.currentSubscriptionAutoRenew ??
+                currentSubscriptionAutoRenew,
+            currentSubscriptionId:
+                newUser.currentSubscriptionId ?? currentSubscriptionId,
+            stripeSubscriptionStatus:
+                newUser.stripeSubscriptionStatus ?? stripeSubscriptionStatus,
+            walletId: newUser.walletId ?? walletId,
+            locationName: newUser.locationName ?? locationName,
+            latitude: newUser.latitude ?? latitude,
+            longitude: newUser.longitude ?? longitude,
+            createdAt: createdAt ?? newUser.createdAt,
+            updatedAt: newUser.updatedAt ?? updatedAt,
+            loginTime: newUser.loginTime ?? loginTime,
+          )
+          ..id = id
+          ..devices.addAll(
+            newUser.devices.isNotEmpty ? newUser.devices : devices,
+          );
+
+    return merged;
   }
 }

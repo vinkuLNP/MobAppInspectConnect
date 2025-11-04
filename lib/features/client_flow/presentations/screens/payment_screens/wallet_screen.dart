@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:http/http.dart' as http;
+import 'package:inspect_connect/core/utils/constants/app_constants.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_button.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/features/client_flow/presentations/widgets/common_app_bar.dart';
@@ -64,64 +65,6 @@ class _WalletScreenState extends State<WalletScreen> {
         return const SizedBox.shrink();
     }
   }
-
-  // Future<void> _showAddMoneyDialog() async {
-  //   final controller = TextEditingController();
-  //   await showDialog(
-  //     context: context,
-  //     builder: (_) => Dialog(
-  //       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-  //       insetPadding: const EdgeInsets.symmetric(horizontal: 24),
-  //       child: Padding(
-  //         padding: const EdgeInsets.all(20),
-  //         child: Column(
-  //           mainAxisSize: MainAxisSize.min,
-  //           children: [
-  //             textWidget(
-  //               text: "Add Money",
-  //               fontWeight: FontWeight.bold,
-  //               fontSize: 16,
-  //             ),
-  //             const SizedBox(height: 12),
-  //             TextField(
-  //               controller: controller,
-  //               keyboardType: TextInputType.number,
-  //               decoration: InputDecoration(
-  //                 hintText: "Enter amount (e.g. 50)",
-  //                 filled: true,
-  //                 fillColor: Colors.grey[100],
-  //                 border: OutlineInputBorder(
-  //                   borderRadius: BorderRadius.circular(12),
-  //                   borderSide: BorderSide(color: Colors.grey.shade300),
-  //                 ),
-  //               ),
-  //             ),
-  //             const SizedBox(height: 20),
-  //             AppButton(
-  //               text: "Proceed to Pay",
-  //               onTap: () {
-  //                 final amount = controller.text.trim();
-  //                 if (amount.isEmpty ||
-  //                     double.tryParse(amount) == null ||
-  //                     double.tryParse(amount)! < 50.0 ||
-  //                     double.tryParse(amount)! > 100000) {
-  //                   ScaffoldMessenger.of(context).showSnackBar(
-  //                     const SnackBar(
-  //                       content: Text("Please enter a valid amount"),
-  //                     ),
-  //                   );
-  //                   return;
-  //                 }
-  //                 Navigator.pop(context);
-  //                 makePayment(amount);
-  //               },
-  //             ),
-  //           ],
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // }
 
   Future<void> _showAddMoneyDialog() async {
     final controller = TextEditingController();
@@ -212,7 +155,7 @@ class _WalletScreenState extends State<WalletScreen> {
       }
 
       // ✅ Open your custom card entry modal
-      await _showCardPaymentSheet(clientSecret, amount);
+      await _showCardPaymentSheet(context, clientSecret, amount);
     } catch (e, st) {
       log("❌ makePayment error: $e\n$st");
       ScaffoldMessenger.of(
@@ -221,11 +164,15 @@ class _WalletScreenState extends State<WalletScreen> {
     }
   }
 
-  Future<void> _showCardPaymentSheet(String clientSecret, String amount) async {
+  Future<void> _showCardPaymentSheet(
+    BuildContext parentCtx,
+    String clientSecret,
+    String amount,
+  ) async {
     bool isProcessing = false;
 
     await showModalBottomSheet(
-      context: context,
+      context: parentCtx,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
@@ -298,16 +245,16 @@ class _WalletScreenState extends State<WalletScreen> {
                               );
 
                               Navigator.pop(context);
-                              _showPaymentSuccess();
+                              _showPaymentSuccess(parentCtx);
                             } on StripeException catch (e) {
                               log("⚠️ Stripe error: $e");
-                              ScaffoldMessenger.of(context).showSnackBar(
+                              ScaffoldMessenger.of(parentCtx).showSnackBar(
                                 const SnackBar(
                                   content: Text('Payment canceled'),
                                 ),
                               );
                             } catch (e) {
-                              ScaffoldMessenger.of(context).showSnackBar(
+                              ScaffoldMessenger.of(parentCtx).showSnackBar(
                                 SnackBar(content: Text('Payment failed: $e')),
                               );
                             } finally {
@@ -337,89 +284,17 @@ class _WalletScreenState extends State<WalletScreen> {
     );
   }
 
-void _showPaymentSuccess() {
-  final walletContext = context;
+  void _showPaymentSuccess(BuildContext context) {
+    final walletContext = context;
 
-  showDialog(
-    context: context,
-    barrierDismissible: false,
-    builder: (_) => Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      backgroundColor: Colors.white,
-      child: StatefulBuilder(
-        builder: (context, setState) {
-          bool showCheck = false;
-
-          Future.delayed(const Duration(milliseconds: 150), () {
-            setState(() => showCheck = true);
-          });
-
-          return Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                AnimatedScale(
-                  scale: showCheck ? 1.0 : 0.4,
-                  duration: const Duration(milliseconds: 500),
-                  curve: Curves.easeOutBack,
-                  child: AnimatedOpacity(
-                    duration: const Duration(milliseconds: 400),
-                    opacity: showCheck ? 1 : 0,
-                    child: Container(
-                      width: 90,
-                      height: 90,
-                      decoration: const BoxDecoration(
-                        color: Color(0xFFD1FADF),
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Color(0xAA4CAF50),
-                            blurRadius: 18,
-                            spreadRadius: 4,
-                          ),
-                        ],
-                      ),
-                      child: const Icon(
-                        Icons.check_rounded,
-                        color: Colors.green,
-                        size: 55,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 22),
-                textWidget(
-                  text: "Payment Successful!",
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                ),
-                const SizedBox(height: 8),
-                textWidget(
-                  text: "Your wallet balance has been updated successfully.",
-                  color: Colors.grey[700]!,
-                  fontSize: 14,
-                  alignment: TextAlign.center,
-                ),
-                const SizedBox(height: 26),
-                AppButton(
-                  text: "Continue",
-                  onTap: () {
-                    // use the parent context, not the dialog context
-                    walletContext.read<WalletProvider>().refreshAll(walletContext);
-
-                    Navigator.pop(context);
-                  },
-                ),
-              ],
-            ),
-          );
-        },
-      ),
-    ),
-  );
-}
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const _PaymentSuccessDialog(),
+    ).then((_) {
+      walletContext.read<WalletProvider>().refreshAll(walletContext);
+    });
+  }
 
   Future<void> displayPaymentSheet() async {
     try {
@@ -467,11 +342,10 @@ void _showPaymentSuccess() {
         'totalAmount': amount,
         'type': '0',
         'paymentType': 'payment-plain',
+        'device': '1',
       };
 
-      final url = Uri.parse(
-        'http://10.0.2.2:5002/api/v1/payments/paymentIntent',
-      );
+      final url = Uri.parse('$devBaseUrl/payments/paymentIntent');
       final response = await http.post(
         url,
         headers: {'Authorization': 'Bearer ${user.token}'},
@@ -577,15 +451,15 @@ class _WalletHeaderCard extends StatelessWidget {
                   textColor: AppColors.authThemeColor,
                 ),
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: AppButton(
-                  text: "Withdraw",
-                  buttonBackgroundColor: Colors.white.withOpacity(0.7),
-                  textColor: AppColors.authThemeColor,
-                  onTap: () {},
-                ),
-              ),
+              // const SizedBox(width: 12),
+              // Expanded(
+              //   child: AppButton(
+              //     text: "Withdraw",
+              //     buttonBackgroundColor: Colors.white.withOpacity(0.7),
+              //     textColor: AppColors.authThemeColor,
+              //     onTap: () {},
+              //   ),
+              // ),
             ],
           ),
         ],
@@ -774,6 +648,93 @@ class _ErrorView extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             AppButton(text: "Retry", onTap: onRetry),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _PaymentSuccessDialog extends StatefulWidget {
+  const _PaymentSuccessDialog({super.key});
+
+  @override
+  State<_PaymentSuccessDialog> createState() => _PaymentSuccessDialogState();
+}
+
+class _PaymentSuccessDialogState extends State<_PaymentSuccessDialog> {
+  bool showCheck = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Delay the checkmark animation safely
+    Future.delayed(const Duration(milliseconds: 150), () {
+      if (mounted) setState(() => showCheck = true);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      backgroundColor: Colors.white,
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            AnimatedScale(
+              scale: showCheck ? 1.0 : 0.4,
+              duration: const Duration(milliseconds: 500),
+              curve: Curves.easeOutBack,
+              child: AnimatedOpacity(
+                duration: const Duration(milliseconds: 400),
+                opacity: showCheck ? 1 : 0,
+                child: Container(
+                  width: 90,
+                  height: 90,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFD1FADF),
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Color(0xAA4CAF50),
+                        blurRadius: 18,
+                        spreadRadius: 4,
+                      ),
+                    ],
+                  ),
+                  child: const Icon(
+                    Icons.check_rounded,
+                    color: Colors.green,
+                    size: 55,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 22),
+            const Text(
+              "Payment Successful!",
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              "Your wallet balance has been updated successfully.",
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.grey[700], fontSize: 14),
+            ),
+            const SizedBox(height: 26),
+            AppButton(
+              text: "Continue",
+              onTap: () {
+                Navigator.pop(context);
+              },
+            ),
           ],
         ),
       ),

@@ -10,6 +10,7 @@ import 'package:inspect_connect/features/auth_flow/domain/usecases/sign_in_useca
 import 'package:inspect_connect/features/auth_flow/domain/usecases/sign_up_usecases.dart';
 import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
+import 'package:inspect_connect/features/auth_flow/domain/usecases/update_profile_usecase.dart';
 import 'package:inspect_connect/features/client_flow/data/datasources/remote_datasource/client_api_datasource.dart';
 import 'package:inspect_connect/features/client_flow/data/repositories/client_repository_imp.dart';
 import 'package:inspect_connect/features/client_flow/domain/repositories/booking_repository.dart';
@@ -57,6 +58,8 @@ void setupLocator() {
   locator.registerLazySingleton(() => GetUserWalletAmountUseCase(locator()));
   locator.registerLazySingleton(() => GetUserPaymentsListUseCase(locator()));
   locator.registerLazySingleton(() => GetUserUseCase(locator()));
+  locator.registerLazySingleton(() => UpdateProfileUseCase(locator()));
+
 
 
 

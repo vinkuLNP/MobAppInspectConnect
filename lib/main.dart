@@ -10,10 +10,12 @@ import 'package:inspect_connect/features/client_flow/presentations/providers/boo
 import 'package:inspect_connect/features/client_flow/presentations/providers/session_manager.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/user_provider.dart';
 import 'package:provider/provider.dart';
-
+    final rootNavigatorKey = GlobalKey<NavigatorState>();
+ final appRouter = AppRouter(navigatorKey: rootNavigatorKey);
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 Stripe.publishableKey = stripePublishableKey;
+
 await dotenv.load(fileName: "assets/.env");
  await Stripe.instance.applySettings();
   // Initialize DI first
@@ -27,16 +29,10 @@ await dotenv.load(fileName: "assets/.env");
   configService.configure(productFlavor: _productFlavor);
   print(' BUILD_VARIANT = ${EnvironmentConfig.BUILD_VARIANT}');
   print(' Base URL = ${configService.baseUrl}');
-    final rootNavigatorKey = GlobalKey<NavigatorState>();
- final appRouter = AppRouter(navigatorKey: rootNavigatorKey);
+
  SessionManager().navigatorKey = rootNavigatorKey;
 
-  // runApp(const MyApp());
-  //   final appRouter = AppRouter(rootNavigatorKey: rootNavigatorKey);
-  // SessionManager().navigatorKey = rootNavigatorKey;
-
   runApp(MyApp(appRouter: appRouter));
-  // runApp(MyApp());
 
 }
 
@@ -51,7 +47,7 @@ class MyApp extends StatefulWidget {
 
 
 class _MyAppState extends State<MyApp> {
-  final AppRouter _appRouter = AppRouter();
+  // final AppRouter _appRouter = AppRouter();
   final GlobalKey<NavigatorState> navigatorKey = 
   // SessionManager().navigatorKey;
   GlobalKey<NavigatorState>();
@@ -66,7 +62,7 @@ class _MyAppState extends State<MyApp> {
          ChangeNotifierProvider(create: (_) => BookingProvider()),
       ],
       child: MaterialApp.router(
-        routerConfig: _appRouter.config(),
+        routerConfig: appRouter.config(),
   // navigatorKey: SessionManager().navigatorKey,
 
         debugShowCheckedModeBanner: false,

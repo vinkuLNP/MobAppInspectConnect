@@ -40,7 +40,10 @@ class _AccountSettingsViewState extends State<AccountSettingsView> {
 
     setState(() => isUpdating = true);
     try {
-      await context.read<UserProvider>().updateUserName(nameCtrl.text.trim());
+      await context.read<UserProvider>().updateUserName(
+        context,
+        nameCtrl.text.trim(),
+      );
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

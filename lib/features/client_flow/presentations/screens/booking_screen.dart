@@ -3,6 +3,7 @@ import 'package:inspect_connect/core/utils/constants/app_colors.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_button.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/features/client_flow/domain/entities/booking_list_entity.dart';
+import 'package:inspect_connect/features/client_flow/presentations/widgets/recent_booking_card.dart';
 import 'package:intl/intl.dart';
 import 'package:inspect_connect/core/basecomponents/base_responsive_widget.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/booking_provider.dart';
@@ -26,13 +27,10 @@ class _BookingsScreenState extends State<BookingsScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final provider = context.read<BookingProvider>();
-      setState(() {
-        selectedStatus = 'all';
-        provider.isFetchingBookings = true;
-        provider.clearFilters();
-        provider.fetchBookingsList(reset: true);
-      });
-      provider.fetchBookingsList();
+      setState(() => selectedStatus = 'all');
+      provider.resetBookings();
+      provider.clearFilters(triggerFetch: false);
+      provider.fetchBookingsList(reset: true);
       _setupScrollListener(provider);
     });
   }
@@ -68,6 +66,12 @@ class _BookingsScreenState extends State<BookingsScreen> {
       buildWidget: (ctx, rc, app) {
         return Consumer<BookingProvider>(
           builder: (context, provider, _) {
+            final todaysApproved = _getTodaysApprovedBookings(
+              provider.bookings,
+            );
+            final otherBookings = provider.bookings
+                .where((b) => !todaysApproved.contains(b))
+                .toList();
             return Scaffold(
               appBar: const CommonAppBar(showLogo: true, title: 'Bookings'),
               backgroundColor: Colors.grey[100],
@@ -82,102 +86,110 @@ class _BookingsScreenState extends State<BookingsScreen> {
                         _buildBookNowButton(context),
                         const SizedBox(height: 16),
                         Expanded(
-                          child: Consumer<BookingProvider>(
-                            builder: (context, provider, child) {
-                              if (provider.isFetchingBookings &&
-                                  provider.bookings.isEmpty) {
-                                return const Center(
-                                  child: CircularProgressIndicator(),
-                                );
-                              }
+                          child: RefreshIndicator(
+                            onRefresh: () async =>
+                                provider.fetchBookingsList(reset: true),
+                            child: ListView.builder(
+                              controller: _scrollController,
+                              padding: const EdgeInsets.only(bottom: 24),
+                              itemCount:
+                                  todaysApproved.length +
+                                  otherBookings.length +
+                                  (provider.isLoadMoreRunning ? 1 : 0),
+                              itemBuilder: (context, index) {
+                                if (index < todaysApproved.length) {
+                                  final booking = todaysApproved[index];
+                                  return Padding(
+                                    padding: const EdgeInsets.only(bottom: 8.0),
+                                    child: GestureDetector(
+                                      onTap: () =>
+                                          _showBookingDetails(context, booking),
+                                      child: RecentBookingViewerCard(
+                                        bookingListEntity: booking,
+                                      ),
+                                    ),
+                                  );
+                                }
 
-                              if (!provider.isFetchingBookings &&
-                                  provider.bookings.isEmpty) {
-                                return Center(
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
+                                final adjustedIndex =
+                                    index - todaysApproved.length;
+                                if (adjustedIndex < otherBookings.length) {
+                                  final booking = otherBookings[adjustedIndex];
+                                  return Column(
                                     children: [
-                                      Image.asset(
-                                        'assets/images/no_booking.webp',
-                                        width: 150,
-                                        height: 150,
-                                      ),
-                                      const SizedBox(height: 16),
-                                      textWidget(
-                                        text: "No bookings found.",
-                                        fontSize: 16,
-                                        color: Colors.grey,
-                                      ),
-                                      const SizedBox(height: 16),
-                                      // ElevatedButton(
-                                      //   onPressed: () {
-                                      //     if (widget.onBookNowTapped != null) {
-                                      //       setState(() {
-                                      //         selectedStatus = 'all';
-                                      //         provider.isFetchingBookings =
-                                      //             true;
-                                      //         provider.clearFilters();
-                                      //         provider.fetchBookingsList(
-                                      //           reset: true,
-                                      //         );
-                                      //       });
-                                      //       widget.onBookNowTapped!();
-                                      //     }
-                                      //   },
-                                      //   style: ElevatedButton.styleFrom(
-                                      //     backgroundColor: Theme.of(
-                                      //       context,
-                                      //     ).colorScheme.primary,
-                                      //     minimumSize: const Size(150, 48),
-                                      //     shape: RoundedRectangleBorder(
-                                      //       borderRadius: BorderRadius.circular(
-                                      //         12,
-                                      //       ),
-                                      //     ),
-                                      //   ),
-                                      //   child: textWidget(
-                                      //     text: 'Book Now',
-                                      //     color: AppColors.whiteColor,
-                                      //   ),
-                                      // ),
+                                      _buildBookingCard(context, booking),
+                                      index == provider.bookings.length - 1
+                                          ? SizedBox(height: 80)
+                                          : SizedBox.shrink(),
                                     ],
+                                  );
+                                  // _buildBookingCard(context, booking);
+                                }
+                                if (provider.isFetchingBookings &&
+                                    provider.bookings.isEmpty) {
+                                  return const Center(
+                                    child: CircularProgressIndicator(),
+                                  );
+                                }
+                                if (!provider.isFetchingBookings &&
+                                    provider.bookings.isEmpty) {
+                                  return Center(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Image.asset(
+                                          'assets/images/no_booking.webp',
+                                          width: 150,
+                                          height: 150,
+                                        ),
+                                        const SizedBox(height: 16),
+                                        textWidget(
+                                          text: "No bookings found.",
+                                          fontSize: 16,
+                                          color: Colors.grey,
+                                        ),
+                                        const SizedBox(height: 16),
+                                      ],
+                                    ),
+                                  );
+                                }
+
+                                return const Padding(
+                                  padding: EdgeInsets.all(16),
+                                  child: Center(
+                                    child: CircularProgressIndicator(),
                                   ),
                                 );
-                              }
-
-                              return RefreshIndicator(
-                                onRefresh: () async =>
-                                    provider.fetchBookingsList(reset: true),
-                                child: ListView.builder(
-                                  controller: _scrollController,
-                                  padding: const EdgeInsets.only(bottom: 24),
-                                  itemCount:
-                                      provider.bookings.length +
-                                      (provider.isLoadMoreRunning ? 1 : 0),
-                                  itemBuilder: (context, index) {
-                                    if (index < provider.bookings.length) {
-                                      final booking = provider.bookings[index];
-                                      return _buildBookingCard(
-                                        context,
-                                        booking,
-                                      );
-                                    } else {
-                                      return const Padding(
-                                        padding: EdgeInsets.all(16),
-                                        child: Center(
-                                          child: CircularProgressIndicator(),
-                                        ),
-                                      );
-                                    }
-                                  },
-                                ),
-                              );
-                            },
+                              },
+                            ),
                           ),
                         ),
                       ],
                     ),
                   ),
+                  if (provider.isFetchingBookings && provider.bookings.isEmpty)
+                    const Center(child: CircularProgressIndicator()),
+                  if (!provider.isFetchingBookings && provider.bookings.isEmpty)
+                    Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.asset(
+                            'assets/images/no_booking.webp',
+                            width: 150,
+                            height: 150,
+                          ),
+                          const SizedBox(height: 16),
+                          textWidget(
+                            text: "No bookings found.",
+                            fontSize: 16,
+                            color: Colors.grey,
+                          ),
+                          const SizedBox(height: 16),
+                        ],
+                      ),
+                    ),
 
                   if (provider.isLoadingBookingDetail)
                     Container(
@@ -271,8 +283,7 @@ class _BookingsScreenState extends State<BookingsScreen> {
                                       .read<BookingProvider>();
 
                                   if (option['value'] == 'all') {
-                                    provider.isFetchingBookings = true;
-                                    provider.clearFilters();
+                                    provider.clearFilters(triggerFetch: false);
                                     provider.fetchBookingsList(reset: true);
                                   } else {
                                     provider.filterByStatus(option['value']);
@@ -339,7 +350,7 @@ class _BookingsScreenState extends State<BookingsScreen> {
               onTap: () => _showSortFilterSheet(context),
               child: Container(
                 padding: const EdgeInsets.all(10),
-                margin:const EdgeInsets.only(bottom: 15) ,
+                margin: const EdgeInsets.only(bottom: 15),
                 decoration: BoxDecoration(
                   color: primary.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(12),
@@ -652,57 +663,52 @@ class _BookingsScreenState extends State<BookingsScreen> {
       },
     );
   }
+
+  List<BookingListEntity> _getTodaysApprovedBookings(
+    List<BookingListEntity> list,
+  ) {
+    final now =
+        // DateTime.parse('2025-10-29 11:42:33.753577');
+        DateTime.now();
+
+    // Get current day boundaries (midnight to 23:59:59)
+    final startOfDay = DateTime(now.year, now.month, now.day);
+    final endOfDay = DateTime(now.year, now.month, now.day, 23, 59, 59);
+
+    final todaysApproved = <BookingListEntity>[];
+
+    for (final b in list) {
+      if (b.status == 1) {
+        final dt = _bookingDateTime(b);
+        if (dt.isAfter(startOfDay) && dt.isBefore(endOfDay)) {
+          todaysApproved.add(b);
+        }
+      }
+    }
+
+    // Sort by time (earliest first)
+    todaysApproved.sort((a, b) {
+      final aTime = _bookingDateTime(a);
+      final bTime = _bookingDateTime(b);
+      return aTime.compareTo(bTime);
+    });
+
+    return todaysApproved;
+  }
+
+  DateTime _bookingDateTime(BookingListEntity b) {
+    final date = DateTime.parse(b.bookingDate);
+    DateTime time;
+    final t = b.bookingTime.trim().toUpperCase().replaceAll('.', '');
+    try {
+      if (t.contains('AM') || t.contains('PM')) {
+        time = DateFormat('h:mm a').parse(t);
+      } else {
+        time = DateFormat('HH:mm').parse(t);
+      }
+    } catch (_) {
+      time = DateFormat('h:mm a').parse('10:00 AM');
+    }
+    return DateTime(date.year, date.month, date.day, time.hour, time.minute);
+  }
 }
-
-     // SizedBox(
-      //   height: 42,
-      //   child: Scrollbar(
-      //     controller: scrollController,
-      //     thumbVisibility: true,
-      //     thickness: 4,
-      //     radius: const Radius.circular(6),
-      //     scrollbarOrientation: ScrollbarOrientation.bottom,
-      //     trackVisibility: false,
-      //     interactive: true,
-      //     child: SingleChildScrollView(
-      //       controller: scrollController,
-      //       scrollDirection: Axis.horizontal,
-      //       physics: const BouncingScrollPhysics(),
-      //       child: Row(
-      //         children: _statusOptions.map((option) {
-      //           final isSelected = selectedStatus == option['value'];
-      //           return Padding(
-      //             padding: const EdgeInsets.only(right: 8),
-      //             child: ChoiceChip(
-      //               label: textWidget(
-      //                 text: option['label'],
-      //                 color: isSelected ? Colors.white : Colors.grey[700]!,
-      //                 fontWeight:
-      //                     isSelected ? FontWeight.bold : FontWeight.w500,
-      //               ),
-      //               selected: isSelected,
-      //               selectedColor: primary,
-      //               backgroundColor: Colors.grey[200],
-      //               shape: RoundedRectangleBorder(
-      //                 borderRadius: BorderRadius.circular(20),
-      //               ),
-      //               elevation: isSelected ? 3 : 0,
-      //               onSelected: (selected) {
-      //                 setState(() => selectedStatus = option['value']);
-      //                 final provider = context.read<BookingProvider>();
-
-      //                 if (option['value'] == 'all') {
-      //                   provider.isFetchingBookings = true;
-      //                   provider.clearFilters();
-      //                   provider.fetchBookingsList(reset: true);
-      //                 } else {
-      //                   provider.filterByStatus(option['value']);
-      //                 }
-      //               },
-      //             ),
-      //           );
-      //         }).toList(),
-      //       ),
-      //     ),
-      //   ),
-      // ),

@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -6,6 +5,7 @@ import 'package:inspect_connect/core/basecomponents/base_view_model.dart';
 import 'package:inspect_connect/core/commondomain/entities/based_api_result/api_result_state.dart';
 import 'package:inspect_connect/core/di/app_component/app_component.dart';
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
+import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/features/auth_flow/data/datasources/local_datasources/auth_local_datasource.dart';
 import 'package:inspect_connect/features/client_flow/data/models/booking_detail_model.dart';
 import 'package:inspect_connect/features/client_flow/data/models/booking_model.dart';
@@ -42,9 +42,8 @@ class BookingProvider extends BaseViewModel {
   TimeOfDay? get selectedTime => _selectedTime;
   CertificateSubTypeEntity? get inspectionType => _inspectionType;
   String? get getLocation => location;
-bool isLoadingBookingDetail = false;
+  bool isLoadingBookingDetail = false;
 
-  
   void setDate(DateTime d) {
     _selectedDate = DateTime(d.year, d.month, d.day);
     notifyListeners();
@@ -72,10 +71,7 @@ bool isLoadingBookingDetail = false;
   }
 
   void setInspectionType(CertificateSubTypeEntity? t) {
-    log('---------<t $t');
-
     _inspectionType = t;
-    log('-----_inspectionType----<t $_inspectionType');
 
     notifyListeners();
   }
@@ -105,31 +101,67 @@ bool isLoadingBookingDetail = false;
     }
   }
 
-  bool validate() {
+  bool validate({required BuildContext cntx}) {
     bool isValid = true;
 
     if (_selectedTime == null) {
       print("Please select a time");
+      ScaffoldMessenger.of(cntx).showSnackBar(
+        SnackBar(
+          content: textWidget(
+            text: 'Please select a time',
+            color: AppColors.backgroundColor,
+          ),
+        ),
+      );
       isValid = false;
     }
 
     if (_inspectionType == null) {
-      print("Please select an inspection type");
+      ScaffoldMessenger.of(cntx).showSnackBar(
+        SnackBar(
+          content: textWidget(
+            text:"Please select an inspection type",
+            color: AppColors.backgroundColor,
+          ),
+        ),
+      );
       isValid = false;
     }
 
     if (location == null) {
-      print("Please select a location");
+    ScaffoldMessenger.of(cntx).showSnackBar(
+        SnackBar(
+          content: textWidget(
+            text:"Please select a location",
+            color: AppColors.backgroundColor,
+          ),
+        ),
+      );
       isValid = false;
     }
 
-    if (description == null || description.trim().isEmpty) {
-      print("Please enter a description");
+    if (description == '' || description.trim().isEmpty) {
+     ScaffoldMessenger.of(cntx).showSnackBar(
+        SnackBar(
+          content: textWidget(
+            text:"Please enter a description",
+            color: AppColors.backgroundColor,
+          ),
+        ),
+      );
       isValid = false;
     }
 
     if (uploadedUrls.isEmpty) {
-      print("Please add at least one image");
+     ScaffoldMessenger.of(cntx).showSnackBar(
+        SnackBar(
+          content: textWidget(
+            text:"Please add at least one image",
+            color: AppColors.backgroundColor,
+          ),
+        ),
+      );
       isValid = false;
     }
 
@@ -226,7 +258,6 @@ bool isLoadingBookingDetail = false;
       if (user == null || user.token == null) {
         throw Exception('User not found in local storage');
       }
-      log('-------> uploadurl------->$uploadedUrls');
       final booking = BookingEntity(
         bookingDate: _selectedDate.toIso8601String().split('T').first,
         bookingTime: formattedTime!,
@@ -235,7 +266,6 @@ bool isLoadingBookingDetail = false;
         images: uploadedUrls,
         description: description,
       );
-      log('-------> booking------->$booking');
 
       final updateBookingDetailUseCase = locator<UpdateBookingDetailUseCase>();
       final state =
@@ -277,8 +307,8 @@ bool isLoadingBookingDetail = false;
     required bool isEditable,
   }) async {
     try {
-       isLoadingBookingDetail = true;
-    notifyListeners();
+      isLoadingBookingDetail = true;
+      notifyListeners();
       final user = await locator<AuthLocalDataSource>().getUser();
       if (user == null || user.token == null) {
         throw Exception('User not found in local storage');
@@ -301,7 +331,6 @@ bool isLoadingBookingDetail = false;
           clearBookingDetail();
           bookingDetailModel = response;
 
-          log(response.bookingLocation);
           // Navigator.pop(context);
           Navigator.push(
             context,
@@ -326,8 +355,10 @@ bool isLoadingBookingDetail = false;
           );
         },
       );
-    } finally {isLoadingBookingDetail = false;
-    notifyListeners();}
+    } finally {
+      isLoadingBookingDetail = false;
+      notifyListeners();
+    }
   }
 
   Future<void> deleteBookingDetail({
@@ -384,14 +415,12 @@ bool isLoadingBookingDetail = false;
       state?.when(
         data: (response) {
           subTypes = response;
-          log(subTypes[0].name);
-        setInspectionType(subTypes[0]);
+          setInspectionType(subTypes[0]);
           notifyListeners();
         },
         error: (e) {},
       );
     } catch (e) {
-      log('fetchCertificateSubTypes error: $e');
     } finally {
       setProcessing(false);
     }
@@ -440,7 +469,6 @@ bool isLoadingBookingDetail = false;
         },
       );
     } catch (e) {
-      log('uploadImage error: $e');
     } finally {
       setProcessing(false);
     }
@@ -449,7 +477,6 @@ bool isLoadingBookingDetail = false;
   List<String> uploadedUrls = [];
 
   void clearBookingData() {
-    log('🧹 Clearing booking data...');
     _selectedDate = DateTime.now();
     _selectedTime = null;
     formattedTime = null;
@@ -532,10 +559,8 @@ bool isLoadingBookingDetail = false;
         data: (response) {
           if (loadMore) {
             bookings.addAll(response);
-            log('------<response------->$response');
           } else {
             bookings = response;
-            log('------<response------->$response');
           }
 
           if (response.length < _perPageLimit) {
@@ -545,12 +570,9 @@ bool isLoadingBookingDetail = false;
           }
           notifyListeners();
         },
-        error: (e) {
-          log("Error fetching bookings: ${e.message}");
-        },
+        error: (e) {},
       );
     } catch (e) {
-      log("❌ fetchBookingsList error: $e");
     } finally {
       isFetchingBookings = false;
       isLoadMoreRunning = false;
@@ -573,7 +595,6 @@ bool isLoadingBookingDetail = false;
   }
 
   void filterByStatus(String? status) {
-    log("🔍 Filtering by status: $status");
     if (_status == "status") return;
     _status = status;
     _currentPage = 1;
@@ -589,12 +610,18 @@ bool isLoadingBookingDetail = false;
     notifyListeners();
   }
 
-  void clearFilters() {
+  void clearFilters({bool triggerFetch = false}) {
     _searchQuery = null;
     _searchDate = null;
     _status = null;
     _currentPage = 1;
-    fetchBookingsList(reset: true);
+    hasMoreBookings = true;
+    bookings.clear();
+    notifyListeners();
+
+    if (triggerFetch) {
+      fetchBookingsList(reset: true);
+    }
   }
 
   TimeOfDay parseTime(String str) {
@@ -609,7 +636,7 @@ bool isLoadingBookingDetail = false;
       final dt = DateFormat('HH:mm').parse(normalized);
       return TimeOfDay(hour: dt.hour, minute: dt.minute);
     } catch (e) {
-      return const TimeOfDay(hour: 10, minute: 0); // default fallback
+      return const TimeOfDay(hour: 10, minute: 0);
     }
   }
 

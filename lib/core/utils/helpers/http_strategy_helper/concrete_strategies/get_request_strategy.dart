@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:developer';
 
-
 import 'package:inspect_connect/core/commondomain/entities/based_api_result/api_result_model.dart';
 import 'package:inspect_connect/core/utils/constants/app_constants.dart';
 import 'package:inspect_connect/core/utils/helpers/extension_functions/extension_functions.dart';
@@ -17,10 +16,12 @@ class GetRequestStrategy implements HttpRequestStrategy {
     Map<String, dynamic> requestData = const <String, dynamic>{},
   }) async {
     log('uri------<Uri---$uri');
-    
+
     log('token------<Uri---$headers');
-    
-    log('-----uri.parseUri(params: requestData)-----${uri.parseUri(params: requestData)}');
+
+    log(
+      '-----uri.parseUri(params: requestData)-----${uri.parseUri(params: requestData)}',
+    );
     log(uri);
 
     final http.Response response = await http

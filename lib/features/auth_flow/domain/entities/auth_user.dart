@@ -141,3 +141,4 @@ extension AuthUserLocalEntityMerge on AuthUserLocalEntity {
     );
   }
 }
+

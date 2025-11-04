@@ -274,7 +274,7 @@ class InspectorViewModelProvider extends BaseViewModel {
 
     try {
 
-      context.router.replaceAll([ ClientSignInRoute(showBackButton: false)]);
+      context.router.replaceAll([ InspectorSignInRoute()]);
     } finally {
       _isResetting = false;
       notifyListeners();
