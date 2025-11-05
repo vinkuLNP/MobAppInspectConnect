@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/utils/constants/app_assets_constants.dart';
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
@@ -6,7 +8,7 @@ import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.d
 class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool showLogo;
   final bool showBackButton;
-  final bool showNotification,showBookButton;
+  final bool showNotification, showBookButton;
   final String? title;
   final VoidCallback? onBack;
   final VoidCallback? onNotificationTap;
@@ -48,7 +50,6 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
             Color(0xFF0070F2), // Deep navy
 
             Color(0xFF002A86), // Softer blue tone
-
             // Color(0xFF00144A), // Muted navy blue
           ],
           begin: Alignment.topLeft,
@@ -74,8 +75,9 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
               )
             : null,
         title: Row(
-          mainAxisAlignment:  showLogo
-                ?  MainAxisAlignment.start : MainAxisAlignment.center,
+          mainAxisAlignment: showLogo
+              ? MainAxisAlignment.start
+              : MainAxisAlignment.center,
 
           children: [
             showLogo
@@ -92,7 +94,8 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
                           color: Colors.white,
                         ),
                       ),
-                      SizedBox(width: 120),
+
+                      SizedBox(width: Platform.isIOS ? 100 : 120),
                     ],
                   )
                 : SizedBox(),
@@ -120,7 +123,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
                     SnackBar(content: textWidget(text: 'Notifications tapped')),
                   ),
             ),
-             if (showBookButton)
+          if (showBookButton)
             IconButton(
               icon: const Icon(
                 Icons.my_library_books_outlined,

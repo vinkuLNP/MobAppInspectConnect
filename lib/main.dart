@@ -10,14 +10,15 @@ import 'package:inspect_connect/features/client_flow/presentations/providers/boo
 import 'package:inspect_connect/features/client_flow/presentations/providers/session_manager.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/user_provider.dart';
 import 'package:provider/provider.dart';
-    final rootNavigatorKey = GlobalKey<NavigatorState>();
- final appRouter = AppRouter(navigatorKey: rootNavigatorKey);
+
+final rootNavigatorKey = GlobalKey<NavigatorState>();
+final appRouter = AppRouter(navigatorKey: rootNavigatorKey);
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-Stripe.publishableKey = stripePublishableKey;
+  Stripe.publishableKey = stripePublishableKey;
 
-await dotenv.load(fileName: "assets/.env");
- await Stripe.instance.applySettings();
+  await dotenv.load(fileName: "assets/.env");
+  await Stripe.instance.applySettings();
   // Initialize DI first
   await initAppComponentLocator();
   setupLocator();
@@ -30,41 +31,30 @@ await dotenv.load(fileName: "assets/.env");
   print(' BUILD_VARIANT = ${EnvironmentConfig.BUILD_VARIANT}');
   print(' Base URL = ${configService.baseUrl}');
 
- SessionManager().navigatorKey = rootNavigatorKey;
+  SessionManager().navigatorKey = rootNavigatorKey;
 
   runApp(MyApp(appRouter: appRouter));
-
 }
 
 class MyApp extends StatefulWidget {
-    final AppRouter appRouter;
+  final AppRouter appRouter;
   const MyApp({super.key, required this.appRouter});
 
   @override
   State<MyApp> createState() => _MyAppState();
 }
 
-
-
 class _MyAppState extends State<MyApp> {
-  // final AppRouter _appRouter = AppRouter();
-  final GlobalKey<NavigatorState> navigatorKey = 
-  // SessionManager().navigatorKey;
-  GlobalKey<NavigatorState>();
-  // SessionManager().navigatorKey = navigatorKey;
-
   static const Color themeColor = Color(0xFF002A86);
   @override
   Widget build(BuildContext context) {
- return   MultiProvider(
+    return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => UserProvider()),
-         ChangeNotifierProvider(create: (_) => BookingProvider()),
+        ChangeNotifierProvider(create: (_) => BookingProvider()),
       ],
       child: MaterialApp.router(
         routerConfig: appRouter.config(),
-  // navigatorKey: SessionManager().navigatorKey,
-
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           primaryColor: themeColor,
@@ -88,34 +78,3 @@ class _MyAppState extends State<MyApp> {
     );
   }
 }
-
-// class MyApp extends StatelessWidget {
-//   final AppRouter appRouter;
-//   const MyApp({super.key, required this.appRouter});
-
-//   static const Color themeColor = Color(0xff1a2c47);
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return MultiProvider(
-//       providers: [
-//         ChangeNotifierProvider(create: (_) => locator<UserProvider>()),
-//       ],
-//       child: MaterialApp.router(
-//         routerConfig: appRouter.config(),
-//         navigatorKey: SessionManager().navigatorKey, 
-//         debugShowCheckedModeBanner: false,
-//         theme: ThemeData(
-//           primaryColor: themeColor,
-//           scaffoldBackgroundColor: Colors.white,
-//           colorScheme: ColorScheme.fromSwatch().copyWith(
-//             primary: themeColor,
-//             secondary: themeColor,
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-// }
-
-

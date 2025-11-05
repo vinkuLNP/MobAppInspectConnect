@@ -4,10 +4,10 @@ class DateTimePickerProvider extends ChangeNotifier {
   DateTime tempDate;
   TimeOfDay tempTime;
   String? errorMessage;
-
+ final bool showTimePicker;
   final DateTime now;
 
-  DateTimePickerProvider({required this.now})
+  DateTimePickerProvider({required this.now,this.showTimePicker = true})
       : tempDate = now,
         tempTime = TimeOfDay.fromDateTime(now);
 
@@ -24,6 +24,9 @@ class DateTimePickerProvider extends ChangeNotifier {
   }
 
   bool validateDateTime() {
+    if(!showTimePicker){
+      return true;
+    }
     final chosenDateTime = DateTime(
       tempDate.year,
       tempDate.month,

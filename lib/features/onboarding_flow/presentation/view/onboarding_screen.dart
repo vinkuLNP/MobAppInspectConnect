@@ -271,7 +271,7 @@ class _OnBoardingPageState extends State<OnBoardingPage>
                               if (_isClient == true) {
                                 context.replaceRoute( ClientSignUpRoute(showBackButton: false));
                               } else {
-                                context.replaceRoute( ClientSignUpRoute(showBackButton: false));
+                                context.replaceRoute( InspectorSignUpRoute());
                               }
                             },
                           ),

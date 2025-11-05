@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:inspect_connect/core/basecomponents/base_view_model.dart';
@@ -783,6 +784,10 @@ Future<void> fetchUserDetail({
 
       final signInUseCase = locator<SignInUseCase>();
       log('---- SignIn Info ----> token=$deviceToken type=$deviceType');
+  final result = await InternetAddress.lookup('google.com');
+  if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+    log('✅ Internet available');
+  }
 
       final state = await executeParamsUseCase<AuthUser, SignInParams>(
         useCase: signInUseCase,
@@ -797,41 +802,7 @@ Future<void> fetchUserDetail({
 
       state?.when(
         data: (user) async {
-          // final localUser = user.toLocalEntity();
-          // await locator<AuthLocalDataSource>().saveUser(localUser);
-          // final userProvider = context.read<UserProvider>();
-          // await userProvider.setUser(localUser);
-
-          // await userProvider.loadUser();
-          // log(user.id);
-          // log(user.token);
-
-          // final fetchUserUseCase = locator<GetUserUseCase>();
-          // final userState =
-          //     await executeParamsUseCase<UserDetail, GetUserParams>(
-          //       useCase: fetchUserUseCase,
-          //       query: GetUserParams(userId: user.id),
-          //       launchLoader: true,
-          //     );
-          // userState?.when(
-          //   data: (userData) async {
-          //     final mergedUser = localUser.mergeWithUserDetail(userData);
-          //     await locator<AuthLocalDataSource>().saveUser(mergedUser);
-
-          //     await userProvider.setUser(mergedUser);
-
-          //     ScaffoldMessenger.of(context).showSnackBar(
-          //       const SnackBar(content: Text('Sign-in successful')),
-          //     );
-          //     emailCtrl.clear();
-          //     passwordCtrl.clear();
-          //     context.router.replaceAll([const ClientDashboardRoute()]);
-          //   },
-          //   error: (e) {
-          //     context.router.replaceAll([const ClientDashboardRoute()]);
-          //   },
-          // );
-
+       
           await fetchUserDetail(user: user, context: context);
           ScaffoldMessenger.of(
             context,
@@ -846,7 +817,11 @@ Future<void> fetchUserDetail({
           );
         },
       );
-    } finally {
+    } 
+    on SocketException catch (_) {
+  log('❌ No Internet connection');
+}
+    finally {
       setSigningIn(false);
     }
   }
@@ -898,3 +873,37 @@ Future<void> fetchUserDetail({
     }
   }
 }
+   // final localUser = user.toLocalEntity();
+          // await locator<AuthLocalDataSource>().saveUser(localUser);
+          // final userProvider = context.read<UserProvider>();
+          // await userProvider.setUser(localUser);
+
+          // await userProvider.loadUser();
+          // log(user.id);
+          // log(user.token);
+
+          // final fetchUserUseCase = locator<GetUserUseCase>();
+          // final userState =
+          //     await executeParamsUseCase<UserDetail, GetUserParams>(
+          //       useCase: fetchUserUseCase,
+          //       query: GetUserParams(userId: user.id),
+          //       launchLoader: true,
+          //     );
+          // userState?.when(
+          //   data: (userData) async {
+          //     final mergedUser = localUser.mergeWithUserDetail(userData);
+          //     await locator<AuthLocalDataSource>().saveUser(mergedUser);
+
+          //     await userProvider.setUser(mergedUser);
+
+          //     ScaffoldMessenger.of(context).showSnackBar(
+          //       const SnackBar(content: Text('Sign-in successful')),
+          //     );
+          //     emailCtrl.clear();
+          //     passwordCtrl.clear();
+          //     context.router.replaceAll([const ClientDashboardRoute()]);
+          //   },
+          //   error: (e) {
+          //     context.router.replaceAll([const ClientDashboardRoute()]);
+          //   },
+          // );

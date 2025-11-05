@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:inspect_connect/core/basecomponents/base_view_model.dart';
@@ -13,7 +14,15 @@ import 'package:flutter/material.dart';
 
 class InspectorViewModelProvider extends BaseViewModel {
   void init() {}
+  bool _autoValidate = false;
+  bool get autoValidate => _autoValidate;
 
+  void enableAutoValidate() {
+    if (!_autoValidate) {
+      _autoValidate = true;
+      notifyListeners();
+    }
+  }
   final emailCtrl = TextEditingController();
   final passwordCtrl = TextEditingController();
 
@@ -394,600 +403,61 @@ final Map<String, String> certAuthorityByType = {
     }
     return null;
   }
+
+
+  List<File> documents = [];
+  List<String> existingDocumentUrls = [];
+
+  Future<void> uploadDocument(BuildContext context) async {
+    final picker = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['pdf', 'doc', 'docx'],
+    );
+
+    if (picker != null && picker.files.single.path != null) {
+      documents.add(File(picker.files.single.path!));
+      notifyListeners();
+    }
+  }
+
+  void removeDocumentAt(int index) {
+    documents.removeAt(index);
+    notifyListeners();
+  }
+
+  void removeExistingDocumentAt(int index) {
+    existingDocumentUrls.removeAt(index);
+    notifyListeners();
+  }
+
+  void openDocument(String url) {
+    // open remote document (use url_launcher or open_file)
+  }
+
+  void openLocalDocument(File file) {
+    // open local file
+  }
+
+  String? country;
+  String? state;
+  String? city;
+
+  void setCountry(String? value) {
+    country = value;
+    state = null;
+    city = null;
+    notifyListeners();
+  }
+
+  void setStateValue(String? value) {
+    state = value;
+    city = null;
+    notifyListeners();
+  }
+
+  void setDropCity(String? value) {
+    city = value;
+    notifyListeners();
+  }
 }
 
-
-
-
-/// --- Data Models --- ///
-
-
-
-
-
-
-// /// --- Provider (State) --- ///
-// class SignUpProvider extends ChangeNotifier {
-//   int _currentStep = 0;
-//   int get currentStep => _currentStep;
-
-//   final personal = PersonalDetails();
-//   final professional = ProfessionalDetails();
-//   final serviceArea = ServiceAreaDetails();
-//   final additional = AdditionalDetails();
-
-//   void goNext() {
-//     if (_currentStep < 3) {
-//       _currentStep++;
-//       notifyListeners();
-//     }
-//   }
-
-//   void goPrevious() {
-//     if (_currentStep > 0) {
-//       _currentStep--;
-//       notifyListeners();
-//     }
-//   }
-
-//   void goTo(int index) {
-//     _currentStep = index.clamp(0, 3);
-//     notifyListeners();
-//   }
-
-//   Map<String, dynamic> buildPayload() => {
-//         'personal': personal.toJson(),
-//         'professional': professional.toJson(),
-//         'serviceArea': serviceArea.toJson(),
-//         'additional': additional.toJson(),
-//       };
-
-//   /// Example final submission
-//   Future<void> submit() async {
-//     // TODO: call your API here with buildPayload()
-//     // e.g., await http.post(url, body: jsonEncode(buildPayload()));
-//     await Future.delayed(const Duration(milliseconds: 400));
-//   }
-// }
-// import 'package:flutter/material.dart';
-// import 'package:provider/provider.dart';
-// import 'signup_provider.dart';
-
-// class SignUpScreen extends StatefulWidget {
-//   const SignUpScreen({super.key});
-//   @override
-//   State<SignUpScreen> createState() => _SignUpScreenState();
-// }
-
-// class _SignUpScreenState extends State<SignUpScreen> {
-//   final _personalKey = GlobalKey<FormState>();
-//   final _professionalKey = GlobalKey<FormState>();
-//   final _serviceAreaKey = GlobalKey<FormState>();
-//   final _additionalKey = GlobalKey<FormState>();
-
-//   bool _showPwd = false;
-//   bool _showConfirmPwd = false;
-
-//   @override
-//   Widget build(BuildContext context) {
-//     final p = context.watch<SignUpProvider>();
-//     final steps = [
-//       _StepMeta('Personal Details', _buildPersonal(p), _personalKey),
-//       _StepMeta('Professional Details', _buildProfessional(p), _professionalKey),
-//       _StepMeta('Service Area', _buildServiceArea(p), _serviceAreaKey),
-//       _StepMeta('Additional Details', _buildAdditional(p), _additionalKey),
-//     ];
-
-//     final theme = Theme.of(context);
-//     final cardRadius = BorderRadius.circular(16);
-
-//     return Scaffold(
-//       backgroundColor: theme.colorScheme.surface,
-//       body: SafeArea(
-//         child: Center(
-//           child: ConstrainedBox(
-//             constraints: const BoxConstraints(maxWidth: 760),
-//             child: Padding(
-//               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-//               child: Column(
-//                 children: [
-//                   const SizedBox(height: 12),
-//                   Icon(Icons.settings_suggest_rounded,
-//                       size: 64, color: theme.colorScheme.onSurface),
-//                   const SizedBox(height: 8),
-//                   Text('Sign Up',
-//                       style: theme.textTheme.headlineSmall?.copyWith(
-//                         fontWeight: FontWeight.w600,
-//                       )),
-//                   const SizedBox(height: 8),
-//                   Text(
-//                     'Please fill in the details below to sign up',
-//                     style: theme.textTheme.titleMedium
-//                         ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
-//                     textAlign: TextAlign.center,
-//                   ),
-//                   const SizedBox(height: 16),
-//                   _StepperHeader(
-//                     current: p.currentStep,
-//                     labels: const [
-//                       'Personal\nDetails',
-//                       'Professional\nDetails',
-//                       'Service\nArea',
-//                       'Additional\nDetails'
-//                     ],
-//                     onTap: (i) {
-//                       // Allow going back by tap
-//                       if (i <= p.currentStep) p.goTo(i);
-//                     },
-//                   ),
-//                   const SizedBox(height: 16),
-//                   Expanded(
-//                     child: Container(
-//                       decoration: BoxDecoration(
-//                         color: theme.colorScheme.surface,
-//                         borderRadius: cardRadius,
-//                         boxShadow: [
-//                           BoxShadow(
-//                             color:
-//                                 theme.colorScheme.onSurface.withOpacity(0.05),
-//                             blurRadius: 24,
-//                             spreadRadius: 2,
-//                             offset: const Offset(0, 12),
-//                           ),
-//                         ],
-//                       ),
-//                       child: Card(
-//                         margin: EdgeInsets.zero,
-//                         color: theme.colorScheme.surface,
-//                         elevation: 0,
-//                         shape: RoundedRectangleBorder(
-//                           borderRadius: cardRadius,
-//                           side: BorderSide(
-//                             color:
-//                                 theme.colorScheme.outlineVariant.withOpacity(.6),
-//                           ),
-//                         ),
-//                         child: Padding(
-//                           padding: const EdgeInsets.all(20),
-//                           child: Form(
-//                             key: steps[p.currentStep].formKey,
-//                             child: SingleChildScrollView(
-//                               child: steps[p.currentStep].content,
-//                             ),
-//                           ),
-//                         ),
-//                       ),
-//                     ),
-//                   ),
-//                   const SizedBox(height: 12),
-//                   Row(
-//                     children: [
-//                       Expanded(
-//                         child: OutlinedButton(
-//                           onPressed: p.currentStep == 0 ? null : p.goPrevious,
-//                           style: OutlinedButton.styleFrom(
-//                             minimumSize: const Size.fromHeight(52),
-//                             shape: RoundedRectangleBorder(
-//                                 borderRadius: BorderRadius.circular(12)),
-//                           ),
-//                           child: const Text('Previous'),
-//                         ),
-//                       ),
-//                       const SizedBox(width: 12),
-//                       Expanded(
-//                         child: FilledButton(
-//                           onPressed: () async {
-//                             final key = steps[p.currentStep].formKey;
-//                             if (key.currentState?.validate() ?? false) {
-//                               key.currentState?.save();
-//                               if (p.currentStep < steps.length - 1) {
-//                                 p.goNext();
-//                               } else {
-//                                 if (!p.additional.termsAccepted) {
-//                                   _toast(context,
-//                                       'Please accept Terms & Conditions.');
-//                                   return;
-//                                 }
-//                                 await p.submit();
-//                                 if (!mounted) return;
-//                                 showDialog(
-//                                   context: context,
-//                                   builder: (_) => AlertDialog(
-//                                     title: const Text('Success'),
-//                                     content: Text(
-//                                       'We captured your details.\n\n${p.buildPayload()}',
-//                                       style: theme.textTheme.bodySmall,
-//                                     ),
-//                                     actions: [
-//                                       TextButton(
-//                                         onPressed: () =>
-//                                             Navigator.of(context).pop(),
-//                                         child: const Text('OK'),
-//                                       )
-//                                     ],
-//                                   ),
-//                                 );
-//                               }
-//                             }
-//                           },
-//                           style: FilledButton.styleFrom(
-//                             minimumSize: const Size.fromHeight(52),
-//                             shape: RoundedRectangleBorder(
-//                                 borderRadius: BorderRadius.circular(12)),
-//                           ),
-//                           child: Text(p.currentStep < 3 ? 'Next' : 'Submit'),
-//                         ),
-//                       ),
-//                     ],
-//                   ),
-//                   const SizedBox(height: 6),
-//                 ],
-//               ),
-//             ),
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-
-//   /// --- Step 1: Personal --- ///
-//   Widget _buildPersonal(SignUpProvider p) {
-//     final cc = const ['+1', '+44', '+61', '+91'];
-//     return Column(
-//       crossAxisAlignment: CrossAxisAlignment.start,
-//       children: [
-//         const _SectionTitle('Personal Details'),
-//         const SizedBox(height: 10),
-//         _roundedField(
-//           initialValue: p.personal.fullName,
-//           label: 'Full Name',
-//           validator: (v) =>
-//               (v == null || v.trim().isEmpty) ? 'Full name is required' : null,
-//           onSaved: (v) => p.personal.fullName = v!.trim(),
-//         ),
-//         const SizedBox(height: 12),
-//         Row(
-//           children: [
-//             Expanded(
-//               flex: 3,
-//               child: _roundedDropdown<String>(
-//                 value: p.personal.countryCode,
-//                 label: 'Code',
-//                 items: cc.map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
-//                 onChanged: (v) => setState(() => p.personal.countryCode = v!),
-//               ),
-//             ),
-//             const SizedBox(width: 12),
-//             Expanded(
-//               flex: 7,
-//               child: _roundedField(
-//                 initialValue: p.personal.phone,
-//                 label: 'Phone Number',
-//                 keyboardType: TextInputType.phone,
-//                 validator: (v) =>
-//                     (v == null || v.trim().length < 6) ? 'Invalid phone' : null,
-//                 onSaved: (v) => p.personal.phone = v!.trim(),
-//               ),
-//             ),
-//           ],
-//         ),
-//         const SizedBox(height: 12),
-//         _roundedField(
-//           initialValue: p.personal.email,
-//           label: 'Email',
-//           keyboardType: TextInputType.emailAddress,
-//           validator: (v) {
-//             if (v == null || v.trim().isEmpty) return 'Email is required';
-//             final ok = RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(v.trim());
-//             return ok ? null : 'Enter a valid email';
-//           },
-//           onSaved: (v) => p.personal.email = v!.trim(),
-//         ),
-//         const SizedBox(height: 12),
-//         _roundedField(
-//           initialValue: p.personal.address,
-//           label: 'Mailing Address',
-//           onSaved: (v) => p.personal.address = v?.trim() ?? '',
-//         ),
-//         const SizedBox(height: 12),
-//         _roundedField(
-//           initialValue: p.personal.password,
-//           label: 'Password',
-//           obscureText: !_showPwd,
-//           validator: (v) =>
-//               (v == null || v.length < 6) ? 'Min 6 characters' : null,
-//           onSaved: (v) => p.personal.password = v!,
-//           suffix: IconButton(
-//             icon: Icon(_showPwd ? Icons.visibility_off : Icons.visibility),
-//             onPressed: () => setState(() => _showPwd = !_showPwd),
-//           ),
-//         ),
-//         const SizedBox(height: 12),
-//         _roundedField(
-//           initialValue: p.personal.confirmPassword,
-//           label: 'Confirm Password',
-//           obscureText: !_showConfirmPwd,
-//           validator: (v) =>
-//               (v != p.personal.password) ? 'Passwords do not match' : null,
-//           onSaved: (v) => p.personal.confirmPassword = v!,
-//           suffix: IconButton(
-//             icon:
-//                 Icon(_showConfirmPwd ? Icons.visibility_off : Icons.visibility),
-//             onPressed: () => setState(() => _showConfirmPwd = !_showConfirmPwd),
-//           ),
-//         ),
-//       ],
-//     );
-//   }
-
-//   /// --- Step 2: Professional --- ///
-//   Widget _buildProfessional(SignUpProvider p) {
-//     return Column(
-//       crossAxisAlignment: CrossAxisAlignment.start,
-//       children: [
-//         const _SectionTitle('Professional Details'),
-//         const SizedBox(height: 10),
-//         _roundedField(
-//           initialValue: p.professional.company,
-//           label: 'Company',
-//           onSaved: (v) => p.professional.company = v?.trim() ?? '',
-//         ),
-//         const SizedBox(height: 12),
-//         _roundedField(
-//           initialValue: p.professional.designation,
-//           label: 'Designation',
-//           onSaved: (v) => p.professional.designation = v?.trim() ?? '',
-//         ),
-//         const SizedBox(height: 12),
-//         _roundedField(
-//           initialValue: p.professional.experienceYears.toString(),
-//           label: 'Years of Experience',
-//           keyboardType: TextInputType.number,
-//           validator: (v) {
-//             if (v == null || v.isEmpty) return null;
-//             final n = int.tryParse(v);
-//             return (n == null || n < 0) ? 'Enter a valid number' : null;
-//           },
-//           onSaved: (v) =>
-//               p.professional.experienceYears = int.tryParse(v ?? '0') ?? 0,
-//         ),
-//       ],
-//     );
-//   }
-
-//   /// --- Step 3: Service Area --- ///
-//   Widget _buildServiceArea(SignUpProvider p) {
-//     final addCtl = TextEditingController();
-//     return Column(
-//       crossAxisAlignment: CrossAxisAlignment.start,
-//       children: [
-//         const _SectionTitle('Service Area'),
-//         const SizedBox(height: 10),
-//         _roundedField(
-//           initialValue: p.serviceArea.city,
-//           label: 'Base City',
-//           validator: (v) =>
-//               (v == null || v.trim().isEmpty) ? 'City is required' : null,
-//           onSaved: (v) => p.serviceArea.city = v!.trim(),
-//         ),
-//         const SizedBox(height: 12),
-//         Row(
-//           children: [
-//             Expanded(
-//               child: _roundedRawField(
-//                 controller: addCtl,
-//                 label: 'Add Area (e.g., suburb or zip)',
-//               ),
-//             ),
-//             const SizedBox(width: 12),
-//             FilledButton(
-//               onPressed: () {
-//                 final text = addCtl.text.trim();
-//                 if (text.isNotEmpty) {
-//                   setState(() => p.serviceArea.serviceAreas.add(text));
-//                   addCtl.clear();
-//                 }
-//               },
-//               child: const Text('Add'),
-//             ),
-//           ],
-//         ),
-//         const SizedBox(height: 10),
-//         Wrap(
-//           spacing: 8,
-//           runSpacing: 8,
-//           children: p.serviceArea.serviceAreas
-//               .map(
-//                 (s) => Chip(
-//                   label: Text(s),
-//                   onDeleted: () =>
-//                       setState(() => p.serviceArea.serviceAreas.remove(s)),
-//                 ),
-//               )
-//               .toList(),
-//         ),
-//       ],
-//     );
-//   }
-
-//   /// --- Step 4: Additional --- ///
-//   Widget _buildAdditional(SignUpProvider p) {
-//     return Column(
-//       crossAxisAlignment: CrossAxisAlignment.start,
-//       children: [
-//         const _SectionTitle('Additional Details'),
-//         const SizedBox(height: 10),
-//         SwitchListTile(
-//           contentPadding: EdgeInsets.zero,
-//           title: const Text('I accept the Terms & Conditions'),
-//           value: p.additional.termsAccepted,
-//           onChanged: (v) => setState(() => p.additional.termsAccepted = v),
-//         ),
-//         const SizedBox(height: 12),
-//         _roundedField(
-//           initialValue: p.additional.notes,
-//           label: 'Notes (optional)',
-//           maxLines: 4,
-//           onSaved: (v) => p.additional.notes = v?.trim() ?? '',
-//         ),
-//         const SizedBox(height: 8),
-//         if (!p.additional.termsAccepted)
-//           const Text(
-//             'Please accept the Terms & Conditions to continue.',
-//             style: TextStyle(color: Colors.red),
-//           ),
-//       ],
-//     );
-//   }
-
-//   // ---------- Styled Inputs ----------
-//   Widget _roundedField({
-//     required String? initialValue,
-//     required String label,
-//     String? Function(String?)? validator,
-//     void Function(String?)? onSaved,
-//     TextInputType? keyboardType,
-//     bool obscureText = false,
-//     int maxLines = 1,
-//     Widget? suffix,
-//   }) {
-//     return TextFormField(
-//       initialValue: initialValue,
-//       keyboardType: keyboardType,
-//       validator: validator,
-//       onSaved: onSaved,
-//       obscureText: obscureText,
-//       maxLines: maxLines,
-//       decoration: _roundedDecoration(label).copyWith(suffixIcon: suffix),
-//     );
-//   }
-
-//   Widget _roundedRawField({
-//     required TextEditingController controller,
-//     required String label,
-//   }) {
-//     return TextField(
-//       controller: controller,
-//       decoration: _roundedDecoration(label),
-//     );
-//   }
-
-//   InputDecoration _roundedDecoration(String label) {
-//     return InputDecoration(
-//       labelText: label,
-//       filled: true,
-//       isDense: true,
-//       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
-//       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-//       enabledBorder: OutlineInputBorder(
-//         borderRadius: BorderRadius.circular(12),
-//         borderSide: BorderSide(
-//           color: Theme.of(context).colorScheme.outlineVariant,
-//         ),
-//       ),
-//     );
-//   }
-
-//   Widget _roundedDropdown<T>({
-//     required T value,
-//     required String label,
-//     required List<DropdownMenuItem<T>> items,
-//     required void Function(T?) onChanged,
-//   }) {
-//     return DropdownButtonFormField<T>(
-//       value: value,
-//       items: items,
-//       onChanged: onChanged,
-//       decoration: _roundedDecoration(label),
-//     );
-//   }
-
-//   void _toast(BuildContext context, String msg) {
-//     ScaffoldMessenger.of(context).showSnackBar(
-//       SnackBar(content: Text(msg)),
-//     );
-//   }
-// }
-
-// // --- Small structs & widgets ---
-// class _StepMeta {
-//   final String title;
-//   final Widget content;
-//   final GlobalKey<FormState> formKey;
-//   _StepMeta(this.title, this.content, this.formKey);
-// }
-
-// class _StepperHeader extends StatelessWidget {
-//   final int current;
-//   final List<String> labels;
-//   final void Function(int index)? onTap;
-//   const _StepperHeader({
-//     required this.current,
-//     required this.labels,
-//     this.onTap,
-//   });
-
-//   @override
-//   Widget build(BuildContext context) {
-//     final theme = Theme.of(context);
-//     return Row(
-//       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//       children: List.generate(labels.length, (i) {
-//         final active = i == current;
-//         final done = i < current;
-//         final bg = active
-//             ? theme.colorScheme.primary
-//             : theme.colorScheme.surfaceVariant;
-//         final fg = active
-//             ? theme.colorScheme.onPrimary
-//             : theme.colorScheme.onSurfaceVariant;
-
-//         return Expanded(
-//           child: InkWell(
-//             onTap: onTap == null ? null : () => onTap!(i),
-//             child: Column(
-//               children: [
-//                 CircleAvatar(
-//                   radius: 22,
-//                   backgroundColor: bg,
-//                   child: Text(
-//                     '${i + 1}',
-//                     style: TextStyle(
-//                       color: fg,
-//                       fontWeight: FontWeight.w700,
-//                     ),
-//                   ),
-//                 ),
-//                 const SizedBox(height: 6),
-//                 Text(
-//                   labels[i],
-//                   textAlign: TextAlign.center,
-//                   style: theme.textTheme.labelMedium?.copyWith(
-//                     color: (active || done)
-//                         ? theme.colorScheme.onSurface
-//                         : theme.colorScheme.onSurface.withOpacity(0.6),
-//                   ),
-//                 ),
-//               ],
-//             ),
-//           ),
-//         );
-//       }),
-//     );
-//   }
-// }
-
-// class _SectionTitle extends StatelessWidget {
-//   final String text;
-//   const _SectionTitle(this.text);
-//   @override
-//   Widget build(BuildContext context) {
-//     return Text(
-//       text,
-//       style: Theme.of(context)
-//           .textTheme
-//           .titleLarge
-//           ?.copyWith(fontWeight: FontWeight.w700),
-//     );
-//   }
-// }

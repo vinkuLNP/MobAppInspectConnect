@@ -1,10 +1,109 @@
-import 'package:inspect_connect/core/utils/values/colors.dart';
+import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:flutter/material.dart';
+
+// class StepperHeader extends StatelessWidget {
+//   final int current;
+//   final List<String> labels;
+//   final void Function(int index)? onTap;
+
+//   const StepperHeader({
+//     super.key,
+//     required this.current,
+//     required this.labels,
+//     this.onTap,
+//   });
+
+//   @override
+//   Widget build(BuildContext context) {
+//     final theme = Theme.of(context);
+
+//     return  Row(
+//       mainAxisAlignment: MainAxisAlignment.center,
+//       crossAxisAlignment: CrossAxisAlignment.center,
+//       children: List.generate(labels.length, (i) {
+//         final bool active = i == current;
+//         final bool done = i < current;
+//         final bool upcoming = i > current;
+
+//         final Color circleColor = active || done
+//             ? theme.colorScheme.primary
+//             : Colors.grey.shade400;
+
+//         final Color textColor = active || done
+//             ? theme.colorScheme.onPrimary
+//             : theme.colorScheme.onSurfaceVariant;
+
+//         final Color connectorColor = done
+//             ? theme.colorScheme.primary
+//             : Colors.grey.shade400;
+
+//         return Expanded(
+//           child: Row(
+//             children: [
+//               InkWell(
+//                 onTap: onTap == null ? null : () => onTap!(i),
+//                 child: AnimatedContainer(
+//                   duration: const Duration(milliseconds: 300),
+//                   curve: Curves.easeInOut,
+//                   width: 30,
+//                   height: 30,
+//                   decoration: BoxDecoration(
+//                     color: circleColor,
+//                     shape: BoxShape.circle,
+//                     border: upcoming
+//                         ? Border.all(
+//                             color: theme.colorScheme.outlineVariant,
+//                             width: 1.2,
+//                           )
+//                         : null,
+//                     boxShadow: active
+//                         ? [
+//                             BoxShadow(
+//                               color: theme.colorScheme.primary
+//                                   .withOpacity(0.3),
+//                               blurRadius: 6,
+//                               spreadRadius: 2,
+//                             ),
+//                           ]
+//                         : [],
+//                   ),
+//                   alignment: Alignment.center,
+//                   child: done
+//                       ? Icon(
+//                           Icons.check_rounded,
+//                           color: white,
+//                           size: 24,
+//                         )
+//                       : textWidget(
+//                           text: '${i + 1}',
+//                           color: textColor,
+//                           fontWeight: FontWeight.w500,
+//                         ),
+//                 ),
+//               ),
+//               if (i != labels.length - 1)
+//                 Expanded(
+//                   child: AnimatedContainer(
+//                     duration: const Duration(milliseconds: 300),
+//                     curve: Curves.easeInOut,
+//                     height: 2,
+//                     color: connectorColor,
+//                   ),
+//                 ),
+//             ],
+//           ),
+//         );
+//       }),
+//     );
+
+//   }
+// }
 
 class StepperHeader extends StatelessWidget {
   final int current;
   final List<String> labels;
   final void Function(int index)? onTap;
+
   const StepperHeader({
     super.key,
     required this.current,
@@ -15,69 +114,83 @@ class StepperHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return LayoutBuilder(
-      builder: (context, c) {
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: List.generate(labels.length, (i) {
-            final active = i == current;
-            final done = i < current;
-            final bool isUpcoming = i > current;
-            final bg = active
-                ? theme.colorScheme.primary
-                : done
-                ? theme.colorScheme.primary
-                : Colors.grey;
-            final fg = active
-                ? theme.colorScheme.onPrimary
-                : theme.colorScheme.onSurfaceVariant;
 
-            return Expanded(
-              child: InkWell(
-                onTap: onTap == null ? null : () => onTap!(i),
-                child: Column(
-                  children: [
-                    Container(
-                      width: 44,
-                      height: 44,
-                      decoration: BoxDecoration(
-                        color: bg,
-                        shape: BoxShape.circle,
-                        border: isUpcoming
-                            ? Border.all(
-                                color: theme.colorScheme.outlineVariant,
-                                width: 1.2,
-                              )
-                            : null,
-                      ),
-                      alignment: Alignment.center,
-                      child: done
-                          ? Icon(Icons.check_rounded, color: white, size: 24)
-                          : Text(
-                              '${i + 1}',
-                              style: TextStyle(
-                                color: fg,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      labels[i],
-                      textAlign: TextAlign.center,
-                      style: theme.textTheme.labelMedium?.copyWith(
-                        color: active || done
-                            ? theme.colorScheme.onSurface
-                            : theme.colorScheme.onSurface.withOpacity(0.6),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+    return Center(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: List.generate(labels.length * 2 - 1, (index) {
+          final i = index ~/ 2;
+          final bool isConnector = index.isOdd;
+
+          if (isConnector) {
+            final bool done = i < current;
+            final Color connectorColor = done
+                ? theme.colorScheme.primary
+                : Colors.grey.shade400;
+
+            return AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+              width: 60, 
+              height: 2,
+              color: connectorColor,
+              // margin: const EdgeInsets.symmetric(horizontal: 4),
             );
-          }),
-        );
-      },
+          }
+
+          final bool active = i == current;
+          final bool done = i < current;
+          final bool upcoming = i > current;
+
+          final Color circleColor = active || done
+              ? theme.colorScheme.primary
+              : Colors.grey.shade400;
+
+          final Color textColor = active || done
+              ? theme.colorScheme.onPrimary
+              : theme.colorScheme.onSurfaceVariant;
+
+          return InkWell(
+            onTap: onTap == null ? null : () => onTap!(i),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+              width: 30,
+              height: 30,
+              // margin: const EdgeInsets.symmetric(
+              //   horizontal: 8,
+              // ), // equal spacing
+              decoration: BoxDecoration(
+                color: circleColor,
+                shape: BoxShape.circle,
+                border: upcoming
+                    ? Border.all(
+                        color: theme.colorScheme.outlineVariant,
+                        width: 1.2,
+                      )
+                    : null,
+                boxShadow: active
+                    ? [
+                        BoxShadow(
+                          color: theme.colorScheme.primary.withOpacity(0.3),
+                          blurRadius: 6,
+                          spreadRadius: 2,
+                        ),
+                      ]
+                    : [],
+              ),
+              alignment: Alignment.center,
+              child: done
+                  ? Icon(Icons.check_rounded, color: Colors.white, size: 20)
+                  : textWidget(
+                      text: '${i + 1}',
+                      color: textColor,
+                      fontWeight: FontWeight.w500,
+                    ),
+            ),
+          );
+        }),
+      ),
     );
   }
 }
@@ -87,12 +200,6 @@ class SectionTitle extends StatelessWidget {
   const SectionTitle(this.text, {super.key});
   @override
   Widget build(BuildContext context) {
-    return Text(
-      text,
-      style: Theme.of(
-        context,
-      ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
-    );
+    return textWidget(text: text, fontSize: 16, fontWeight: FontWeight.w600);
   }
 }
-

@@ -8,11 +8,13 @@ import 'package:provider/provider.dart';
 class DateTimePickerWidget extends StatefulWidget {
   final DateTime? initialDateTime;
   final ValueChanged<DateTime> onDateTimeSelected;
+  final bool showTimePicker;
 
   const DateTimePickerWidget({
     super.key,
     this.initialDateTime,
     required this.onDateTimeSelected,
+    this.showTimePicker = true,
   });
 
   @override
@@ -36,7 +38,10 @@ class _DateTimePickerWidgetState extends State<DateTimePickerWidget> {
       barrierDismissible: false,
       builder: (context) {
         return ChangeNotifierProvider(
-          create: (_) => DateTimePickerProvider(now: now),
+          create: (_) => DateTimePickerProvider(
+            now: now,
+            showTimePicker: widget.showTimePicker,
+          ),
           child: Consumer<DateTimePickerProvider>(
             builder: (context, provider, _) {
               return AlertDialog(
@@ -56,24 +61,31 @@ class _DateTimePickerWidgetState extends State<DateTimePickerWidget> {
                         ),
                       ),
                       const SizedBox(height: 16),
-                      ElevatedButton.icon(
-                        onPressed: () async {
-                          final isToday = DateUtils.isSameDay(
-                            provider.tempDate,
-                            now,
-                          );
-                          final minTime = TimeOfDay.fromDateTime(
-                            now.add(const Duration(hours: 2)),
-                          );
-                          final picked = await showTimePicker(
-                            context: context,
-                            initialTime: isToday ? minTime : provider.tempTime,
-                          );
-                          if (picked != null) provider.setTime(picked);
-                        },
-                        icon: const Icon(Icons.access_time),
-                        label: textWidget(text: "Pick Time",color: AppColors.whiteColor),
-                      ),
+                      widget.showTimePicker
+                          ? ElevatedButton.icon(
+                              onPressed: () async {
+                                final isToday = DateUtils.isSameDay(
+                                  provider.tempDate,
+                                  now,
+                                );
+                                final minTime = TimeOfDay.fromDateTime(
+                                  now.add(const Duration(hours: 2)),
+                                );
+                                final picked = await showTimePicker(
+                                  context: context,
+                                  initialTime: isToday
+                                      ? minTime
+                                      : provider.tempTime,
+                                );
+                                if (picked != null) provider.setTime(picked);
+                              },
+                              icon: const Icon(Icons.access_time),
+                              label: textWidget(
+                                text: "Pick Time",
+                                color: AppColors.whiteColor,
+                              ),
+                            )
+                          : SizedBox.shrink(),
                       if (provider.errorMessage != null)
                         Padding(
                           padding: const EdgeInsets.only(top: 12),
@@ -100,7 +112,10 @@ class _DateTimePickerWidgetState extends State<DateTimePickerWidget> {
                       widget.onDateTimeSelected(provider.chosenDateTime);
                       Navigator.pop(context);
                     },
-                    child: textWidget(text: "Confirm",color: AppColors.whiteColor),
+                    child: textWidget(
+                      text: "Confirm",
+                      color: AppColors.whiteColor,
+                    ),
                   ),
                 ],
               );
@@ -114,14 +129,14 @@ class _DateTimePickerWidgetState extends State<DateTimePickerWidget> {
   @override
   Widget build(BuildContext context) {
     final formatted = DateFormat(
-      'EEE, MMM d • hh:mm a',
+   widget.showTimePicker ?    'EEE, MMM d • hh:mm a' : 'd MMM, yyyy',
     ).format(selectedDateTime);
 
     return GestureDetector(
       onTap: () => _pickDateTime(context),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 250),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        padding:  EdgeInsets.symmetric(horizontal: 16 , vertical: widget.showTimePicker ?  16 : 6),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
           // gradient: LinearGradient(
@@ -164,7 +179,8 @@ class _DateTimePickerWidgetState extends State<DateTimePickerWidget> {
                   ),
                   const SizedBox(height: 2),
                   textWidget(
-                    text: "Tap to select date & time",
+                    text:widget
+                    .showTimePicker ?  "Tap to select date & time" : "Tap to choose date",
                     fontSize: 13,
                     color: Colors.grey.shade600,
                   ),

@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:inspect_connect/core/utils/constants/app_colors.dart';
 import 'package:inspect_connect/core/utils/helpers/responsive_ui_helper/responsive_config.dart';
 import 'package:inspect_connect/core/utils/presentation/app_assets_widget.dart';
-import 'package:inspect_connect/core/utils/presentation/app_common_logo_bar.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 
 class CommonAuthBar extends StatelessWidget {

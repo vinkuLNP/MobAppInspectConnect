@@ -104,9 +104,11 @@ class _BookingsScreenState extends State<BookingsScreen> {
                                     child: GestureDetector(
                                       onTap: () =>
                                           _showBookingDetails(context, booking),
-                                      child: RecentBookingViewerCard(
-                                        bookingListEntity: booking,
-                                      ),
+                                      child:
+                                      //  RecentBookingViewerCard(
+                                      //   bookingListEntity: booking,
+                                      // ),
+                                        _buildBookingCard(context, booking),
                                     ),
                                   );
                                 }
@@ -364,109 +366,226 @@ class _BookingsScreenState extends State<BookingsScreen> {
     );
   }
 
-  Widget _buildBookingCard(BuildContext context, BookingListEntity booking) {
-    final color = _statusColor(booking.status);
+  // Widget _buildBookingCard(BuildContext context, BookingListEntity booking) {
+  //   final color = _statusColor(booking.status);
 
-    return GestureDetector(
-      onTap: () => _showBookingDetails(context, booking),
-      child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 8),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(18),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.15),
-              blurRadius: 8,
-              offset: const Offset(0, 3),
+  //   return GestureDetector(
+  //     onTap: () => _showBookingDetails(context, booking),
+  //     child: Container(
+  //       margin: const EdgeInsets.symmetric(vertical: 8),
+  //       decoration: BoxDecoration(
+  //         color: Colors.white,
+  //         borderRadius: BorderRadius.circular(18),
+  //         boxShadow: [
+  //           BoxShadow(
+  //             color: Colors.grey.withOpacity(0.15),
+  //             blurRadius: 8,
+  //             offset: const Offset(0, 3),
+  //           ),
+  //         ],
+  //       ),
+  //       child: Padding(
+  //         padding: const EdgeInsets.all(16),
+  //         child: Row(
+  //           crossAxisAlignment: CrossAxisAlignment.start,
+  //           children: [
+  //             Container(
+  //               width: 6,
+  //               height: 70,
+  //               decoration: BoxDecoration(
+  //                 color: color,
+  //                 borderRadius: BorderRadius.circular(4),
+  //               ),
+  //             ),
+  //             const SizedBox(width: 12),
+  //             Expanded(
+  //               child: Column(
+  //                 crossAxisAlignment: CrossAxisAlignment.start,
+  //                 children: [
+  //                   textWidget(
+  //                     text: booking.bookingLocation,
+  //                     fontSize: 14,
+  //                     fontWeight: FontWeight.w600,
+  //                   ),
+  //                   const SizedBox(height: 6),
+  //                   Row(
+  //                     children: [
+  //                       Icon(
+  //                         Icons.calendar_today,
+  //                         size: 14,
+  //                         color: Colors.grey[600],
+  //                       ),
+  //                       const SizedBox(width: 4),
+  //                       textWidget(
+  //                         text: DateFormat(
+  //                           'dd MMM yyyy',
+  //                         ).format(DateTime.parse(booking.bookingDate)),
+  //                         fontSize: 12,
+  //                         color: Colors.grey[700]!,
+  //                       ),
+  //                       const SizedBox(width: 10),
+  //                       Icon(
+  //                         Icons.access_time,
+  //                         size: 14,
+  //                         color: Colors.grey[600],
+  //                       ),
+  //                       const SizedBox(width: 4),
+  //                       textWidget(
+  //                         text: booking.bookingTime,
+  //                         fontSize: 12,
+
+  //                         color: Colors.grey[700]!,
+  //                       ),
+  //                     ],
+  //                   ),
+  //                   const SizedBox(height: 6),
+  //                   textWidget(
+  //                     text: booking.description.isNotEmpty
+  //                         ? booking.description
+  //                         : "No description provided",
+  //                     fontSize: 12,
+
+  //                     color: Colors.grey[800]!,
+  //                     maxLine: 2,
+  //                     textOverflow: TextOverflow.ellipsis,
+  //                   ),
+  //                 ],
+  //               ),
+  //             ),
+  //             const SizedBox(width: 8),
+  //             Chip(
+  //               label: textWidget(
+  //                 text: _statusLabel(booking.status),
+  //                 color: Colors.white,
+  //                 fontSize: 12,
+  //               ),
+  //               backgroundColor: color,
+  //             ),
+  //           ],
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
+
+Widget _buildBookingCard(BuildContext context, BookingListEntity booking) {
+  final color = _statusColor(booking.status);
+
+  return GestureDetector(
+    onTap: () => _showBookingDetails(context, booking),
+    child: Container(
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.15),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 6,
+              height: 70,
+              decoration: BoxDecoration(
+                color: color,
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
+            const SizedBox(width: 12),
+
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        child: textWidget(
+                          text: booking.bookingLocation,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          // maxLine: 2,
+                          // textOverflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Chip(
+                        label: textWidget(
+                          text: _statusLabel(booking.status),
+                          color: Colors.white,
+                          fontSize: 12,
+                        ),
+                        backgroundColor: color,
+                        padding: EdgeInsets.zero,
+                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
+                    ],
+                  ),
+
+                  // const SizedBox(height: 3),
+
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.calendar_today,
+                        size: 14,
+                        color: Colors.grey[600],
+                      ),
+                      const SizedBox(width: 4),
+                      textWidget(
+                        text: DateFormat('dd MMM yyyy')
+                            .format(DateTime.parse(booking.bookingDate)),
+                        fontSize: 12,
+                        color: Colors.grey[700]!,
+                      ),
+                      const SizedBox(width: 10),
+                      Icon(
+                        Icons.access_time,
+                        size: 14,
+                        color: Colors.grey[600],
+                      ),
+                      const SizedBox(width: 4),
+                      textWidget(
+                        text: booking.bookingTime,
+                        fontSize: 12,
+                        color: Colors.grey[700]!,
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 2),
+
+                  textWidget(
+                    text: booking.description.isNotEmpty
+                        ? booking.description
+                        : "No description provided",
+                    fontSize: 12,
+                    color: Colors.grey[800]!,
+                    // maxLine: 3,
+                    // textOverflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
             ),
           ],
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                width: 6,
-                height: 70,
-                decoration: BoxDecoration(
-                  color: color,
-                  borderRadius: BorderRadius.circular(4),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    textWidget(
-                      text: booking.bookingLocation,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                    ),
-                    const SizedBox(height: 6),
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.calendar_today,
-                          size: 14,
-                          color: Colors.grey[600],
-                        ),
-                        const SizedBox(width: 4),
-                        textWidget(
-                          text: DateFormat(
-                            'dd MMM yyyy',
-                          ).format(DateTime.parse(booking.bookingDate)),
-                          fontSize: 12,
-                          color: Colors.grey[700]!,
-                        ),
-                        const SizedBox(width: 10),
-                        Icon(
-                          Icons.access_time,
-                          size: 14,
-                          color: Colors.grey[600],
-                        ),
-                        const SizedBox(width: 4),
-                        textWidget(
-                          text: booking.bookingTime,
-                          fontSize: 12,
-
-                          color: Colors.grey[700]!,
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 6),
-                    textWidget(
-                      text: booking.description.isNotEmpty
-                          ? booking.description
-                          : "No description provided",
-                      fontSize: 12,
-
-                      color: Colors.grey[800]!,
-                      maxLine: 2,
-                      textOverflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 8),
-              Chip(
-                label: textWidget(
-                  text: _statusLabel(booking.status),
-                  color: Colors.white,
-                  fontSize: 12,
-                ),
-                backgroundColor: color,
-              ),
-            ],
-          ),
-        ),
       ),
-    );
-  }
+    ),
+  );
+}
 
-  void _showBookingDetails(BuildContext context, BookingListEntity booking) {
+
+ void _showBookingDetails(BuildContext context, BookingListEntity booking) {
     final isPending = booking.status == 5;
     showModalBottomSheet(
       context: context,

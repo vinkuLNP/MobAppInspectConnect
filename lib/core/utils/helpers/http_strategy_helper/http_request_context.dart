@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:inspect_connect/core/commondomain/entities/based_api_result/api_result_model.dart';
@@ -30,6 +31,7 @@ class HttpRequestContext {
 
   Future<bool> _getConnectionState() async {
     final bool _result = await connectivityCheckerHelper.checkConnectivity();
+    print('Connectivity check result: $_result');
     return _result;
   }
 
@@ -41,7 +43,9 @@ class HttpRequestContext {
   }) async {
     await initSharedDefaultHeader();
     _sharedDefaultHeader.addAll(headers);
-    if (await _getConnectionState()) {
+    if (!await _getConnectionState()) {
+        log('⚠️ Connectivity not detected, but attempting network call anyway (possible simulator case)');
+}
       try {
         print('=====baseUrl====>$baseUrl');
         print('====uri=====>$uri');
@@ -54,24 +58,30 @@ class HttpRequestContext {
           headers: _sharedDefaultHeader,
           requestData: requestData,
         );
-      } on TimeoutException catch (_) {
+      } on TimeoutException catch (e) {
+        log('timout cexpetio----------?>>>>e$e');
         return const ApiResultModel<http.Response>.failure(
           errorResultEntity: ErrorResultModel(
             message: commonErrorUnexpectedMessage,
             statusCode: timeoutRequestStatusCode,
           ),
         );
-      } on IOException catch (_) {
+      } on IOException catch (e) {
+        log('io cexpetio----------?>>>>e$e');
+
         throw CustomConnectionException(
           exceptionMessage: commonConnectionFailedMessage,
           exceptionCode: ioExceptionStatusCode,
         );
       }
-    } else {
-      throw CustomConnectionException(
-        exceptionMessage: commonConnectionFailedMessage,
-        exceptionCode: ioExceptionStatusCode,
-      );
-    }
-  }
+   } 
+  //  else {
+  //       // log('esle cexpetio----------?>>>>e$e');
+
+  //     throw CustomConnectionException(
+  //       exceptionMessage: commonConnectionFailedMessage,
+  //       exceptionCode: ioExceptionStatusCode,
+  //     );
+    // }
+  // }
 }

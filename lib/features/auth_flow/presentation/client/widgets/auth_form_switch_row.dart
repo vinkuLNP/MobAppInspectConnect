@@ -22,7 +22,7 @@ class AuthFormSwitchRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-                const SizedBox(height: 16),
+        const SizedBox(height: 16),
 
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
