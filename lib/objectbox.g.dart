@@ -15,6 +15,7 @@ import 'package:objectbox/objectbox.dart' as obx;
 import 'package:objectbox_flutter_libs/objectbox_flutter_libs.dart';
 
 import 'features/auth_flow/data/datasources/local_datasources/auth_user_local_entity.dart';
+import 'features/auth_flow/domain/entities/inspector_sign_up_entity.dart';
 
 export 'package:objectbox/objectbox.dart'; // so that callers only have to import this file
 
@@ -251,6 +252,178 @@ final _entities = <obx_int.ModelEntity>[
     relations: <obx_int.ModelRelation>[],
     backlinks: <obx_int.ModelBacklink>[],
   ),
+  obx_int.ModelEntity(
+    id: const obx_int.IdUid(7, 6897323812471320470),
+    name: 'InspectorSignUpLocalEntity',
+    lastPropertyId: const obx_int.IdUid(27, 6308629480548868413),
+    flags: 0,
+    properties: <obx_int.ModelProperty>[
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(1, 1608022142185072257),
+        name: 'id',
+        type: 6,
+        flags: 1,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(2, 5944647149347506689),
+        name: 'name',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(3, 2659386822160961841),
+        name: 'email',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(4, 1777616599758635826),
+        name: 'password',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(5, 2557546231358882658),
+        name: 'phoneNumber',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(6, 3670339820616169600),
+        name: 'countryCode',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(7, 6779074503090054880),
+        name: 'certificateTypeId',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(8, 8221997847214816239),
+        name: 'certificateExpiryDate',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(9, 3938258897970181186),
+        name: 'certificateDocuments',
+        type: 30,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(10, 8826163247314718597),
+        name: 'certificateAgencyIds',
+        type: 30,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(11, 7126946317936680765),
+        name: 'country',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(12, 996089868518354117),
+        name: 'state',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(13, 5549259924164504091),
+        name: 'city',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(14, 6200623269580581175),
+        name: 'zipCode',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(15, 96549469011877958),
+        name: 'mailingAddress',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(16, 4302797122267047435),
+        name: 'uploadedIdOrLicenseDocument',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(17, 4282650781858068304),
+        name: 'referenceDocuments',
+        type: 30,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(18, 6346452895957981168),
+        name: 'profileImage',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(19, 3906025559829544710),
+        name: 'agreedToTerms',
+        type: 1,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(20, 459714567419254534),
+        name: 'isTruthfully',
+        type: 1,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(21, 4034109265116003399),
+        name: 'role',
+        type: 6,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(22, 2820916023932604926),
+        name: 'deviceType',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(23, 7169903911769862731),
+        name: 'deviceToken',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(24, 669343029844788976),
+        name: 'locationType',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(25, 3421770643298715055),
+        name: 'locationName',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(26, 6170495915697225193),
+        name: 'latitude',
+        type: 8,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(27, 6308629480548868413),
+        name: 'longitude',
+        type: 8,
+        flags: 0,
+      ),
+    ],
+    relations: <obx_int.ModelRelation>[],
+    backlinks: <obx_int.ModelBacklink>[],
+  ),
 ];
 
 /// Shortcut for [obx.Store.new] that passes [getObjectBoxModel] and for Flutter
@@ -291,13 +464,35 @@ Future<obx.Store> openStore({
 obx_int.ModelDefinition getObjectBoxModel() {
   final model = obx_int.ModelInfo(
     entities: _entities,
-    lastEntityId: const obx_int.IdUid(2, 8224409923190584740),
+    lastEntityId: const obx_int.IdUid(7, 6897323812471320470),
     lastIndexId: const obx_int.IdUid(1, 7489877441751012150),
     lastRelationId: const obx_int.IdUid(0, 0),
     lastSequenceId: const obx_int.IdUid(0, 0),
-    retiredEntityUids: const [],
+    retiredEntityUids: const [
+      6323051419829769589,
+      5886969448355518645,
+      2314900235999128927,
+      5507700486728886686,
+    ],
     retiredIndexUids: const [],
-    retiredPropertyUids: const [],
+    retiredPropertyUids: const [
+      647249224450654308,
+      5188489944007397346,
+      7320807151972493534,
+      1894962048992247963,
+      2053712292897892099,
+      6070666122015563262,
+      6551788488995435288,
+      4610802090803421973,
+      1252569695644190240,
+      8062780496289760997,
+      8820879528324421200,
+      6304320797684281056,
+      3069690599400147834,
+      5905080434010146167,
+      4175805726105451342,
+      4590080569558135951,
+    ],
     retiredRelationUids: const [],
     modelVersion: 5,
     modelVersionParserMinimum: 5,
@@ -599,6 +794,260 @@ obx_int.ModelDefinition getObjectBoxModel() {
         return object;
       },
     ),
+    InspectorSignUpLocalEntity:
+        obx_int.EntityDefinition<InspectorSignUpLocalEntity>(
+          model: _entities[2],
+          toOneRelations: (InspectorSignUpLocalEntity object) => [],
+          toManyRelations: (InspectorSignUpLocalEntity object) => {},
+          getId: (InspectorSignUpLocalEntity object) => object.id,
+          setId: (InspectorSignUpLocalEntity object, int id) {
+            object.id = id;
+          },
+          objectToFB: (InspectorSignUpLocalEntity object, fb.Builder fbb) {
+            final nameOffset = object.name == null
+                ? null
+                : fbb.writeString(object.name!);
+            final emailOffset = object.email == null
+                ? null
+                : fbb.writeString(object.email!);
+            final passwordOffset = object.password == null
+                ? null
+                : fbb.writeString(object.password!);
+            final phoneNumberOffset = object.phoneNumber == null
+                ? null
+                : fbb.writeString(object.phoneNumber!);
+            final countryCodeOffset = object.countryCode == null
+                ? null
+                : fbb.writeString(object.countryCode!);
+            final certificateTypeIdOffset = object.certificateTypeId == null
+                ? null
+                : fbb.writeString(object.certificateTypeId!);
+            final certificateExpiryDateOffset =
+                object.certificateExpiryDate == null
+                ? null
+                : fbb.writeString(object.certificateExpiryDate!);
+            final certificateDocumentsOffset =
+                object.certificateDocuments == null
+                ? null
+                : fbb.writeList(
+                    object.certificateDocuments!
+                        .map(fbb.writeString)
+                        .toList(growable: false),
+                  );
+            final certificateAgencyIdsOffset =
+                object.certificateAgencyIds == null
+                ? null
+                : fbb.writeList(
+                    object.certificateAgencyIds!
+                        .map(fbb.writeString)
+                        .toList(growable: false),
+                  );
+            final countryOffset = object.country == null
+                ? null
+                : fbb.writeString(object.country!);
+            final stateOffset = object.state == null
+                ? null
+                : fbb.writeString(object.state!);
+            final cityOffset = object.city == null
+                ? null
+                : fbb.writeString(object.city!);
+            final zipCodeOffset = object.zipCode == null
+                ? null
+                : fbb.writeString(object.zipCode!);
+            final mailingAddressOffset = object.mailingAddress == null
+                ? null
+                : fbb.writeString(object.mailingAddress!);
+            final uploadedIdOrLicenseDocumentOffset =
+                object.uploadedIdOrLicenseDocument == null
+                ? null
+                : fbb.writeString(object.uploadedIdOrLicenseDocument!);
+            final referenceDocumentsOffset = object.referenceDocuments == null
+                ? null
+                : fbb.writeList(
+                    object.referenceDocuments!
+                        .map(fbb.writeString)
+                        .toList(growable: false),
+                  );
+            final profileImageOffset = object.profileImage == null
+                ? null
+                : fbb.writeString(object.profileImage!);
+            final deviceTypeOffset = object.deviceType == null
+                ? null
+                : fbb.writeString(object.deviceType!);
+            final deviceTokenOffset = object.deviceToken == null
+                ? null
+                : fbb.writeString(object.deviceToken!);
+            final locationTypeOffset = object.locationType == null
+                ? null
+                : fbb.writeString(object.locationType!);
+            final locationNameOffset = object.locationName == null
+                ? null
+                : fbb.writeString(object.locationName!);
+            fbb.startTable(28);
+            fbb.addInt64(0, object.id);
+            fbb.addOffset(1, nameOffset);
+            fbb.addOffset(2, emailOffset);
+            fbb.addOffset(3, passwordOffset);
+            fbb.addOffset(4, phoneNumberOffset);
+            fbb.addOffset(5, countryCodeOffset);
+            fbb.addOffset(6, certificateTypeIdOffset);
+            fbb.addOffset(7, certificateExpiryDateOffset);
+            fbb.addOffset(8, certificateDocumentsOffset);
+            fbb.addOffset(9, certificateAgencyIdsOffset);
+            fbb.addOffset(10, countryOffset);
+            fbb.addOffset(11, stateOffset);
+            fbb.addOffset(12, cityOffset);
+            fbb.addOffset(13, zipCodeOffset);
+            fbb.addOffset(14, mailingAddressOffset);
+            fbb.addOffset(15, uploadedIdOrLicenseDocumentOffset);
+            fbb.addOffset(16, referenceDocumentsOffset);
+            fbb.addOffset(17, profileImageOffset);
+            fbb.addBool(18, object.agreedToTerms);
+            fbb.addBool(19, object.isTruthfully);
+            fbb.addInt64(20, object.role);
+            fbb.addOffset(21, deviceTypeOffset);
+            fbb.addOffset(22, deviceTokenOffset);
+            fbb.addOffset(23, locationTypeOffset);
+            fbb.addOffset(24, locationNameOffset);
+            fbb.addFloat64(25, object.latitude);
+            fbb.addFloat64(26, object.longitude);
+            fbb.finish(fbb.endTable());
+            return object.id;
+          },
+          objectFromFB: (obx.Store store, ByteData fbData) {
+            final buffer = fb.BufferContext(fbData);
+            final rootOffset = buffer.derefObject(0);
+            final idParam = const fb.Int64Reader().vTableGet(
+              buffer,
+              rootOffset,
+              4,
+              0,
+            );
+            final nameParam = const fb.StringReader(
+              asciiOptimization: true,
+            ).vTableGetNullable(buffer, rootOffset, 6);
+            final emailParam = const fb.StringReader(
+              asciiOptimization: true,
+            ).vTableGetNullable(buffer, rootOffset, 8);
+            final passwordParam = const fb.StringReader(
+              asciiOptimization: true,
+            ).vTableGetNullable(buffer, rootOffset, 10);
+            final phoneNumberParam = const fb.StringReader(
+              asciiOptimization: true,
+            ).vTableGetNullable(buffer, rootOffset, 12);
+            final countryCodeParam = const fb.StringReader(
+              asciiOptimization: true,
+            ).vTableGetNullable(buffer, rootOffset, 14);
+            final certificateTypeIdParam = const fb.StringReader(
+              asciiOptimization: true,
+            ).vTableGetNullable(buffer, rootOffset, 16);
+            final certificateExpiryDateParam = const fb.StringReader(
+              asciiOptimization: true,
+            ).vTableGetNullable(buffer, rootOffset, 18);
+            final certificateDocumentsParam = const fb.ListReader<String>(
+              fb.StringReader(asciiOptimization: true),
+              lazy: false,
+            ).vTableGetNullable(buffer, rootOffset, 20);
+            final certificateAgencyIdsParam = const fb.ListReader<String>(
+              fb.StringReader(asciiOptimization: true),
+              lazy: false,
+            ).vTableGetNullable(buffer, rootOffset, 22);
+            final countryParam = const fb.StringReader(
+              asciiOptimization: true,
+            ).vTableGetNullable(buffer, rootOffset, 24);
+            final stateParam = const fb.StringReader(
+              asciiOptimization: true,
+            ).vTableGetNullable(buffer, rootOffset, 26);
+            final cityParam = const fb.StringReader(
+              asciiOptimization: true,
+            ).vTableGetNullable(buffer, rootOffset, 28);
+            final mailingAddressParam = const fb.StringReader(
+              asciiOptimization: true,
+            ).vTableGetNullable(buffer, rootOffset, 32);
+            final uploadedIdOrLicenseDocumentParam = const fb.StringReader(
+              asciiOptimization: true,
+            ).vTableGetNullable(buffer, rootOffset, 34);
+            final referenceDocumentsParam = const fb.ListReader<String>(
+              fb.StringReader(asciiOptimization: true),
+              lazy: false,
+            ).vTableGetNullable(buffer, rootOffset, 36);
+            final profileImageParam = const fb.StringReader(
+              asciiOptimization: true,
+            ).vTableGetNullable(buffer, rootOffset, 38);
+            final agreedToTermsParam = const fb.BoolReader().vTableGetNullable(
+              buffer,
+              rootOffset,
+              40,
+            );
+            final isTruthfullyParam = const fb.BoolReader().vTableGetNullable(
+              buffer,
+              rootOffset,
+              42,
+            );
+            final roleParam = const fb.Int64Reader().vTableGetNullable(
+              buffer,
+              rootOffset,
+              44,
+            );
+            final deviceTypeParam = const fb.StringReader(
+              asciiOptimization: true,
+            ).vTableGetNullable(buffer, rootOffset, 46);
+            final deviceTokenParam = const fb.StringReader(
+              asciiOptimization: true,
+            ).vTableGetNullable(buffer, rootOffset, 48);
+            final locationTypeParam = const fb.StringReader(
+              asciiOptimization: true,
+            ).vTableGetNullable(buffer, rootOffset, 50);
+            final locationNameParam = const fb.StringReader(
+              asciiOptimization: true,
+            ).vTableGetNullable(buffer, rootOffset, 52);
+            final latitudeParam = const fb.Float64Reader().vTableGetNullable(
+              buffer,
+              rootOffset,
+              54,
+            );
+            final longitudeParam = const fb.Float64Reader().vTableGetNullable(
+              buffer,
+              rootOffset,
+              56,
+            );
+            final object =
+                InspectorSignUpLocalEntity(
+                    id: idParam,
+                    name: nameParam,
+                    email: emailParam,
+                    password: passwordParam,
+                    phoneNumber: phoneNumberParam,
+                    countryCode: countryCodeParam,
+                    certificateTypeId: certificateTypeIdParam,
+                    certificateExpiryDate: certificateExpiryDateParam,
+                    certificateDocuments: certificateDocumentsParam,
+                    certificateAgencyIds: certificateAgencyIdsParam,
+                    country: countryParam,
+                    state: stateParam,
+                    city: cityParam,
+                    mailingAddress: mailingAddressParam,
+                    uploadedIdOrLicenseDocument:
+                        uploadedIdOrLicenseDocumentParam,
+                    referenceDocuments: referenceDocumentsParam,
+                    profileImage: profileImageParam,
+                    agreedToTerms: agreedToTermsParam,
+                    isTruthfully: isTruthfullyParam,
+                    role: roleParam,
+                    deviceType: deviceTypeParam,
+                    deviceToken: deviceTokenParam,
+                    locationType: locationTypeParam,
+                    locationName: locationNameParam,
+                    latitude: latitudeParam,
+                    longitude: longitudeParam,
+                  )
+                  ..zipCode = const fb.StringReader(
+                    asciiOptimization: true,
+                  ).vTableGetNullable(buffer, rootOffset, 30);
+
+            return object;
+          },
+        ),
   };
 
   return obx_int.ModelDefinition(model, bindings);
@@ -788,4 +1237,157 @@ class AuthUserDeviceEntity_ {
       obx.QueryRelationToOne<AuthUserDeviceEntity, AuthUserLocalEntity>(
         _entities[1].properties[3],
       );
+}
+
+/// [InspectorSignUpLocalEntity] entity fields to define ObjectBox queries.
+class InspectorSignUpLocalEntity_ {
+  /// See [InspectorSignUpLocalEntity.id].
+  static final id = obx.QueryIntegerProperty<InspectorSignUpLocalEntity>(
+    _entities[2].properties[0],
+  );
+
+  /// See [InspectorSignUpLocalEntity.name].
+  static final name = obx.QueryStringProperty<InspectorSignUpLocalEntity>(
+    _entities[2].properties[1],
+  );
+
+  /// See [InspectorSignUpLocalEntity.email].
+  static final email = obx.QueryStringProperty<InspectorSignUpLocalEntity>(
+    _entities[2].properties[2],
+  );
+
+  /// See [InspectorSignUpLocalEntity.password].
+  static final password = obx.QueryStringProperty<InspectorSignUpLocalEntity>(
+    _entities[2].properties[3],
+  );
+
+  /// See [InspectorSignUpLocalEntity.phoneNumber].
+  static final phoneNumber =
+      obx.QueryStringProperty<InspectorSignUpLocalEntity>(
+        _entities[2].properties[4],
+      );
+
+  /// See [InspectorSignUpLocalEntity.countryCode].
+  static final countryCode =
+      obx.QueryStringProperty<InspectorSignUpLocalEntity>(
+        _entities[2].properties[5],
+      );
+
+  /// See [InspectorSignUpLocalEntity.certificateTypeId].
+  static final certificateTypeId =
+      obx.QueryStringProperty<InspectorSignUpLocalEntity>(
+        _entities[2].properties[6],
+      );
+
+  /// See [InspectorSignUpLocalEntity.certificateExpiryDate].
+  static final certificateExpiryDate =
+      obx.QueryStringProperty<InspectorSignUpLocalEntity>(
+        _entities[2].properties[7],
+      );
+
+  /// See [InspectorSignUpLocalEntity.certificateDocuments].
+  static final certificateDocuments =
+      obx.QueryStringVectorProperty<InspectorSignUpLocalEntity>(
+        _entities[2].properties[8],
+      );
+
+  /// See [InspectorSignUpLocalEntity.certificateAgencyIds].
+  static final certificateAgencyIds =
+      obx.QueryStringVectorProperty<InspectorSignUpLocalEntity>(
+        _entities[2].properties[9],
+      );
+
+  /// See [InspectorSignUpLocalEntity.country].
+  static final country = obx.QueryStringProperty<InspectorSignUpLocalEntity>(
+    _entities[2].properties[10],
+  );
+
+  /// See [InspectorSignUpLocalEntity.state].
+  static final state = obx.QueryStringProperty<InspectorSignUpLocalEntity>(
+    _entities[2].properties[11],
+  );
+
+  /// See [InspectorSignUpLocalEntity.city].
+  static final city = obx.QueryStringProperty<InspectorSignUpLocalEntity>(
+    _entities[2].properties[12],
+  );
+
+  /// See [InspectorSignUpLocalEntity.zipCode].
+  static final zipCode = obx.QueryStringProperty<InspectorSignUpLocalEntity>(
+    _entities[2].properties[13],
+  );
+
+  /// See [InspectorSignUpLocalEntity.mailingAddress].
+  static final mailingAddress =
+      obx.QueryStringProperty<InspectorSignUpLocalEntity>(
+        _entities[2].properties[14],
+      );
+
+  /// See [InspectorSignUpLocalEntity.uploadedIdOrLicenseDocument].
+  static final uploadedIdOrLicenseDocument =
+      obx.QueryStringProperty<InspectorSignUpLocalEntity>(
+        _entities[2].properties[15],
+      );
+
+  /// See [InspectorSignUpLocalEntity.referenceDocuments].
+  static final referenceDocuments =
+      obx.QueryStringVectorProperty<InspectorSignUpLocalEntity>(
+        _entities[2].properties[16],
+      );
+
+  /// See [InspectorSignUpLocalEntity.profileImage].
+  static final profileImage =
+      obx.QueryStringProperty<InspectorSignUpLocalEntity>(
+        _entities[2].properties[17],
+      );
+
+  /// See [InspectorSignUpLocalEntity.agreedToTerms].
+  static final agreedToTerms =
+      obx.QueryBooleanProperty<InspectorSignUpLocalEntity>(
+        _entities[2].properties[18],
+      );
+
+  /// See [InspectorSignUpLocalEntity.isTruthfully].
+  static final isTruthfully =
+      obx.QueryBooleanProperty<InspectorSignUpLocalEntity>(
+        _entities[2].properties[19],
+      );
+
+  /// See [InspectorSignUpLocalEntity.role].
+  static final role = obx.QueryIntegerProperty<InspectorSignUpLocalEntity>(
+    _entities[2].properties[20],
+  );
+
+  /// See [InspectorSignUpLocalEntity.deviceType].
+  static final deviceType = obx.QueryStringProperty<InspectorSignUpLocalEntity>(
+    _entities[2].properties[21],
+  );
+
+  /// See [InspectorSignUpLocalEntity.deviceToken].
+  static final deviceToken =
+      obx.QueryStringProperty<InspectorSignUpLocalEntity>(
+        _entities[2].properties[22],
+      );
+
+  /// See [InspectorSignUpLocalEntity.locationType].
+  static final locationType =
+      obx.QueryStringProperty<InspectorSignUpLocalEntity>(
+        _entities[2].properties[23],
+      );
+
+  /// See [InspectorSignUpLocalEntity.locationName].
+  static final locationName =
+      obx.QueryStringProperty<InspectorSignUpLocalEntity>(
+        _entities[2].properties[24],
+      );
+
+  /// See [InspectorSignUpLocalEntity.latitude].
+  static final latitude = obx.QueryDoubleProperty<InspectorSignUpLocalEntity>(
+    _entities[2].properties[25],
+  );
+
+  /// See [InspectorSignUpLocalEntity.longitude].
+  static final longitude = obx.QueryDoubleProperty<InspectorSignUpLocalEntity>(
+    _entities[2].properties[26],
+  );
 }

@@ -11,7 +11,9 @@ import 'package:inspect_connect/core/utils/helpers/http_strategy_helper/concrete
 import 'package:inspect_connect/core/utils/helpers/http_strategy_helper/http_request_context.dart';
 import 'package:inspect_connect/features/auth_flow/data/datasources/local_datasources/auth_user_local_entity.dart';
 import 'package:inspect_connect/features/auth_flow/data/datasources/local_datasources/auth_local_datasource.dart';
+import 'package:inspect_connect/features/auth_flow/data/models/agency_certificate_data_model.dart';
 import 'package:inspect_connect/features/auth_flow/data/models/auth_user_dto.dart';
+import 'package:inspect_connect/features/auth_flow/data/models/certificate_inspector_type_datamodel.dart';
 import 'package:inspect_connect/features/auth_flow/data/models/change_password_dto.dart';
 import 'package:inspect_connect/features/auth_flow/data/models/profile_update_dto.dart';
 import 'package:inspect_connect/features/auth_flow/data/models/resend_otp_request_model.dart';
@@ -32,7 +34,10 @@ abstract class AuthRemoteDataSource {
 
   Future<ApiResultModel<UserDetail>> fetchUserDetail(UserDetailDto dto);
 
-
+ Future<ApiResultModel<List<CertificateInspectorTypeModelData>>>
+  getCertificateType(); 
+  Future<ApiResultModel<List<AgencyModel>>>
+  getCertificateAgency();
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -363,6 +368,107 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     }
   }
 
+
+
+
+  @override
+  Future<ApiResultModel<List<CertificateInspectorTypeModelData>>>
+  getCertificateType() async {
+    try {
+      final ApiResultModel<http.Response> res = await _ctx.makeRequest(
+        uri: getInspectorCertificateTypesEndPoint,
+        httpRequestStrategy: GetRequestStrategy(),
+        // headers: const {'Content-Type': 'application/json', 'Accept': 'application/json'},
+        // requestData: dto.toJson(),
+      );
+
+      return res.when(
+        success: (http.Response response) {
+          final Map<String, dynamic> root = response.body.isEmpty
+              ? {}
+              : (jsonDecode(response.body) as Map<String, dynamic>);
+          // Backend shape:
+          // { "success": true, "message": "...", "body": { ... user object ... } }
+          // final Map<String, dynamic> body =
+          //     (root['body'] as Map?)?.cast<String, dynamic>() ??
+          //     <String, dynamic>{};
+          // final List<dynamic> list = body['certificateSubTypes'] ?? [];
+             final List<dynamic> list = (root['body'] as List?) ?? [];
+
+          final List<CertificateInspectorTypeModelData> dtoList = list
+              .map((e) => CertificateInspectorTypeModelData.fromJson(e))
+              .toList();
+
+          return ApiResultModel<List<CertificateInspectorTypeModelData>>.success(
+            data: dtoList,
+          );
+        },
+        failure: (ErrorResultModel e) =>
+            ApiResultModel<List<CertificateInspectorTypeModelData>>.failure(
+              errorResultEntity: e,
+            ),
+      );
+    } catch (e) {
+      log('autoremoteresopoonse------> $e');
+      return const ApiResultModel.failure(
+        errorResultEntity: ErrorResultModel(
+          message: "Network error occurred",
+          statusCode: 500,
+        ),
+      );
+    }
+  }
+
+
+
+  @override
+  Future<ApiResultModel<List<AgencyModel>>>
+  getCertificateAgency() async {
+    try {
+      final ApiResultModel<http.Response> res = await _ctx.makeRequest(
+        uri: getInspectorCertificateTAgenciesEndPoint,
+        httpRequestStrategy: GetRequestStrategy(),
+        // headers: const {'Content-Type': 'application/json', 'Accept': 'application/json'},
+        // requestData: dto.toJson(),
+      );
+
+      return res.when(
+        success: (http.Response response) {
+          final Map<String, dynamic> root = response.body.isEmpty
+              ? {}
+              : (jsonDecode(response.body) as Map<String, dynamic>);
+          // Backend shape:
+          // { "success": true, "message": "...", "body": { ... user object ... } }
+          // final Map<String, dynamic> body =
+          //     (root['body'] as Map?)?.cast<String, dynamic>() ??
+          //     <String, dynamic>{};
+          // final List<dynamic> list = body['certificateSubTypes'] ?? [
+          // ];
+             final List<dynamic> list = (root['body'] as List?) ?? [];
+
+          final List<AgencyModel> dtoList = list
+              .map((e) => AgencyModel.fromJson(e))
+              .toList();
+
+          return ApiResultModel<List<AgencyModel>>.success(
+            data: dtoList,
+          );
+        },
+        failure: (ErrorResultModel e) =>
+            ApiResultModel<List<AgencyModel>>.failure(
+              errorResultEntity: e,
+            ),
+      );
+    } catch (e) {
+      log('autoremoteresopoonse------> $e');
+      return const ApiResultModel.failure(
+        errorResultEntity: ErrorResultModel(
+          message: "Network error occurred",
+          statusCode: 500,
+        ),
+      );
+    }
+  }
 
 
 }

@@ -2,6 +2,8 @@ import 'package:inspect_connect/core/di/app_component/app_component.config.dart'
 import 'package:inspect_connect/features/auth_flow/data/datasources/remote_datasources/auth_remote_datasource.dart';
 import 'package:inspect_connect/features/auth_flow/data/repositories/auth_repository_impl.dart';
 import 'package:inspect_connect/features/auth_flow/domain/repositories/auth_repository.dart';
+import 'package:inspect_connect/features/auth_flow/domain/usecases/agency_type_usecase.dart';
+import 'package:inspect_connect/features/auth_flow/domain/usecases/certificate_type_usecase.dart';
 import 'package:inspect_connect/features/auth_flow/domain/usecases/change_password_usecases.dart';
 import 'package:inspect_connect/features/auth_flow/domain/usecases/get_user__usercase.dart';
 import 'package:inspect_connect/features/auth_flow/domain/usecases/otp_verification_usecases.dart';
@@ -59,6 +61,9 @@ void setupLocator() {
   locator.registerLazySingleton(() => GetUserPaymentsListUseCase(locator()));
   locator.registerLazySingleton(() => GetUserUseCase(locator()));
   locator.registerLazySingleton(() => UpdateProfileUseCase(locator()));
+
+  locator.registerLazySingleton(() => GetAgencyUseCase(locator()));
+  locator.registerLazySingleton(() => GetCertificateTypeUseCase(locator()));
 
 
 

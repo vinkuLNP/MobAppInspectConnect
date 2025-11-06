@@ -68,7 +68,6 @@ flutter:
     - assets/images/
     - assets/images/app_logo.png
     - assets/videos/onboarding_video.mp4
-    - assets/.env
 
 fonts:
     - family: PoppinsBold

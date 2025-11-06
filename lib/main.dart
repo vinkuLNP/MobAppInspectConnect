@@ -1,4 +1,3 @@
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:inspect_connect/core/di/app_component/app_component.dart';
 import 'package:inspect_connect/core/utils/auto_router_setup/auto_router.dart';
@@ -15,6 +14,8 @@ final rootNavigatorKey = GlobalKey<NavigatorState>();
 final appRouter = AppRouter(navigatorKey: rootNavigatorKey);
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  Stripe.publishableKey = stripePublishableKey;
+
   await Stripe.instance.applySettings();
   // Initialize DI first
   await initAppComponentLocator();

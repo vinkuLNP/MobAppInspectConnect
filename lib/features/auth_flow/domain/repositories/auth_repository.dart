@@ -1,8 +1,12 @@
 import 'package:inspect_connect/core/commondomain/entities/based_api_result/api_result_model.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/auth_user.dart';
+import 'package:inspect_connect/features/auth_flow/domain/entities/certificate_agency_entity.dart';
+import 'package:inspect_connect/features/auth_flow/domain/entities/certificate_type_entity.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/user_detail.dart';
 
 abstract class AuthRepository {
+   Future<ApiResultModel<List<CertificateInspectorTypeEntity>>>  getCertificateTypes();
+    Future<ApiResultModel<List<AgencyEntity>>>  getCertificateAgency();
   Future<ApiResultModel<AuthUser>> signIn({
     required String email,
     required String password,

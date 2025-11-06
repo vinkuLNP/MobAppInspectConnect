@@ -34,6 +34,7 @@ const Duration timeOutDuration = Duration(seconds: 20);
 // const String devBaseUrl = 'http://10.0.2.2:5002/api/v1/';
 const String devBaseUrl = 'https://inspect-connect-api-auakczg0ave2bqex.westus2-01.azurewebsites.net/api/v1/';
 
+const String stripePublishableKey = "pk_test_51RuoE4A1eZHeCW31LaeAmCLpWw0Zmyme5RfE3HG8Svoum8yGvBmYhm2gatOR6zWhyn0PmQGcJQqE5GtzvEIuAVKN00W26f1it7";
  
 
 const String prodBaseUrl = '';
@@ -49,6 +50,10 @@ const String changePasswordEndPoint = 'user/changePassword';
 const String updateUser = 'user';
 
 const String getCertificateSubTypesEndPoint = 'certificate/subTypes';
+const String getInspectorCertificateTypesEndPoint = 'certificate/types';
+const String getInspectorCertificateTAgenciesEndPoint = 'certificate/agencies';
+
+
 const String createBookingEndPoint = 'bookings';
 const String uploadImageEndPoint = 'uploads';
 

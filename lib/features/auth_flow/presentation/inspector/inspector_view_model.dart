@@ -1,20 +1,36 @@
 import 'dart:async';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:inspect_connect/core/basecomponents/base_view_model.dart';
+import 'package:inspect_connect/core/commondomain/entities/based_api_result/api_result_state.dart';
+import 'package:inspect_connect/core/di/app_component/app_component.dart';
 import 'package:inspect_connect/core/utils/auto_router_setup/auto_router.dart';
-import 'package:inspect_connect/features/auth_flow/domain/entities/additional_details_entity.dart';
-import 'package:inspect_connect/features/auth_flow/domain/entities/personal_detail_entity.dart';
-import 'package:inspect_connect/features/auth_flow/domain/entities/professtional_detail_entity.dart';
-import 'package:inspect_connect/features/auth_flow/domain/entities/service_area_entity.dart';
+import 'package:inspect_connect/features/auth_flow/data/datasources/local_datasources/inspector_local_data_source.dart';
+import 'package:inspect_connect/features/auth_flow/domain/entities/certificate_agency_entity.dart';
+import 'package:inspect_connect/features/auth_flow/domain/entities/certificate_type_entity.dart';
+import 'package:inspect_connect/features/auth_flow/domain/entities/inspector_sign_up_entity.dart';
+import 'package:inspect_connect/features/auth_flow/domain/usecases/agency_type_usecase.dart';
+import 'package:inspect_connect/features/auth_flow/domain/usecases/certificate_type_usecase.dart';
 import 'package:inspect_connect/features/auth_flow/utils/otp_enum.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
 class InspectorViewModelProvider extends BaseViewModel {
-  void init() {}
+  final InspectorSignUpLocalDataSource _localDs =
+      locator<InspectorSignUpLocalDataSource>();
+  bool isLoading = false;
+  Future<void> init() async {
+    isLoading = true;
+    notifyListeners();
+    fetchCertificateTypes();
+
+    isLoading = false;
+    notifyListeners();
+  }
+
   bool _autoValidate = false;
   bool get autoValidate => _autoValidate;
 
@@ -24,6 +40,7 @@ class InspectorViewModelProvider extends BaseViewModel {
       notifyListeners();
     }
   }
+
   final emailCtrl = TextEditingController();
   final passwordCtrl = TextEditingController();
 
@@ -39,24 +56,27 @@ class InspectorViewModelProvider extends BaseViewModel {
     if (!(formKey.currentState?.validate() ?? false)) return;
   }
 
+  String? selectedCertificateTypeId;
+  String? certificateExpiryDate;
+  List<String>? uploadedCertificateUrls;
+  List<String>? selectedAgencyIds;
+
   final fullNameCtrl = TextEditingController();
   final phoneCtrl = TextEditingController();
   final emailCtrlSignUp = TextEditingController();
   final addressCtrl = TextEditingController();
   final passwordCtrlSignUp = TextEditingController();
-  final confirmPasswordCtrl = TextEditingController();
+
+  String? country;
+  String? state;
+  String? city;
+  String? mailingAddress;
+  String? zipCode;
 
   bool _obscurePassword = true;
   bool get obscurePassword => _obscurePassword;
   void toggleObscurePassword() {
     _obscurePassword = !_obscurePassword;
-    notifyListeners();
-  }
-
-  bool _obscureConfirm = true;
-  bool get obscureConfirm => _obscureConfirm;
-  void toggleObscureConfirm() {
-    _obscureConfirm = !_obscureConfirm;
     notifyListeners();
   }
 
@@ -101,12 +121,6 @@ class InspectorViewModelProvider extends BaseViewModel {
     }
   }
 
-  String? validateConfirmPassword(String? v) {
-    if (v == null || v.isEmpty) return 'Confirm your password';
-    if (v != passwordCtrlSignUp.text) return 'Passwords do not match';
-    return null;
-  }
-
   Future<void> submitSignUp({
     required GlobalKey<FormState> formKey,
     required BuildContext context,
@@ -117,7 +131,7 @@ class InspectorViewModelProvider extends BaseViewModel {
     // }
     startOtpFlow(OtpPurpose.signUp);
 
-    context.pushRoute( OtpVerificationRoute(addShowButton: true));
+    context.pushRoute(OtpVerificationRoute(addShowButton: true));
   }
 
   @override
@@ -129,7 +143,6 @@ class InspectorViewModelProvider extends BaseViewModel {
     emailCtrlSignUp.dispose();
     addressCtrl.dispose();
     passwordCtrlSignUp.dispose();
-    confirmPasswordCtrl.dispose();
     _timer?.cancel();
     pinController.dispose();
     focusNode.dispose();
@@ -173,7 +186,7 @@ class InspectorViewModelProvider extends BaseViewModel {
         context.router.replaceAll([const InspectorSignInRoute()]);
         break;
       case OtpPurpose.forgotPassword:
-        context.router.replaceAll([ ResetPasswordRoute(showBackButton: false)]);
+        context.router.replaceAll([ResetPasswordRoute(showBackButton: false)]);
         break;
       default:
         context.router.replaceAll([const InspectorSignInRoute()]);
@@ -265,7 +278,7 @@ class InspectorViewModelProvider extends BaseViewModel {
 
       // verifyInit();
       startOtpFlow(OtpPurpose.forgotPassword);
-      context.pushRoute( OtpVerificationRoute(addShowButton: true));
+      context.pushRoute(OtpVerificationRoute(addShowButton: true));
     } finally {
       _isSendingReset = false;
       notifyListeners();
@@ -283,8 +296,7 @@ class InspectorViewModelProvider extends BaseViewModel {
     notifyListeners();
 
     try {
-
-      context.router.replaceAll([ InspectorSignInRoute()]);
+      context.router.replaceAll([InspectorSignInRoute()]);
     } finally {
       _isResetting = false;
       notifyListeners();
@@ -296,17 +308,12 @@ class InspectorViewModelProvider extends BaseViewModel {
 
   void startOtpFlow(OtpPurpose purpose) {
     _otpPurpose = purpose;
-    verifyInit(); 
+    verifyInit();
     notifyListeners();
   }
 
   int _currentStep = 0;
   int get currentStep => _currentStep;
-
-  final personal = PersonalDetails();
-  final professional = ProfessionalDetails();
-  final serviceArea = ServiceAreaDetails();
-  final additional = AdditionalDetails();
 
   void goNext() {
     if (_currentStep < 3) {
@@ -327,84 +334,9 @@ class InspectorViewModelProvider extends BaseViewModel {
     notifyListeners();
   }
 
-  /// Example final submission
   Future<void> submit() async {
     await Future.delayed(const Duration(milliseconds: 500));
   }
-
- void addServiceArea(String area) {
-    if (area.trim().isEmpty) return;
-    serviceArea.serviceAreas.add(area.trim());
-    notifyListeners();
-  }
-
-  void removeServiceArea(String area) {
-    serviceArea.serviceAreas.remove(area);
-    notifyListeners();
-  }
-
-  void setCity(String city) {
-    serviceArea.city = city.trim();
-    notifyListeners();
-  }
-
-  // --- Terms toggle ---
-  void setTermsAccepted(bool v) {
-    additional.termsAccepted = v;
-    notifyListeners();
-  }
-
-final Map<String, String> certAuthorityByType = {
-    'PMP Certification': 'Project Management Institute (PMI)',
-    'NEBOSH IGC': 'NEBOSH',
-    'ISO 9001 Lead Auditor': 'IRCA / Exemplar Global',
-    'Other': 'Self-declared / Local body'
-  };
-
- String? certificationType;
-  String? certifyingBody;             // auto-filled
-  DateTime? expirationDate;
-  List<PlatformFile> certFiles = [];
-  
-  void setCertificationType(String? v) {
-    certificationType = v;
-    certifyingBody = v == null ? null : certAuthorityByType[v];
-    notifyListeners();
-  }
-
-  void setExpirationDate(DateTime? d) {
-    expirationDate = d;
-    notifyListeners();
-  }
-
-  Future<void> pickCertificationFiles() async {
-    final res = await FilePicker.platform.pickFiles(
-      allowMultiple: true,
-      type: FileType.custom,
-      allowedExtensions: ['pdf', 'jpg', 'jpeg', 'png'],
-      withData: false,
-    );
-    if (res != null && res.files.isNotEmpty) {
-      certFiles = res.files;
-      notifyListeners();
-    }
-  }
-
-  int get uploadedCount => certFiles.length;
-
-  // validators you can reuse in the form
-  String? validateCertType(String? _) =>
-      certificationType == null ? 'Certification type is required' : null;
-
-  String? validateExpiry(String? _) {
-    if (expirationDate == null) return 'Select an expiration date';
-    final today = DateTime.now();
-    if (!expirationDate!.isAfter(DateTime(today.year, today.month, today.day))) {
-      return 'Date must be in the future';
-    }
-    return null;
-  }
-
 
   List<File> documents = [];
   List<String> existingDocumentUrls = [];
@@ -439,27 +371,6 @@ final Map<String, String> certAuthorityByType = {
     // open local file
   }
 
-  String? country;
-  String? state;
-  String? city;
-
-  void setCountry(String? value) {
-    country = value;
-    state = null;
-    city = null;
-    notifyListeners();
-  }
-
-  void setStateValue(String? value) {
-    state = value;
-    city = null;
-    notifyListeners();
-  }
-
-  void setDropCity(String? value) {
-    city = value;
-    notifyListeners();
-  }
   final picker = ImagePicker();
 
   File? profileImage;
@@ -470,27 +381,6 @@ final Map<String, String> certAuthorityByType = {
   final TextEditingController workHistoryController = TextEditingController();
 
   bool isProcessing = false;
-
-  Future<void> pickImage(BuildContext context, String type) async {
-    final picked = await picker.pickImage(source: ImageSource.gallery);
-    if (picked == null) return;
-
-    final file = File(picked.path);
-
-    switch (type) {
-      case 'profile':
-        profileImage = file;
-        break;
-      case 'id':
-        idLicense = file;
-        break;
-      case 'ref':
-        referenceLetters.add(file);
-        break;
-    }
-
-    notifyListeners();
-  }
 
   void toggleTerms(bool? value) {
     agreedToTerms = value ?? false;
@@ -524,7 +414,6 @@ final Map<String, String> certAuthorityByType = {
     isProcessing = true;
     notifyListeners();
 
-    // Simulate upload delay
     await Future.delayed(const Duration(seconds: 2));
 
     isProcessing = false;
@@ -534,6 +423,265 @@ final Map<String, String> certAuthorityByType = {
       const SnackBar(content: Text('Profile submitted successfully!')),
     );
   }
+
+  List<File> idImages = [];
+  List<File> referenceLetterImages = [];
+
+  void removeProfileImage() {
+    profileImage = null;
+    notifyListeners();
+  }
+
+  void removeIdImage(int i) {
+    idLicense = null;
+    notifyListeners();
+  }
+
+  void removeReferenceLetterImage(int i) {
+    referenceLetters.removeAt(i);
+    notifyListeners();
+  }
+
+  void setProcessing(bool value) {
+    isProcessing = value;
+    notifyListeners();
+  }
+
+  List<CertificateInspectorTypeEntity> certificateType = [];
+  List<AgencyEntity> agencyType = [];
+
+  CertificateInspectorTypeEntity? _certificateInspectorType;
+  AgencyEntity? _agencyType;
+  CertificateInspectorTypeEntity? get certificateInspectorType =>
+      _certificateInspectorType;
+  AgencyEntity? get agencyTypeData => _agencyType;
+
+  void setCertificateType(CertificateInspectorTypeEntity? t) {
+    _certificateInspectorType = t;
+fetchCertificateAgencies();
+    notifyListeners();
+  }
+
+  void setAgencyType(AgencyEntity? t) {
+    _agencyType = t;
+
+    notifyListeners();
+  }
+
+  Future<void> fetchCertificateTypes() async {
+    try {
+      setProcessing(true);
+      final getSubTypesUseCase = locator<GetCertificateTypeUseCase>();
+      final state =
+          await executeParamsUseCase<
+            List<CertificateInspectorTypeEntity>,
+            GetCertificateInspectorTypesParams
+          >(useCase: getSubTypesUseCase, launchLoader: true);
+
+      state?.when(
+        data: (response) {
+          certificateType = response;
+          setCertificateType(certificateType[0]);
+          notifyListeners();
+        },
+        error: (e) {},
+      );
+    } catch (e) {
+    } finally {
+      setProcessing(false);
+    }
+  }
+
+  Future<void> fetchCertificateAgencies() async {
+    try {
+      setProcessing(true);
+      final getSubTypesUseCase = locator<GetAgencyUseCase>();
+      final state =
+          await executeParamsUseCase<List<AgencyEntity>, GetAgencyTypesParams>(
+            useCase: getSubTypesUseCase,
+            launchLoader: true,
+          );
+
+      state?.when(
+        data: (response) {
+          agencyType = response;
+          setAgencyType(agencyType[0]);
+          notifyListeners();
+        },
+        error: (e) {},
+      );
+    } catch (e) {
+    } finally {
+      setProcessing(false);
+    }
+  }
+
+  Future<void> pickFile(
+    BuildContext context,
+    String type, {
+    bool allowOnlyImages = false,
+  }) async {
+    if (allowOnlyImages) {
+      final picked = await ImagePicker().pickImage(source: ImageSource.gallery);
+      if (picked != null) {
+        profileImage = File(picked.path);
+        notifyListeners();
+      }
+    } else {
+      final result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['jpg', 'jpeg', 'png', 'pdf', 'doc', 'docx'],
+      );
+
+      if (result != null && result.files.single.path != null) {
+        final file = File(result.files.single.path!);
+
+        if (type == 'id') {
+          idLicense = file;
+        } else if (type == 'ref') {
+          referenceLetters.add(file);
+        }
+
+        notifyListeners();
+      }
+    }
+  }
+
+  Future<void> savePersonalStep() async {
+    fetchCertificateTypes();
+    await _localDs.updateFields({
+      'name': fullNameCtrl.text.trim(),
+      'phoneNumber': phoneCtrl.text.trim(),
+      'countryCode': phoneE164 != null && phoneE164!.startsWith('+')
+          ? phoneE164!.substring(0, phoneE164!.length - (phoneCtrl.text.length))
+          : phoneDial ?? (await _localDs.getFullData())?.countryCode ?? '+91',
+      'email': emailCtrlSignUp.text.trim(),
+      'password': passwordCtrlSignUp.text,
+      'isoCode': phoneIso != "" || phoneIso != null || phoneIso!.isNotEmpty
+          ? phoneIso
+          : (await _localDs.getFullData())?.isoCode ?? 'IN',
+    });
+  }
+
+  // Save professional step (step 2)
+  Future<void> saveProfessionalStep({
+    required String certificateTypeId,
+    required String certificateExpiryDate,
+    List<String>? uploadedCertificateUrls,
+    List<String>? agencyIds,
+  }) async {
+    await _localDs.updateFields({
+      'certificateTypeId': certificateTypeId,
+      'certificateExpiryDate': certificateExpiryDate,
+      'certificateDocuments': uploadedCertificateUrls ?? [],
+      'certificateAgencyIds': agencyIds ?? [],
+    });
+  }
+
+  // Save service area (step 3)
+  Future<void> saveServiceAreaStep({
+    required String country,
+    required String state,
+    required String city,
+    String? mailingAddress,
+    String? zipCode,
+    // double? lat,
+    // double? lng,
+  }) async {
+    await _localDs.updateFields({
+      'country': country,
+      'state': state,
+      'city': city,
+      if (mailingAddress != null) 'mailingAddress': mailingAddress,
+      if (zipCode != null) 'zipCode': zipCode,
+
+      // if (lat != null) 'latitude': lat,
+      // if (lng != null) 'longitude': lng,
+    });
+  }
+
+  Future<void> saveAdditionalStep({
+    String? profileImageUrlOrPath,
+    String? idLicenseUrlOrPath,
+    List<String>? referenceDocs,
+    bool? agreed,
+    bool? truthful,
+  }) async {
+    await _localDs.updateFields({
+      if (profileImageUrlOrPath != null) 'profileImage': profileImageUrlOrPath,
+      if (idLicenseUrlOrPath != null)
+        'uploadedIdOrLicenseDocument': idLicenseUrlOrPath,
+      if (referenceDocs != null) 'referenceDocuments': referenceDocs,
+      if (agreed != null) 'agreedToTerms': agreed,
+      if (truthful != null) 'isTruthfully': truthful,
+    });
+  }
+
+  Future<InspectorSignUpLocalEntity?> getSavedData() async {
+    return await _localDs.getFullData();
+  }
+
+  Future<void> loadSavedData() async {
+    final saved = await _localDs.getFullData();
+    log('📦 Loaded saved data: ${saved?.toString()}');
+    if (saved == null) return;
+
+    // Step 1 - Personal
+    fullNameCtrl.text = saved.name ?? '';
+    phoneCtrl.text = saved.phoneNumber ?? '';
+    phoneE164 = saved.phoneNumber;
+    emailCtrlSignUp.text = saved.email ?? '';
+    passwordCtrlSignUp.text = saved.password ?? '';
+    if (saved.phoneNumber != null && saved.phoneNumber!.isNotEmpty) {
+      // Extract dial code & raw number if possible
+      final phone = saved.phoneNumber!;
+      String dial = saved.countryCode ?? '';
+      String iso = saved.isoCode ?? '';
+
+      String raw = phone;
+
+      // Try to split country code (assuming format like +911234567890)
+      final match = RegExp(r'^\+(\d{1,3})(\d+)$').firstMatch(phone);
+      if (match != null) {
+        dial = '+${match.group(1)}';
+        raw = match.group(2)!;
+      }
+
+      setPhoneParts(
+        iso: iso,
+        dial: dial.isNotEmpty ? dial : '+91',
+        number: raw,
+        e164: phone,
+      );
+    }
+
+    // Step 2 - Professional
+    selectedCertificateTypeId = saved.certificateTypeId;
+    certificateExpiryDate = saved.certificateExpiryDate;
+    uploadedCertificateUrls = saved.certificateDocuments ?? [];
+    selectedAgencyIds = saved.certificateAgencyIds ?? [];
+
+    // Step 3 - Service area
+    country = saved.country;
+    state = saved.state;
+    city = saved.city;
+    mailingAddress = saved.mailingAddress;
+    zipCode = saved.zipCode;
+
+    // Step 4 - Additional
+    if (saved.profileImage != null && saved.profileImage!.isNotEmpty) {
+      profileImage = File(saved.profileImage!);
+    }
+    if (saved.uploadedIdOrLicenseDocument != null &&
+        saved.uploadedIdOrLicenseDocument!.isNotEmpty) {
+      idLicense = File(saved.uploadedIdOrLicenseDocument!);
+    }
+    referenceLetters = (saved.referenceDocuments ?? [])
+        .map((e) => File(e))
+        .toList();
+    agreedToTerms = saved.agreedToTerms ?? false;
+    confirmTruth = saved.isTruthfully ?? false;
+
+    notifyListeners();
+  }
 }
-
-

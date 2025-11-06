@@ -9,13 +9,30 @@ import 'package:inspect_connect/features/auth_flow/data/models/signup_request_mo
 import 'package:inspect_connect/features/auth_flow/data/models/user_detail_dto.dart';
 import 'package:inspect_connect/features/auth_flow/data/models/verify_otp_request_model.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/auth_user.dart';
+import 'package:inspect_connect/features/auth_flow/domain/entities/certificate_agency_entity.dart';
+import 'package:inspect_connect/features/auth_flow/domain/entities/certificate_type_entity.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/user_detail.dart';
 import 'package:inspect_connect/features/auth_flow/domain/repositories/auth_repository.dart';
-import 'package:inspect_connect/features/auth_flow/domain/usecases/update_profile_usecase.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDataSource _remote;
   AuthRepositoryImpl(this._remote);
+
+
+  @override
+  Future<ApiResultModel<List<CertificateInspectorTypeEntity>>>
+  getCertificateTypes() {
+    return _remote.getCertificateType();
+  }
+
+
+
+  @override
+  Future<ApiResultModel<List<AgencyEntity>>>
+  getCertificateAgency() {
+    return _remote.getCertificateAgency();
+  }
+
 
   @override
   Future<ApiResultModel<AuthUser>> signIn({

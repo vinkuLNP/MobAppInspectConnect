@@ -193,17 +193,183 @@
         }
       ],
       "relations": []
+    },
+    {
+      "id": "7:6897323812471320470",
+      "lastPropertyId": "27:6308629480548868413",
+      "name": "InspectorSignUpLocalEntity",
+      "properties": [
+        {
+          "id": "1:1608022142185072257",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:5944647149347506689",
+          "name": "name",
+          "type": 9
+        },
+        {
+          "id": "3:2659386822160961841",
+          "name": "email",
+          "type": 9
+        },
+        {
+          "id": "4:1777616599758635826",
+          "name": "password",
+          "type": 9
+        },
+        {
+          "id": "5:2557546231358882658",
+          "name": "phoneNumber",
+          "type": 9
+        },
+        {
+          "id": "6:3670339820616169600",
+          "name": "countryCode",
+          "type": 9
+        },
+        {
+          "id": "7:6779074503090054880",
+          "name": "certificateTypeId",
+          "type": 9
+        },
+        {
+          "id": "8:8221997847214816239",
+          "name": "certificateExpiryDate",
+          "type": 9
+        },
+        {
+          "id": "9:3938258897970181186",
+          "name": "certificateDocuments",
+          "type": 30
+        },
+        {
+          "id": "10:8826163247314718597",
+          "name": "certificateAgencyIds",
+          "type": 30
+        },
+        {
+          "id": "11:7126946317936680765",
+          "name": "country",
+          "type": 9
+        },
+        {
+          "id": "12:996089868518354117",
+          "name": "state",
+          "type": 9
+        },
+        {
+          "id": "13:5549259924164504091",
+          "name": "city",
+          "type": 9
+        },
+        {
+          "id": "14:6200623269580581175",
+          "name": "zipCode",
+          "type": 9
+        },
+        {
+          "id": "15:96549469011877958",
+          "name": "mailingAddress",
+          "type": 9
+        },
+        {
+          "id": "16:4302797122267047435",
+          "name": "uploadedIdOrLicenseDocument",
+          "type": 9
+        },
+        {
+          "id": "17:4282650781858068304",
+          "name": "referenceDocuments",
+          "type": 30
+        },
+        {
+          "id": "18:6346452895957981168",
+          "name": "profileImage",
+          "type": 9
+        },
+        {
+          "id": "19:3906025559829544710",
+          "name": "agreedToTerms",
+          "type": 1
+        },
+        {
+          "id": "20:459714567419254534",
+          "name": "isTruthfully",
+          "type": 1
+        },
+        {
+          "id": "21:4034109265116003399",
+          "name": "role",
+          "type": 6
+        },
+        {
+          "id": "22:2820916023932604926",
+          "name": "deviceType",
+          "type": 9
+        },
+        {
+          "id": "23:7169903911769862731",
+          "name": "deviceToken",
+          "type": 9
+        },
+        {
+          "id": "24:669343029844788976",
+          "name": "locationType",
+          "type": 9
+        },
+        {
+          "id": "25:3421770643298715055",
+          "name": "locationName",
+          "type": 9
+        },
+        {
+          "id": "26:6170495915697225193",
+          "name": "latitude",
+          "type": 8
+        },
+        {
+          "id": "27:6308629480548868413",
+          "name": "longitude",
+          "type": 8
+        }
+      ],
+      "relations": []
     }
   ],
-  "lastEntityId": "2:8224409923190584740",
+  "lastEntityId": "7:6897323812471320470",
   "lastIndexId": "1:7489877441751012150",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",
   "modelVersion": 5,
   "modelVersionParserMinimum": 5,
-  "retiredEntityUids": [],
+  "retiredEntityUids": [
+    6323051419829769589,
+    5886969448355518645,
+    2314900235999128927,
+    5507700486728886686
+  ],
   "retiredIndexUids": [],
-  "retiredPropertyUids": [],
+  "retiredPropertyUids": [
+    647249224450654308,
+    5188489944007397346,
+    7320807151972493534,
+    1894962048992247963,
+    2053712292897892099,
+    6070666122015563262,
+    6551788488995435288,
+    4610802090803421973,
+    1252569695644190240,
+    8062780496289760997,
+    8820879528324421200,
+    6304320797684281056,
+    3069690599400147834,
+    5905080434010146167,
+    4175805726105451342,
+    4590080569558135951
+  ],
   "retiredRelationUids": [],
   "version": 1
 }

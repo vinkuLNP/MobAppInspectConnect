@@ -1,10 +1,12 @@
 import 'package:country_state_city_pro/country_state_city_pro.dart';
 import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
+import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/core/utils/presentation/app_text_style.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/client/widgets/input_fields.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/inspector/inspector_view_model.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/inspector/widgets/stepper_header.dart';
+
 class ServiceAreaStep extends StatefulWidget {
   final InspectorViewModelProvider vm;
   final GlobalKey<FormState> formKey;
@@ -24,12 +26,14 @@ class _ServiceAreaStepState extends State<ServiceAreaStep> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-         const SectionTitle('Address Details'),
+        const SectionTitle('Address Details'),
         const SizedBox(height: 8),
-        Text(
-          'Select your Service Area',
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+        textWidget(
+          text: 'Select your Service Area',
+          fontWeight: FontWeight.w400,
+          fontSize: 14,
         ),
+
         const SizedBox(height: 8),
         CountryStateCityPicker(
           country: country,
@@ -68,12 +72,11 @@ class _ServiceAreaStepState extends State<ServiceAreaStep> {
         ),
         SizedBox(height: 8),
 
-         AppInputField(
+        AppInputField(
           label: 'Enter your Mailing Address',
-          hint: 'mailing address',
+          hint: 'Mailing address',
           controller: TextEditingController(),
         ),
-
       ],
     );
   }
