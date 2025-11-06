@@ -12,6 +12,8 @@ class AppInputField extends StatelessWidget {
   final Function(String?)? onChanged;
   final String? hint;
   final int? maxLength;
+  final int? maxLines;
+
 final bool? readOnly;
   final List<TextInputFormatter>? inputFormatters;
 
@@ -25,6 +27,7 @@ final bool? readOnly;
     this.readOnly = false,
     this.hint,
     this.maxLength,
+    this.maxLines,
     super.key,
   });
 
@@ -41,7 +44,7 @@ final bool? readOnly;
           keyboardType: keyboardType,
           readOnly: readOnly!,
           maxLength: maxLength,
-          
+          maxLines: maxLength != null ? 1 : maxLines,
           onChanged: onChanged,
           decoration: InputDecoration(
             counterText: '',
@@ -62,9 +65,9 @@ final bool? readOnly;
                 width: 2,
               ),
             ),
-            contentPadding: const EdgeInsets.symmetric(
+            contentPadding:  EdgeInsets.symmetric(
               horizontal: 10,
-              vertical: 0,
+              vertical:maxLines != null ? 4 : 0,
             ),
           ),
 

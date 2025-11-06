@@ -49,16 +49,18 @@ class _BookingFormWidgetState extends State<BookingFormWidget> {
         provider.setDate(DateTime.parse(b.bookingDate));
         provider.setTime(provider.parseTime(b.bookingTime));
         provider.setInspectionType(
-          (b.certificateSubTypes != [] ? b.certificateSubTypes[0] : null)
-              as CertificateSubTypeEntity?,
+          (b.certificateSubTypes != [] ? b.certificateSubTypes[0] : null),
         );
 
         if (b.images != [] && b.images.isNotEmpty) {
           provider.uploadedUrls = List<String>.from(b.images);
           provider.existingImageUrls = List<String>.from(b.images);
-        log('--------->provider.uploadedUrls ${provider.uploadedUrls.toString()}');
-        log('--------->provider.existingImageUrls ${provider.existingImageUrls.toString()}');
-
+          log(
+            '--------->provider.uploadedUrls ${provider.uploadedUrls.toString()}',
+          );
+          log(
+            '--------->provider.existingImageUrls ${provider.existingImageUrls.toString()}',
+          );
         }
       }
     });
@@ -192,7 +194,6 @@ class _BookingFormWidgetState extends State<BookingFormWidget> {
                                     ? null
                                     : () {
                                         if (!prov.validate(cntx: context)) {
-                                          
                                           return;
                                         }
 

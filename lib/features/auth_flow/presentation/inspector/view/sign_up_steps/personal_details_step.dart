@@ -8,13 +8,10 @@ import 'package:inspect_connect/features/auth_flow/presentation/inspector/widget
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-
 class PersonalDetailsStep extends StatelessWidget {
   final InspectorViewModelProvider vm;
   final GlobalKey<FormState> formKey;
-
   const PersonalDetailsStep(this.vm, this.formKey, {super.key});
-
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -55,7 +52,6 @@ class PersonalDetailsStep extends StatelessWidget {
                     counterText: '',
                     errorStyle: appTextStyle(fontSize: 12, color: Colors.red),
                     hintStyle: appTextStyle(fontSize: 12, color: Colors.grey),
-
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
@@ -77,7 +73,6 @@ class PersonalDetailsStep extends StatelessWidget {
                     ),
                   ),
                   showDropdownIcon: true,
-
                   inputFormatters: [
                     FilteringTextInputFormatter.digitsOnly,
                     LengthLimitingTextInputFormatter(10),
@@ -85,9 +80,7 @@ class PersonalDetailsStep extends StatelessWidget {
                   flagsButtonPadding: const EdgeInsets.only(left: 8),
                   dropdownIconPosition: IconPosition.trailing,
                   disableLengthCheck: true,
-
                   validator: (_) => null,
-
                   onChanged: (phone) {
                     vm.setPhoneParts(
                       iso: phone.countryISOCode,
@@ -96,7 +89,7 @@ class PersonalDetailsStep extends StatelessWidget {
                       e164: phone.completeNumber,
                     );
                     if (vm.autoValidate) {
-                      state.validate();
+                     formKey.currentState?.validate();
                     }
                   },
                   onCountryChanged: (country) {
@@ -108,7 +101,7 @@ class PersonalDetailsStep extends StatelessWidget {
                           ? '+${country.dialCode}${vm.phoneRaw}'
                           : '',
                     );
-                    if (vm.autoValidate) state.validate();
+                    if (vm.autoValidate) formKey.currentState?.validate();
                   },
                 ),
                 if (state.hasError)
@@ -147,7 +140,6 @@ class PersonalDetailsStep extends StatelessWidget {
           },
         ),
         const SizedBox(height: 6),
-
       ],
     );
   }

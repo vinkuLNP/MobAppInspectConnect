@@ -15,9 +15,6 @@ final rootNavigatorKey = GlobalKey<NavigatorState>();
 final appRouter = AppRouter(navigatorKey: rootNavigatorKey);
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  Stripe.publishableKey = stripePublishableKey;
-
-  await dotenv.load(fileName: "assets/.env");
   await Stripe.instance.applySettings();
   // Initialize DI first
   await initAppComponentLocator();

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:auto_route/auto_route.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:inspect_connect/core/basecomponents/base_view_model.dart';
 import 'package:inspect_connect/core/utils/auto_router_setup/auto_router.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/additional_details_entity.dart';
@@ -459,5 +460,80 @@ final Map<String, String> certAuthorityByType = {
     city = value;
     notifyListeners();
   }
+  final picker = ImagePicker();
+
+  File? profileImage;
+  File? idLicense;
+  List<File> referenceLetters = [];
+  bool agreedToTerms = false;
+  bool confirmTruth = false;
+  final TextEditingController workHistoryController = TextEditingController();
+
+  bool isProcessing = false;
+
+  Future<void> pickImage(BuildContext context, String type) async {
+    final picked = await picker.pickImage(source: ImageSource.gallery);
+    if (picked == null) return;
+
+    final file = File(picked.path);
+
+    switch (type) {
+      case 'profile':
+        profileImage = file;
+        break;
+      case 'id':
+        idLicense = file;
+        break;
+      case 'ref':
+        referenceLetters.add(file);
+        break;
+    }
+
+    notifyListeners();
+  }
+
+  void toggleTerms(bool? value) {
+    agreedToTerms = value ?? false;
+    notifyListeners();
+  }
+
+  void toggleTruth(bool? value) {
+    confirmTruth = value ?? false;
+    notifyListeners();
+  }
+
+  bool validate(BuildContext context) {
+    if (profileImage == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please upload a profile image')),
+      );
+      return false;
+    }
+    if (!agreedToTerms || !confirmTruth) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please agree to all conditions')),
+      );
+      return false;
+    }
+    return true;
+  }
+
+  Future<void> submitProfile(BuildContext context) async {
+    if (!validate(context)) return;
+
+    isProcessing = true;
+    notifyListeners();
+
+    // Simulate upload delay
+    await Future.delayed(const Duration(seconds: 2));
+
+    isProcessing = false;
+    notifyListeners();
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Profile submitted successfully!')),
+    );
+  }
 }
+
 
