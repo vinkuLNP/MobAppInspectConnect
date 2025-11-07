@@ -218,15 +218,15 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
     UploadImageDto dto,
   ) async {
     try {
-      final user = await locator<AuthLocalDataSource>().getUser();
-      if (user == null || user.token == null) {
-        throw Exception('User not found in local storage');
-      }
+      // final user = await locator<AuthLocalDataSource>().getUser();
+      // if (user == null || user.token == null) {
+      //   throw Exception('User not found in local storage');
+      // }
       final ApiResultModel<http.Response> res = await _ctx.makeRequest(
         uri: uploadImageEndPoint,
         httpRequestStrategy: MultipartPostRequestStrategy(),
         headers: {
-          'Authorization': 'Bearer ${user.token}',
+          // 'Authorization': 'Bearer ${user.token}',
           "Content-Type": "multipart/form-data",
         },
         requestData: dto.toJson(),

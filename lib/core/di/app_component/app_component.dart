@@ -6,6 +6,7 @@ import 'package:inspect_connect/features/auth_flow/domain/usecases/agency_type_u
 import 'package:inspect_connect/features/auth_flow/domain/usecases/certificate_type_usecase.dart';
 import 'package:inspect_connect/features/auth_flow/domain/usecases/change_password_usecases.dart';
 import 'package:inspect_connect/features/auth_flow/domain/usecases/get_user__usercase.dart';
+import 'package:inspect_connect/features/auth_flow/domain/usecases/inspector_signup_case.dart';
 import 'package:inspect_connect/features/auth_flow/domain/usecases/otp_verification_usecases.dart';
 import 'package:inspect_connect/features/auth_flow/domain/usecases/resend_otp_usecases.dart';
 import 'package:inspect_connect/features/auth_flow/domain/usecases/sign_in_usecase.dart';
@@ -64,6 +65,8 @@ void setupLocator() {
 
   locator.registerLazySingleton(() => GetAgencyUseCase(locator()));
   locator.registerLazySingleton(() => GetCertificateTypeUseCase(locator()));
+  locator.registerLazySingleton(() => InspectorSignUpUseCase(locator()));
+
 
 
 

@@ -244,6 +244,22 @@ class InspectorAuthAutoWrapperRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [InspectorDashboardView]
+class InspectorDashboardRoute extends PageRouteInfo<void> {
+  const InspectorDashboardRoute({List<PageRouteInfo>? children})
+    : super(InspectorDashboardRoute.name, initialChildren: children);
+
+  static const String name = 'InspectorDashboardRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const InspectorDashboardView();
+    },
+  );
+}
+
+/// generated route for
 /// [InspectorSignInView]
 class InspectorSignInRoute extends PageRouteInfo<void> {
   const InspectorSignInRoute({List<PageRouteInfo>? children})

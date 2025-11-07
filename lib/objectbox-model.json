@@ -196,7 +196,7 @@
     },
     {
       "id": "7:6897323812471320470",
-      "lastPropertyId": "27:6308629480548868413",
+      "lastPropertyId": "29:4099796525503528676",
       "name": "InspectorSignUpLocalEntity",
       "properties": [
         {
@@ -334,6 +334,16 @@
           "id": "27:6308629480548868413",
           "name": "longitude",
           "type": 8
+        },
+        {
+          "id": "28:8552915215688275361",
+          "name": "isoCode",
+          "type": 9
+        },
+        {
+          "id": "29:4099796525503528676",
+          "name": "workHistoryDescription",
+          "type": 9
         }
       ],
       "relations": []

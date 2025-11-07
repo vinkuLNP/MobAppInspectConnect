@@ -182,159 +182,6 @@ class ClientViewModelProvider extends BaseViewModel {
     });
   }
 
-  // Future<void> verify({required BuildContext context}) async {
-  //   if (!canVerify) return;
-  //   try {
-  //     final user = await locator<AuthLocalDataSource>().getUser();
-  //     if (user == null || user.token == null) {
-  //       throw Exception('User not found in local storage');
-  //     }
-  //     final verifyOtpUseCase = locator<OtpVerificarionUseCase>();
-  //     final state = await executeParamsUseCase<AuthUser, OtpVerificationParams>(
-  //       useCase: verifyOtpUseCase,
-
-  //       query: OtpVerificationParams(
-  //         phoneNumber: user.phoneNumber ?? emailCtrl.text.trim(),
-  //         countryCode: user.countryCode ?? passwordCtrl.text.trim(),
-  //         phoneOtp: pinController.text.trim(),
-  //       ),
-  //       launchLoader: true,
-  //     );
-
-  //     state?.when(
-  //       data: (user) async {
-  //         final newUserLocal = user.toLocalEntity();
-  //         final existingUser = await locator<AuthLocalDataSource>().getUser();
-
-  //         // Merge instead of overwrite
-  //         final merged = existingUser != null
-  //             ? existingUser.mergeWithNewData(newUserLocal)
-  //             : newUserLocal;
-
-  //         await locator<AuthLocalDataSource>().saveUser(merged);
-  //         await fetchUserDetail(user: user, context: context);
-
-  //         // await locator<AuthLocalDataSource>().saveUser(user.toLocalEntity());
-  //         // await fetchUserDetail(user: user, context: context);
-
-  //         ScaffoldMessenger.of(
-  //           context,
-  //         ).showSnackBar(const SnackBar(content: Text('Sign-up successful')));
-  //         pinController.clear();
-  //         context.router.replaceAll([const ClientDashboardRoute()]);
-  //       },
-  //       error: (e) {
-  //         ScaffoldMessenger.of(context).showSnackBar(
-  //           SnackBar(content: Text(e.message ?? 'Sign-up failed')),
-  //         );
-  //       },
-  //     );
-  //   } finally {
-  //     emailCtrl.clear();
-  //     passwordCtrl.clear();
-  //     // setSigningIn(false);
-  //   }
-  // }
-
-  // Future<void> fetchUserDetail({
-  //   required AuthUser user,
-  //   required BuildContext context,
-  // }) async {
-  //   final localUser = user.toLocalEntity();
-  //   await locator<AuthLocalDataSource>().saveUser(localUser);
-  //   final userProvider = context.read<UserProvider>();
-  //   await userProvider.setUser(localUser);
-
-  //   await userProvider.loadUser();
-  //   log(user.id);
-  //   log(user.token);
-
-  //   final fetchUserUseCase = locator<GetUserUseCase>();
-  //   final userState = await executeParamsUseCase<UserDetail, GetUserParams>(
-  //     useCase: fetchUserUseCase,
-  //     query: GetUserParams(userId: user.id),
-  //     launchLoader: true,
-  //   );
-  //   userState?.when(
-  //     data: (userData) async {
-  //       final mergedUser = localUser.mergeWithUserDetail(userData);
-  //       await locator<AuthLocalDataSource>().saveUser(mergedUser);
-
-  //       await userProvider.setUser(mergedUser);
-  //     },
-  //     error: (e) {
-  //       context.router.replaceAll([const ClientDashboardRoute()]);
-  //     },
-  //   );
-  // }
-
-
-  // Future<void> resetPassword({
-  //   required GlobalKey<FormState> formKey,
-  //   required BuildContext context,
-  // }) async {
-  //   if (!(formKey.currentState?.validate() ?? false)) return;
-
-  //   _isResetting = true;
-  //   notifyListeners();
-  //   setSigningIn(true);
-  //   try {
-  //     deviceToken = await DeviceInfoHelper.getDeviceToken();
-  //     deviceType = await DeviceInfoHelper.getDeviceType();
-  //     final useCase = locator<SignUpUseCase>();
-
-  //     final params = SignUpParams(
-  //       role: 1,
-  //       email: emailCtrlSignUp.text.trim(),
-  //       name: fullNameCtrl.text.trim(),
-  //       phoneNumber: phoneRaw ?? '',
-  //       countryCode: phoneDial ?? "91",
-  //       password: passwordCtrlSignUp.text.trim(),
-  //       deviceToken: deviceToken,
-  //       deviceType: deviceType,
-  //       mailingAddress: "456 Broadway, New York, NY 10001",
-  //       agreedToTerms: true,
-  //       isTruthfully: true,
-  //       location: {
-  //         "type": "Point",
-  //         "locationName": "Midtown",
-  //         "coordinates": [-73.9857, 40.7484],
-  //       },
-  //     );
-
-  //     final state = await executeParamsUseCase<AuthUser, SignUpParams>(
-  //       useCase: useCase,
-  //       query: params,
-  //       launchLoader: true,
-  //     );
-
-  //     state?.when(
-  //       data: (user) async {
-  //         final localUser = user.toLocalEntity();
-  //         await locator<AuthLocalDataSource>().saveUser(localUser);
-  //         final userProvider = context.read<UserProvider>();
-  //         await userProvider.setUser(localUser);
-
-  //         await userProvider.loadUser();
-  //         log(user.id);
-  //         log(user.token);
-  //         ScaffoldMessenger.of(
-  //           context,
-  //         ).showSnackBar(const SnackBar(content: Text('Verify Your Otp Now')));
-  //         context.pushRoute(OtpVerificationRoute(addShowButton: true));
-  //       },
-  //       error: (e) {
-  //         ScaffoldMessenger.of(
-  //           context,
-  //         ).showSnackBar(SnackBar(content: Text(e.message ?? 'Signup failed')));
-  //       },
-  //     );
-  //   } finally {
-  //     setSigningIn(false);
-  //     _isResetting = false;
-  //     notifyListeners();
-  //   }
-  // }
 
 Future<void> resetPassword({
   required GlobalKey<FormState> formKey,
@@ -453,20 +300,22 @@ Future<void> verify({required BuildContext context}) async {
   try {
     log('[VERIFY] Starting verification process...');
 
-    final user = await locator<AuthLocalDataSource>().getUser();
-    if (user == null) {
-      log('[VERIFY] ❌ No local user found.');
-      throw Exception('User not found in local storage');
-    }
+    // final user = await locator<AuthLocalDataSource>().getUser();
+    // if (user == null) {
+    //   log('[VERIFY] ❌ No local user found.');
+    //   throw Exception('User not found in local storage');
+    // }
 
-    log('[VERIFY] Found local user: id=${user.id}, token=${user.token}, phone=${user.phoneNumber}');
-
+    // log('[VERIFY] Found local user: id=${user.id}, token=${user.token}, phone=${user.phoneNumber}');
+// 
     final verifyOtpUseCase = locator<OtpVerificarionUseCase>();
     final state = await executeParamsUseCase<AuthUser, OtpVerificationParams>(
       useCase: verifyOtpUseCase,
       query: OtpVerificationParams(
-        phoneNumber: user.phoneNumber ?? emailCtrl.text.trim(),
-        countryCode: user.countryCode ?? passwordCtrl.text.trim(),
+        phoneNumber: '9925356568',
+        // user.phoneNumber ?? emailCtrl.text.trim(),
+        countryCode: '+91',
+        // user.countryCode ?? passwordCtrl.text.trim(),
         phoneOtp: pinController.text.trim(),
       ),
       launchLoader: true,
@@ -474,8 +323,14 @@ Future<void> verify({required BuildContext context}) async {
 
     state?.when(
       data: (user) async {
+
+
         log('[VERIFY] ✅ OTP verification successful, received user from API:@$user');
         log('  id=${user.id}');
+        log('  iroled=${user.role}');
+
+        
+
         log('  token=${user.token}');
         log('  name=${user.fullName}');
         log('  email=${user.emailHashed}');
@@ -511,7 +366,13 @@ Future<void> verify({required BuildContext context}) async {
         ScaffoldMessenger.of(context)
             .showSnackBar(const SnackBar(content: Text('Sign-up successful')));
         pinController.clear();
+        if(user.role == 1){
         context.router.replaceAll([const ClientDashboardRoute()]);
+
+        }else{
+        context.router.replaceAll([const InspectorDashboardRoute()]);
+
+        }
       },
       error: (e) {
         log('[VERIFY] ❌ OTP verification failed: ${e.message}');

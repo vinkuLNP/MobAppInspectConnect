@@ -11,6 +11,8 @@ import 'package:inspect_connect/features/auth_flow/data/models/verify_otp_reques
 import 'package:inspect_connect/features/auth_flow/domain/entities/auth_user.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/certificate_agency_entity.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/certificate_type_entity.dart';
+import 'package:inspect_connect/features/auth_flow/domain/entities/inspector_sign_up_entity.dart';
+import 'package:inspect_connect/features/auth_flow/domain/entities/inspector_user.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/user_detail.dart';
 import 'package:inspect_connect/features/auth_flow/domain/repositories/auth_repository.dart';
 
@@ -67,6 +69,33 @@ class AuthRepositoryImpl implements AuthRepository {
       failure: (err) => ApiResultModel<AuthUser>.failure(errorResultEntity: err),
     );
   }
+
+
+  @override
+Future<ApiResultModel<InspectorUser>> inspectorSignUp({
+  required InspectorSignUpLocalEntity inspectorSignUpLocalEntity
+}) async {
+  final res = await _remote.inspectorSignUp(
+    inspectorSignUpLocalEntity
+  );
+
+  return res.when(
+    success: (dto) {
+      try {
+        return ApiResultModel.success(data: dto);
+      } catch (e) {
+        return const ApiResultModel.failure(
+          errorResultEntity: ErrorResultModel(
+            message: "Parsing error",
+            statusCode: 500,
+          ),
+        );
+      }
+    },
+    failure: (err) =>
+        ApiResultModel<InspectorUser>.failure(errorResultEntity: err),
+  );
+}
 
 
 

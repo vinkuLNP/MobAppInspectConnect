@@ -8,16 +8,22 @@ import 'package:inspect_connect/core/basecomponents/base_view_model.dart';
 import 'package:inspect_connect/core/commondomain/entities/based_api_result/api_result_state.dart';
 import 'package:inspect_connect/core/di/app_component/app_component.dart';
 import 'package:inspect_connect/core/utils/auto_router_setup/auto_router.dart';
+import 'package:inspect_connect/core/utils/helpers/device_helper/device_helper.dart';
 import 'package:inspect_connect/features/auth_flow/data/datasources/local_datasources/inspector_local_data_source.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/certificate_agency_entity.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/certificate_type_entity.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/inspector_sign_up_entity.dart';
+import 'package:inspect_connect/features/auth_flow/domain/entities/inspector_user.dart';
 import 'package:inspect_connect/features/auth_flow/domain/usecases/agency_type_usecase.dart';
 import 'package:inspect_connect/features/auth_flow/domain/usecases/certificate_type_usecase.dart';
+import 'package:inspect_connect/features/auth_flow/domain/usecases/inspector_signup_case.dart';
 import 'package:inspect_connect/features/auth_flow/utils/otp_enum.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-
+import 'package:inspect_connect/features/client_flow/data/models/upload_image_model.dart';
+import 'package:inspect_connect/features/client_flow/domain/entities/upload_image_dto.dart';
+import 'package:inspect_connect/features/client_flow/domain/usecases/upload_image_usecase.dart';
+ 
 class InspectorViewModelProvider extends BaseViewModel {
   final InspectorSignUpLocalDataSource _localDs =
       locator<InspectorSignUpLocalDataSource>();
@@ -41,6 +47,19 @@ class InspectorViewModelProvider extends BaseViewModel {
     }
   }
 
+  String certificateExpiryDate = '';
+  DateTime certificateExpiryDateShow = DateTime.now();
+
+  String get selectedcertificateExpiryDate => certificateExpiryDate;
+  void setDate(DateTime d) {
+    certificateExpiryDateShow = DateTime(d.year, d.month, d.day);
+    certificateExpiryDate = certificateExpiryDateShow
+        .toIso8601String()
+        .split('T')
+        .first;
+    notifyListeners();
+  }
+
   final emailCtrl = TextEditingController();
   final passwordCtrl = TextEditingController();
 
@@ -57,8 +76,7 @@ class InspectorViewModelProvider extends BaseViewModel {
   }
 
   String? selectedCertificateTypeId;
-  String? certificateExpiryDate;
-  List<String>? uploadedCertificateUrls;
+  List<String> uploadedCertificateUrls = [];
   List<String>? selectedAgencyIds;
 
   final fullNameCtrl = TextEditingController();
@@ -66,6 +84,18 @@ class InspectorViewModelProvider extends BaseViewModel {
   final emailCtrlSignUp = TextEditingController();
   final addressCtrl = TextEditingController();
   final passwordCtrlSignUp = TextEditingController();
+  final countryController = TextEditingController();
+  final stateController = TextEditingController();
+  final cityController = TextEditingController();
+  final zipController = TextEditingController();
+  final mailingAddressController = TextEditingController();
+  void saveDataToProvider() {
+    country = countryController.text;
+    state = stateController.text;
+    city = cityController.text;
+    zipCode = zipController.text;
+    mailingAddress = mailingAddressController.text;
+  }
 
   String? country;
   String? state;
@@ -126,9 +156,9 @@ class InspectorViewModelProvider extends BaseViewModel {
     required BuildContext context,
   }) async {
     if (!(formKey.currentState?.validate() ?? false)) return;
-    // if (!agreeTnC || !isTruthful) {
-    //   return;
-    // }
+    if (!agreeTnC || !isTruthful) {
+      return;
+    }
     startOtpFlow(OtpPurpose.signUp);
 
     context.pushRoute(OtpVerificationRoute(addShowButton: true));
@@ -346,10 +376,52 @@ class InspectorViewModelProvider extends BaseViewModel {
       type: FileType.custom,
       allowedExtensions: ['pdf', 'doc', 'docx'],
     );
+    try {
+      setProcessing(true);
+      if (picker == null && picker!.files.single.path == null) return;
+      final file = File(picker.files.single.path.toString());
+      if (await file.length() > 2 * 1024 * 1024) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('File must be under 2 MB')),
+        );
+        return;
+      }
+      // if (picker != null && picker.files.single.path != null) {
+      //   documents.add(File(picker.files.single.path!));
+      //   notifyListeners();
+      // }
+      final uploadImage = UploadImageDto(filePath: file.path);
+      final uploadImageUseCase = locator<UploadImageUseCase>();
+      final result =
+          await executeParamsUseCase<
+            UploadImageResponseModel,
+            UploadImageParams
+          >(
+            useCase: uploadImageUseCase,
+            query: UploadImageParams(filePath: uploadImage),
+            launchLoader: true,
+          );
 
-    if (picker != null && picker.files.single.path != null) {
-      documents.add(File(picker.files.single.path!));
-      notifyListeners();
+      result?.when(
+        data: (response) {
+          documents.add(
+            picker.files.single.path != null
+                ? File(picker.files.single.path!)
+                : file,
+          );
+          uploadedCertificateUrls.add(response.fileUrl);
+          notifyListeners();
+        },
+        error: (e) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(e.message ?? 'Image upload failed')),
+          );
+        },
+      );
+    } catch (e) {
+      log('Error picking file: $e');
+    } finally {
+      setProcessing(false);
     }
   }
 
@@ -360,6 +432,7 @@ class InspectorViewModelProvider extends BaseViewModel {
 
   void removeExistingDocumentAt(int index) {
     existingDocumentUrls.removeAt(index);
+    uploadedCertificateUrls.removeAt(index);
     notifyListeners();
   }
 
@@ -374,8 +447,14 @@ class InspectorViewModelProvider extends BaseViewModel {
   final picker = ImagePicker();
 
   File? profileImage;
+  File? profileImageUrl;
+
   File? idLicense;
+  File? idLicenseUrl;
+
   List<File> referenceLetters = [];
+  List<File> referenceLettersUrls = [];
+
   bool agreedToTerms = false;
   bool confirmTruth = false;
   final TextEditingController workHistoryController = TextEditingController();
@@ -386,6 +465,24 @@ class InspectorViewModelProvider extends BaseViewModel {
     agreedToTerms = value ?? false;
     notifyListeners();
   }
+bool showValidationError = false;
+
+ void validateBeforeSubmit({required BuildContext context}) {
+    if (!agreedToTerms || !confirmTruth) {
+    showValidationError = true;
+    notifyListeners();
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Please agree to all terms before continuing.'),
+        backgroundColor: Colors.redAccent,
+      ),
+    );
+    return;
+  }
+  showValidationError = false;
+  notifyListeners();
+  }
+
 
   void toggleTruth(bool? value) {
     confirmTruth = value ?? false;
@@ -458,17 +555,18 @@ class InspectorViewModelProvider extends BaseViewModel {
 
   void setCertificateType(CertificateInspectorTypeEntity? t) {
     _certificateInspectorType = t;
-fetchCertificateAgencies();
+    selectedCertificateTypeId = t?.id;
+    fetchCertificateAgencies();
     notifyListeners();
   }
 
   void setAgencyType(AgencyEntity? t) {
     _agencyType = t;
-
+    selectedAgencyIds = [t?.id ?? ''];
     notifyListeners();
   }
 
-  Future<void> fetchCertificateTypes() async {
+  Future<void> fetchCertificateTypes({String? savedId}) async {
     try {
       setProcessing(true);
       final getSubTypesUseCase = locator<GetCertificateTypeUseCase>();
@@ -481,7 +579,16 @@ fetchCertificateAgencies();
       state?.when(
         data: (response) {
           certificateType = response;
-          setCertificateType(certificateType[0]);
+          if (savedId != null) {
+            final matched = response.firstWhere(
+              (e) => e.id == savedId,
+              orElse: () => response.first,
+            );
+            setCertificateType(matched);
+          } else {
+            // setCertificateType(certificateType[0]);
+            setCertificateType(response.first);
+          }
           notifyListeners();
         },
         error: (e) {},
@@ -492,7 +599,7 @@ fetchCertificateAgencies();
     }
   }
 
-  Future<void> fetchCertificateAgencies() async {
+  Future<void> fetchCertificateAgencies({String? savedId}) async {
     try {
       setProcessing(true);
       final getSubTypesUseCase = locator<GetAgencyUseCase>();
@@ -505,7 +612,16 @@ fetchCertificateAgencies();
       state?.when(
         data: (response) {
           agencyType = response;
-          setAgencyType(agencyType[0]);
+          if (savedId != null) {
+            final matched = response.firstWhere(
+              (e) => e.id == savedId,
+              orElse: () => response.first,
+            );
+            setAgencyType(matched);
+          } else {
+            setAgencyType(response.first);
+          }
+          // setAgencyType(agencyType[0]);
           notifyListeners();
         },
         error: (e) {},
@@ -521,35 +637,125 @@ fetchCertificateAgencies();
     String type, {
     bool allowOnlyImages = false,
   }) async {
-    if (allowOnlyImages) {
-      final picked = await ImagePicker().pickImage(source: ImageSource.gallery);
-      if (picked != null) {
-        profileImage = File(picked.path);
-        notifyListeners();
-      }
-    } else {
-      final result = await FilePicker.platform.pickFiles(
-        type: FileType.custom,
-        allowedExtensions: ['jpg', 'jpeg', 'png', 'pdf', 'doc', 'docx'],
-      );
+    try {
+      setProcessing(true);
 
-      if (result != null && result.files.single.path != null) {
-        final file = File(result.files.single.path!);
+      if (allowOnlyImages) {
+        final picked = await ImagePicker().pickImage(
+          source: ImageSource.gallery,
+        );
 
-        if (type == 'id') {
-          idLicense = file;
-        } else if (type == 'ref') {
-          referenceLetters.add(file);
+        if (picked == null) return;
+
+        final file = File(picked.path);
+        if (await file.length() > 1 * 1024 * 1024) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('File must be under 1 MB')),
+          );
+          return;
         }
 
-        notifyListeners();
+        final uploadImage = UploadImageDto(filePath: file.path);
+        final uploadImageUseCase = locator<UploadImageUseCase>();
+        final result =
+            await executeParamsUseCase<
+              UploadImageResponseModel,
+              UploadImageParams
+            >(
+              useCase: uploadImageUseCase,
+              query: UploadImageParams(filePath: uploadImage),
+              launchLoader: true,
+            );
+
+        result?.when(
+          data: (response) {
+            profileImageUrl = File(response.fileUrl);
+            profileImage = File(file.path);
+            notifyListeners();
+          },
+          error: (e) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(e.message ?? 'Image upload failed')),
+            );
+          },
+        );
+        // if (picked != null) {
+        //   profileImage = File(picked.path);
+        //   notifyListeners();
+        // }
+      } else {
+        setProcessing(true);
+        final result = await FilePicker.platform.pickFiles(
+          type: FileType.custom,
+          allowedExtensions: ['jpg', 'jpeg', 'png', 'pdf', 'doc', 'docx'],
+        );
+        if (result == null && result!.files.single.path == null) return;
+        final file = File(result.files.single.path.toString());
+        if (await file.length() > 2 * 1024 * 1024) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('File must be under 2 MB')),
+          );
+          return;
+        }
+        final uploadImage = UploadImageDto(filePath: file.path);
+        final uploadImageUseCase = locator<UploadImageUseCase>();
+        final responseResult =
+            await executeParamsUseCase<
+              UploadImageResponseModel,
+              UploadImageParams
+            >(
+              useCase: uploadImageUseCase,
+              query: UploadImageParams(filePath: uploadImage),
+              launchLoader: true,
+            );
+
+        responseResult?.when(
+          data: (response) {
+            if (type == 'id') {
+              idLicense = file;
+              idLicenseUrl = File(response.fileUrl);
+            } else if (type == 'ref') {
+              referenceLetters.add(file);
+              referenceLettersUrls.add(File(response.fileUrl));
+            }
+
+            // documents.add(
+            //   result.files.single.path != null
+            //       ? File(result.files.single.path!)
+            //       : file,
+            // );
+            // uploadedCertificateUrls.add(response.fileUrl);
+            notifyListeners();
+          },
+          error: (e) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(e.message ?? 'Image upload failed')),
+            );
+          },
+        );
+
+        // if (result != null && result.files.single.path != null) {
+        //   final file = File(result.files.single.path!);
+
+        //   notifyListeners();
+        // }
       }
+    } catch (e) {
+      log('Error picking file: $e');
+    } finally {
+      setProcessing(false);
     }
   }
 
   Future<void> savePersonalStep() async {
     fetchCertificateTypes();
+    final  deviceToken = await DeviceInfoHelper.getDeviceToken();
+  final  deviceType = await DeviceInfoHelper.getDeviceType();
     await _localDs.updateFields({
+      'role':2,
+      'deviceType':deviceType,
+
+      'deviceToken':deviceToken,
       'name': fullNameCtrl.text.trim(),
       'phoneNumber': phoneCtrl.text.trim(),
       'countryCode': phoneE164 != null && phoneE164!.startsWith('+')
@@ -563,7 +769,6 @@ fetchCertificateAgencies();
     });
   }
 
-  // Save professional step (step 2)
   Future<void> saveProfessionalStep({
     required String certificateTypeId,
     required String certificateExpiryDate,
@@ -594,15 +799,21 @@ fetchCertificateAgencies();
       'city': city,
       if (mailingAddress != null) 'mailingAddress': mailingAddress,
       if (zipCode != null) 'zipCode': zipCode,
+  //         "type": "Point",
+      'locationType' :'Point',
+      'locationName' :'Midtown',
+      'latitude' :-73.9857,
+      'longitude' :40.7484,
 
-      // if (lat != null) 'latitude': lat,
-      // if (lng != null) 'longitude': lng,
+
     });
   }
 
   Future<void> saveAdditionalStep({
     String? profileImageUrlOrPath,
     String? idLicenseUrlOrPath,
+    String? workHistoryDescription,
+
     List<String>? referenceDocs,
     bool? agreed,
     bool? truthful,
@@ -612,6 +823,9 @@ fetchCertificateAgencies();
       if (idLicenseUrlOrPath != null)
         'uploadedIdOrLicenseDocument': idLicenseUrlOrPath,
       if (referenceDocs != null) 'referenceDocuments': referenceDocs,
+      if (workHistoryDescription != null)
+        'workHistoryDescription': workHistoryDescription,
+
       if (agreed != null) 'agreedToTerms': agreed,
       if (truthful != null) 'isTruthfully': truthful,
     });
@@ -657,31 +871,168 @@ fetchCertificateAgencies();
 
     // Step 2 - Professional
     selectedCertificateTypeId = saved.certificateTypeId;
-    certificateExpiryDate = saved.certificateExpiryDate;
+    // certificateExpiryDate = .toString();
+    setDate(DateTime.parse(saved.certificateExpiryDate.toString()));
+    // uploadedCertificateUrls = saved.certificateDocuments ?? [];
     uploadedCertificateUrls = saved.certificateDocuments ?? [];
+existingDocumentUrls = List.from(uploadedCertificateUrls); 
     selectedAgencyIds = saved.certificateAgencyIds ?? [];
-
+    await fetchCertificateTypes(savedId: selectedCertificateTypeId);
     // Step 3 - Service area
-    country = saved.country;
-    state = saved.state;
-    city = saved.city;
-    mailingAddress = saved.mailingAddress;
-    zipCode = saved.zipCode;
+    countryController.text = saved.country.toString();
+    stateController.text = saved.state.toString();
+    cityController.text = saved.city.toString();
+    mailingAddressController.text = saved.mailingAddress.toString();
+    zipController.text = saved.zipCode.toString();
 
     // Step 4 - Additional
-    if (saved.profileImage != null && saved.profileImage!.isNotEmpty) {
-      profileImage = File(saved.profileImage!);
+    // if (saved.profileImage != null && saved.profileImage!.isNotEmpty) {
+    //   profileImage = File(saved.profileImage!);
+    // }
+    // if (saved.uploadedIdOrLicenseDocument != null &&
+    //     saved.uploadedIdOrLicenseDocument!.isNotEmpty) {
+    //   idLicense = File(saved.uploadedIdOrLicenseDocument!);
+    // }
+    if (saved.profileImage != null &&
+        saved.profileImage!.isNotEmpty &&
+        saved.profileImage != 'null') {
+      profileImageUrl = File(saved.profileImage!);
     }
+
     if (saved.uploadedIdOrLicenseDocument != null &&
-        saved.uploadedIdOrLicenseDocument!.isNotEmpty) {
-      idLicense = File(saved.uploadedIdOrLicenseDocument!);
+        saved.uploadedIdOrLicenseDocument!.isNotEmpty &&
+        saved.uploadedIdOrLicenseDocument != 'null') {
+      idLicenseUrl = File(saved.uploadedIdOrLicenseDocument!);
     }
-    referenceLetters = (saved.referenceDocuments ?? [])
+
+    referenceLettersUrls = (saved.referenceDocuments ?? [])
+        .where((e) => e != 'null' && e.isNotEmpty)
         .map((e) => File(e))
         .toList();
+    workHistoryController.text = saved.workHistoryDescription ?? '';
+    // referenceLetters = (saved.referenceDocuments ?? [])
+    //     .map((e) => File(e))
+    //     .toList();
     agreedToTerms = saved.agreedToTerms ?? false;
     confirmTruth = saved.isTruthfully ?? false;
+    
 
     notifyListeners();
   }
+
+
+  // bool _isSigningIn = false;
+  // bool get isSigningIn => _isSigningIn;
+
+  // void setSigningIn(bool value) {
+  //   _isSigningIn = value;
+  //   notifyListeners();
+  // }
+
+Future<void> signUp({
+  // required GlobalKey<FormState> formKey,
+  required BuildContext context,
+}) async {
+  // if (!(formKey.currentState?.validate() ?? false)) {
+  //   log('[SignUP] ❌ Form validation failed — aborting.');
+  //   return;
+  // }
+
+  _isResetting = true;
+  notifyListeners();
+  setProcessing(true);
+
+  try {
+    log('[SignUP] 🚀 Startingsignup process...');
+    log('[SignUP] Collecting device info...');
+
+
+ final saved = await _localDs.getFullData();
+
+    final useCase = locator<InspectorSignUpUseCase>();
+
+    final params = InspectorSignUpParams( 
+      inspectorSignUpLocalEntity: saved!,
+      // role: 1,
+      // email: emailCtrlSignUp.text.trim(),
+      // name: fullNameCtrl.text.trim(),
+      // phoneNumber: phoneRaw ?? '',
+      // countryCode: phoneDial ?? "91",
+      // password: passwordCtrlSignUp.text.trim(),
+      // deviceToken: deviceToken,
+      // deviceType: deviceType,
+      // mailingAddress: "456 Broadway, New York, NY 10001",
+      // agreedToTerms: true,
+      // isTruthfully: true,
+      // location: {
+      //   "type": "Point",
+      //   "locationName": "Midtown",
+      //   "coordinates": [-73.9857, 40.7484],
+      // },
+    );
+
+    log('[SignUP] Parameters ready:');
+    log('  name=${params.inspectorSignUpLocalEntity.name}');
+    log('  email=${params.inspectorSignUpLocalEntity.email}');
+    log('  phone=${params..inspectorSignUpLocalEntity.phoneNumber}');
+    log('  countryCode=${params.inspectorSignUpLocalEntity.countryCode}');
+    log('  password=${params.inspectorSignUpLocalEntity.password!.isNotEmpty ? "***" : "empty"}');
+
+    final state = await executeParamsUseCase<InspectorUser, InspectorSignUpParams>(
+      useCase: useCase,
+      query: params,
+      launchLoader: true,
+    );
+
+    state?.when(
+      data: (user) async {
+        // log('[SignUP] ✅ API returned user data:');
+        log('  id=${user.id}');
+        log('  token=${user.authToken}');
+        log('  fullName=${user.name}');
+        log('  email=${user.email}');
+        log('  phone=${user.phoneNumber}');
+
+        // final localUser = user.toLocalEntity();
+        // log('[SignUP] Converted to local entity:');
+        // log('  token=${localUser.token}');
+        // log('  name=${localUser.name}');
+        // log('  email=${localUser.email}');
+        // log('  phone=${localUser.phoneNumber}');
+
+        // await locator<AuthLocalDataSource>().saveUser(localUser);
+        // log('[SignUP] ✅ Local user saved.');
+
+        // final userProvider = context.read<UserProvider>();
+        // await userProvider.setUser(localUser);
+        // await userProvider.loadUser();
+        // log('[SignUP] ✅ User loaded into provider.');
+
+        // log('[SignUP] Verifying saved data:');
+        // log('  saved token=${localUser.token}');
+        // log('  saved name=${localUser.name}');
+        // log('  saved email=${localUser.email}');
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Verify Your Otp Now')),
+        );
+        context.pushRoute(OtpVerificationRoute(addShowButton: true));
+      },
+      error: (e) {
+        log('[SignUP] ❌ API error: ${e.message}');
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(e.message ?? 'Signup failed')));
+      },
+    );
+  } catch (e, s) {
+    log('[SignUP] ❌ Exception during reset: $e');
+    log('[SignUP] Stacktrace: $s');
+  } finally {
+    setProcessing(false);
+    _isResetting = false;
+    notifyListeners();
+    log('[SignUP] 🧹 Cleanup complete.');
+  }
+}
 }

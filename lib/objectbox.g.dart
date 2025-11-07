@@ -255,7 +255,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
     id: const obx_int.IdUid(7, 6897323812471320470),
     name: 'InspectorSignUpLocalEntity',
-    lastPropertyId: const obx_int.IdUid(27, 6308629480548868413),
+    lastPropertyId: const obx_int.IdUid(29, 4099796525503528676),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
@@ -418,6 +418,18 @@ final _entities = <obx_int.ModelEntity>[
         id: const obx_int.IdUid(27, 6308629480548868413),
         name: 'longitude',
         type: 8,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(28, 8552915215688275361),
+        name: 'isoCode',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(29, 4099796525503528676),
+        name: 'workHistoryDescription',
+        type: 9,
         flags: 0,
       ),
     ],
@@ -883,7 +895,14 @@ obx_int.ModelDefinition getObjectBoxModel() {
             final locationNameOffset = object.locationName == null
                 ? null
                 : fbb.writeString(object.locationName!);
-            fbb.startTable(28);
+            final isoCodeOffset = object.isoCode == null
+                ? null
+                : fbb.writeString(object.isoCode!);
+            final workHistoryDescriptionOffset =
+                object.workHistoryDescription == null
+                ? null
+                : fbb.writeString(object.workHistoryDescription!);
+            fbb.startTable(30);
             fbb.addInt64(0, object.id);
             fbb.addOffset(1, nameOffset);
             fbb.addOffset(2, emailOffset);
@@ -911,6 +930,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
             fbb.addOffset(24, locationNameOffset);
             fbb.addFloat64(25, object.latitude);
             fbb.addFloat64(26, object.longitude);
+            fbb.addOffset(27, isoCodeOffset);
+            fbb.addOffset(28, workHistoryDescriptionOffset);
             fbb.finish(fbb.endTable());
             return object.id;
           },
@@ -944,6 +965,12 @@ obx_int.ModelDefinition getObjectBoxModel() {
             final certificateExpiryDateParam = const fb.StringReader(
               asciiOptimization: true,
             ).vTableGetNullable(buffer, rootOffset, 18);
+            final workHistoryDescriptionParam = const fb.StringReader(
+              asciiOptimization: true,
+            ).vTableGetNullable(buffer, rootOffset, 60);
+            final zipCodeParam = const fb.StringReader(
+              asciiOptimization: true,
+            ).vTableGetNullable(buffer, rootOffset, 30);
             final certificateDocumentsParam = const fb.ListReader<String>(
               fb.StringReader(asciiOptimization: true),
               lazy: false,
@@ -1006,44 +1033,45 @@ obx_int.ModelDefinition getObjectBoxModel() {
               rootOffset,
               54,
             );
+            final isoCodeParam = const fb.StringReader(
+              asciiOptimization: true,
+            ).vTableGetNullable(buffer, rootOffset, 58);
             final longitudeParam = const fb.Float64Reader().vTableGetNullable(
               buffer,
               rootOffset,
               56,
             );
-            final object =
-                InspectorSignUpLocalEntity(
-                    id: idParam,
-                    name: nameParam,
-                    email: emailParam,
-                    password: passwordParam,
-                    phoneNumber: phoneNumberParam,
-                    countryCode: countryCodeParam,
-                    certificateTypeId: certificateTypeIdParam,
-                    certificateExpiryDate: certificateExpiryDateParam,
-                    certificateDocuments: certificateDocumentsParam,
-                    certificateAgencyIds: certificateAgencyIdsParam,
-                    country: countryParam,
-                    state: stateParam,
-                    city: cityParam,
-                    mailingAddress: mailingAddressParam,
-                    uploadedIdOrLicenseDocument:
-                        uploadedIdOrLicenseDocumentParam,
-                    referenceDocuments: referenceDocumentsParam,
-                    profileImage: profileImageParam,
-                    agreedToTerms: agreedToTermsParam,
-                    isTruthfully: isTruthfullyParam,
-                    role: roleParam,
-                    deviceType: deviceTypeParam,
-                    deviceToken: deviceTokenParam,
-                    locationType: locationTypeParam,
-                    locationName: locationNameParam,
-                    latitude: latitudeParam,
-                    longitude: longitudeParam,
-                  )
-                  ..zipCode = const fb.StringReader(
-                    asciiOptimization: true,
-                  ).vTableGetNullable(buffer, rootOffset, 30);
+            final object = InspectorSignUpLocalEntity(
+              id: idParam,
+              name: nameParam,
+              email: emailParam,
+              password: passwordParam,
+              phoneNumber: phoneNumberParam,
+              countryCode: countryCodeParam,
+              certificateTypeId: certificateTypeIdParam,
+              certificateExpiryDate: certificateExpiryDateParam,
+              workHistoryDescription: workHistoryDescriptionParam,
+              zipCode: zipCodeParam,
+              certificateDocuments: certificateDocumentsParam,
+              certificateAgencyIds: certificateAgencyIdsParam,
+              country: countryParam,
+              state: stateParam,
+              city: cityParam,
+              mailingAddress: mailingAddressParam,
+              uploadedIdOrLicenseDocument: uploadedIdOrLicenseDocumentParam,
+              referenceDocuments: referenceDocumentsParam,
+              profileImage: profileImageParam,
+              agreedToTerms: agreedToTermsParam,
+              isTruthfully: isTruthfullyParam,
+              role: roleParam,
+              deviceType: deviceTypeParam,
+              deviceToken: deviceTokenParam,
+              locationType: locationTypeParam,
+              locationName: locationNameParam,
+              latitude: latitudeParam,
+              isoCode: isoCodeParam,
+              longitude: longitudeParam,
+            );
 
             return object;
           },
@@ -1390,4 +1418,15 @@ class InspectorSignUpLocalEntity_ {
   static final longitude = obx.QueryDoubleProperty<InspectorSignUpLocalEntity>(
     _entities[2].properties[26],
   );
+
+  /// See [InspectorSignUpLocalEntity.isoCode].
+  static final isoCode = obx.QueryStringProperty<InspectorSignUpLocalEntity>(
+    _entities[2].properties[27],
+  );
+
+  /// See [InspectorSignUpLocalEntity.workHistoryDescription].
+  static final workHistoryDescription =
+      obx.QueryStringProperty<InspectorSignUpLocalEntity>(
+        _entities[2].properties[28],
+      );
 }

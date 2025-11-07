@@ -14,6 +14,8 @@ class InspectorCommonAuthBar extends StatelessWidget {
 
   final String image;
   final bool showBackButton;
+  final bool? showSubscriptionBanner;
+
   final ResponsiveUiConfig rc;
 
   const InspectorCommonAuthBar({
@@ -24,6 +26,7 @@ class InspectorCommonAuthBar extends StatelessWidget {
     required this.bottomSection,
     required this.image,
     required this.showBackButton,
+    this.showSubscriptionBanner = false,
     required this.rc,
     super.key,
   });
@@ -66,7 +69,7 @@ class InspectorCommonAuthBar extends StatelessWidget {
                 Positioned(
                   left: 24,
                   right: 24,
-                  top: showBackButton ? 40 : 80,
+                  top: showBackButton ? 40 : showSubscriptionBanner! ? 40 : 80,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -89,28 +92,33 @@ class InspectorCommonAuthBar extends StatelessWidget {
                         color: Colors.white,
                       ),
 
-                      const SizedBox(height: 110),
-                      Container(
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.shade200,
-                              blurRadius: 12,
-                              offset: const Offset(0, 6),
+                      SizedBox(
+                        height: showSubscriptionBanner == true ? 0 : 110,
+                      ),
+                      showSubscriptionBanner == true
+                          ? SizedBox()
+                          : Container(
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(20),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.grey.shade200,
+                                    blurRadius: 12,
+                                    offset: const Offset(0, 6),
+                                  ),
+                                ],
+                              ),
+                              padding: const EdgeInsets.all(15.0),
+                              child: headerWidget,
                             ),
-                          ],
-                        ),
-                        padding: const EdgeInsets.all(15.0),
-                        child: headerWidget,
-                      ),
-
-                      Container(
-                        color: AppColors.whiteColor,
-                        child: CustomPaint(painter: TrianglePainter()),
-                      ),
+                      showSubscriptionBanner == true
+                          ? SizedBox()
+                          : Container(
+                              color: AppColors.whiteColor,
+                              child: CustomPaint(painter: TrianglePainter()),
+                            ),
                     ],
                   ),
                 ),
@@ -123,7 +131,10 @@ class InspectorCommonAuthBar extends StatelessWidget {
           ],
         ),
       ),
-      bottomNavigationBar: SafeArea(child: bottomSection),
+
+      bottomNavigationBar: showSubscriptionBanner!
+          ? null
+          : SafeArea(child: bottomSection),
     );
   }
 }

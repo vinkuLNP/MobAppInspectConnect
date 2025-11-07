@@ -2,6 +2,8 @@ import 'package:inspect_connect/core/commondomain/entities/based_api_result/api_
 import 'package:inspect_connect/features/auth_flow/domain/entities/auth_user.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/certificate_agency_entity.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/certificate_type_entity.dart';
+import 'package:inspect_connect/features/auth_flow/domain/entities/inspector_sign_up_entity.dart';
+import 'package:inspect_connect/features/auth_flow/domain/entities/inspector_user.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/user_detail.dart';
 
 abstract class AuthRepository {
@@ -32,6 +34,10 @@ abstract class AuthRepository {
     required String phoneOtp,
     required String phoneNumber,
     required String countryCode,
+  });
+
+   Future<ApiResultModel<InspectorUser>> inspectorSignUp({
+    required InspectorSignUpLocalEntity inspectorSignUpLocalEntity
   });
 
    Future<ApiResultModel<AuthUser>> resendOtp({
