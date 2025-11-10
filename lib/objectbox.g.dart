@@ -21,187 +21,301 @@ export 'package:objectbox/objectbox.dart'; // so that callers only have to impor
 
 final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
-    id: const obx_int.IdUid(1, 5131635798235456301),
-    name: 'AuthUserLocalEntity',
-    lastPropertyId: const obx_int.IdUid(30, 3271705913206409547),
+    id: const obx_int.IdUid(1, 6706348540238291838),
+    name: 'AuthUserDeviceEntity',
+    lastPropertyId: const obx_int.IdUid(4, 1656981505077753466),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(1, 4611869412995201516),
+        id: const obx_int.IdUid(1, 7903789545280373362),
         name: 'id',
         type: 6,
         flags: 1,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(2, 8272780988710511950),
-        name: 'token',
+        id: const obx_int.IdUid(2, 7276179211685549603),
+        name: 'deviceToken',
         type: 9,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(3, 1482861332686892814),
+        id: const obx_int.IdUid(3, 5974167347893996918),
+        name: 'deviceType',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(4, 1656981505077753466),
+        name: 'userId',
+        type: 11,
+        flags: 520,
+        indexId: const obx_int.IdUid(1, 1381949025203565816),
+        relationTarget: 'AuthUserLocalEntity',
+      ),
+    ],
+    relations: <obx_int.ModelRelation>[],
+    backlinks: <obx_int.ModelBacklink>[],
+  ),
+  obx_int.ModelEntity(
+    id: const obx_int.IdUid(2, 7510821947055321623),
+    name: 'AuthUserLocalEntity',
+    lastPropertyId: const obx_int.IdUid(43, 5105618599375191812),
+    flags: 0,
+    properties: <obx_int.ModelProperty>[
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(1, 4977728006046384477),
+        name: 'id',
+        type: 6,
+        flags: 1,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(2, 8628880249020340326),
+        name: 'authToken',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(3, 7448645097453528156),
         name: 'name',
         type: 9,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(4, 997857176921112707),
+        id: const obx_int.IdUid(4, 3400367580876140345),
         name: 'email',
         type: 9,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(5, 3976464959677611987),
+        id: const obx_int.IdUid(5, 9159726942363196862),
         name: 'phoneNumber',
         type: 9,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(6, 8134907860381373967),
+        id: const obx_int.IdUid(6, 9074335077169029502),
         name: 'countryCode',
         type: 9,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(7, 607818520923023036),
+        id: const obx_int.IdUid(7, 7142021894114820947),
         name: 'mailingAddress',
         type: 9,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(8, 5012892644845956447),
+        id: const obx_int.IdUid(8, 3761681116789920791),
         name: 'role',
         type: 6,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(9, 2706555786363321275),
+        id: const obx_int.IdUid(9, 8622226598331293884),
         name: 'status',
         type: 6,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(10, 5188505656236194826),
+        id: const obx_int.IdUid(10, 96454780337836301),
         name: 'phoneOtpVerified',
         type: 1,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(11, 3279684472998237889),
+        id: const obx_int.IdUid(11, 2748252265901843734),
         name: 'emailOtpVerified',
         type: 1,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(12, 3139177082061344221),
+        id: const obx_int.IdUid(12, 6067500703375922462),
         name: 'agreedToTerms',
         type: 1,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(13, 3448151157588637092),
+        id: const obx_int.IdUid(13, 8693323874627607521),
         name: 'isTruthfully',
         type: 1,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(14, 132889661029488037),
+        id: const obx_int.IdUid(14, 5058542504887666690),
         name: 'approvalStatusByAdmin',
         type: 6,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(15, 593940584799512486),
+        id: const obx_int.IdUid(15, 815433817228123830),
         name: 'rejectedReason',
         type: 9,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(16, 2148407587997559327),
+        id: const obx_int.IdUid(16, 4710430893609031014),
         name: 'stripeCustomerId',
         type: 9,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(17, 1493272936218018139),
+        id: const obx_int.IdUid(17, 4710107865299513468),
         name: 'stripeAccountId',
         type: 9,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(18, 4361464192518718559),
+        id: const obx_int.IdUid(18, 8933747536940468220),
         name: 'stripePayoutsEnabled',
         type: 1,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(19, 3222730919390221459),
+        id: const obx_int.IdUid(19, 8140600119593809259),
         name: 'stripeTransfersActive',
         type: 1,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(20, 3540610438679751168),
+        id: const obx_int.IdUid(20, 7589101533977070173),
         name: 'currentSubscriptionTrialDays',
         type: 6,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(21, 2332234854265821318),
+        id: const obx_int.IdUid(21, 2205212665702389342),
         name: 'currentSubscriptionAutoRenew',
         type: 6,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(22, 39882207688389351),
+        id: const obx_int.IdUid(22, 3730392305248784100),
         name: 'currentSubscriptionId',
         type: 9,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(23, 4686123977379770666),
+        id: const obx_int.IdUid(23, 1561577677941793754),
         name: 'stripeSubscriptionStatus',
         type: 9,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(24, 6140693525709463196),
+        id: const obx_int.IdUid(24, 1696120360638824616),
         name: 'walletId',
         type: 9,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(25, 5796780863751892772),
+        id: const obx_int.IdUid(25, 4241434292874720691),
         name: 'locationName',
         type: 9,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(26, 1498496296919574464),
+        id: const obx_int.IdUid(26, 4844683456458531299),
         name: 'latitude',
         type: 8,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(27, 5584120390685559358),
+        id: const obx_int.IdUid(27, 5180203900191409144),
         name: 'longitude',
         type: 8,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(28, 8462199880617792571),
+        id: const obx_int.IdUid(28, 8253652263703126921),
         name: 'createdAt',
         type: 10,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(29, 6233394496800560090),
+        id: const obx_int.IdUid(29, 3509022603680572381),
         name: 'updatedAt',
         type: 10,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(30, 3271705913206409547),
+        id: const obx_int.IdUid(30, 1461643812927463339),
+        name: 'profileImage',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(31, 2939544253580277981),
+        name: 'bookingInProgress',
+        type: 1,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(32, 7455222307864686066),
+        name: 'isDeleted',
+        type: 1,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(33, 2310972432133450897),
+        name: 'country',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(34, 2108784632282699482),
+        name: 'state',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(35, 1683338692122169949),
+        name: 'city',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(36, 7707187672438981528),
+        name: 'certificateTypeId',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(37, 3812095102116327804),
+        name: 'certificateAgencyIds',
+        type: 30,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(38, 1322619594078037508),
+        name: 'certificateDocuments',
+        type: 30,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(39, 8318957044173853223),
+        name: 'certificateExpiryDate',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(40, 6683843560515343898),
+        name: 'referenceDocuments',
+        type: 30,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(41, 2822043330167833312),
+        name: 'uploadedIdOrLicenseDocument',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(42, 7361908397267452669),
+        name: 'workHistoryDescription',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(43, 5105618599375191812),
         name: 'loginTime',
         type: 10,
         flags: 0,
@@ -217,205 +331,181 @@ final _entities = <obx_int.ModelEntity>[
     ],
   ),
   obx_int.ModelEntity(
-    id: const obx_int.IdUid(2, 8224409923190584740),
-    name: 'AuthUserDeviceEntity',
-    lastPropertyId: const obx_int.IdUid(4, 2446156020687410148),
-    flags: 0,
-    properties: <obx_int.ModelProperty>[
-      obx_int.ModelProperty(
-        id: const obx_int.IdUid(1, 1201763598529109640),
-        name: 'id',
-        type: 6,
-        flags: 1,
-      ),
-      obx_int.ModelProperty(
-        id: const obx_int.IdUid(2, 4991843973117758024),
-        name: 'deviceToken',
-        type: 9,
-        flags: 0,
-      ),
-      obx_int.ModelProperty(
-        id: const obx_int.IdUid(3, 2587492729026246349),
-        name: 'deviceType',
-        type: 9,
-        flags: 0,
-      ),
-      obx_int.ModelProperty(
-        id: const obx_int.IdUid(4, 2446156020687410148),
-        name: 'userId',
-        type: 11,
-        flags: 520,
-        indexId: const obx_int.IdUid(1, 7489877441751012150),
-        relationTarget: 'AuthUserLocalEntity',
-      ),
-    ],
-    relations: <obx_int.ModelRelation>[],
-    backlinks: <obx_int.ModelBacklink>[],
-  ),
-  obx_int.ModelEntity(
-    id: const obx_int.IdUid(7, 6897323812471320470),
+    id: const obx_int.IdUid(3, 9109420249064471506),
     name: 'InspectorSignUpLocalEntity',
-    lastPropertyId: const obx_int.IdUid(27, 6308629480548868413),
+    lastPropertyId: const obx_int.IdUid(29, 5971348717096684686),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(1, 1608022142185072257),
+        id: const obx_int.IdUid(1, 4508438178353477505),
         name: 'id',
         type: 6,
         flags: 1,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(2, 5944647149347506689),
+        id: const obx_int.IdUid(2, 5337601937719951958),
         name: 'name',
         type: 9,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(3, 2659386822160961841),
+        id: const obx_int.IdUid(3, 8984501950055425564),
         name: 'email',
         type: 9,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(4, 1777616599758635826),
+        id: const obx_int.IdUid(4, 747165839657268135),
         name: 'password',
         type: 9,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(5, 2557546231358882658),
+        id: const obx_int.IdUid(5, 1708947877299647342),
         name: 'phoneNumber',
         type: 9,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(6, 3670339820616169600),
+        id: const obx_int.IdUid(6, 8660919674515096567),
         name: 'countryCode',
         type: 9,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(7, 6779074503090054880),
+        id: const obx_int.IdUid(7, 4258692124644960770),
+        name: 'isoCode',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(8, 217125110715837022),
         name: 'certificateTypeId',
         type: 9,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(8, 8221997847214816239),
+        id: const obx_int.IdUid(9, 931265546274407687),
         name: 'certificateExpiryDate',
         type: 9,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(9, 3938258897970181186),
+        id: const obx_int.IdUid(10, 3832810131687575410),
         name: 'certificateDocuments',
         type: 30,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(10, 8826163247314718597),
+        id: const obx_int.IdUid(11, 4509228448113690047),
         name: 'certificateAgencyIds',
         type: 30,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(11, 7126946317936680765),
+        id: const obx_int.IdUid(12, 3343242310044903772),
         name: 'country',
         type: 9,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(12, 996089868518354117),
+        id: const obx_int.IdUid(13, 5929173274600292394),
         name: 'state',
         type: 9,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(13, 5549259924164504091),
+        id: const obx_int.IdUid(14, 2430642351229016959),
         name: 'city',
         type: 9,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(14, 6200623269580581175),
+        id: const obx_int.IdUid(15, 6934937195310391165),
         name: 'zipCode',
         type: 9,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(15, 96549469011877958),
+        id: const obx_int.IdUid(16, 3571384632198165329),
         name: 'mailingAddress',
         type: 9,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(16, 4302797122267047435),
+        id: const obx_int.IdUid(17, 8563527971304190649),
         name: 'uploadedIdOrLicenseDocument',
         type: 9,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(17, 4282650781858068304),
+        id: const obx_int.IdUid(18, 1303636506337963961),
+        name: 'workHistoryDescription',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(19, 8441941961876582789),
         name: 'referenceDocuments',
         type: 30,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(18, 6346452895957981168),
+        id: const obx_int.IdUid(20, 6975515860393936727),
         name: 'profileImage',
         type: 9,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(19, 3906025559829544710),
+        id: const obx_int.IdUid(21, 3310720633964425158),
         name: 'agreedToTerms',
         type: 1,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(20, 459714567419254534),
+        id: const obx_int.IdUid(22, 8596761536149048617),
         name: 'isTruthfully',
         type: 1,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(21, 4034109265116003399),
+        id: const obx_int.IdUid(23, 7853610846225801814),
         name: 'role',
         type: 6,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(22, 2820916023932604926),
+        id: const obx_int.IdUid(24, 868977506242046544),
         name: 'deviceType',
         type: 9,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(23, 7169903911769862731),
+        id: const obx_int.IdUid(25, 7537171130744517007),
         name: 'deviceToken',
         type: 9,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(24, 669343029844788976),
+        id: const obx_int.IdUid(26, 5656893369707610242),
         name: 'locationType',
         type: 9,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(25, 3421770643298715055),
+        id: const obx_int.IdUid(27, 681259737902032796),
         name: 'locationName',
         type: 9,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(26, 6170495915697225193),
+        id: const obx_int.IdUid(28, 8981014397423736499),
         name: 'latitude',
         type: 8,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(27, 6308629480548868413),
+        id: const obx_int.IdUid(29, 5971348717096684686),
         name: 'longitude',
         type: 8,
         flags: 0,
@@ -464,35 +554,13 @@ Future<obx.Store> openStore({
 obx_int.ModelDefinition getObjectBoxModel() {
   final model = obx_int.ModelInfo(
     entities: _entities,
-    lastEntityId: const obx_int.IdUid(7, 6897323812471320470),
-    lastIndexId: const obx_int.IdUid(1, 7489877441751012150),
+    lastEntityId: const obx_int.IdUid(3, 9109420249064471506),
+    lastIndexId: const obx_int.IdUid(1, 1381949025203565816),
     lastRelationId: const obx_int.IdUid(0, 0),
     lastSequenceId: const obx_int.IdUid(0, 0),
-    retiredEntityUids: const [
-      6323051419829769589,
-      5886969448355518645,
-      2314900235999128927,
-      5507700486728886686,
-    ],
+    retiredEntityUids: const [],
     retiredIndexUids: const [],
-    retiredPropertyUids: const [
-      647249224450654308,
-      5188489944007397346,
-      7320807151972493534,
-      1894962048992247963,
-      2053712292897892099,
-      6070666122015563262,
-      6551788488995435288,
-      4610802090803421973,
-      1252569695644190240,
-      8062780496289760997,
-      8820879528324421200,
-      6304320797684281056,
-      3069690599400147834,
-      5905080434010146167,
-      4175805726105451342,
-      4590080569558135951,
-    ],
+    retiredPropertyUids: const [],
     retiredRelationUids: const [],
     modelVersion: 5,
     modelVersionParserMinimum: 5,
@@ -500,8 +568,54 @@ obx_int.ModelDefinition getObjectBoxModel() {
   );
 
   final bindings = <Type, obx_int.EntityDefinition>{
-    AuthUserLocalEntity: obx_int.EntityDefinition<AuthUserLocalEntity>(
+    AuthUserDeviceEntity: obx_int.EntityDefinition<AuthUserDeviceEntity>(
       model: _entities[0],
+      toOneRelations: (AuthUserDeviceEntity object) => [object.user],
+      toManyRelations: (AuthUserDeviceEntity object) => {},
+      getId: (AuthUserDeviceEntity object) => object.id,
+      setId: (AuthUserDeviceEntity object, int id) {
+        object.id = id;
+      },
+      objectToFB: (AuthUserDeviceEntity object, fb.Builder fbb) {
+        final deviceTokenOffset = object.deviceToken == null
+            ? null
+            : fbb.writeString(object.deviceToken!);
+        final deviceTypeOffset = object.deviceType == null
+            ? null
+            : fbb.writeString(object.deviceType!);
+        fbb.startTable(5);
+        fbb.addInt64(0, object.id);
+        fbb.addOffset(1, deviceTokenOffset);
+        fbb.addOffset(2, deviceTypeOffset);
+        fbb.addInt64(3, object.user.targetId);
+        fbb.finish(fbb.endTable());
+        return object.id;
+      },
+      objectFromFB: (obx.Store store, ByteData fbData) {
+        final buffer = fb.BufferContext(fbData);
+        final rootOffset = buffer.derefObject(0);
+        final deviceTokenParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGetNullable(buffer, rootOffset, 6);
+        final deviceTypeParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGetNullable(buffer, rootOffset, 8);
+        final object = AuthUserDeviceEntity(
+          deviceToken: deviceTokenParam,
+          deviceType: deviceTypeParam,
+        )..id = const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0);
+        object.user.targetId = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          10,
+          0,
+        );
+        object.user.attach(store);
+        return object;
+      },
+    ),
+    AuthUserLocalEntity: obx_int.EntityDefinition<AuthUserLocalEntity>(
+      model: _entities[1],
       toOneRelations: (AuthUserLocalEntity object) => [],
       toManyRelations: (AuthUserLocalEntity object) => {
         obx_int.RelInfo<AuthUserDeviceEntity>.toOneBacklink(
@@ -515,9 +629,9 @@ obx_int.ModelDefinition getObjectBoxModel() {
         object.id = id;
       },
       objectToFB: (AuthUserLocalEntity object, fb.Builder fbb) {
-        final tokenOffset = object.token == null
+        final authTokenOffset = object.authToken == null
             ? null
-            : fbb.writeString(object.token!);
+            : fbb.writeString(object.authToken!);
         final nameOffset = object.name == null
             ? null
             : fbb.writeString(object.name!);
@@ -555,9 +669,56 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final locationNameOffset = object.locationName == null
             ? null
             : fbb.writeString(object.locationName!);
-        fbb.startTable(31);
+        final profileImageOffset = object.profileImage == null
+            ? null
+            : fbb.writeString(object.profileImage!);
+        final countryOffset = object.country == null
+            ? null
+            : fbb.writeString(object.country!);
+        final stateOffset = object.state == null
+            ? null
+            : fbb.writeString(object.state!);
+        final cityOffset = object.city == null
+            ? null
+            : fbb.writeString(object.city!);
+        final certificateTypeIdOffset = object.certificateTypeId == null
+            ? null
+            : fbb.writeString(object.certificateTypeId!);
+        final certificateAgencyIdsOffset = object.certificateAgencyIds == null
+            ? null
+            : fbb.writeList(
+                object.certificateAgencyIds!
+                    .map(fbb.writeString)
+                    .toList(growable: false),
+              );
+        final certificateDocumentsOffset = object.certificateDocuments == null
+            ? null
+            : fbb.writeList(
+                object.certificateDocuments!
+                    .map(fbb.writeString)
+                    .toList(growable: false),
+              );
+        final certificateExpiryDateOffset = object.certificateExpiryDate == null
+            ? null
+            : fbb.writeString(object.certificateExpiryDate!);
+        final referenceDocumentsOffset = object.referenceDocuments == null
+            ? null
+            : fbb.writeList(
+                object.referenceDocuments!
+                    .map(fbb.writeString)
+                    .toList(growable: false),
+              );
+        final uploadedIdOrLicenseDocumentOffset =
+            object.uploadedIdOrLicenseDocument == null
+            ? null
+            : fbb.writeString(object.uploadedIdOrLicenseDocument!);
+        final workHistoryDescriptionOffset =
+            object.workHistoryDescription == null
+            ? null
+            : fbb.writeString(object.workHistoryDescription!);
+        fbb.startTable(44);
         fbb.addInt64(0, object.id);
-        fbb.addOffset(1, tokenOffset);
+        fbb.addOffset(1, authTokenOffset);
         fbb.addOffset(2, nameOffset);
         fbb.addOffset(3, emailOffset);
         fbb.addOffset(4, phoneNumberOffset);
@@ -585,7 +746,20 @@ obx_int.ModelDefinition getObjectBoxModel() {
         fbb.addFloat64(26, object.longitude);
         fbb.addInt64(27, object.createdAt?.millisecondsSinceEpoch);
         fbb.addInt64(28, object.updatedAt?.millisecondsSinceEpoch);
-        fbb.addInt64(29, object.loginTime?.millisecondsSinceEpoch);
+        fbb.addOffset(29, profileImageOffset);
+        fbb.addBool(30, object.bookingInProgress);
+        fbb.addBool(31, object.isDeleted);
+        fbb.addOffset(32, countryOffset);
+        fbb.addOffset(33, stateOffset);
+        fbb.addOffset(34, cityOffset);
+        fbb.addOffset(35, certificateTypeIdOffset);
+        fbb.addOffset(36, certificateAgencyIdsOffset);
+        fbb.addOffset(37, certificateDocumentsOffset);
+        fbb.addOffset(38, certificateExpiryDateOffset);
+        fbb.addOffset(39, referenceDocumentsOffset);
+        fbb.addOffset(40, uploadedIdOrLicenseDocumentOffset);
+        fbb.addOffset(41, workHistoryDescriptionOffset);
+        fbb.addInt64(42, object.loginTime?.millisecondsSinceEpoch);
         fbb.finish(fbb.endTable());
         return object.id;
       },
@@ -605,9 +779,9 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final loginTimeValue = const fb.Int64Reader().vTableGetNullable(
           buffer,
           rootOffset,
-          62,
+          88,
         );
-        final tokenParam = const fb.StringReader(
+        final authTokenParam = const fb.StringReader(
           asciiOptimization: true,
         ).vTableGetNullable(buffer, rootOffset, 6);
         final nameParam = const fb.StringReader(
@@ -705,8 +879,54 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final loginTimeParam = loginTimeValue == null
             ? null
             : DateTime.fromMillisecondsSinceEpoch(loginTimeValue);
+        final profileImageParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGetNullable(buffer, rootOffset, 62);
+        final bookingInProgressParam = const fb.BoolReader().vTableGetNullable(
+          buffer,
+          rootOffset,
+          64,
+        );
+        final isDeletedParam = const fb.BoolReader().vTableGetNullable(
+          buffer,
+          rootOffset,
+          66,
+        );
+        final countryParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGetNullable(buffer, rootOffset, 68);
+        final stateParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGetNullable(buffer, rootOffset, 70);
+        final cityParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGetNullable(buffer, rootOffset, 72);
+        final certificateTypeIdParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGetNullable(buffer, rootOffset, 74);
+        final certificateAgencyIdsParam = const fb.ListReader<String>(
+          fb.StringReader(asciiOptimization: true),
+          lazy: false,
+        ).vTableGetNullable(buffer, rootOffset, 76);
+        final certificateDocumentsParam = const fb.ListReader<String>(
+          fb.StringReader(asciiOptimization: true),
+          lazy: false,
+        ).vTableGetNullable(buffer, rootOffset, 78);
+        final certificateExpiryDateParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGetNullable(buffer, rootOffset, 80);
+        final referenceDocumentsParam = const fb.ListReader<String>(
+          fb.StringReader(asciiOptimization: true),
+          lazy: false,
+        ).vTableGetNullable(buffer, rootOffset, 82);
+        final uploadedIdOrLicenseDocumentParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGetNullable(buffer, rootOffset, 84);
+        final workHistoryDescriptionParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGetNullable(buffer, rootOffset, 86);
         final object = AuthUserLocalEntity(
-          token: tokenParam,
+          authToken: authTokenParam,
           name: nameParam,
           email: emailParam,
           phoneNumber: phoneNumberParam,
@@ -735,6 +955,19 @@ obx_int.ModelDefinition getObjectBoxModel() {
           createdAt: createdAtParam,
           updatedAt: updatedAtParam,
           loginTime: loginTimeParam,
+          profileImage: profileImageParam,
+          bookingInProgress: bookingInProgressParam,
+          isDeleted: isDeletedParam,
+          country: countryParam,
+          state: stateParam,
+          city: cityParam,
+          certificateTypeId: certificateTypeIdParam,
+          certificateAgencyIds: certificateAgencyIdsParam,
+          certificateDocuments: certificateDocumentsParam,
+          certificateExpiryDate: certificateExpiryDateParam,
+          referenceDocuments: referenceDocumentsParam,
+          uploadedIdOrLicenseDocument: uploadedIdOrLicenseDocumentParam,
+          workHistoryDescription: workHistoryDescriptionParam,
         )..id = const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0);
         obx_int.InternalToManyAccess.setRelInfo<AuthUserLocalEntity>(
           object.devices,
@@ -745,52 +978,6 @@ obx_int.ModelDefinition getObjectBoxModel() {
             (AuthUserDeviceEntity srcObject) => srcObject.user,
           ),
         );
-        return object;
-      },
-    ),
-    AuthUserDeviceEntity: obx_int.EntityDefinition<AuthUserDeviceEntity>(
-      model: _entities[1],
-      toOneRelations: (AuthUserDeviceEntity object) => [object.user],
-      toManyRelations: (AuthUserDeviceEntity object) => {},
-      getId: (AuthUserDeviceEntity object) => object.id,
-      setId: (AuthUserDeviceEntity object, int id) {
-        object.id = id;
-      },
-      objectToFB: (AuthUserDeviceEntity object, fb.Builder fbb) {
-        final deviceTokenOffset = object.deviceToken == null
-            ? null
-            : fbb.writeString(object.deviceToken!);
-        final deviceTypeOffset = object.deviceType == null
-            ? null
-            : fbb.writeString(object.deviceType!);
-        fbb.startTable(5);
-        fbb.addInt64(0, object.id);
-        fbb.addOffset(1, deviceTokenOffset);
-        fbb.addOffset(2, deviceTypeOffset);
-        fbb.addInt64(3, object.user.targetId);
-        fbb.finish(fbb.endTable());
-        return object.id;
-      },
-      objectFromFB: (obx.Store store, ByteData fbData) {
-        final buffer = fb.BufferContext(fbData);
-        final rootOffset = buffer.derefObject(0);
-        final deviceTokenParam = const fb.StringReader(
-          asciiOptimization: true,
-        ).vTableGetNullable(buffer, rootOffset, 6);
-        final deviceTypeParam = const fb.StringReader(
-          asciiOptimization: true,
-        ).vTableGetNullable(buffer, rootOffset, 8);
-        final object = AuthUserDeviceEntity(
-          deviceToken: deviceTokenParam,
-          deviceType: deviceTypeParam,
-        )..id = const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0);
-        object.user.targetId = const fb.Int64Reader().vTableGet(
-          buffer,
-          rootOffset,
-          10,
-          0,
-        );
-        object.user.attach(store);
         return object;
       },
     ),
@@ -819,6 +1006,9 @@ obx_int.ModelDefinition getObjectBoxModel() {
             final countryCodeOffset = object.countryCode == null
                 ? null
                 : fbb.writeString(object.countryCode!);
+            final isoCodeOffset = object.isoCode == null
+                ? null
+                : fbb.writeString(object.isoCode!);
             final certificateTypeIdOffset = object.certificateTypeId == null
                 ? null
                 : fbb.writeString(object.certificateTypeId!);
@@ -861,6 +1051,10 @@ obx_int.ModelDefinition getObjectBoxModel() {
                 object.uploadedIdOrLicenseDocument == null
                 ? null
                 : fbb.writeString(object.uploadedIdOrLicenseDocument!);
+            final workHistoryDescriptionOffset =
+                object.workHistoryDescription == null
+                ? null
+                : fbb.writeString(object.workHistoryDescription!);
             final referenceDocumentsOffset = object.referenceDocuments == null
                 ? null
                 : fbb.writeList(
@@ -883,34 +1077,36 @@ obx_int.ModelDefinition getObjectBoxModel() {
             final locationNameOffset = object.locationName == null
                 ? null
                 : fbb.writeString(object.locationName!);
-            fbb.startTable(28);
+            fbb.startTable(30);
             fbb.addInt64(0, object.id);
             fbb.addOffset(1, nameOffset);
             fbb.addOffset(2, emailOffset);
             fbb.addOffset(3, passwordOffset);
             fbb.addOffset(4, phoneNumberOffset);
             fbb.addOffset(5, countryCodeOffset);
-            fbb.addOffset(6, certificateTypeIdOffset);
-            fbb.addOffset(7, certificateExpiryDateOffset);
-            fbb.addOffset(8, certificateDocumentsOffset);
-            fbb.addOffset(9, certificateAgencyIdsOffset);
-            fbb.addOffset(10, countryOffset);
-            fbb.addOffset(11, stateOffset);
-            fbb.addOffset(12, cityOffset);
-            fbb.addOffset(13, zipCodeOffset);
-            fbb.addOffset(14, mailingAddressOffset);
-            fbb.addOffset(15, uploadedIdOrLicenseDocumentOffset);
-            fbb.addOffset(16, referenceDocumentsOffset);
-            fbb.addOffset(17, profileImageOffset);
-            fbb.addBool(18, object.agreedToTerms);
-            fbb.addBool(19, object.isTruthfully);
-            fbb.addInt64(20, object.role);
-            fbb.addOffset(21, deviceTypeOffset);
-            fbb.addOffset(22, deviceTokenOffset);
-            fbb.addOffset(23, locationTypeOffset);
-            fbb.addOffset(24, locationNameOffset);
-            fbb.addFloat64(25, object.latitude);
-            fbb.addFloat64(26, object.longitude);
+            fbb.addOffset(6, isoCodeOffset);
+            fbb.addOffset(7, certificateTypeIdOffset);
+            fbb.addOffset(8, certificateExpiryDateOffset);
+            fbb.addOffset(9, certificateDocumentsOffset);
+            fbb.addOffset(10, certificateAgencyIdsOffset);
+            fbb.addOffset(11, countryOffset);
+            fbb.addOffset(12, stateOffset);
+            fbb.addOffset(13, cityOffset);
+            fbb.addOffset(14, zipCodeOffset);
+            fbb.addOffset(15, mailingAddressOffset);
+            fbb.addOffset(16, uploadedIdOrLicenseDocumentOffset);
+            fbb.addOffset(17, workHistoryDescriptionOffset);
+            fbb.addOffset(18, referenceDocumentsOffset);
+            fbb.addOffset(19, profileImageOffset);
+            fbb.addBool(20, object.agreedToTerms);
+            fbb.addBool(21, object.isTruthfully);
+            fbb.addInt64(22, object.role);
+            fbb.addOffset(23, deviceTypeOffset);
+            fbb.addOffset(24, deviceTokenOffset);
+            fbb.addOffset(25, locationTypeOffset);
+            fbb.addOffset(26, locationNameOffset);
+            fbb.addFloat64(27, object.latitude);
+            fbb.addFloat64(28, object.longitude);
             fbb.finish(fbb.endTable());
             return object.id;
           },
@@ -940,110 +1136,117 @@ obx_int.ModelDefinition getObjectBoxModel() {
             ).vTableGetNullable(buffer, rootOffset, 14);
             final certificateTypeIdParam = const fb.StringReader(
               asciiOptimization: true,
-            ).vTableGetNullable(buffer, rootOffset, 16);
+            ).vTableGetNullable(buffer, rootOffset, 18);
             final certificateExpiryDateParam = const fb.StringReader(
               asciiOptimization: true,
-            ).vTableGetNullable(buffer, rootOffset, 18);
+            ).vTableGetNullable(buffer, rootOffset, 20);
+            final workHistoryDescriptionParam = const fb.StringReader(
+              asciiOptimization: true,
+            ).vTableGetNullable(buffer, rootOffset, 38);
+            final zipCodeParam = const fb.StringReader(
+              asciiOptimization: true,
+            ).vTableGetNullable(buffer, rootOffset, 32);
             final certificateDocumentsParam = const fb.ListReader<String>(
               fb.StringReader(asciiOptimization: true),
               lazy: false,
-            ).vTableGetNullable(buffer, rootOffset, 20);
+            ).vTableGetNullable(buffer, rootOffset, 22);
             final certificateAgencyIdsParam = const fb.ListReader<String>(
               fb.StringReader(asciiOptimization: true),
               lazy: false,
-            ).vTableGetNullable(buffer, rootOffset, 22);
+            ).vTableGetNullable(buffer, rootOffset, 24);
             final countryParam = const fb.StringReader(
               asciiOptimization: true,
-            ).vTableGetNullable(buffer, rootOffset, 24);
+            ).vTableGetNullable(buffer, rootOffset, 26);
             final stateParam = const fb.StringReader(
               asciiOptimization: true,
-            ).vTableGetNullable(buffer, rootOffset, 26);
+            ).vTableGetNullable(buffer, rootOffset, 28);
             final cityParam = const fb.StringReader(
               asciiOptimization: true,
-            ).vTableGetNullable(buffer, rootOffset, 28);
+            ).vTableGetNullable(buffer, rootOffset, 30);
             final mailingAddressParam = const fb.StringReader(
               asciiOptimization: true,
-            ).vTableGetNullable(buffer, rootOffset, 32);
+            ).vTableGetNullable(buffer, rootOffset, 34);
             final uploadedIdOrLicenseDocumentParam = const fb.StringReader(
               asciiOptimization: true,
-            ).vTableGetNullable(buffer, rootOffset, 34);
+            ).vTableGetNullable(buffer, rootOffset, 36);
             final referenceDocumentsParam = const fb.ListReader<String>(
               fb.StringReader(asciiOptimization: true),
               lazy: false,
-            ).vTableGetNullable(buffer, rootOffset, 36);
+            ).vTableGetNullable(buffer, rootOffset, 40);
             final profileImageParam = const fb.StringReader(
               asciiOptimization: true,
-            ).vTableGetNullable(buffer, rootOffset, 38);
+            ).vTableGetNullable(buffer, rootOffset, 42);
             final agreedToTermsParam = const fb.BoolReader().vTableGetNullable(
-              buffer,
-              rootOffset,
-              40,
-            );
-            final isTruthfullyParam = const fb.BoolReader().vTableGetNullable(
-              buffer,
-              rootOffset,
-              42,
-            );
-            final roleParam = const fb.Int64Reader().vTableGetNullable(
               buffer,
               rootOffset,
               44,
             );
+            final isTruthfullyParam = const fb.BoolReader().vTableGetNullable(
+              buffer,
+              rootOffset,
+              46,
+            );
+            final roleParam = const fb.Int64Reader().vTableGetNullable(
+              buffer,
+              rootOffset,
+              48,
+            );
             final deviceTypeParam = const fb.StringReader(
               asciiOptimization: true,
-            ).vTableGetNullable(buffer, rootOffset, 46);
+            ).vTableGetNullable(buffer, rootOffset, 50);
             final deviceTokenParam = const fb.StringReader(
               asciiOptimization: true,
-            ).vTableGetNullable(buffer, rootOffset, 48);
+            ).vTableGetNullable(buffer, rootOffset, 52);
             final locationTypeParam = const fb.StringReader(
               asciiOptimization: true,
-            ).vTableGetNullable(buffer, rootOffset, 50);
+            ).vTableGetNullable(buffer, rootOffset, 54);
             final locationNameParam = const fb.StringReader(
               asciiOptimization: true,
-            ).vTableGetNullable(buffer, rootOffset, 52);
+            ).vTableGetNullable(buffer, rootOffset, 56);
             final latitudeParam = const fb.Float64Reader().vTableGetNullable(
               buffer,
               rootOffset,
-              54,
+              58,
             );
+            final isoCodeParam = const fb.StringReader(
+              asciiOptimization: true,
+            ).vTableGetNullable(buffer, rootOffset, 16);
             final longitudeParam = const fb.Float64Reader().vTableGetNullable(
               buffer,
               rootOffset,
-              56,
+              60,
             );
-            final object =
-                InspectorSignUpLocalEntity(
-                    id: idParam,
-                    name: nameParam,
-                    email: emailParam,
-                    password: passwordParam,
-                    phoneNumber: phoneNumberParam,
-                    countryCode: countryCodeParam,
-                    certificateTypeId: certificateTypeIdParam,
-                    certificateExpiryDate: certificateExpiryDateParam,
-                    certificateDocuments: certificateDocumentsParam,
-                    certificateAgencyIds: certificateAgencyIdsParam,
-                    country: countryParam,
-                    state: stateParam,
-                    city: cityParam,
-                    mailingAddress: mailingAddressParam,
-                    uploadedIdOrLicenseDocument:
-                        uploadedIdOrLicenseDocumentParam,
-                    referenceDocuments: referenceDocumentsParam,
-                    profileImage: profileImageParam,
-                    agreedToTerms: agreedToTermsParam,
-                    isTruthfully: isTruthfullyParam,
-                    role: roleParam,
-                    deviceType: deviceTypeParam,
-                    deviceToken: deviceTokenParam,
-                    locationType: locationTypeParam,
-                    locationName: locationNameParam,
-                    latitude: latitudeParam,
-                    longitude: longitudeParam,
-                  )
-                  ..zipCode = const fb.StringReader(
-                    asciiOptimization: true,
-                  ).vTableGetNullable(buffer, rootOffset, 30);
+            final object = InspectorSignUpLocalEntity(
+              id: idParam,
+              name: nameParam,
+              email: emailParam,
+              password: passwordParam,
+              phoneNumber: phoneNumberParam,
+              countryCode: countryCodeParam,
+              certificateTypeId: certificateTypeIdParam,
+              certificateExpiryDate: certificateExpiryDateParam,
+              workHistoryDescription: workHistoryDescriptionParam,
+              zipCode: zipCodeParam,
+              certificateDocuments: certificateDocumentsParam,
+              certificateAgencyIds: certificateAgencyIdsParam,
+              country: countryParam,
+              state: stateParam,
+              city: cityParam,
+              mailingAddress: mailingAddressParam,
+              uploadedIdOrLicenseDocument: uploadedIdOrLicenseDocumentParam,
+              referenceDocuments: referenceDocumentsParam,
+              profileImage: profileImageParam,
+              agreedToTerms: agreedToTermsParam,
+              isTruthfully: isTruthfullyParam,
+              role: roleParam,
+              deviceType: deviceTypeParam,
+              deviceToken: deviceTokenParam,
+              locationType: locationTypeParam,
+              locationName: locationNameParam,
+              latitude: latitudeParam,
+              isoCode: isoCodeParam,
+              longitude: longitudeParam,
+            );
 
             return object;
           },
@@ -1053,189 +1256,255 @@ obx_int.ModelDefinition getObjectBoxModel() {
   return obx_int.ModelDefinition(model, bindings);
 }
 
+/// [AuthUserDeviceEntity] entity fields to define ObjectBox queries.
+class AuthUserDeviceEntity_ {
+  /// See [AuthUserDeviceEntity.id].
+  static final id = obx.QueryIntegerProperty<AuthUserDeviceEntity>(
+    _entities[0].properties[0],
+  );
+
+  /// See [AuthUserDeviceEntity.deviceToken].
+  static final deviceToken = obx.QueryStringProperty<AuthUserDeviceEntity>(
+    _entities[0].properties[1],
+  );
+
+  /// See [AuthUserDeviceEntity.deviceType].
+  static final deviceType = obx.QueryStringProperty<AuthUserDeviceEntity>(
+    _entities[0].properties[2],
+  );
+
+  /// See [AuthUserDeviceEntity.user].
+  static final user =
+      obx.QueryRelationToOne<AuthUserDeviceEntity, AuthUserLocalEntity>(
+        _entities[0].properties[3],
+      );
+}
+
 /// [AuthUserLocalEntity] entity fields to define ObjectBox queries.
 class AuthUserLocalEntity_ {
   /// See [AuthUserLocalEntity.id].
   static final id = obx.QueryIntegerProperty<AuthUserLocalEntity>(
-    _entities[0].properties[0],
+    _entities[1].properties[0],
   );
 
-  /// See [AuthUserLocalEntity.token].
-  static final token = obx.QueryStringProperty<AuthUserLocalEntity>(
-    _entities[0].properties[1],
+  /// See [AuthUserLocalEntity.authToken].
+  static final authToken = obx.QueryStringProperty<AuthUserLocalEntity>(
+    _entities[1].properties[1],
   );
 
   /// See [AuthUserLocalEntity.name].
   static final name = obx.QueryStringProperty<AuthUserLocalEntity>(
-    _entities[0].properties[2],
+    _entities[1].properties[2],
   );
 
   /// See [AuthUserLocalEntity.email].
   static final email = obx.QueryStringProperty<AuthUserLocalEntity>(
-    _entities[0].properties[3],
+    _entities[1].properties[3],
   );
 
   /// See [AuthUserLocalEntity.phoneNumber].
   static final phoneNumber = obx.QueryStringProperty<AuthUserLocalEntity>(
-    _entities[0].properties[4],
+    _entities[1].properties[4],
   );
 
   /// See [AuthUserLocalEntity.countryCode].
   static final countryCode = obx.QueryStringProperty<AuthUserLocalEntity>(
-    _entities[0].properties[5],
+    _entities[1].properties[5],
   );
 
   /// See [AuthUserLocalEntity.mailingAddress].
   static final mailingAddress = obx.QueryStringProperty<AuthUserLocalEntity>(
-    _entities[0].properties[6],
+    _entities[1].properties[6],
   );
 
   /// See [AuthUserLocalEntity.role].
   static final role = obx.QueryIntegerProperty<AuthUserLocalEntity>(
-    _entities[0].properties[7],
+    _entities[1].properties[7],
   );
 
   /// See [AuthUserLocalEntity.status].
   static final status = obx.QueryIntegerProperty<AuthUserLocalEntity>(
-    _entities[0].properties[8],
+    _entities[1].properties[8],
   );
 
   /// See [AuthUserLocalEntity.phoneOtpVerified].
   static final phoneOtpVerified = obx.QueryBooleanProperty<AuthUserLocalEntity>(
-    _entities[0].properties[9],
+    _entities[1].properties[9],
   );
 
   /// See [AuthUserLocalEntity.emailOtpVerified].
   static final emailOtpVerified = obx.QueryBooleanProperty<AuthUserLocalEntity>(
-    _entities[0].properties[10],
+    _entities[1].properties[10],
   );
 
   /// See [AuthUserLocalEntity.agreedToTerms].
   static final agreedToTerms = obx.QueryBooleanProperty<AuthUserLocalEntity>(
-    _entities[0].properties[11],
+    _entities[1].properties[11],
   );
 
   /// See [AuthUserLocalEntity.isTruthfully].
   static final isTruthfully = obx.QueryBooleanProperty<AuthUserLocalEntity>(
-    _entities[0].properties[12],
+    _entities[1].properties[12],
   );
 
   /// See [AuthUserLocalEntity.approvalStatusByAdmin].
   static final approvalStatusByAdmin =
       obx.QueryIntegerProperty<AuthUserLocalEntity>(
-        _entities[0].properties[13],
+        _entities[1].properties[13],
       );
 
   /// See [AuthUserLocalEntity.rejectedReason].
   static final rejectedReason = obx.QueryStringProperty<AuthUserLocalEntity>(
-    _entities[0].properties[14],
+    _entities[1].properties[14],
   );
 
   /// See [AuthUserLocalEntity.stripeCustomerId].
   static final stripeCustomerId = obx.QueryStringProperty<AuthUserLocalEntity>(
-    _entities[0].properties[15],
+    _entities[1].properties[15],
   );
 
   /// See [AuthUserLocalEntity.stripeAccountId].
   static final stripeAccountId = obx.QueryStringProperty<AuthUserLocalEntity>(
-    _entities[0].properties[16],
+    _entities[1].properties[16],
   );
 
   /// See [AuthUserLocalEntity.stripePayoutsEnabled].
   static final stripePayoutsEnabled =
       obx.QueryBooleanProperty<AuthUserLocalEntity>(
-        _entities[0].properties[17],
+        _entities[1].properties[17],
       );
 
   /// See [AuthUserLocalEntity.stripeTransfersActive].
   static final stripeTransfersActive =
       obx.QueryBooleanProperty<AuthUserLocalEntity>(
-        _entities[0].properties[18],
+        _entities[1].properties[18],
       );
 
   /// See [AuthUserLocalEntity.currentSubscriptionTrialDays].
   static final currentSubscriptionTrialDays =
       obx.QueryIntegerProperty<AuthUserLocalEntity>(
-        _entities[0].properties[19],
+        _entities[1].properties[19],
       );
 
   /// See [AuthUserLocalEntity.currentSubscriptionAutoRenew].
   static final currentSubscriptionAutoRenew =
       obx.QueryIntegerProperty<AuthUserLocalEntity>(
-        _entities[0].properties[20],
+        _entities[1].properties[20],
       );
 
   /// See [AuthUserLocalEntity.currentSubscriptionId].
   static final currentSubscriptionId =
-      obx.QueryStringProperty<AuthUserLocalEntity>(_entities[0].properties[21]);
+      obx.QueryStringProperty<AuthUserLocalEntity>(_entities[1].properties[21]);
 
   /// See [AuthUserLocalEntity.stripeSubscriptionStatus].
   static final stripeSubscriptionStatus =
-      obx.QueryStringProperty<AuthUserLocalEntity>(_entities[0].properties[22]);
+      obx.QueryStringProperty<AuthUserLocalEntity>(_entities[1].properties[22]);
 
   /// See [AuthUserLocalEntity.walletId].
   static final walletId = obx.QueryStringProperty<AuthUserLocalEntity>(
-    _entities[0].properties[23],
+    _entities[1].properties[23],
   );
 
   /// See [AuthUserLocalEntity.locationName].
   static final locationName = obx.QueryStringProperty<AuthUserLocalEntity>(
-    _entities[0].properties[24],
+    _entities[1].properties[24],
   );
 
   /// See [AuthUserLocalEntity.latitude].
   static final latitude = obx.QueryDoubleProperty<AuthUserLocalEntity>(
-    _entities[0].properties[25],
+    _entities[1].properties[25],
   );
 
   /// See [AuthUserLocalEntity.longitude].
   static final longitude = obx.QueryDoubleProperty<AuthUserLocalEntity>(
-    _entities[0].properties[26],
+    _entities[1].properties[26],
   );
 
   /// See [AuthUserLocalEntity.createdAt].
   static final createdAt = obx.QueryDateProperty<AuthUserLocalEntity>(
-    _entities[0].properties[27],
+    _entities[1].properties[27],
   );
 
   /// See [AuthUserLocalEntity.updatedAt].
   static final updatedAt = obx.QueryDateProperty<AuthUserLocalEntity>(
-    _entities[0].properties[28],
+    _entities[1].properties[28],
   );
+
+  /// See [AuthUserLocalEntity.profileImage].
+  static final profileImage = obx.QueryStringProperty<AuthUserLocalEntity>(
+    _entities[1].properties[29],
+  );
+
+  /// See [AuthUserLocalEntity.bookingInProgress].
+  static final bookingInProgress =
+      obx.QueryBooleanProperty<AuthUserLocalEntity>(
+        _entities[1].properties[30],
+      );
+
+  /// See [AuthUserLocalEntity.isDeleted].
+  static final isDeleted = obx.QueryBooleanProperty<AuthUserLocalEntity>(
+    _entities[1].properties[31],
+  );
+
+  /// See [AuthUserLocalEntity.country].
+  static final country = obx.QueryStringProperty<AuthUserLocalEntity>(
+    _entities[1].properties[32],
+  );
+
+  /// See [AuthUserLocalEntity.state].
+  static final state = obx.QueryStringProperty<AuthUserLocalEntity>(
+    _entities[1].properties[33],
+  );
+
+  /// See [AuthUserLocalEntity.city].
+  static final city = obx.QueryStringProperty<AuthUserLocalEntity>(
+    _entities[1].properties[34],
+  );
+
+  /// See [AuthUserLocalEntity.certificateTypeId].
+  static final certificateTypeId = obx.QueryStringProperty<AuthUserLocalEntity>(
+    _entities[1].properties[35],
+  );
+
+  /// See [AuthUserLocalEntity.certificateAgencyIds].
+  static final certificateAgencyIds =
+      obx.QueryStringVectorProperty<AuthUserLocalEntity>(
+        _entities[1].properties[36],
+      );
+
+  /// See [AuthUserLocalEntity.certificateDocuments].
+  static final certificateDocuments =
+      obx.QueryStringVectorProperty<AuthUserLocalEntity>(
+        _entities[1].properties[37],
+      );
+
+  /// See [AuthUserLocalEntity.certificateExpiryDate].
+  static final certificateExpiryDate =
+      obx.QueryStringProperty<AuthUserLocalEntity>(_entities[1].properties[38]);
+
+  /// See [AuthUserLocalEntity.referenceDocuments].
+  static final referenceDocuments =
+      obx.QueryStringVectorProperty<AuthUserLocalEntity>(
+        _entities[1].properties[39],
+      );
+
+  /// See [AuthUserLocalEntity.uploadedIdOrLicenseDocument].
+  static final uploadedIdOrLicenseDocument =
+      obx.QueryStringProperty<AuthUserLocalEntity>(_entities[1].properties[40]);
+
+  /// See [AuthUserLocalEntity.workHistoryDescription].
+  static final workHistoryDescription =
+      obx.QueryStringProperty<AuthUserLocalEntity>(_entities[1].properties[41]);
 
   /// See [AuthUserLocalEntity.loginTime].
   static final loginTime = obx.QueryDateProperty<AuthUserLocalEntity>(
-    _entities[0].properties[29],
+    _entities[1].properties[42],
   );
 
   /// see [AuthUserLocalEntity.devices]
   static final devices =
       obx.QueryBacklinkToMany<AuthUserDeviceEntity, AuthUserLocalEntity>(
         AuthUserDeviceEntity_.user,
-      );
-}
-
-/// [AuthUserDeviceEntity] entity fields to define ObjectBox queries.
-class AuthUserDeviceEntity_ {
-  /// See [AuthUserDeviceEntity.id].
-  static final id = obx.QueryIntegerProperty<AuthUserDeviceEntity>(
-    _entities[1].properties[0],
-  );
-
-  /// See [AuthUserDeviceEntity.deviceToken].
-  static final deviceToken = obx.QueryStringProperty<AuthUserDeviceEntity>(
-    _entities[1].properties[1],
-  );
-
-  /// See [AuthUserDeviceEntity.deviceType].
-  static final deviceType = obx.QueryStringProperty<AuthUserDeviceEntity>(
-    _entities[1].properties[2],
-  );
-
-  /// See [AuthUserDeviceEntity.user].
-  static final user =
-      obx.QueryRelationToOne<AuthUserDeviceEntity, AuthUserLocalEntity>(
-        _entities[1].properties[3],
       );
 }
 
@@ -1273,121 +1542,132 @@ class InspectorSignUpLocalEntity_ {
         _entities[2].properties[5],
       );
 
+  /// See [InspectorSignUpLocalEntity.isoCode].
+  static final isoCode = obx.QueryStringProperty<InspectorSignUpLocalEntity>(
+    _entities[2].properties[6],
+  );
+
   /// See [InspectorSignUpLocalEntity.certificateTypeId].
   static final certificateTypeId =
       obx.QueryStringProperty<InspectorSignUpLocalEntity>(
-        _entities[2].properties[6],
+        _entities[2].properties[7],
       );
 
   /// See [InspectorSignUpLocalEntity.certificateExpiryDate].
   static final certificateExpiryDate =
       obx.QueryStringProperty<InspectorSignUpLocalEntity>(
-        _entities[2].properties[7],
+        _entities[2].properties[8],
       );
 
   /// See [InspectorSignUpLocalEntity.certificateDocuments].
   static final certificateDocuments =
       obx.QueryStringVectorProperty<InspectorSignUpLocalEntity>(
-        _entities[2].properties[8],
+        _entities[2].properties[9],
       );
 
   /// See [InspectorSignUpLocalEntity.certificateAgencyIds].
   static final certificateAgencyIds =
       obx.QueryStringVectorProperty<InspectorSignUpLocalEntity>(
-        _entities[2].properties[9],
+        _entities[2].properties[10],
       );
 
   /// See [InspectorSignUpLocalEntity.country].
   static final country = obx.QueryStringProperty<InspectorSignUpLocalEntity>(
-    _entities[2].properties[10],
+    _entities[2].properties[11],
   );
 
   /// See [InspectorSignUpLocalEntity.state].
   static final state = obx.QueryStringProperty<InspectorSignUpLocalEntity>(
-    _entities[2].properties[11],
+    _entities[2].properties[12],
   );
 
   /// See [InspectorSignUpLocalEntity.city].
   static final city = obx.QueryStringProperty<InspectorSignUpLocalEntity>(
-    _entities[2].properties[12],
+    _entities[2].properties[13],
   );
 
   /// See [InspectorSignUpLocalEntity.zipCode].
   static final zipCode = obx.QueryStringProperty<InspectorSignUpLocalEntity>(
-    _entities[2].properties[13],
+    _entities[2].properties[14],
   );
 
   /// See [InspectorSignUpLocalEntity.mailingAddress].
   static final mailingAddress =
       obx.QueryStringProperty<InspectorSignUpLocalEntity>(
-        _entities[2].properties[14],
+        _entities[2].properties[15],
       );
 
   /// See [InspectorSignUpLocalEntity.uploadedIdOrLicenseDocument].
   static final uploadedIdOrLicenseDocument =
       obx.QueryStringProperty<InspectorSignUpLocalEntity>(
-        _entities[2].properties[15],
+        _entities[2].properties[16],
+      );
+
+  /// See [InspectorSignUpLocalEntity.workHistoryDescription].
+  static final workHistoryDescription =
+      obx.QueryStringProperty<InspectorSignUpLocalEntity>(
+        _entities[2].properties[17],
       );
 
   /// See [InspectorSignUpLocalEntity.referenceDocuments].
   static final referenceDocuments =
       obx.QueryStringVectorProperty<InspectorSignUpLocalEntity>(
-        _entities[2].properties[16],
+        _entities[2].properties[18],
       );
 
   /// See [InspectorSignUpLocalEntity.profileImage].
   static final profileImage =
       obx.QueryStringProperty<InspectorSignUpLocalEntity>(
-        _entities[2].properties[17],
+        _entities[2].properties[19],
       );
 
   /// See [InspectorSignUpLocalEntity.agreedToTerms].
   static final agreedToTerms =
       obx.QueryBooleanProperty<InspectorSignUpLocalEntity>(
-        _entities[2].properties[18],
+        _entities[2].properties[20],
       );
 
   /// See [InspectorSignUpLocalEntity.isTruthfully].
   static final isTruthfully =
       obx.QueryBooleanProperty<InspectorSignUpLocalEntity>(
-        _entities[2].properties[19],
+        _entities[2].properties[21],
       );
 
   /// See [InspectorSignUpLocalEntity.role].
   static final role = obx.QueryIntegerProperty<InspectorSignUpLocalEntity>(
-    _entities[2].properties[20],
+    _entities[2].properties[22],
   );
 
   /// See [InspectorSignUpLocalEntity.deviceType].
   static final deviceType = obx.QueryStringProperty<InspectorSignUpLocalEntity>(
-    _entities[2].properties[21],
+    _entities[2].properties[23],
   );
 
   /// See [InspectorSignUpLocalEntity.deviceToken].
   static final deviceToken =
       obx.QueryStringProperty<InspectorSignUpLocalEntity>(
-        _entities[2].properties[22],
+        _entities[2].properties[24],
       );
 
   /// See [InspectorSignUpLocalEntity.locationType].
   static final locationType =
       obx.QueryStringProperty<InspectorSignUpLocalEntity>(
-        _entities[2].properties[23],
+        _entities[2].properties[25],
       );
 
   /// See [InspectorSignUpLocalEntity.locationName].
   static final locationName =
       obx.QueryStringProperty<InspectorSignUpLocalEntity>(
-        _entities[2].properties[24],
+        _entities[2].properties[26],
       );
 
   /// See [InspectorSignUpLocalEntity.latitude].
   static final latitude = obx.QueryDoubleProperty<InspectorSignUpLocalEntity>(
-    _entities[2].properties[25],
+    _entities[2].properties[27],
   );
 
   /// See [InspectorSignUpLocalEntity.longitude].
   static final longitude = obx.QueryDoubleProperty<InspectorSignUpLocalEntity>(
-    _entities[2].properties[26],
+    _entities[2].properties[28],
   );
 }

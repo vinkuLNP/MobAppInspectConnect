@@ -12,7 +12,18 @@ class UserProvider extends BaseViewModel {
 
   AuthUserLocalEntity? get user => _user;
 
-  bool get isLoggedIn => _user != null && _user?.token != null;
+  bool get isLoggedIn =>
+      _user != null &&
+      _user?.authToken != null &&
+      _user?.phoneOtpVerified == true;
+
+       bool get isUserClient =>
+      _user != null &&
+      _user?.role == 1;
+
+       bool get isUserInspector =>
+      _user != null &&
+      _user?.role == 2;
 
   final AuthLocalDataSource _local = locator<AuthLocalDataSource>();
 
@@ -81,7 +92,7 @@ class UserProvider extends BaseViewModel {
 
   Future<void> refreshUser() async {
     final fresh = await _local.getUser();
-    if (fresh?.token != _user?.token) {
+    if (fresh?.authToken != _user?.authToken) {
       _user = fresh;
       notifyListeners();
     }

@@ -6,7 +6,7 @@ import 'package:objectbox/objectbox.dart';
 @Entity()
 class AuthUserLocalEntity {
   int id = 0;
-  String? token;
+  String? authToken;
   String? name;
   String? email;
   String? phoneNumber;
@@ -34,12 +34,28 @@ class AuthUserLocalEntity {
   double? longitude;
   DateTime? createdAt;
   DateTime? updatedAt;
+  String? profileImage;
+  bool? bookingInProgress;
+  bool? isDeleted;
+  String? country;
+  String? state;
+  String? city;
+  String? zipCode;
+
+  Map<String, dynamic>? location;
+  String? certificateTypeId;
+  List<String>? certificateAgencyIds;
+  List<String>? certificateDocuments;
+  String? certificateExpiryDate;
+  List<String>? referenceDocuments;
+  String? uploadedIdOrLicenseDocument;
+  String? workHistoryDescription;
   DateTime? loginTime;
   @Backlink()
   final devices = ToMany<AuthUserDeviceEntity>();
 
   AuthUserLocalEntity({
-    this.token,
+    this.authToken,
     this.name,
     this.email,
     this.phoneNumber,
@@ -68,11 +84,26 @@ class AuthUserLocalEntity {
     this.createdAt,
     this.updatedAt,
     this.loginTime,
+    this.profileImage,
+    this.bookingInProgress,
+    this.isDeleted,
+    this.country,
+    this.state,
+    this.city,
+    this.location,
+    this.zipCode,
+    this.certificateTypeId,
+    this.certificateAgencyIds,
+    this.certificateDocuments,
+    this.certificateExpiryDate,
+    this.referenceDocuments,
+    this.uploadedIdOrLicenseDocument,
+    this.workHistoryDescription,
   });
   AuthUserLocalEntity copyWith({
     String? name,
     String? email,
-    String? token,
+    String? authToken,
     int? role,
     String? phoneNumber,
     String? mailingAddress,
@@ -90,7 +121,7 @@ class AuthUserLocalEntity {
     return AuthUserLocalEntity(
       name: name ?? this.name,
       email: email ?? this.email,
-      token: token ?? this.token,
+      authToken: authToken ?? this.authToken,
       role: role ?? this.role,
       phoneNumber: phoneNumber ?? this.phoneNumber,
       countryCode: countryCode ?? this.countryCode,
@@ -121,7 +152,7 @@ class AuthUserLocalEntity {
     }
 
     return AuthUserLocalEntity(
-      token: authToken,
+      authToken: authToken,
       name: user?['name'],
       email: user?['email'],
       phoneNumber: user?['phoneNumber'],
@@ -156,6 +187,25 @@ class AuthUserLocalEntity {
       loginTime: user?['loginTime'] != null
           ? DateTime.parse(user!['loginTime'])
           : null,
+      zipCode: user?['zipCode'],
+      profileImage: user?["profileImage"],
+      bookingInProgress: user?["bookingInProgress"],
+      isDeleted: user?["isDeleted"],
+      country: user?["country"],
+      state: user?["state"],
+      city: user?["city"],
+      location: user?["location"],
+      certificateTypeId: user?["certificateTypeId"],
+      certificateAgencyIds: List<String>.from(
+        user?["certificateAgencyIds"] ?? [],
+      ),
+      certificateDocuments: List<String>.from(
+        user?["certificateDocuments"] ?? [],
+      ),
+      certificateExpiryDate: user?["certificateExpiryDate"],
+      referenceDocuments: List<String>.from(user?["referenceDocuments"] ?? []),
+      uploadedIdOrLicenseDocument: user?["uploadedIdOrLicenseDocument"],
+      workHistoryDescription: user?["workHistoryDescription"],
     );
   }
 }
@@ -175,9 +225,9 @@ extension AuthUserLocalMapping on AuthUserLocalEntity {
   AuthUser toDomainEntity() {
     return AuthUser(
       id: id.toString(),
-      fullName: name ?? '',
+      name: name ?? '',
       emailHashed: email ?? '',
-      token: token ?? '',
+      authToken: authToken ?? '',
       role: role,
       phoneNumber: phoneNumber,
       countryCode: countryCode,
@@ -196,6 +246,22 @@ extension AuthUserLocalMapping on AuthUserLocalEntity {
             )
           : null,
       devices: devices.map((d) => d.toDomainEntity()).toList(),
+      bookingInProgress: bookingInProgress,
+      certificateAgencyIds: certificateAgencyIds,
+      certificateDocuments: certificateDocuments,
+      certificateExpiryDate: certificateExpiryDate,
+      isDeleted: isDeleted,
+      referenceDocuments: referenceDocuments,
+      status: status,
+      mailingAddress: mailingAddress,
+      profileImage: profileImage,
+      certificateTypeId: certificateTypeId,
+      country: country,
+      state: state,
+      zip: zipCode,
+      city: city,
+      uploadedIdOrLicenseDocument: uploadedIdOrLicenseDocument,
+      workHistoryDescription: workHistoryDescription,
     );
   }
 }
@@ -215,7 +281,9 @@ extension AuthUserLocalEntityMergeData on AuthUserLocalEntity {
             phoneNumber: newUser.phoneNumber ?? phoneNumber,
             countryCode: newUser.countryCode ?? countryCode,
             role: newUser.role ?? role,
-            token: (newUser.token?.isNotEmpty ?? false) ? newUser.token : token,
+            authToken: (newUser.authToken?.isNotEmpty ?? false)
+                ? newUser.authToken
+                : authToken,
             agreedToTerms: newUser.agreedToTerms ?? agreedToTerms,
             isTruthfully: newUser.isTruthfully ?? isTruthfully,
             mailingAddress: newUser.mailingAddress ?? mailingAddress,
@@ -246,6 +314,7 @@ extension AuthUserLocalEntityMergeData on AuthUserLocalEntity {
             latitude: newUser.latitude ?? latitude,
             longitude: newUser.longitude ?? longitude,
             createdAt: createdAt ?? newUser.createdAt,
+            zipCode: zipCode ?? newUser.zipCode,
             updatedAt: newUser.updatedAt ?? updatedAt,
             loginTime: newUser.loginTime ?? loginTime,
           )

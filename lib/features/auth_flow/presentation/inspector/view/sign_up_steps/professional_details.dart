@@ -16,64 +16,64 @@ class ProfessionalDetailsStep extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    
     return ChangeNotifierProvider.value(
       value: vm,
       child: Consumer<InspectorViewModelProvider>(
         builder: (context, prov, _) {
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          return Stack(
             children: [
-              Text(
-                'Professional Details',
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
-              ),
-              const SizedBox(height: 8),
-              _section(
-                title: 'Certificate Type',
-                child: _inspectionTypeDropdown(prov),
-              ),
-              const SizedBox(height: 6),
+              AbsorbPointer(
+                absorbing: prov.isProcessing,
+                child: Opacity(
+                  opacity: prov.isProcessing ? 0.6 : 1.0,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Professional Details',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      _section(
+                        title: 'Certificate Type',
+                        child: _inspectionTypeDropdown(prov),
+                      ),
+                      const SizedBox(height: 6),
 
-              _section(
-                title: 'Certifying Agencies ',
-                child: _agencyTypeDropdown(prov),
-              ),
-              const SizedBox(height: 6),
+                      _section(
+                        title: 'Certifying Agencies ',
+                        child: _agencyTypeDropdown(prov),
+                      ),
+                      const SizedBox(height: 6),
 
-              _section(
-                title: 'Select Expiration Date',
-                child: IgnorePointer(
-                  ignoring: false,
-                  // widget.isReadOnly,
-                  child: DateTimePickerWidget(
-                    showTimePicker: false,
-                    initialDateTime: DateTime.now(),
-                    // prov.selectedDate.add(
-                    //   Duration(
-                    //     hours:
-                    //         prov.selectedTime?.hour ??
-                    //         TimeOfDay.now().hour,
-                    //     minutes:
-                    //         prov.selectedTime?.minute ??
-                    //         TimeOfDay.now().minute,
-                    //   ),
-                    // ),
-                    onDateTimeSelected: (dt) {
-                      // prov.setDate(dt);
-                      // prov.setTime(TimeOfDay.fromDateTime(dt));
-                    },
+                      _section(
+                        title: 'Select Expiration Date',
+                        child: IgnorePointer(
+                          ignoring: false,
+                          child: DateTimePickerWidget(
+                            showTimePicker: false,
+                            initialDateTime: prov.certificateExpiryDateShow,
+                            onDateTimeSelected: (dt) {
+                              prov.setDate(dt);
+                            },
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      _section(
+                        title: 'Upload Certification Documents (max 5)',
+                        child: _documentGrid(prov, context),
+                      ),
+                    ],
                   ),
                 ),
               ),
-              const SizedBox(height: 6),
-              _section(
-                title: 'Upload Certification Documents (max 5)',
-                child: _documentGrid(prov, context),
-              ),
+
+              if (prov.isProcessing)
+                const Center(child: CircularProgressIndicator()),
             ],
           );
         },
@@ -97,10 +97,11 @@ class ProfessionalDetailsStep extends StatelessWidget {
     );
   }
 
-   Widget _agencyTypeDropdown(InspectorViewModelProvider prov) {
+  Widget _agencyTypeDropdown(InspectorViewModelProvider prov) {
     return DropdownButtonFormField<AgencyEntity>(
       decoration: _inputDecoration('Select Certifying Agencies'),
       initialValue: prov.agencyTypeData,
+
       style: appTextStyle(fontSize: 12),
       items: prov.agencyType
           .map(
@@ -110,8 +111,9 @@ class ProfessionalDetailsStep extends StatelessWidget {
             ),
           )
           .toList(),
-      onChanged:  prov.setAgencyType,
-    );}
+      onChanged: null,
+    );
+  }
 
   Widget _inspectionTypeDropdown(InspectorViewModelProvider prov) {
     return DropdownButtonFormField<CertificateInspectorTypeEntity>(
@@ -126,31 +128,8 @@ class ProfessionalDetailsStep extends StatelessWidget {
             ),
           )
           .toList(),
-      onChanged:  prov.setCertificateType,
+      onChanged: prov.setCertificateType,
     );
-    // return DropdownButtonFormField<String>(
-    //   decoration: _inputDecoration('Select inspection type'),
-    //   initialValue: 'type 1',
-    //   style: appTextStyle(fontSize: 12),
-    //   items: ['type 1', 'type 2', 'type 3']
-    //       .map(
-    //         (subType) => DropdownMenuItem<String>(
-    //           value: subType,
-    //           child: textWidget(text: subType, fontSize: 12),
-    //         ),
-    //       )
-    //       .toList(),
-    //   // prov.subTypes
-    //   //     .map(
-    //   //       (subType) => DropdownMenuItem<CertificateSubTypeEntity>(
-    //   //         value: subType,
-    //   //         child: textWidget(text: subType.name, fontSize: 12),
-    //   //       ),
-    //   //     )
-    //   //     .toList(),
-    //   // onChanged:  prov.setInspectionType,
-    //   onChanged: (value) {},
-    // );
   }
 
   InputDecoration _inputDecoration(String hint) => InputDecoration(
@@ -176,7 +155,7 @@ class ProfessionalDetailsStep extends StatelessWidget {
   );
 
   Widget _documentGrid(InspectorViewModelProvider prov, BuildContext context) {
-    final totalDocs = prov.documents.length;
+    final totalDocs =  prov.documents.length + prov.existingDocumentUrls.length;
     final canAddMore = totalDocs < 5;
 
     if (totalDocs == 0) {

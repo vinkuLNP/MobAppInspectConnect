@@ -110,14 +110,14 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
   Future<ApiResultModel<WalletModel>> getUserWalletAmount() async {
     try {
       final user = await locator<AuthLocalDataSource>().getUser();
-      if (user == null || user.token == null) {
+      if (user == null || user.authToken == null) {
         throw Exception('User not found in local storage');
       }
       final ApiResultModel<http.Response> res = await _ctx.makeRequest(
         uri: walletEndPoint,
         httpRequestStrategy: GetRequestStrategy(),
         headers: {
-          'Authorization': 'Bearer ${user.token}',
+          'Authorization': 'Bearer ${user.authToken}',
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
@@ -163,7 +163,7 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
   }) async {
     try {
       final user = await locator<AuthLocalDataSource>().getUser();
-      if (user == null || user.token == null) {
+      if (user == null || user.authToken == null) {
         throw Exception('User not found in local storage');
       }
       final queryParams = {
@@ -179,7 +179,7 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
         requestData: queryParams,
         httpRequestStrategy: GetRequestStrategy(),
         headers: {
-          'Authorization': 'Bearer ${user.token}',
+          'Authorization': 'Bearer ${user.authToken}',
           'Accept': 'application/json',
           'Content-Type': 'application/json',
         },
@@ -218,15 +218,15 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
     UploadImageDto dto,
   ) async {
     try {
-      final user = await locator<AuthLocalDataSource>().getUser();
-      if (user == null || user.token == null) {
-        throw Exception('User not found in local storage');
-      }
+      // final user = await locator<AuthLocalDataSource>().getUser();
+      // if (user == null || user.token == null) {
+      //   throw Exception('User not found in local storage');
+      // }
       final ApiResultModel<http.Response> res = await _ctx.makeRequest(
         uri: uploadImageEndPoint,
         httpRequestStrategy: MultipartPostRequestStrategy(),
         headers: {
-          'Authorization': 'Bearer ${user.token}',
+          // 'Authorization': 'Bearer ${user.token}',
           "Content-Type": "multipart/form-data",
         },
         requestData: dto.toJson(),
@@ -267,14 +267,14 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
   ) async {
     try {
       final user = await locator<AuthLocalDataSource>().getUser();
-      if (user == null || user.token == null) {
+      if (user == null || user.authToken == null) {
         throw Exception('User not found in local storage');
       }
       log(dto.certificateSubTypeId.toString());
       final ApiResultModel<http.Response> res = await _ctx.makeRequest(
         uri: createBookingEndPoint,
         headers: {
-          'Authorization': 'Bearer ${user.token}',
+          'Authorization': 'Bearer ${user.authToken}',
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
@@ -322,7 +322,7 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
   }) async {
     try {
       final user = await locator<AuthLocalDataSource>().getUser();
-      if (user == null || user.token == null) {
+      if (user == null || user.authToken == null) {
         throw Exception('User not found in local storage');
       }
       final queryParams = {
@@ -342,7 +342,7 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
         requestData: queryParams,
         httpRequestStrategy: GetRequestStrategy(),
         headers: {
-          'Authorization': 'Bearer ${user.token}',
+          'Authorization': 'Bearer ${user.authToken}',
           'Accept': 'application/json',
         },
       );
@@ -387,7 +387,7 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
   ) async {
     try {
       final user = await locator<AuthLocalDataSource>().getUser();
-      if (user == null || user.token == null) {
+      if (user == null || user.authToken == null) {
         throw Exception('User not found in local storage');
       }
 
@@ -395,7 +395,7 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
         uri: "$createBookingEndPoint/$bookingId",
         httpRequestStrategy: GetRequestStrategy(),
         headers: {
-          'Authorization': 'Bearer ${user.token}',
+          'Authorization': 'Bearer ${user.authToken}',
           'Accept': 'application/json',
         },
       );
@@ -428,7 +428,7 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
   Future<ApiResultModel<bool>> deleteBooking(String bookingId) async {
     try {
       final user = await locator<AuthLocalDataSource>().getUser();
-      if (user == null || user.token == null) {
+      if (user == null || user.authToken == null) {
         throw Exception('User not found in local storage');
       }
 
@@ -436,7 +436,7 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
         uri: "$createBookingEndPoint/$bookingId",
         httpRequestStrategy: DeleteRequestStrategy(),
         headers: {
-          'Authorization': 'Bearer ${user.token}',
+          'Authorization': 'Bearer ${user.authToken}',
           'Accept': 'application/json',
         },
       );
@@ -463,7 +463,7 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
   ) async {
     try {
       final user = await locator<AuthLocalDataSource>().getUser();
-      if (user == null || user.token == null) {
+      if (user == null || user.authToken == null) {
         throw Exception('User not found in local storage');
       }
 
@@ -471,7 +471,7 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
         uri: "$createBookingEndPoint/$bookingId",
         httpRequestStrategy: PutRequestStrategy(),
         headers: {
-          'Authorization': 'Bearer ${user.token}',
+          'Authorization': 'Bearer ${user.authToken}',
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },

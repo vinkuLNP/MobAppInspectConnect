@@ -45,7 +45,7 @@ class _ClientDashboardViewState extends State<ClientDashboardView> {
       backgroundColor: Colors.grey,
       extendBody: true,
       body: _pages[_selectedIndex],
-          bottomNavigationBar: SizedBox(
+      bottomNavigationBar: SizedBox(
         height: 95,
         child: Stack(
           clipBehavior: Clip.none,
@@ -159,84 +159,6 @@ class _ClientDashboardViewState extends State<ClientDashboardView> {
           ],
         ),
       ),
-
-      // bottomNavigationBar: SizedBox(
-      //   height: 90,
-      //   child: Stack(
-      //     alignment: Alignment.bottomCenter,
-      //     children: [
-      //       ClipRRect(
-      //         child: BackdropFilter(
-      //           filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-      //           child: Container(
-      //             height: 70,
-      //             decoration: BoxDecoration(
-      //               gradient: const LinearGradient(
-      //                 colors: [
-      //                   Color(0xFF1B90FF),
-      //                   Color(0xFF0070F2),
-      //                   Color(0xFF002A86),
-      //                 ],
-      //                 begin: Alignment.topLeft,
-      //                 end: Alignment.topRight,
-      //               ),
-      //               boxShadow: [
-      //                 BoxShadow(
-      //                   color: Colors.black.withOpacity(0.05),
-      //                   blurRadius: 12,
-      //                   offset: Offset(0, 4),
-      //                 ),
-      //               ],
-      //             ),
-      //             child: Row(
-      //               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      //               children: [
-      //                 Expanded(
-      //                   child: Align(
-      //                     alignment: Alignment.center,
-      //                     child: _buildNavItem(
-      //                       icon: Icons.assignment_outlined,
-      //                       activeIcon: Icons.assignment,
-      //                       label: 'My Bookings',
-      //                       index: 1,
-      //                       primary: primary,
-      //                     ),
-      //                   ),
-      //                 ),
-
-      //                 Expanded(
-      //                   child: Align(
-      //                     alignment: Alignment.center,
-      //                     child: _buildNavItem(
-      //                       icon: Icons.add_outlined,
-      //                       activeIcon: Icons.add,
-      //                       label: 'Book Now',
-      //                       index: 0,
-      //                       primary: primary,
-      //                     ),
-      //                   ),
-      //                 ),
-
-      //                 Expanded(
-      //                   child: Align(
-      //                     alignment: Alignment.center,
-      //                     child: _buildNavItem(
-      //                       icon: Icons.person_outline,
-      //                       activeIcon: Icons.person,
-      //                       label: 'Profile',
-      //                       index: 2,
-      //                       primary: primary,
-      //                     ),
-      //                   ),
-      //                 ),
-      //               ],
-      //             ),
-      //           ),
-      //         ),
-      //       ),
-      //     ],
-      //   ),
-      // ),
     );
   }
 

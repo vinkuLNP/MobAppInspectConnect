@@ -41,6 +41,7 @@ dependencies:
   google_fonts: ^6.3.2
   flutter_dotenv: ^6.0.0
   country_state_city_pro: ^0.0.6
+  carousel_slider: ^5.1.1
 
   
   

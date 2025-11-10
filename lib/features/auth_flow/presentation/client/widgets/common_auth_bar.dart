@@ -9,13 +9,14 @@ class CommonAuthBar extends StatelessWidget {
   final Widget form;
   final String image;
   final bool showBackButton;
+  final Function()? onBackPressed;
   final ResponsiveUiConfig rc;
   const CommonAuthBar({
     required this.title,
     required this.subtitle,
     required this.form,
     required this.image,
-    required this.showBackButton,
+    required this.showBackButton,this.onBackPressed,
     required this.rc,
     super.key,
   });

@@ -61,6 +61,9 @@ const String walletEndPoint = 'wallet';
 const String paymentEndPOint = 'payments';
 
 
+const String subscriptionEndPoint = 'subscriptionPlans';
+const String userSubscriptionByIdEndPoint = 'subscriptions';
+
 
 
 
@@ -71,3 +74,7 @@ const String longitudeKey = 'lon';
 
 /// local database keys
 const String weatherInfoTable = 'WeatherInfo';
+
+
+
+

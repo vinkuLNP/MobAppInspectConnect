@@ -46,14 +46,14 @@ class _AdditionalDetailsStepState extends State<AdditionalDetailsStep> {
                         const SizedBox(height: 8),
 
                         _section(
-                          title: 'Profile Image',
+                          title: 'Profile Image(Optional)',
                           child: _imageUploader(
                             context: context,
-                            files: prov.profileImage != null
-                                ? [prov.profileImage!]
+                            files: prov.profileImageUrl != null
+                                ? [prov.profileImageUrl!]
                                 : [],
                             maxFiles: 1,
-                            allowOnlyImages: true, 
+                            allowOnlyImages: true,
                             onAdd: () => prov.pickFile(
                               context,
                               'profile',
@@ -64,11 +64,11 @@ class _AdditionalDetailsStepState extends State<AdditionalDetailsStep> {
                         ),
 
                         _section(
-                          title: 'Upload ID / License',
+                          title: 'Upload ID / License(Optional)',
                           child: _imageUploader(
                             context: context,
-                            files: prov.idLicense != null
-                                ? [prov.idLicense!]
+                            files: prov.idLicenseUrl != null
+                                ? [prov.idLicenseUrl!]
                                 : [],
                             maxFiles: 1,
                             onAdd: () => prov.pickFile(context, 'id'),
@@ -77,10 +77,10 @@ class _AdditionalDetailsStepState extends State<AdditionalDetailsStep> {
                         ),
 
                         _section(
-                          title: 'Upload Reference Letters',
+                          title: 'Upload Reference Letters(Optional)',
                           child: _imageUploader(
                             context: context,
-                            files: prov.referenceLetters,
+                            files: prov.referenceLettersUrls,
                             maxFiles: 5,
                             onAdd: () => prov.pickFile(context, 'ref'),
                             onRemove: (index) =>
@@ -92,14 +92,18 @@ class _AdditionalDetailsStepState extends State<AdditionalDetailsStep> {
 
                         AppInputField(
                           controller: prov.workHistoryController,
-                          label: 'Work History Description',
+                          label: 'Work History Description(Optional)',
                           maxLines: 4,
                           hint: 'Enter work experience details...',
                         ),
 
                         CheckboxListTile(
                           value: prov.agreedToTerms,
-                          onChanged: prov.toggleTerms,
+                          // onChanged: prov.toggleTerms,
+                          onChanged: (val) {
+                            prov.toggleTerms(val);
+                            setState(() => prov.showValidationError = false);
+                          },
                           contentPadding: EdgeInsets.zero,
                           visualDensity: VisualDensity.compact,
                           dense: true,
@@ -107,11 +111,19 @@ class _AdditionalDetailsStepState extends State<AdditionalDetailsStep> {
                           title: textWidget(
                             text: 'I agree to the Terms and Conditions.',
                             fontSize: 12,
+                            color:
+                                prov.showValidationError && !prov.agreedToTerms
+                                ? Colors.red
+                                : Colors.black,
                           ),
                         ),
                         CheckboxListTile(
                           value: prov.confirmTruth,
-                          onChanged: prov.toggleTruth,
+                          // onChanged: prov.toggleTruth,
+                          onChanged: (val) {
+                            prov.toggleTruth(val);
+                            setState(() => prov.showValidationError = false);
+                          },
                           visualDensity: VisualDensity.compact,
                           dense: true,
                           contentPadding: EdgeInsets.zero,
@@ -119,6 +131,10 @@ class _AdditionalDetailsStepState extends State<AdditionalDetailsStep> {
                           title: textWidget(
                             text: 'I confirm all information is truthful.',
                             fontSize: 12,
+                            color:
+                                prov.showValidationError && !prov.confirmTruth
+                                ? Colors.red
+                                : Colors.black,
                           ),
                         ),
                       ],
@@ -149,13 +165,43 @@ class _AdditionalDetailsStepState extends State<AdditionalDetailsStep> {
     );
   }
 
+  Widget _buildImageWidget(File file) {
+    final path = file.path;
+
+    // Condition 1 — Check if it’s a remote URL
+    if (path.startsWith('http://') || path.startsWith('https://')) {
+      return Image.network(
+        path,
+        fit: BoxFit.cover,
+        width: double.infinity,
+        height: double.infinity,
+        errorBuilder: (_, __, ___) =>
+            const Center(child: Icon(Icons.broken_image, color: Colors.grey)),
+        loadingBuilder: (context, child, progress) {
+          if (progress == null) return child;
+          return const Center(child: CircularProgressIndicator(strokeWidth: 2));
+        },
+      );
+    }
+
+    // Condition 2 — Otherwise, treat it as a local file
+    return Image.file(
+      file,
+      fit: BoxFit.cover,
+      width: double.infinity,
+      height: double.infinity,
+      errorBuilder: (_, __, ___) =>
+          const Center(child: Icon(Icons.broken_image, color: Colors.grey)),
+    );
+  }
+
   Widget _imageUploader({
     required BuildContext context,
     required List<File> files,
     required int maxFiles,
     required VoidCallback onAdd,
     required void Function(int index) onRemove,
-    bool allowOnlyImages = false, 
+    bool allowOnlyImages = false,
   }) {
     final canAddMore = files.length < maxFiles;
 
@@ -227,12 +273,7 @@ class _AdditionalDetailsStepState extends State<AdditionalDetailsStep> {
                   Container(
                     color: Colors.grey.shade100,
                     child: isImage
-                        ? Image.file(
-                            file,
-                            fit: BoxFit.cover,
-                            width: double.infinity,
-                            height: double.infinity,
-                          )
+                        ? _buildImageWidget(file)
                         : Center(
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,

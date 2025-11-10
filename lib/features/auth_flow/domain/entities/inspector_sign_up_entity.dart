@@ -28,6 +28,8 @@ class InspectorSignUpLocalEntity {
 
   // --- Step 4: Additional Details ---
   String? uploadedIdOrLicenseDocument;
+  String? workHistoryDescription;
+
   List<String>? referenceDocuments;
   String? profileImage;
   bool? agreedToTerms;
@@ -53,6 +55,8 @@ class InspectorSignUpLocalEntity {
     this.countryCode,
     this.certificateTypeId,
     this.certificateExpiryDate,
+    this.workHistoryDescription,
+    this.zipCode,
     this.certificateDocuments,
     this.certificateAgencyIds,
     this.country,
@@ -76,13 +80,14 @@ class InspectorSignUpLocalEntity {
   
 }
 extension InspectorSignUpEntityMapper on InspectorSignUpLocalEntity {
-  Map<String, dynamic> toJson() => {
+Map<String, dynamic> toJson() {
+    final map = <String, dynamic>{
         "name": name,
         "email": email,
         "password": password,
         "phoneNumber": phoneNumber,
         "countryCode": countryCode,
-        "isoCode":isoCode,
+        // "isoCode":isoCode,
         "certificateTypeId": certificateTypeId,
         "certificateExpiryDate": certificateExpiryDate,
         "certificateDocuments": certificateDocuments,
@@ -90,6 +95,8 @@ extension InspectorSignUpEntityMapper on InspectorSignUpLocalEntity {
         "country": country,
         "state": state,
         "city": city,
+        "workHistoryDescription": workHistoryDescription,
+        // "zipCode": zipCode,
         "mailingAddress": mailingAddress,
         "uploadedIdOrLicenseDocument": uploadedIdOrLicenseDocument,
         "referenceDocuments": referenceDocuments,
@@ -104,5 +111,8 @@ extension InspectorSignUpEntityMapper on InspectorSignUpLocalEntity {
           "locationName": locationName,
           "coordinates": [latitude, longitude],
         },
-      };
-}
+      }; // remove all null keys from the map recursively
+    map.removeWhere((k, v) => v == null);
+
+    return map;
+}}
