@@ -333,7 +333,7 @@ class _WalletScreenState extends State<WalletScreen> {
   ) async {
     try {
       final user = await locator<AuthLocalDataSource>().getUser();
-      if (user == null || user.token == null) {
+      if (user == null || user.authToken == null) {
         throw Exception('User not found in local storage');
       }
 
@@ -348,7 +348,7 @@ class _WalletScreenState extends State<WalletScreen> {
       final url = Uri.parse('$devBaseUrl/payments/paymentIntent');
       final response = await http.post(
         url,
-        headers: {'Authorization': 'Bearer ${user.token}'},
+        headers: {'Authorization': 'Bearer ${user.authToken}'},
         body: body,
       );
 

@@ -5,10 +5,12 @@ import 'package:inspect_connect/core/utils/constants/app_constants.dart';
 import 'package:inspect_connect/core/utils/helpers/app_flavor_helper/app_flavors_helper.dart';
 import 'package:inspect_connect/core/utils/helpers/app_flavor_helper/environment_config.dart';
 import 'package:flutter/material.dart';
+import 'package:inspect_connect/features/auth_flow/presentation/auth_user_provider.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/client/client_view_model.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/booking_provider.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/session_manager.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/user_provider.dart';
+import 'package:inspect_connect/features/inspector_flow/providers/inspector_main_provider.dart';
 import 'package:provider/provider.dart';
 
 final rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -51,7 +53,12 @@ class _MyAppState extends State<MyApp> {
       providers: [
         ChangeNotifierProvider(create: (_) => UserProvider()),
         ChangeNotifierProvider(create: (_) => BookingProvider()),
+        ChangeNotifierProvider(create: (_) => AuthFlowProvider()),
         ChangeNotifierProvider(create: (_) => ClientViewModelProvider()),
+        ChangeNotifierProvider(create: (_) => InspectorDashboardProvider()),
+
+
+        
       ],
       child: MaterialApp.router(
         routerConfig: appRouter.config(),

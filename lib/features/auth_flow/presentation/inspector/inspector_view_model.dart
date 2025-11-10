@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
-
 import 'package:auto_route/auto_route.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:inspect_connect/core/basecomponents/base_view_model.dart';
@@ -9,11 +8,12 @@ import 'package:inspect_connect/core/commondomain/entities/based_api_result/api_
 import 'package:inspect_connect/core/di/app_component/app_component.dart';
 import 'package:inspect_connect/core/utils/auto_router_setup/auto_router.dart';
 import 'package:inspect_connect/core/utils/helpers/device_helper/device_helper.dart';
+import 'package:inspect_connect/features/auth_flow/data/datasources/local_datasources/auth_local_datasource.dart';
 import 'package:inspect_connect/features/auth_flow/data/datasources/local_datasources/inspector_local_data_source.dart';
+import 'package:inspect_connect/features/auth_flow/domain/entities/auth_user.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/certificate_agency_entity.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/certificate_type_entity.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/inspector_sign_up_entity.dart';
-import 'package:inspect_connect/features/auth_flow/domain/entities/inspector_user.dart';
 import 'package:inspect_connect/features/auth_flow/domain/usecases/agency_type_usecase.dart';
 import 'package:inspect_connect/features/auth_flow/domain/usecases/certificate_type_usecase.dart';
 import 'package:inspect_connect/features/auth_flow/domain/usecases/inspector_signup_case.dart';
@@ -23,7 +23,9 @@ import 'package:flutter/material.dart';
 import 'package:inspect_connect/features/client_flow/data/models/upload_image_model.dart';
 import 'package:inspect_connect/features/client_flow/domain/entities/upload_image_dto.dart';
 import 'package:inspect_connect/features/client_flow/domain/usecases/upload_image_usecase.dart';
- 
+import 'package:inspect_connect/features/client_flow/presentations/providers/user_provider.dart';
+import 'package:provider/provider.dart';
+
 class InspectorViewModelProvider extends BaseViewModel {
   final InspectorSignUpLocalDataSource _localDs =
       locator<InspectorSignUpLocalDataSource>();
@@ -465,24 +467,24 @@ class InspectorViewModelProvider extends BaseViewModel {
     agreedToTerms = value ?? false;
     notifyListeners();
   }
-bool showValidationError = false;
 
- void validateBeforeSubmit({required BuildContext context}) {
+  bool showValidationError = false;
+
+  void validateBeforeSubmit({required BuildContext context}) {
     if (!agreedToTerms || !confirmTruth) {
-    showValidationError = true;
+      showValidationError = true;
+      notifyListeners();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please agree to all terms before continuing.'),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+      return;
+    }
+    showValidationError = false;
     notifyListeners();
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Please agree to all terms before continuing.'),
-        backgroundColor: Colors.redAccent,
-      ),
-    );
-    return;
   }
-  showValidationError = false;
-  notifyListeners();
-  }
-
 
   void toggleTruth(bool? value) {
     confirmTruth = value ?? false;
@@ -749,13 +751,13 @@ bool showValidationError = false;
 
   Future<void> savePersonalStep() async {
     fetchCertificateTypes();
-    final  deviceToken = await DeviceInfoHelper.getDeviceToken();
-  final  deviceType = await DeviceInfoHelper.getDeviceType();
+    final deviceToken = await DeviceInfoHelper.getDeviceToken();
+    final deviceType = await DeviceInfoHelper.getDeviceType();
     await _localDs.updateFields({
-      'role':2,
-      'deviceType':deviceType,
+      'role': 2,
+      'deviceType': deviceType,
 
-      'deviceToken':deviceToken,
+      'deviceToken': deviceToken,
       'name': fullNameCtrl.text.trim(),
       'phoneNumber': phoneCtrl.text.trim(),
       'countryCode': phoneE164 != null && phoneE164!.startsWith('+')
@@ -783,7 +785,6 @@ bool showValidationError = false;
     });
   }
 
-  // Save service area (step 3)
   Future<void> saveServiceAreaStep({
     required String country,
     required String state,
@@ -799,13 +800,11 @@ bool showValidationError = false;
       'city': city,
       if (mailingAddress != null) 'mailingAddress': mailingAddress,
       if (zipCode != null) 'zipCode': zipCode,
-  //         "type": "Point",
-      'locationType' :'Point',
-      'locationName' :'Midtown',
-      'latitude' :-73.9857,
-      'longitude' :40.7484,
-
-
+      //         "type": "Point",
+      'locationType': 'Point',
+      'locationName': 'Midtown',
+      'latitude': -73.9857,
+      'longitude': 40.7484,
     });
   }
 
@@ -875,7 +874,7 @@ bool showValidationError = false;
     setDate(DateTime.parse(saved.certificateExpiryDate.toString()));
     // uploadedCertificateUrls = saved.certificateDocuments ?? [];
     uploadedCertificateUrls = saved.certificateDocuments ?? [];
-existingDocumentUrls = List.from(uploadedCertificateUrls); 
+    existingDocumentUrls = List.from(uploadedCertificateUrls);
     selectedAgencyIds = saved.certificateAgencyIds ?? [];
     await fetchCertificateTypes(savedId: selectedCertificateTypeId);
     // Step 3 - Service area
@@ -915,124 +914,89 @@ existingDocumentUrls = List.from(uploadedCertificateUrls);
     //     .toList();
     agreedToTerms = saved.agreedToTerms ?? false;
     confirmTruth = saved.isTruthfully ?? false;
-    
 
     notifyListeners();
   }
 
-
-  // bool _isSigningIn = false;
-  // bool get isSigningIn => _isSigningIn;
-
-  // void setSigningIn(bool value) {
-  //   _isSigningIn = value;
-  //   notifyListeners();
-  // }
-
-Future<void> signUp({
-  // required GlobalKey<FormState> formKey,
-  required BuildContext context,
-}) async {
-  // if (!(formKey.currentState?.validate() ?? false)) {
-  //   log('[SignUP] ❌ Form validation failed — aborting.');
-  //   return;
-  // }
-
-  _isResetting = true;
-  notifyListeners();
-  setProcessing(true);
-
-  try {
-    log('[SignUP] 🚀 Startingsignup process...');
-    log('[SignUP] Collecting device info...');
-
-
- final saved = await _localDs.getFullData();
-
-    final useCase = locator<InspectorSignUpUseCase>();
-
-    final params = InspectorSignUpParams( 
-      inspectorSignUpLocalEntity: saved!,
-      // role: 1,
-      // email: emailCtrlSignUp.text.trim(),
-      // name: fullNameCtrl.text.trim(),
-      // phoneNumber: phoneRaw ?? '',
-      // countryCode: phoneDial ?? "91",
-      // password: passwordCtrlSignUp.text.trim(),
-      // deviceToken: deviceToken,
-      // deviceType: deviceType,
-      // mailingAddress: "456 Broadway, New York, NY 10001",
-      // agreedToTerms: true,
-      // isTruthfully: true,
-      // location: {
-      //   "type": "Point",
-      //   "locationName": "Midtown",
-      //   "coordinates": [-73.9857, 40.7484],
-      // },
-    );
-
-    log('[SignUP] Parameters ready:');
-    log('  name=${params.inspectorSignUpLocalEntity.name}');
-    log('  email=${params.inspectorSignUpLocalEntity.email}');
-    log('  phone=${params..inspectorSignUpLocalEntity.phoneNumber}');
-    log('  countryCode=${params.inspectorSignUpLocalEntity.countryCode}');
-    log('  password=${params.inspectorSignUpLocalEntity.password!.isNotEmpty ? "***" : "empty"}');
-
-    final state = await executeParamsUseCase<InspectorUser, InspectorSignUpParams>(
-      useCase: useCase,
-      query: params,
-      launchLoader: true,
-    );
-
-    state?.when(
-      data: (user) async {
-        // log('[SignUP] ✅ API returned user data:');
-        log('  id=${user.id}');
-        log('  token=${user.authToken}');
-        log('  fullName=${user.name}');
-        log('  email=${user.email}');
-        log('  phone=${user.phoneNumber}');
-
-        // final localUser = user.toLocalEntity();
-        // log('[SignUP] Converted to local entity:');
-        // log('  token=${localUser.token}');
-        // log('  name=${localUser.name}');
-        // log('  email=${localUser.email}');
-        // log('  phone=${localUser.phoneNumber}');
-
-        // await locator<AuthLocalDataSource>().saveUser(localUser);
-        // log('[SignUP] ✅ Local user saved.');
-
-        // final userProvider = context.read<UserProvider>();
-        // await userProvider.setUser(localUser);
-        // await userProvider.loadUser();
-        // log('[SignUP] ✅ User loaded into provider.');
-
-        // log('[SignUP] Verifying saved data:');
-        // log('  saved token=${localUser.token}');
-        // log('  saved name=${localUser.name}');
-        // log('  saved email=${localUser.email}');
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Verify Your Otp Now')),
-        );
-        context.pushRoute(OtpVerificationRoute(addShowButton: true));
-      },
-      error: (e) {
-        log('[SignUP] ❌ API error: ${e.message}');
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(e.message ?? 'Signup failed')));
-      },
-    );
-  } catch (e, s) {
-    log('[SignUP] ❌ Exception during reset: $e');
-    log('[SignUP] Stacktrace: $s');
-  } finally {
-    setProcessing(false);
-    _isResetting = false;
+  Future<void> signUp({required BuildContext context}) async {
+    _isResetting = true;
     notifyListeners();
-    log('[SignUP] 🧹 Cleanup complete.');
+    setProcessing(true);
+
+    try {
+      log('[SignUP] 🚀 Startingsignup process...');
+      log('[SignUP] Collecting device info...');
+
+      final saved = await _localDs.getFullData();
+
+      final useCase = locator<InspectorSignUpUseCase>();
+
+      final params = InspectorSignUpParams(inspectorSignUpLocalEntity: saved!);
+
+      log('[SignUP] Parameters ready:');
+      log('  name=${params.inspectorSignUpLocalEntity.name}');
+      log('  email=${params.inspectorSignUpLocalEntity.email}');
+      log('  phone=${params..inspectorSignUpLocalEntity.phoneNumber}');
+      log('  countryCode=${params.inspectorSignUpLocalEntity.countryCode}');
+      log(
+        '  password=${params.inspectorSignUpLocalEntity.password!.isNotEmpty ? "***" : "empty"}',
+      );
+
+      final state = await executeParamsUseCase<AuthUser, InspectorSignUpParams>(
+        useCase: useCase,
+        query: params,
+        launchLoader: true,
+      );
+
+      state?.when(
+        data: (user) async {
+          // log('[SignUP] ✅ API returned user data:');
+          log('  id=${user.id}');
+          log('  token=${user.authToken}');
+          log('  fullName=${user.name}');
+          log('  email=${user.emailHashed}');
+          log('  phone=${user.phoneNumber}');
+
+          final localUser = user.toLocalEntity();
+          log('[SignUP] Converted to local entity:');
+          log('  token=${localUser.authToken}');
+          log('  name=${localUser.name}');
+          log('  email=${localUser.email}');
+          log('  phone=${localUser.phoneNumber}');
+
+          await locator<AuthLocalDataSource>().saveUser(localUser);
+          log('[SignUP] ✅ Local user saved.');
+
+          final userProvider = context.read<UserProvider>();
+          await userProvider.setUser(localUser);
+          await userProvider.loadUser();
+          log('[SignUP] ✅ User loaded into provider.');
+
+          log('[SignUP] Verifying saved data:');
+          log('  saved token=${localUser.authToken}');
+          log('  saved name=${localUser.name}');
+          log('  saved email=${localUser.email}');
+
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text('Verify Your Otp Now')));
+          context.pushRoute(OtpVerificationRoute(addShowButton: true));
+        },
+        error: (e) {
+          log('[SignUP] ❌ API error: ${e.message}');
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(e.message ?? 'Signup failed')));
+        },
+      );
+    } catch (e, s) {
+      log('[SignUP] ❌ Exception during reset: $e');
+      log('[SignUP] Stacktrace: $s');
+    } finally {
+      setProcessing(false);
+      _isResetting = false;
+      notifyListeners();
+      log('[SignUP] 🧹 Cleanup complete.');
+    }
   }
-}
 }

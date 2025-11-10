@@ -194,7 +194,7 @@ class BookingProvider extends BaseViewModel {
     try {
       setProcessing(true);
       final user = await locator<AuthLocalDataSource>().getUser();
-      if (user == null || user.token == null) {
+      if (user == null || user.authToken == null) {
         throw Exception('User not found in local storage');
       }
       final booking = BookingEntity(
@@ -255,7 +255,7 @@ class BookingProvider extends BaseViewModel {
     try {
       setProcessing(true);
       final user = await locator<AuthLocalDataSource>().getUser();
-      if (user == null || user.token == null) {
+      if (user == null || user.authToken == null) {
         throw Exception('User not found in local storage');
       }
       final booking = BookingEntity(
@@ -310,7 +310,7 @@ class BookingProvider extends BaseViewModel {
       isLoadingBookingDetail = true;
       notifyListeners();
       final user = await locator<AuthLocalDataSource>().getUser();
-      if (user == null || user.token == null) {
+      if (user == null || user.authToken == null) {
         throw Exception('User not found in local storage');
       }
 
@@ -368,7 +368,7 @@ class BookingProvider extends BaseViewModel {
     try {
       setProcessing(true);
       final user = await locator<AuthLocalDataSource>().getUser();
-      if (user == null || user.token == null) {
+      if (user == null || user.authToken == null) {
         throw Exception('User not found in local storage');
       }
 
@@ -697,4 +697,49 @@ class BookingProvider extends BaseViewModel {
       },
     );
   }
+
+  Future<void> updateBookingStatus({
+  required BuildContext context,
+  required String bookingId,
+  required int newStatus,
+  String? rejectionReason,
+}) async {
+  try {
+    isLoadingBookingDetail = true;
+    notifyListeners();
+
+    // final response = await apiService.updateBookingStatus(
+    //   bookingId: bookingId,
+    //   status: newStatus,
+    //   reason: rejectionReason,
+    // );
+
+    // if (response.success) {
+    //   // Update local list
+    //   final index = bookings.indexWhere((b) => b.id == bookingId);
+    //   if (index != -1) {
+    //     bookings[index] = bookings[index].copyWith(status: newStatus);
+    //   }
+    //   notifyListeners();
+
+    //   ScaffoldMessenger.of(context).showSnackBar(
+    //     SnackBar(
+    //       content: Text(
+    //         newStatus == 1
+    //             ? 'Booking accepted successfully'
+    //             : 'Booking rejected',
+    //       ),
+    //     ),
+    //   );
+    // }
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Failed: $e')),
+    );
+  } finally {
+    isLoadingBookingDetail = false;
+    notifyListeners();
+  }
+}
+
 }

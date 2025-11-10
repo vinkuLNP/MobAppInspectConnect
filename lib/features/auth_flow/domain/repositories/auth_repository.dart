@@ -1,4 +1,5 @@
 import 'package:inspect_connect/core/commondomain/entities/based_api_result/api_result_model.dart';
+import 'package:inspect_connect/features/auth_flow/data/models/auth_user_dto.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/auth_user.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/certificate_agency_entity.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/certificate_type_entity.dart';
@@ -36,7 +37,7 @@ abstract class AuthRepository {
     required String countryCode,
   });
 
-   Future<ApiResultModel<InspectorUser>> inspectorSignUp({
+   Future<ApiResultModel<AuthUser>> inspectorSignUp({
     required InspectorSignUpLocalEntity inspectorSignUpLocalEntity
   });
 
@@ -50,7 +51,8 @@ abstract class AuthRepository {
     required String newPassword,
   });
 
-       Future<ApiResultModel<UserDetail>>fetchUserDetail({
+       Future<ApiResultModel<UserDetail>>fetchUserDetail(
+        {
     required String userId,
   });
       Future<ApiResultModel<AuthUser>>updateProfile({

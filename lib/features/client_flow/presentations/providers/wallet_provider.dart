@@ -50,7 +50,7 @@ class WalletProvider extends BaseViewModel {
 
   Future<void> getUserWallet({required BuildContext context}) async {
     final user = await locator<AuthLocalDataSource>().getUser();
-    if (user?.token == null) return;
+    if (user?.authToken == null) return;
 
     final useCase = locator<GetUserWalletAmountUseCase>();
     final state = await executeParamsUseCase<WalletModel, GetUserWalletAmountParams>(
@@ -80,7 +80,7 @@ class WalletProvider extends BaseViewModel {
     notifyListeners();
 
     final user = await locator<AuthLocalDataSource>().getUser();
-    if (user?.token == null) return;
+    if (user?.authToken == null) return;
 
     final useCase = locator<GetUserPaymentsListUseCase>();
     final state = await executeParamsUseCase<PaymentsBodyModel, GetUserPaymentsListParams>(

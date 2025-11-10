@@ -1,13 +1,15 @@
+
+
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_button.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
-import 'package:inspect_connect/features/inspector_flow/data/subscription_model.dart';
+import 'package:inspect_connect/features/inspector_flow/data/models/subscription_model.dart';
 
 class SubscriptionCarousel extends StatefulWidget {
-  final List<SubscriptionPlan> plans;
-  final void Function(SubscriptionPlan plan)? onSubscribe;
+  final List<SubscriptionPlanModel> plans;
+  final void Function(SubscriptionPlanModel plan)? onSubscribe;
 
   const SubscriptionCarousel({
     super.key,
@@ -93,7 +95,7 @@ class _SubscriptionCarouselState extends State<SubscriptionCarousel> {
 
   Widget _buildPlanCard(
     BuildContext context,
-    SubscriptionPlan plan,
+    SubscriptionPlanModel plan,
     bool isActive,
   ) {
     return Container(

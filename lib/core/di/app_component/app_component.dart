@@ -28,26 +28,40 @@ import 'package:inspect_connect/features/client_flow/domain/usecases/update_book
 import 'package:inspect_connect/features/client_flow/domain/usecases/upload_image_usecase.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/session_manager.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/user_provider.dart';
-
+import 'package:inspect_connect/features/inspector_flow/data/datasources/remote_datasource/inspector_api_datasource.dart';
+import 'package:inspect_connect/features/inspector_flow/data/repositories/inspector_repository_imp.dart';
+import 'package:inspect_connect/features/inspector_flow/domain/repositories/inspector_repository.dart';
+import 'package:inspect_connect/features/inspector_flow/domain/usecases/get_subscription_plans_usecase.dart';
+import 'package:inspect_connect/features/inspector_flow/domain/usecases/get_user_subscription_detail_usecase.dart';
 
 final GetIt locator = GetIt.I;
 
-@InjectableInit(
-  preferRelativeImports: false,
-)
+@InjectableInit(preferRelativeImports: false)
 Future<void> initAppComponentLocator() async => locator.init();
 
 void setupLocator() {
   locator.registerLazySingleton<AuthRemoteDataSource>(
-      () => AuthRemoteDataSourceImpl(locator()));
+    () => AuthRemoteDataSourceImpl(locator()),
+  );
   locator.registerLazySingleton<AuthRepository>(
-      () => AuthRepositoryImpl(locator()));
-      locator.registerLazySingleton<ClientUserRepository>(
-      () => ClientUserRepositoryImpl(locator()));
+    () => AuthRepositoryImpl(locator()),
+  );
+  locator.registerLazySingleton<ClientUserRepository>(
+    () => ClientUserRepositoryImpl(locator()),
+  );
 
- locator.registerLazySingleton<BookingRemoteDataSource>(
-      () => BookingRemoteDataSourceImpl(locator()));
-      
+  locator.registerLazySingleton<BookingRemoteDataSource>(
+    () => BookingRemoteDataSourceImpl(locator()),
+  );
+
+  locator.registerLazySingleton<InspectorRemoteDataSource>(
+    () => InspectorRemoteDataSourceImpl(locator()),
+  );
+
+  locator.registerLazySingleton<InspectorRepository>(
+    () => InspectorRepositoryImpl(locator()),
+  );
+
   locator.registerLazySingleton(() => SignInUseCase(locator()));
   locator.registerLazySingleton(() => SignUpUseCase(locator()));
   locator.registerLazySingleton(() => OtpVerificarionUseCase(locator()));
@@ -62,22 +76,17 @@ void setupLocator() {
   locator.registerLazySingleton(() => GetUserPaymentsListUseCase(locator()));
   locator.registerLazySingleton(() => GetUserUseCase(locator()));
   locator.registerLazySingleton(() => UpdateProfileUseCase(locator()));
+  locator.registerLazySingleton(() => GetSubscriptionPlansUseCase(locator()));
+  locator.registerLazySingleton(() => GetUserSubscriptionDetailUseCase(locator()));
+
 
   locator.registerLazySingleton(() => GetAgencyUseCase(locator()));
   locator.registerLazySingleton(() => GetCertificateTypeUseCase(locator()));
   locator.registerLazySingleton(() => InspectorSignUpUseCase(locator()));
 
-
-
-
-
-  
   locator.registerLazySingleton(() => FetchBookingsUseCase(locator()));
 
   locator.registerLazySingleton(() => UploadImageUseCase(locator()));
-locator.registerLazySingleton<UserProvider>(() => UserProvider());
+  locator.registerLazySingleton<UserProvider>(() => UserProvider());
   locator.registerLazySingleton<SessionManager>(() => SessionManager());
-
 }
-
-

@@ -4,189 +4,30 @@
   "_note3": "If you have VCS merge conflicts, you must resolve them according to ObjectBox docs.",
   "entities": [
     {
-      "id": "1:5131635798235456301",
-      "lastPropertyId": "30:3271705913206409547",
-      "name": "AuthUserLocalEntity",
-      "properties": [
-        {
-          "id": "1:4611869412995201516",
-          "name": "id",
-          "type": 6,
-          "flags": 1
-        },
-        {
-          "id": "2:8272780988710511950",
-          "name": "token",
-          "type": 9
-        },
-        {
-          "id": "3:1482861332686892814",
-          "name": "name",
-          "type": 9
-        },
-        {
-          "id": "4:997857176921112707",
-          "name": "email",
-          "type": 9
-        },
-        {
-          "id": "5:3976464959677611987",
-          "name": "phoneNumber",
-          "type": 9
-        },
-        {
-          "id": "6:8134907860381373967",
-          "name": "countryCode",
-          "type": 9
-        },
-        {
-          "id": "7:607818520923023036",
-          "name": "mailingAddress",
-          "type": 9
-        },
-        {
-          "id": "8:5012892644845956447",
-          "name": "role",
-          "type": 6
-        },
-        {
-          "id": "9:2706555786363321275",
-          "name": "status",
-          "type": 6
-        },
-        {
-          "id": "10:5188505656236194826",
-          "name": "phoneOtpVerified",
-          "type": 1
-        },
-        {
-          "id": "11:3279684472998237889",
-          "name": "emailOtpVerified",
-          "type": 1
-        },
-        {
-          "id": "12:3139177082061344221",
-          "name": "agreedToTerms",
-          "type": 1
-        },
-        {
-          "id": "13:3448151157588637092",
-          "name": "isTruthfully",
-          "type": 1
-        },
-        {
-          "id": "14:132889661029488037",
-          "name": "approvalStatusByAdmin",
-          "type": 6
-        },
-        {
-          "id": "15:593940584799512486",
-          "name": "rejectedReason",
-          "type": 9
-        },
-        {
-          "id": "16:2148407587997559327",
-          "name": "stripeCustomerId",
-          "type": 9
-        },
-        {
-          "id": "17:1493272936218018139",
-          "name": "stripeAccountId",
-          "type": 9
-        },
-        {
-          "id": "18:4361464192518718559",
-          "name": "stripePayoutsEnabled",
-          "type": 1
-        },
-        {
-          "id": "19:3222730919390221459",
-          "name": "stripeTransfersActive",
-          "type": 1
-        },
-        {
-          "id": "20:3540610438679751168",
-          "name": "currentSubscriptionTrialDays",
-          "type": 6
-        },
-        {
-          "id": "21:2332234854265821318",
-          "name": "currentSubscriptionAutoRenew",
-          "type": 6
-        },
-        {
-          "id": "22:39882207688389351",
-          "name": "currentSubscriptionId",
-          "type": 9
-        },
-        {
-          "id": "23:4686123977379770666",
-          "name": "stripeSubscriptionStatus",
-          "type": 9
-        },
-        {
-          "id": "24:6140693525709463196",
-          "name": "walletId",
-          "type": 9
-        },
-        {
-          "id": "25:5796780863751892772",
-          "name": "locationName",
-          "type": 9
-        },
-        {
-          "id": "26:1498496296919574464",
-          "name": "latitude",
-          "type": 8
-        },
-        {
-          "id": "27:5584120390685559358",
-          "name": "longitude",
-          "type": 8
-        },
-        {
-          "id": "28:8462199880617792571",
-          "name": "createdAt",
-          "type": 10
-        },
-        {
-          "id": "29:6233394496800560090",
-          "name": "updatedAt",
-          "type": 10
-        },
-        {
-          "id": "30:3271705913206409547",
-          "name": "loginTime",
-          "type": 10
-        }
-      ],
-      "relations": []
-    },
-    {
-      "id": "2:8224409923190584740",
-      "lastPropertyId": "4:2446156020687410148",
+      "id": "1:6706348540238291838",
+      "lastPropertyId": "4:1656981505077753466",
       "name": "AuthUserDeviceEntity",
       "properties": [
         {
-          "id": "1:1201763598529109640",
+          "id": "1:7903789545280373362",
           "name": "id",
           "type": 6,
           "flags": 1
         },
         {
-          "id": "2:4991843973117758024",
+          "id": "2:7276179211685549603",
           "name": "deviceToken",
           "type": 9
         },
         {
-          "id": "3:2587492729026246349",
+          "id": "3:5974167347893996918",
           "name": "deviceType",
           "type": 9
         },
         {
-          "id": "4:2446156020687410148",
+          "id": "4:1656981505077753466",
           "name": "userId",
-          "indexId": "1:7489877441751012150",
+          "indexId": "1:1381949025203565816",
           "type": 11,
           "flags": 520,
           "relationTarget": "AuthUserLocalEntity"
@@ -195,191 +36,393 @@
       "relations": []
     },
     {
-      "id": "7:6897323812471320470",
-      "lastPropertyId": "29:4099796525503528676",
-      "name": "InspectorSignUpLocalEntity",
+      "id": "2:7510821947055321623",
+      "lastPropertyId": "43:5105618599375191812",
+      "name": "AuthUserLocalEntity",
       "properties": [
         {
-          "id": "1:1608022142185072257",
+          "id": "1:4977728006046384477",
           "name": "id",
           "type": 6,
           "flags": 1
         },
         {
-          "id": "2:5944647149347506689",
+          "id": "2:8628880249020340326",
+          "name": "authToken",
+          "type": 9
+        },
+        {
+          "id": "3:7448645097453528156",
           "name": "name",
           "type": 9
         },
         {
-          "id": "3:2659386822160961841",
+          "id": "4:3400367580876140345",
           "name": "email",
           "type": 9
         },
         {
-          "id": "4:1777616599758635826",
-          "name": "password",
-          "type": 9
-        },
-        {
-          "id": "5:2557546231358882658",
+          "id": "5:9159726942363196862",
           "name": "phoneNumber",
           "type": 9
         },
         {
-          "id": "6:3670339820616169600",
+          "id": "6:9074335077169029502",
           "name": "countryCode",
           "type": 9
         },
         {
-          "id": "7:6779074503090054880",
-          "name": "certificateTypeId",
-          "type": 9
-        },
-        {
-          "id": "8:8221997847214816239",
-          "name": "certificateExpiryDate",
-          "type": 9
-        },
-        {
-          "id": "9:3938258897970181186",
-          "name": "certificateDocuments",
-          "type": 30
-        },
-        {
-          "id": "10:8826163247314718597",
-          "name": "certificateAgencyIds",
-          "type": 30
-        },
-        {
-          "id": "11:7126946317936680765",
-          "name": "country",
-          "type": 9
-        },
-        {
-          "id": "12:996089868518354117",
-          "name": "state",
-          "type": 9
-        },
-        {
-          "id": "13:5549259924164504091",
-          "name": "city",
-          "type": 9
-        },
-        {
-          "id": "14:6200623269580581175",
-          "name": "zipCode",
-          "type": 9
-        },
-        {
-          "id": "15:96549469011877958",
+          "id": "7:7142021894114820947",
           "name": "mailingAddress",
           "type": 9
         },
         {
-          "id": "16:4302797122267047435",
-          "name": "uploadedIdOrLicenseDocument",
-          "type": 9
-        },
-        {
-          "id": "17:4282650781858068304",
-          "name": "referenceDocuments",
-          "type": 30
-        },
-        {
-          "id": "18:6346452895957981168",
-          "name": "profileImage",
-          "type": 9
-        },
-        {
-          "id": "19:3906025559829544710",
-          "name": "agreedToTerms",
-          "type": 1
-        },
-        {
-          "id": "20:459714567419254534",
-          "name": "isTruthfully",
-          "type": 1
-        },
-        {
-          "id": "21:4034109265116003399",
+          "id": "8:3761681116789920791",
           "name": "role",
           "type": 6
         },
         {
-          "id": "22:2820916023932604926",
-          "name": "deviceType",
+          "id": "9:8622226598331293884",
+          "name": "status",
+          "type": 6
+        },
+        {
+          "id": "10:96454780337836301",
+          "name": "phoneOtpVerified",
+          "type": 1
+        },
+        {
+          "id": "11:2748252265901843734",
+          "name": "emailOtpVerified",
+          "type": 1
+        },
+        {
+          "id": "12:6067500703375922462",
+          "name": "agreedToTerms",
+          "type": 1
+        },
+        {
+          "id": "13:8693323874627607521",
+          "name": "isTruthfully",
+          "type": 1
+        },
+        {
+          "id": "14:5058542504887666690",
+          "name": "approvalStatusByAdmin",
+          "type": 6
+        },
+        {
+          "id": "15:815433817228123830",
+          "name": "rejectedReason",
           "type": 9
         },
         {
-          "id": "23:7169903911769862731",
-          "name": "deviceToken",
+          "id": "16:4710430893609031014",
+          "name": "stripeCustomerId",
           "type": 9
         },
         {
-          "id": "24:669343029844788976",
-          "name": "locationType",
+          "id": "17:4710107865299513468",
+          "name": "stripeAccountId",
           "type": 9
         },
         {
-          "id": "25:3421770643298715055",
+          "id": "18:8933747536940468220",
+          "name": "stripePayoutsEnabled",
+          "type": 1
+        },
+        {
+          "id": "19:8140600119593809259",
+          "name": "stripeTransfersActive",
+          "type": 1
+        },
+        {
+          "id": "20:7589101533977070173",
+          "name": "currentSubscriptionTrialDays",
+          "type": 6
+        },
+        {
+          "id": "21:2205212665702389342",
+          "name": "currentSubscriptionAutoRenew",
+          "type": 6
+        },
+        {
+          "id": "22:3730392305248784100",
+          "name": "currentSubscriptionId",
+          "type": 9
+        },
+        {
+          "id": "23:1561577677941793754",
+          "name": "stripeSubscriptionStatus",
+          "type": 9
+        },
+        {
+          "id": "24:1696120360638824616",
+          "name": "walletId",
+          "type": 9
+        },
+        {
+          "id": "25:4241434292874720691",
           "name": "locationName",
           "type": 9
         },
         {
-          "id": "26:6170495915697225193",
+          "id": "26:4844683456458531299",
           "name": "latitude",
           "type": 8
         },
         {
-          "id": "27:6308629480548868413",
+          "id": "27:5180203900191409144",
           "name": "longitude",
           "type": 8
         },
         {
-          "id": "28:8552915215688275361",
+          "id": "28:8253652263703126921",
+          "name": "createdAt",
+          "type": 10
+        },
+        {
+          "id": "29:3509022603680572381",
+          "name": "updatedAt",
+          "type": 10
+        },
+        {
+          "id": "30:1461643812927463339",
+          "name": "profileImage",
+          "type": 9
+        },
+        {
+          "id": "31:2939544253580277981",
+          "name": "bookingInProgress",
+          "type": 1
+        },
+        {
+          "id": "32:7455222307864686066",
+          "name": "isDeleted",
+          "type": 1
+        },
+        {
+          "id": "33:2310972432133450897",
+          "name": "country",
+          "type": 9
+        },
+        {
+          "id": "34:2108784632282699482",
+          "name": "state",
+          "type": 9
+        },
+        {
+          "id": "35:1683338692122169949",
+          "name": "city",
+          "type": 9
+        },
+        {
+          "id": "36:7707187672438981528",
+          "name": "certificateTypeId",
+          "type": 9
+        },
+        {
+          "id": "37:3812095102116327804",
+          "name": "certificateAgencyIds",
+          "type": 30
+        },
+        {
+          "id": "38:1322619594078037508",
+          "name": "certificateDocuments",
+          "type": 30
+        },
+        {
+          "id": "39:8318957044173853223",
+          "name": "certificateExpiryDate",
+          "type": 9
+        },
+        {
+          "id": "40:6683843560515343898",
+          "name": "referenceDocuments",
+          "type": 30
+        },
+        {
+          "id": "41:2822043330167833312",
+          "name": "uploadedIdOrLicenseDocument",
+          "type": 9
+        },
+        {
+          "id": "42:7361908397267452669",
+          "name": "workHistoryDescription",
+          "type": 9
+        },
+        {
+          "id": "43:5105618599375191812",
+          "name": "loginTime",
+          "type": 10
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "3:9109420249064471506",
+      "lastPropertyId": "29:5971348717096684686",
+      "name": "InspectorSignUpLocalEntity",
+      "properties": [
+        {
+          "id": "1:4508438178353477505",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:5337601937719951958",
+          "name": "name",
+          "type": 9
+        },
+        {
+          "id": "3:8984501950055425564",
+          "name": "email",
+          "type": 9
+        },
+        {
+          "id": "4:747165839657268135",
+          "name": "password",
+          "type": 9
+        },
+        {
+          "id": "5:1708947877299647342",
+          "name": "phoneNumber",
+          "type": 9
+        },
+        {
+          "id": "6:8660919674515096567",
+          "name": "countryCode",
+          "type": 9
+        },
+        {
+          "id": "7:4258692124644960770",
           "name": "isoCode",
           "type": 9
         },
         {
-          "id": "29:4099796525503528676",
+          "id": "8:217125110715837022",
+          "name": "certificateTypeId",
+          "type": 9
+        },
+        {
+          "id": "9:931265546274407687",
+          "name": "certificateExpiryDate",
+          "type": 9
+        },
+        {
+          "id": "10:3832810131687575410",
+          "name": "certificateDocuments",
+          "type": 30
+        },
+        {
+          "id": "11:4509228448113690047",
+          "name": "certificateAgencyIds",
+          "type": 30
+        },
+        {
+          "id": "12:3343242310044903772",
+          "name": "country",
+          "type": 9
+        },
+        {
+          "id": "13:5929173274600292394",
+          "name": "state",
+          "type": 9
+        },
+        {
+          "id": "14:2430642351229016959",
+          "name": "city",
+          "type": 9
+        },
+        {
+          "id": "15:6934937195310391165",
+          "name": "zipCode",
+          "type": 9
+        },
+        {
+          "id": "16:3571384632198165329",
+          "name": "mailingAddress",
+          "type": 9
+        },
+        {
+          "id": "17:8563527971304190649",
+          "name": "uploadedIdOrLicenseDocument",
+          "type": 9
+        },
+        {
+          "id": "18:1303636506337963961",
           "name": "workHistoryDescription",
           "type": 9
+        },
+        {
+          "id": "19:8441941961876582789",
+          "name": "referenceDocuments",
+          "type": 30
+        },
+        {
+          "id": "20:6975515860393936727",
+          "name": "profileImage",
+          "type": 9
+        },
+        {
+          "id": "21:3310720633964425158",
+          "name": "agreedToTerms",
+          "type": 1
+        },
+        {
+          "id": "22:8596761536149048617",
+          "name": "isTruthfully",
+          "type": 1
+        },
+        {
+          "id": "23:7853610846225801814",
+          "name": "role",
+          "type": 6
+        },
+        {
+          "id": "24:868977506242046544",
+          "name": "deviceType",
+          "type": 9
+        },
+        {
+          "id": "25:7537171130744517007",
+          "name": "deviceToken",
+          "type": 9
+        },
+        {
+          "id": "26:5656893369707610242",
+          "name": "locationType",
+          "type": 9
+        },
+        {
+          "id": "27:681259737902032796",
+          "name": "locationName",
+          "type": 9
+        },
+        {
+          "id": "28:8981014397423736499",
+          "name": "latitude",
+          "type": 8
+        },
+        {
+          "id": "29:5971348717096684686",
+          "name": "longitude",
+          "type": 8
         }
       ],
       "relations": []
     }
   ],
-  "lastEntityId": "7:6897323812471320470",
-  "lastIndexId": "1:7489877441751012150",
+  "lastEntityId": "3:9109420249064471506",
+  "lastIndexId": "1:1381949025203565816",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",
   "modelVersion": 5,
   "modelVersionParserMinimum": 5,
-  "retiredEntityUids": [
-    6323051419829769589,
-    5886969448355518645,
-    2314900235999128927,
-    5507700486728886686
-  ],
+  "retiredEntityUids": [],
   "retiredIndexUids": [],
-  "retiredPropertyUids": [
-    647249224450654308,
-    5188489944007397346,
-    7320807151972493534,
-    1894962048992247963,
-    2053712292897892099,
-    6070666122015563262,
-    6551788488995435288,
-    4610802090803421973,
-    1252569695644190240,
-    8062780496289760997,
-    8820879528324421200,
-    6304320797684281056,
-    3069690599400147834,
-    5905080434010146167,
-    4175805726105451342,
-    4590080569558135951
-  ],
+  "retiredPropertyUids": [],
   "retiredRelationUids": [],
   "version": 1
 }

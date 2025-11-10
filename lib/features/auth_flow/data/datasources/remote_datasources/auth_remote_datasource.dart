@@ -32,7 +32,7 @@ abstract class AuthRemoteDataSource {
   Future<ApiResultModel<AuthUserDto>> verifyOtp(VerifyOtpRequestDto dto);
   Future<ApiResultModel<AuthUserDto>> resendOtp(ResendOtpRequestDto dto);
   Future<ApiResultModel<AuthUserDto>> changePassword(ChangePasswordDto dto);
-  Future<ApiResultModel<InspectorUser>> inspectorSignUp(
+  Future<ApiResultModel<AuthUserDto>> inspectorSignUp(
     InspectorSignUpLocalEntity dto,
   );
 
@@ -105,9 +105,9 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
               <String, dynamic>{};
           final dto = AuthUserDto.fromBody(body);
           final localEntity = AuthUserLocalEntity(
-            token: dto.authToken,
+            authToken: dto.authToken,
             name: dto.name,
-            email: dto.emailHashed,
+            email: dto.email,
             phoneNumber: dto.phoneNumber,
             countryCode: dto.countryCode,
           );
@@ -130,7 +130,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }
 
   @override
-  Future<ApiResultModel<InspectorUser>> inspectorSignUp(
+  Future<ApiResultModel<AuthUserDto>> inspectorSignUp(
     InspectorSignUpLocalEntity dto,
   ) async {
     try {
@@ -148,7 +148,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           final Map<String, dynamic> body =
               (root['body'] as Map?)?.cast<String, dynamic>() ??
               <String, dynamic>{};
-          final dto = InspectorUser.fromJson(body);
+          final dto = AuthUserDto.fromBody(body);
           // final localEntity = AuthUserLocalEntity(
           //   token: dto.authToken,
           //   name: dto.name,
@@ -158,10 +158,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           // );
           // locator<AuthLocalDataSource>().saveUser(localEntity);
           log('------>local user----> localEntity');
-          return ApiResultModel<InspectorUser>.success(data: dto);
+          return ApiResultModel<AuthUserDto>.success(data: dto);
         },
         failure: (ErrorResultModel e) =>
-            ApiResultModel<InspectorUser>.failure(errorResultEntity: e),
+            ApiResultModel<AuthUserDto>.failure(errorResultEntity: e),
       );
     } catch (e) {
       log('signup error: $e');
@@ -190,7 +190,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         uri: verifyOtpndPoint,
         httpRequestStrategy: PostRequestStrategy(),
         headers: {
-          'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5MGRlZmU2YWFiZTQ4NzM4MGVhZDBmZiIsImVtYWlsIjoiVGVzcmVlcmV3cmVydHcxMnRAeW9wbWFpbC5jb20iLCJpYXQiOjE3NjI1MjEwNjMsImV4cCI6MTc2MzEyNTg2M30.H9kQgrb_i8YnxARn3eXkcndaOC1QV1XBZZQc2D7zXp8',
+          'Authorization':
+              'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5MGRlZmU2YWFiZTQ4NzM4MGVhZDBmZiIsImVtYWlsIjoiVGVzcmVlcmV3cmVydHcxMnRAeW9wbWFpbC5jb20iLCJpYXQiOjE3NjI1MjEwNjMsImV4cCI6MTc2MzEyNTg2M30.H9kQgrb_i8YnxARn3eXkcndaOC1QV1XBZZQc2D7zXp8',
           // ${user.token}',
           'Content-Type': 'application/json',
           'Accept': 'application/json',
@@ -228,11 +229,11 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   Future<ApiResultModel<UserDetail>> fetchUserDetail(UserDetailDto dto) async {
     try {
       final user = await locator<AuthLocalDataSource>().getUser();
-      if (user == null || user.token == null) {
+      if (user == null || user.authToken == null) {
         throw Exception('User not found in local storage');
       }
       log('------>user------------->$user');
-      log('------>user-------token------>${user.token}');
+      log('------>user-------token------>${user.authToken}');
       log('------>user-------phone------>${user.phoneNumber}');
       log('------>user-------code------>${user.countryCode}');
 
@@ -240,11 +241,11 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         uri: updateUser,
         httpRequestStrategy: GetRequestStrategy(),
         headers: {
-          'Authorization': 'Bearer ${user.token}',
+          'Authorization': 'Bearer ${user.authToken}',
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
-        requestData: dto.toJson(),
+        // requestData: dto.toJson(),
       );
 
       return res.when(
@@ -276,18 +277,18 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   Future<ApiResultModel<AuthUserDto>> resendOtp(ResendOtpRequestDto dto) async {
     try {
       final user = await locator<AuthLocalDataSource>().getUser();
-      if (user == null || user.token == null) {
+      if (user == null || user.authToken == null) {
         throw Exception('User not found in local storage');
       }
       log('------>user------------->$user');
-      log('------>user-------token------>${user.token}');
+      log('------>user-------token------>${user.authToken}');
       log('------>user-------phone------>${user.phoneNumber}');
       log('------>user-------code------>${user.countryCode}');
       final ApiResultModel<http.Response> res = await _ctx.makeRequest(
         uri: resendOtpEndPoint,
         httpRequestStrategy: PostRequestStrategy(),
         headers: {
-          'Authorization': 'Bearer ${user.token}',
+          'Authorization': 'Bearer ${user.authToken}',
           'Content-Type': 'application/json',
         },
         requestData: dto.toJson(),
@@ -326,18 +327,18 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   ) async {
     try {
       final user = await locator<AuthLocalDataSource>().getUser();
-      if (user == null || user.token == null) {
+      if (user == null || user.authToken == null) {
         throw Exception('User not found in local storage');
       }
       log('------>user------------->$user');
-      log('------>user-------token------>${user.token}');
+      log('------>user-------token------>${user.authToken}');
       log('------>user-------phone------>${user.phoneNumber}');
       log('------>user-------dto------>${dto.toJson()}');
       final ApiResultModel<http.Response> res = await _ctx.makeRequest(
         uri: changePasswordEndPoint,
         httpRequestStrategy: PutRequestStrategy(),
         headers: {
-          'Authorization': 'Bearer ${user.token}',
+          'Authorization': 'Bearer ${user.authToken}',
           'Content-Type': 'application/json',
         },
         requestData: dto.toJson(),
@@ -376,18 +377,18 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   ) async {
     try {
       final user = await locator<AuthLocalDataSource>().getUser();
-      if (user == null || user.token == null) {
+      if (user == null || user.authToken == null) {
         throw Exception('User not found in local storage');
       }
       log('------>user------------->$user');
-      log('------>user-------token------>${user.token}');
+      log('------>user-------token------>${user.authToken}');
       log('------>user-------phone------>${user.phoneNumber}');
       log('------>user-------dto------>${dto.toJson()}');
       final ApiResultModel<http.Response> res = await _ctx.makeRequest(
         uri: updateUser,
         httpRequestStrategy: PutRequestStrategy(),
         headers: {
-          'Authorization': 'Bearer ${user.token}',
+          'Authorization': 'Bearer ${user.authToken}',
           'Content-Type': 'application/json',
         },
         requestData: dto.toJson(),

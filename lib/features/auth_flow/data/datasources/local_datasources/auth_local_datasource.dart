@@ -37,6 +37,6 @@ class AuthLocalDataSource {
 
   Future<String?> getUserToken() async {
     final user = await getUser();
-    return user?.token;
+    return user?.authToken;
   }
 }

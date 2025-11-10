@@ -277,18 +277,55 @@ class InspectorSignInRoute extends PageRouteInfo<void> {
 
 /// generated route for
 /// [InspectorSignUpView]
-class InspectorSignUpRoute extends PageRouteInfo<void> {
-  const InspectorSignUpRoute({List<PageRouteInfo>? children})
-    : super(InspectorSignUpRoute.name, initialChildren: children);
+class InspectorSignUpRoute extends PageRouteInfo<InspectorSignUpRouteArgs> {
+  InspectorSignUpRoute({
+    Key? key,
+    required bool showBackButton,
+    List<PageRouteInfo>? children,
+  }) : super(
+         InspectorSignUpRoute.name,
+         args: InspectorSignUpRouteArgs(
+           key: key,
+           showBackButton: showBackButton,
+         ),
+         initialChildren: children,
+       );
 
   static const String name = 'InspectorSignUpRoute';
 
   static PageInfo page = PageInfo(
     name,
     builder: (data) {
-      return const InspectorSignUpView();
+      final args = data.argsAs<InspectorSignUpRouteArgs>();
+      return InspectorSignUpView(
+        key: args.key,
+        showBackButton: args.showBackButton,
+      );
     },
   );
+}
+
+class InspectorSignUpRouteArgs {
+  const InspectorSignUpRouteArgs({this.key, required this.showBackButton});
+
+  final Key? key;
+
+  final bool showBackButton;
+
+  @override
+  String toString() {
+    return 'InspectorSignUpRouteArgs{key: $key, showBackButton: $showBackButton}';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! InspectorSignUpRouteArgs) return false;
+    return key == other.key && showBackButton == other.showBackButton;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ showBackButton.hashCode;
 }
 
 /// generated route for

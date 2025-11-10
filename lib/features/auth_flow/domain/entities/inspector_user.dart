@@ -52,13 +52,13 @@ class InspectorUser extends Equatable {
     required this.certificateExpiryDate,
     required this.referenceDocuments,
     required this.uploadedIdOrLicenseDocument,
-    this.workHistoryDescription,
+    required this.workHistoryDescription,
     required this.phoneOtpVerified,
     required this.emailOtpVerified,
     required this.agreedToTerms,
     required this.isTruthfully,
-    this.stripeCustomerId,
-    this.authToken,
+    required this.stripeCustomerId,
+    required this.authToken,
   });
 
   factory InspectorUser.fromJson(Map<String, dynamic> json) => InspectorUser(
@@ -158,3 +158,38 @@ class InspectorUser extends Equatable {
         authToken,
       ];
 }
+extension InspectorUserMapping on InspectorUser {
+  InspectorUser toLocalEntity() {
+    return InspectorUser(
+      id: id,
+      bookingInProgress: bookingInProgress,
+      certificateAgencyIds: certificateAgencyIds,
+      certificateDocuments: certificateDocuments,
+      certificateExpiryDate: certificateExpiryDate,
+      isDeleted: isDeleted,
+      location: location,
+      referenceDocuments: referenceDocuments,
+      role: role,
+      status: status,
+      authToken: authToken,
+      name: name,
+      email: email,
+      phoneNumber: phoneNumber,
+      countryCode: countryCode,
+      mailingAddress: mailingAddress,
+      profileImage: profileImage,
+      certificateTypeId: certificateTypeId,
+      country: country,
+      state: state,
+      city: city,
+      phoneOtpVerified: phoneOtpVerified,
+      emailOtpVerified: emailOtpVerified,
+      agreedToTerms: agreedToTerms,
+      isTruthfully: isTruthfully,
+      stripeCustomerId: stripeCustomerId,
+      uploadedIdOrLicenseDocument: uploadedIdOrLicenseDocument,
+      workHistoryDescription: workHistoryDescription,
+    );
+  }
+}
+

@@ -1,6 +1,7 @@
 import 'package:inspect_connect/core/commondomain/entities/based_api_result/api_result_model.dart';
 import 'package:inspect_connect/core/commondomain/entities/based_api_result/error_result_model.dart';
 import 'package:inspect_connect/features/auth_flow/data/datasources/remote_datasources/auth_remote_datasource.dart';
+import 'package:inspect_connect/features/auth_flow/data/models/auth_user_dto.dart';
 import 'package:inspect_connect/features/auth_flow/data/models/change_password_dto.dart';
 import 'package:inspect_connect/features/auth_flow/data/models/profile_update_dto.dart';
 import 'package:inspect_connect/features/auth_flow/data/models/resend_otp_request_model.dart';
@@ -72,7 +73,7 @@ class AuthRepositoryImpl implements AuthRepository {
 
 
   @override
-Future<ApiResultModel<InspectorUser>> inspectorSignUp({
+Future<ApiResultModel<AuthUser>> inspectorSignUp({
   required InspectorSignUpLocalEntity inspectorSignUpLocalEntity
 }) async {
   final res = await _remote.inspectorSignUp(
@@ -82,7 +83,8 @@ Future<ApiResultModel<InspectorUser>> inspectorSignUp({
   return res.when(
     success: (dto) {
       try {
-        return ApiResultModel.success(data: dto);
+         final user = dto.toEntity(); 
+        return ApiResultModel.success(data: user);
       } catch (e) {
         return const ApiResultModel.failure(
           errorResultEntity: ErrorResultModel(
@@ -93,7 +95,7 @@ Future<ApiResultModel<InspectorUser>> inspectorSignUp({
       }
     },
     failure: (err) =>
-        ApiResultModel<InspectorUser>.failure(errorResultEntity: err),
+        ApiResultModel<AuthUser>.failure(errorResultEntity: err),
   );
 }
 

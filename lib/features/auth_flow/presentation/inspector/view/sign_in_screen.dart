@@ -118,7 +118,7 @@ class InspectorSignInView extends StatelessWidget {
                         textWidget(text: "Don’t have an account? "),
                         GestureDetector(
                           onTap: () {
-                            context.pushRoute(const InspectorSignUpRoute());
+                            context.pushRoute( InspectorSignUpRoute(showBackButton: false));
                           },
                           child: textWidget(
                             text: 'Sign Up',

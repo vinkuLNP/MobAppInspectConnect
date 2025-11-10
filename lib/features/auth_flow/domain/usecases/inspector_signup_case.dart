@@ -1,6 +1,8 @@
 import 'package:equatable/equatable.dart';
 import 'package:inspect_connect/core/commondomain/entities/based_api_result/api_result_model.dart';
 import 'package:inspect_connect/core/commondomain/usecases/base_params_usecase.dart';
+import 'package:inspect_connect/features/auth_flow/data/models/auth_user_dto.dart';
+import 'package:inspect_connect/features/auth_flow/domain/entities/auth_user.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/inspector_sign_up_entity.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/inspector_user.dart';
 import 'package:inspect_connect/features/auth_flow/domain/repositories/auth_repository.dart';
@@ -94,13 +96,13 @@ class InspectorSignUpParams extends Equatable {
 }
 
 class InspectorSignUpUseCase
-    extends BaseParamsUseCase<InspectorUser, InspectorSignUpParams> {
+    extends BaseParamsUseCase<AuthUser, InspectorSignUpParams> {
   final AuthRepository _repo;
 
   InspectorSignUpUseCase(this._repo);
 
   @override
-  Future<ApiResultModel<InspectorUser>> call(InspectorSignUpParams? params) {
+  Future<ApiResultModel<AuthUser>> call(InspectorSignUpParams? params) {
     return _repo.inspectorSignUp(
       inspectorSignUpLocalEntity: params!.inspectorSignUpLocalEntity,
     );

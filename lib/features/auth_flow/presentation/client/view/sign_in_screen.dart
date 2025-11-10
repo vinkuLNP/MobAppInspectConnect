@@ -7,6 +7,7 @@ import 'package:inspect_connect/core/utils/constants/app_assets_constants.dart';
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_button.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
+import 'package:inspect_connect/features/auth_flow/presentation/auth_user_provider.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/client/client_view_model.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/client/widgets/auth_form_switch_row.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/client/widgets/common_auth_bar.dart';
@@ -112,16 +113,47 @@ class ClientSignInView extends StatelessWidget {
                         .toList();
 
                     log('extracted route names: $names');
+                  
+                    final authFlow = Provider.of<AuthFlowProvider>(
+                      context,
+                      listen: false,
+                    );
 
-                    final hasSignIn = names.contains(ClientSignUpRoute.name);
-                    if (hasSignIn) {
-                      context.router.replaceAll([
-                        ClientSignUpRoute(showBackButton: false),
-                      ]);
-                    } else {
-                      context.pushRoute(
-                        ClientSignUpRoute(showBackButton: true),
+                    if (authFlow.isClient) {
+                      final hasSignIn = names.contains(ClientSignUpRoute.name);
+                      if (hasSignIn) {
+                        context.router.replaceAll([
+                          ClientSignUpRoute(showBackButton: false),
+                        ]);
+                      } else {
+                        context.pushRoute(
+                          ClientSignUpRoute(showBackButton: true),
+                        );
+                      }
+                    } else if (authFlow.isInspector) {
+                      final hasSignIn = names.contains(
+                        InspectorSignUpRoute.name,
                       );
+                      if (hasSignIn) {
+                        context.router.replaceAll([
+                          InspectorSignUpRoute(showBackButton: false),
+                        ]);
+                      } else {
+                        context.pushRoute(
+                          InspectorSignUpRoute(showBackButton: false),
+                        );
+                      }
+                    } else {
+                      final hasSignIn = names.contains(ClientSignUpRoute.name);
+                      if (hasSignIn) {
+                        context.router.replaceAll([
+                          ClientSignUpRoute(showBackButton: false),
+                        ]);
+                      } else {
+                        context.pushRoute(
+                          ClientSignUpRoute(showBackButton: true),
+                        );
+                      }
                     }
                   },
                   actionColor: AppColors.authThemeLightColor,

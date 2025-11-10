@@ -1,6 +1,8 @@
 import 'dart:developer';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:inspect_connect/features/inspector_flow/domain/enum/inspector_status.dart';
+import 'package:inspect_connect/features/inspector_flow/providers/inspector_main_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:inspect_connect/core/di/app_component/app_component.dart';
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
@@ -88,17 +90,49 @@ class _SplashViewState extends State<SplashView>
       final userProvider = context.read<UserProvider>();
       final bookingProvider = context.read<BookingProvider>();
 
+
       if (user != null) userProvider.setUser(user);
       await userProvider.loadUser();
 
       if (userProvider.isLoggedIn) {
-        await bookingProvider.fetchBookingsList();
-        context.router.replace(const ClientDashboardRoute());
+        if (userProvider.isUserClient) {
+          await bookingProvider.fetchBookingsList();
+          context.router.replace(const ClientDashboardRoute());
+        } else if (userProvider.isUserInspector) {
+          // await inspectorProvider.fetchSubscriptionPlans();
+          // context.router.replace(const InspectorDashboardRoute());
+          checkInspectorState(context);
+        } else {
+          context.router.replace(const OnBoardingRoute());
+        }
       } else {
         context.router.replace(const OnBoardingRoute());
       }
     });
   }
+Future<void> checkInspectorState(BuildContext context) async {
+  final localUser = await locator<AuthLocalDataSource>().getUser();
+  if (localUser == null) {
+    context.router.replaceAll([const OnBoardingRoute()]);
+    return;
+  }
+
+  final provider = InspectorDashboardProvider();
+  await provider.initializeUserState(context);
+
+  switch (provider.status) {
+    case InspectorStatus.needsSubscription:
+      context.router.replaceAll([const InspectorDashboardRoute()]);
+      break;
+    case InspectorStatus.underReview:
+    case InspectorStatus.rejected:
+    case InspectorStatus.approved:
+      context.router.replaceAll([const InspectorDashboardRoute()]);
+      break;
+    default:
+      context.router.replaceAll([const OnBoardingRoute()]);
+  }
+}
 
   @override
   void dispose() {
