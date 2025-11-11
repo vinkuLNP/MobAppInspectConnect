@@ -134,14 +134,7 @@ class _SubscriptionCarouselState extends State<SubscriptionCarousel> {
                     fontWeight: FontWeight.w600,
                     color: Colors.white70,
                   ),
-                  // const SizedBox(height: 4),
-                  //  textWidget(text:
-
-                  //   plan.description.toString(),
-                  //     fontSize: 14,
-                  //     color: Colors.white60,
-                  //   alignment: TextAlign.center,
-                  // ),
+              
                   const SizedBox(height: 8),
                   Container(
                     padding: const EdgeInsets.symmetric(
@@ -165,7 +158,6 @@ class _SubscriptionCarouselState extends State<SubscriptionCarousel> {
 
               const SizedBox(height: 16),
 
-              // FEATURE LIST
               Expanded(
                 child: SingleChildScrollView(
                   physics: const BouncingScrollPhysics(),

@@ -62,7 +62,6 @@ class _OtpVerificationViewState extends State<OtpVerificationView> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                /// OTP Input
                 PerDigitOtp(
                   length: 6,
                   controller: vm.pinController,

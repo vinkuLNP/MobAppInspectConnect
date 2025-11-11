@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/basecomponents/base_responsive_widget.dart';
 import 'package:inspect_connect/core/utils/constants/app_assets_constants.dart';
+import 'package:inspect_connect/core/utils/constants/app_colors.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/auth_user.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/client/widgets/common_auth_bar.dart';
 import 'package:inspect_connect/features/inspector_flow/providers/inspector_main_provider.dart';
@@ -32,8 +33,7 @@ class ApprovalStatusScreen extends StatelessWidget {
             form: _buildStatusCard(
               rc: rc,
               provider: provider,
-              status: 1,
-              // status,
+              status: status,
               reason: reason,
               context: context,
             ),
@@ -61,7 +61,7 @@ class ApprovalStatusScreen extends StatelessWidget {
     switch (status) {
       case 0:
         icon = Icons.access_time_rounded;
-        mainColor = Colors.orangeAccent;
+        mainColor = AppColors.authThemeColor;
         gradientColors = [Colors.orange.shade400, Colors.deepOrange.shade600];
         title = 'Profile Under Review';
         message =
@@ -72,7 +72,7 @@ class ApprovalStatusScreen extends StatelessWidget {
 
       case 2:
         icon = Icons.cancel_rounded;
-        mainColor = Colors.redAccent;
+        mainColor = AppColors.authThemeColor;
         gradientColors = [Colors.red.shade500, Colors.deepOrange.shade700];
         title = 'Profile Rejected';
         message =
@@ -85,7 +85,7 @@ class ApprovalStatusScreen extends StatelessWidget {
 
       case 1:
         icon = Icons.verified_rounded;
-        mainColor = Colors.greenAccent.shade400;
+        mainColor = AppColors.authThemeColor;
         gradientColors = [Colors.green.shade500, Colors.teal.shade700];
         title = 'Profile Approved';
         message =
@@ -186,7 +186,6 @@ class ApprovalStatusScreen extends StatelessWidget {
 
                 const SizedBox(height: 28),
 
-                // Gradient button like subscription card style
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
@@ -231,119 +230,3 @@ class ApprovalStatusScreen extends StatelessWidget {
 }
 
 
-
-
-  // Widget _buildStatusCard({
-  //   required dynamic rc,
-  //   required InspectorDashboardProvider provider,
-  //   required int? status,
-  //   required String reason,
-  //   required BuildContext context,
-  // }) {
-  //   IconData icon;
-  //   Color color;
-  //   String title;
-  //   String message;
-  //   String buttonText;
-  //   VoidCallback onPressed;
-
-  //   switch (status) {
-  //     case 0:
-  //       icon = Icons.access_time;
-  //       color = Colors.orange;
-  //       title = 'Profile Under Review';
-  //       message =
-  //           'Your profile is currently being reviewed by our team.\nThis may take 48–72 hours.\n\nYou’ll be notified once approved.';
-  //       buttonText = 'Check Again';
-  //       onPressed = () => await provider.initializeUserState(context);
-  //       break;
-
-  //     case 2:
-  //       icon = Icons.cancel;
-  //       color = Colors.red;
-  //       title = 'Profile Rejected';
-  //       message =
-  //           'Unfortunately, your profile has been rejected.\n\nReason: $reason\n\nPlease update your profile and resubmit for review.';
-  //       buttonText = 'Update Profile';
-  //       onPressed = () {
-  //         // TODO: navigate to profile update screen
-  //       };
-  //       break;
-
-  //     case 1:
-  //       icon = Icons.check_circle;
-  //       color = Colors.green;
-  //       title = 'Profile Approved';
-  //       message =
-  //           'Congratulations! Your profile has been approved.\nYou now have full access to your dashboard.';
-  //       buttonText = 'Go to Dashboard';
-  //       onPressed = () {
-  //         // TODO: navigate to dashboard
-  //       };
-  //       break;
-
-  //     default:
-  //       icon = Icons.info_outline;
-  //       color = Colors.blueGrey;
-  //       title = 'Unknown Status';
-  //       message = 'We’re unable to determine your profile status at this time.';
-  //       buttonText = 'Try Again';
-  //       onPressed = () => await provider.initializeUserState(context);
-  //   }
-
-  //   return Center(
-  //     child: Card(
-  //       elevation: 6,
-  //       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-  //       color: Colors.white,
-  //       margin: const EdgeInsets.symmetric(horizontal: 8),
-  //       child: Padding(
-  //         padding: const EdgeInsets.all(24),
-  //         child: Column(
-  //           mainAxisSize: MainAxisSize.min,
-  //           children: [
-  //             Icon(icon, size: 80, color: color),
-  //             const SizedBox(height: 16),
-  //             Text(
-  //               title,
-  //               style: const TextStyle(
-  //                 fontSize: 22,
-  //                 fontWeight: FontWeight.bold,
-  //               ),
-  //             ),
-  //             const SizedBox(height: 12),
-  //             Text(
-  //               message,
-  //               textAlign: TextAlign.center,
-  //               style: const TextStyle(fontSize: 16, height: 1.4),
-  //             ),
-  //             const SizedBox(height: 24),
-  //             ElevatedButton(
-  //               onPressed: provider.isLoading ? null : onPressed,
-  //               style: ElevatedButton.styleFrom(
-  //                 backgroundColor: color,
-  //                 shape: RoundedRectangleBorder(
-  //                   borderRadius: BorderRadius.circular(10),
-  //                 ),
-  //                 padding: const EdgeInsets.symmetric(
-  //                   horizontal: 32,
-  //                   vertical: 12,
-  //                 ),
-  //               ),
-  //               child: provider.isLoading
-  //                   ? const SizedBox(
-  //                       width: 22,
-  //                       height: 22,
-  //                       child: CircularProgressIndicator(
-  //                         color: Colors.white,
-  //                         strokeWidth: 2,
-  //                       ),
-  //                     )
-  //                   : Text(buttonText),
-  //             ),
-  //           ],
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // }

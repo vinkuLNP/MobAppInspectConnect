@@ -3,7 +3,6 @@ import 'package:inspect_connect/core/utils/constants/app_colors.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_button.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/features/client_flow/domain/entities/booking_list_entity.dart';
-import 'package:inspect_connect/features/client_flow/presentations/widgets/recent_booking_card.dart';
 import 'package:intl/intl.dart';
 import 'package:inspect_connect/core/basecomponents/base_responsive_widget.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/booking_provider.dart';
@@ -105,9 +104,7 @@ class _BookingsScreenState extends State<BookingsScreen> {
                                       onTap: () =>
                                           _showBookingDetails(context, booking),
                                       child:
-                                      //  RecentBookingViewerCard(
-                                      //   bookingListEntity: booking,
-                                      // ),
+                                   
                                         _buildBookingCard(context, booking),
                                     ),
                                   );
@@ -125,7 +122,6 @@ class _BookingsScreenState extends State<BookingsScreen> {
                                           : SizedBox.shrink(),
                                     ],
                                   );
-                                  // _buildBookingCard(context, booking);
                                 }
                                 if (provider.isFetchingBookings &&
                                     provider.bookings.isEmpty) {
@@ -413,8 +409,6 @@ Widget _buildBookingCard(BuildContext context, BookingListEntity booking) {
                           text: booking.bookingLocation,
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
-                          // maxLine: 2,
-                          // textOverflow: TextOverflow.ellipsis,
                         ),
                       ),
                       const SizedBox(width: 8),
@@ -431,7 +425,6 @@ Widget _buildBookingCard(BuildContext context, BookingListEntity booking) {
                     ],
                   ),
 
-                  // const SizedBox(height: 3),
 
                   Row(
                     children: [
@@ -470,8 +463,6 @@ Widget _buildBookingCard(BuildContext context, BookingListEntity booking) {
                         : "No description provided",
                     fontSize: 12,
                     color: Colors.grey[800]!,
-                    // maxLine: 3,
-                    // textOverflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),
@@ -486,6 +477,8 @@ Widget _buildBookingCard(BuildContext context, BookingListEntity booking) {
 
  void _showBookingDetails(BuildContext context, BookingListEntity booking) {
     final isPending = booking.status == 5;
+    final isApproved = booking.status == 1;
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -538,7 +531,7 @@ Widget _buildBookingCard(BuildContext context, BookingListEntity booking) {
                   );
                 },
               ),
-              if (isPending) ...[
+              if (isPending || isApproved) ...[
                 const SizedBox(height: 12),
                 AppButton(
                   text: 'Delete Booking',
@@ -686,10 +679,8 @@ Widget _buildBookingCard(BuildContext context, BookingListEntity booking) {
     List<BookingListEntity> list,
   ) {
     final now =
-        // DateTime.parse('2025-10-29 11:42:33.753577');
         DateTime.now();
 
-    // Get current day boundaries (midnight to 23:59:59)
     final startOfDay = DateTime(now.year, now.month, now.day);
     final endOfDay = DateTime(now.year, now.month, now.day, 23, 59, 59);
 
@@ -704,7 +695,6 @@ Widget _buildBookingCard(BuildContext context, BookingListEntity booking) {
       }
     }
 
-    // Sort by time (earliest first)
     todaysApproved.sort((a, b) {
       final aTime = _bookingDateTime(a);
       final bTime = _bookingDateTime(b);

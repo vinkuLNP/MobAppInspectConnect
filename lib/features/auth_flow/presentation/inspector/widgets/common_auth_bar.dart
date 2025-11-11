@@ -138,20 +138,3 @@ class InspectorCommonAuthBar extends StatelessWidget {
     );
   }
 }
-  //  Row(
-  //         mainAxisAlignment: MainAxisAlignment.center,
-  //         children: [
-  //           textWidget(text: question, fontSize: fontSize ?? 14),
-  //           const SizedBox(width: 4),
-  //           GestureDetector(
-  //             onTap: onTap,
-  //             child: textWidget(
-  //               text: actionText,
-  //               fontWeight: FontWeight.w400,
-  //               fontSize: fontSize ?? 14,
-  //               color: actionColor ?? AppColors.authThemeLightColor,
-  //             ),
-  //           ),
-  //         ],
-  //       ),
-     

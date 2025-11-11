@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 
@@ -387,51 +388,6 @@ class ClientViewModelProvider extends BaseViewModel {
     }
   }
 
-  // Future<void> fetchUserDetail({
-  //   required AuthUser user,
-  //   required BuildContext context,
-  // }) async {
-  //   log('[FETCH_USER_DETAIL] Fetching user details for userId=${user.id}');
-
-  //   final localUser = user.toLocalEntity();
-  //   log('[FETCH_USER_DETAIL] Local entity before save: token=${localUser.token}, name=${localUser.name}');
-
-  //   await locator<AuthLocalDataSource>().saveUser(localUser);
-  //   log('[FETCH_USER_DETAIL] Saved local user.');
-
-  //   final userProvider = context.read<UserProvider>();
-  //   await userProvider.setUser(localUser);
-  //   await userProvider.loadUser();
-
-  //   log('[FETCH_USER_DETAIL] Local user loaded into provider: id=${user.id}, token=${user.token}');
-
-  // final fetchUserUseCase = locator<GetUserUseCase>();
-  // final userState = await executeParamsUseCase<UserDetail, GetUserParams>(
-  //   useCase: fetchUserUseCase,
-  //   query: GetUserParams(userId: user.id),
-  //   launchLoader: true,
-  // );
-
-  // userState?.when(
-  //   data: (userData) async {
-  //     log('[FETCH_USER_DETAIL] ✅ Received user detail from API: ${userData.fullName} (${userData.email})');
-
-  //     final mergedUser = localUser.mergeWithUserDetail(userData);
-  //     log('[FETCH_USER_DETAIL] Merged user detail: token=${mergedUser.token}, name=${mergedUser.name}');
-
-  //     await locator<AuthLocalDataSource>().saveUser(mergedUser);
-  //     log('[FETCH_USER_DETAIL] ✅ User detail saved locally after merge.');
-
-  //     await userProvider.setUser(mergedUser);
-  //     log('[FETCH_USER_DETAIL] ✅ User updated in provider.');
-  //   },
-  //   error: (e) {
-  //     log('[FETCH_USER_DETAIL] ❌ Failed to fetch user detail: ${e.message}');
-  //     context.router.replaceAll([const ClientDashboardRoute()]);
-  //   },
-  // );
-  // }
-
   Future<void> fetchUserDetail({
     required AuthUser user,
     required BuildContext context,
@@ -631,88 +587,227 @@ class ClientViewModelProvider extends BaseViewModel {
   String deviceToken = '';
   String deviceType = 'windows';
 
-  Future<void> signIn({
-    required GlobalKey<FormState> formKey,
-    required BuildContext context,
-  }) async {
-    log('--login-- SignIn Info ----> token=$deviceToken type=$deviceType');
+//   Future<void> signIn({
+//     required GlobalKey<FormState> formKey,
+//     required BuildContext context,
+//   }) async {
+//     log('--login-- SignIn Info ----> token=$deviceToken type=$deviceType');
 
-    setSigningIn(true);
+//     setSigningIn(true);
 
-    try {
-      deviceToken = await DeviceInfoHelper.getDeviceToken();
-      deviceType = await DeviceInfoHelper.getDeviceType();
+//     try {
+//       deviceToken = await DeviceInfoHelper.getDeviceToken();
+//       deviceType = await DeviceInfoHelper.getDeviceType();
 
-      final signInUseCase = locator<SignInUseCase>();
-      log('---- SignIn Info ----> token=$deviceToken type=$deviceType');
-      final result = await InternetAddress.lookup('google.com');
-      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
-        log('✅ Internet available');
-      }
+//       final signInUseCase = locator<SignInUseCase>();
+//       log('---- SignIn Info ----> token=$deviceToken type=$deviceType');
+//       final result = await InternetAddress.lookup('google.com');
+//       if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+//         log('✅ Internet available');
+//       }
 
-      final state = await executeParamsUseCase<AuthUser, SignInParams>(
-        useCase: signInUseCase,
-        query: SignInParams(
-          email: emailCtrl.text.trim(),
-          password: passwordCtrl.text.trim(),
-          deviceToken: deviceToken,
-          deviceType: deviceType,
-        ),
-        launchLoader: true,
-      );
+//       final state = await executeParamsUseCase<AuthUser, SignInParams>(
+//         useCase: signInUseCase,
+//         query: SignInParams(
+//           email: emailCtrl.text.trim(),
+//           password: passwordCtrl.text.trim(),
+//           deviceToken: deviceToken,
+//           deviceType: deviceType,
+//         ),
+//         launchLoader: true,
+//       );
 
-      state?.when(
-        data: (user) async {
-          await fetchUserDetail(user: user, context: context);
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(const SnackBar(content: Text('Sign-in successful')));
-          emailCtrl.clear();
-          passwordCtrl.clear();
-          // context.router.replaceAll([const ClientDashboardRoute()]);
+//       state?.when(
+//         data: (user) async {
+//           await fetchUserDetail(user: user, context: context);
+//           ScaffoldMessenger.of(
+//             context,
+//           ).showSnackBar(const SnackBar(content: Text('Sign-in successful')));
+//           emailCtrl.clear();
+//           passwordCtrl.clear();
+//           // context.router.replaceAll([const ClientDashboardRoute()]);
 
-           if (user.role == 1) {
-            context.router.replaceAll([const ClientDashboardRoute()]);
-          } else {
-            // context.router.replaceAll([const InspectorDashboardRoute()]);
-               checkInspectorState(context);
-          }
-        },
-        error: (e) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(e.message ?? 'Sign-in failed')),
-          );
-        },
-      );
-    } on SocketException catch (_) {
-      log('❌ No Internet connection');
-    } finally {
-      setSigningIn(false);
+//            if (user.role == 1) {
+//             context.router.replaceAll([const ClientDashboardRoute()]);
+//           } else {
+//             // context.router.replaceAll([const InspectorDashboardRoute()]);
+//                checkInspectorState(context);
+//           }
+//         },
+//         error: (e) {
+//           ScaffoldMessenger.of(context).showSnackBar(
+//             SnackBar(content: Text(e.message ?? 'Sign-in failed')),
+//           );
+//         },
+//       );
+//     } on SocketException catch (_) {
+//       log('❌ No Internet connection');
+//     } finally {
+//       setSigningIn(false);
+//     }
+//   }
+// Future<void> checkInspectorState(BuildContext context) async {
+//   final localUser = await locator<AuthLocalDataSource>().getUser();
+//   if (localUser == null) {
+//     context.router.replaceAll([const OnBoardingRoute()]);
+//     return;
+//   }
+
+//   final provider = InspectorDashboardProvider();
+//   await provider.initializeUserState(context);
+
+//   switch (provider.status) {
+//     case InspectorStatus.needsSubscription:
+//       context.router.replaceAll([const InspectorDashboardRoute()]);
+//       break;
+//     case InspectorStatus.underReview:
+//     case InspectorStatus.rejected:
+//     case InspectorStatus.approved:
+//       context.router.replaceAll([const InspectorDashboardRoute()]);
+//       break;
+//     default:
+//       context.router.replaceAll([const OnBoardingRoute()]);
+//   }
+// }
+ 
+ Future<void> signIn({
+  required GlobalKey<FormState> formKey,
+  required BuildContext context,
+}) async {
+  log('--login-- SignIn Info ----> token=$deviceToken type=$deviceType');
+  setSigningIn(true);
+
+  try {
+    deviceToken = await DeviceInfoHelper.getDeviceToken();
+    deviceType = await DeviceInfoHelper.getDeviceType();
+
+    final signInUseCase = locator<SignInUseCase>();
+    log('---- SignIn Info ----> token=$deviceToken type=$deviceType');
+
+    final result = await InternetAddress.lookup('google.com');
+    if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+      log('✅ Internet available');
     }
+
+    final state = await executeParamsUseCase<AuthUser, SignInParams>(
+      useCase: signInUseCase,
+      query: SignInParams(
+        email: emailCtrl.text.trim(),
+        password: passwordCtrl.text.trim(),
+        deviceToken: deviceToken,
+        deviceType: deviceType,
+      ),
+      launchLoader: true,
+    );
+
+    state?.when(
+      data: (user) async {
+        log('✅ Sign-in success!');
+        log('👤 User Response (key fields):');
+        log('   ID: ${user.id}');
+        log('   Name: ${user.name}');
+        log('   Email: ${user.emailHashed}');
+        log('   Role: ${user.role}');
+        log('   Phone OTP Verified: ${user.phoneOtpVerified}');
+        log('   Stripe Subscription ID: ${user.currentSubscriptionId}');
+        log('   Stripe Status: ${user.stripeSubscriptionStatus}');
+        log('   Admin Approval: ${user.approvalStatusByAdmin}');
+        log('---------------------------------------------');
+
+        try {
+          final prettyJson = const JsonEncoder.withIndent('  ').convert(user.toJson());
+          log('🧾 FULL USER DATA DUMP:\n$prettyJson');
+        } catch (e) {
+          log('⚠️ Failed to serialize full user JSON: $e');
+        }
+
+        await fetchUserDetail(user: user, context: context);
+        ScaffoldMessenger.of(context)
+            .showSnackBar(const SnackBar(content: Text('Sign-in successful')));
+        emailCtrl.clear();
+        passwordCtrl.clear();
+
+        if (user.role == 1) {
+          log('➡️ Navigating to ClientDashboardRoute');
+          context.router.replaceAll([const ClientDashboardRoute()]);
+        } else {
+          log('➡️ Navigating to Inspector flow → checkInspectorState()');
+          checkInspectorState(context);
+        }
+      },
+      error: (e) {
+        log('❌ Sign-in failed: ${e.message}');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.message ?? 'Sign-in failed')),
+        );
+      },
+    );
+  } on SocketException catch (_) {
+    log('❌ No Internet connection');
+  } finally {
+    setSigningIn(false);
+    log('🏁 Sign-in process completed.');
   }
+}
+
+
+
+
 Future<void> checkInspectorState(BuildContext context) async {
+  log('🔍 Checking Inspector State...');
+
   final localUser = await locator<AuthLocalDataSource>().getUser();
   if (localUser == null) {
+    log('⚠️ No local user found — redirecting to OnBoardingRoute');
     context.router.replaceAll([const OnBoardingRoute()]);
     return;
   }
 
+  log('👤 Local user found: ${localUser.name ?? 'Unknown'}');
+  log('   ID: ${localUser.id}');
+  log('   Email: ${localUser.email}');
+  log('   ApprovalStatus: ${localUser.approvalStatusByAdmin}');
+  log('   StripeSubscriptionStatus: ${localUser.stripeSubscriptionStatus}');
+  log('   CurrentSubscriptionId: ${localUser.currentSubscriptionId}');
+  log('---------------------------------------------');
+
   final provider = InspectorDashboardProvider();
   await provider.initializeUserState(context);
 
+  log('📊 InspectorDashboardProvider initialized');
+  log('🔸 Current status: ${provider.status}');
+
   switch (provider.status) {
     case InspectorStatus.needsSubscription:
+      log('➡️ Redirecting: Inspector needs subscription → InspectorDashboardRoute');
       context.router.replaceAll([const InspectorDashboardRoute()]);
       break;
+
     case InspectorStatus.underReview:
-    case InspectorStatus.rejected:
-    case InspectorStatus.approved:
+      log('➡️ Redirecting: Inspector under admin review → InspectorDashboardRoute');
       context.router.replaceAll([const InspectorDashboardRoute()]);
       break;
+
+    case InspectorStatus.rejected:
+      log('➡️ Redirecting: Inspector rejected → InspectorDashboardRoute');
+      context.router.replaceAll([const InspectorDashboardRoute()]);
+      break;
+
+    case InspectorStatus.approved:
+      log('✅ Inspector approved → InspectorDashboardRoute');
+      context.router.replaceAll([const InspectorDashboardRoute()]);
+      break;
+
     default:
+      log('⚠️ Unknown state → Redirecting to OnBoardingRoute');
       context.router.replaceAll([const OnBoardingRoute()]);
   }
+
+  log('🏁 checkInspectorState() completed.\n');
 }
+
+ 
+ 
   Future<void> forgotPasswordApi({
     required GlobalKey<FormState> formKey,
     required BuildContext context,

@@ -8,7 +8,7 @@ import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.d
 class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool showLogo;
   final bool showBackButton;
-  final bool showNotification, showBookButton;
+  final bool showNotification, showBookButton, showDrawerIcon;
   final String? title;
   final VoidCallback? onBack;
   final VoidCallback? onNotificationTap;
@@ -19,6 +19,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.showBackButton = false,
     this.showBookButton = false,
     this.showNotification = true,
+    this.showDrawerIcon = false,
     this.title,
     this.onBack,
     this.onNotificationTap,
@@ -29,28 +30,12 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
     return Container(
       decoration: const BoxDecoration(
         color: AppColors.authThemeColor,
-
-        // gradient: LinearGradient(
-        //   colors: [
-
-        //     //    Color(0xFFBFD7FF),
-        //     // Color(0xFF89AFFF), // sky blue
-        //   // light powder blue
-        //   ],
-        // begin: Alignment.topLeft,
-        // end: Alignment.bottomRight,
-        // ),
-        // boxShadow: [
-        //   BoxShadow(color: Colors.black26, offset: Offset(0, 2), blurRadius: 6),
-        // ],
-        // borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
         gradient: LinearGradient(
           colors: [
-            Color(0xFF1B90FF), // Muted navy blue
-            Color(0xFF0070F2), // Deep navy
+            Color(0xFF1B90FF), 
+            Color(0xFF0070F2), 
 
-            Color(0xFF002A86), // Softer blue tone
-            // Color(0xFF00144A), // Muted navy blue
+            Color(0xFF002A86), 
           ],
           begin: Alignment.topLeft,
           end: Alignment.topRight,
@@ -58,9 +43,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
         boxShadow: [
           BoxShadow(color: Colors.black26, offset: Offset(0, 2), blurRadius: 6),
         ],
-        // borderRadius: BorderRadius.vertical(
-        //   bottom: Radius.circular(20),
-        // ),
+       
       ),
       child: AppBar(
         backgroundColor: Colors.transparent,
@@ -68,7 +51,14 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
 
         centerTitle: true,
         automaticallyImplyLeading: false,
-        leading: showBackButton
+        leading: showDrawerIcon
+            ? Builder(
+                builder: (context) => IconButton(
+                  icon: const Icon(Icons.menu, color: AppColors.whiteColor),
+                  onPressed: () => Scaffold.of(context).openDrawer(),
+                ),
+              )
+            : showBackButton
             ? IconButton(
                 icon: const Icon(Icons.arrow_back, color: AppColors.whiteColor),
                 onPressed: onBack ?? () => Navigator.of(context).maybePop(),

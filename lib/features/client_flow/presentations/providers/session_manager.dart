@@ -76,20 +76,17 @@ class SessionManager {
         debugPrint('❌ [SessionManager] UserProvider not registered in GetIt.');
         return;
       }
-      // appRouter.replaceAll([const OnBoardingRoute()]);
 
       final userProvider = locator<UserProvider>();
       debugPrint('👤 [SessionManager] Clearing user session...');
       await userProvider.clearUser();
       debugPrint('✅ [SessionManager] User cleared successfully.');
-      // appRouter.replaceAll([const OnBoardingRoute()]);
 
       final navContext = navigatorKey?.currentContext;
       if (navContext != null && navContext.mounted) {
         debugPrint('🔁 [SessionManager] Navigating to OnBoardingRoute...');
         navContext.router.replaceAll([const OnBoardingRoute()]);
       } else {
-        // appRouter.replaceAll([const OnBoardingRoute()]);
 
         debugPrint(
           '⚠️ [SessionManager] Navigation context missing or unmounted.',

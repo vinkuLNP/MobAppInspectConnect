@@ -52,7 +52,6 @@ class SubscriptionPlanEntity extends Equatable {
     required this.updatedAt,
   });
 
-  /// Display helper
   String get displayPrice => '\$$amount / ${interval.toLowerCase()}';
 
   @override

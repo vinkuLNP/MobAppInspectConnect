@@ -388,10 +388,6 @@ class InspectorViewModelProvider extends BaseViewModel {
         );
         return;
       }
-      // if (picker != null && picker.files.single.path != null) {
-      //   documents.add(File(picker.files.single.path!));
-      //   notifyListeners();
-      // }
       final uploadImage = UploadImageDto(filePath: file.path);
       final uploadImageUseCase = locator<UploadImageUseCase>();
       final result =
@@ -429,6 +425,7 @@ class InspectorViewModelProvider extends BaseViewModel {
 
   void removeDocumentAt(int index) {
     documents.removeAt(index);
+    uploadedCertificateUrls.removeAt(index);
     notifyListeners();
   }
 
@@ -438,13 +435,9 @@ class InspectorViewModelProvider extends BaseViewModel {
     notifyListeners();
   }
 
-  void openDocument(String url) {
-    // open remote document (use url_launcher or open_file)
-  }
+  void openDocument(String url) {}
 
-  void openLocalDocument(File file) {
-    // open local file
-  }
+  void openLocalDocument(File file) {}
 
   final picker = ImagePicker();
 

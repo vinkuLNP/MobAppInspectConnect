@@ -149,26 +149,19 @@ class _InspectorSignUpContentState extends State<InspectorSignUpContent> {
                             case 3:
                               vm.validateBeforeSubmit(context: ctx);
                               if (!vm.agreedToTerms || !vm.confirmTruth) {
-                                return; // stop here if validation fails
+                                return; 
                               }
-                              // final profilePath =
-                              //     vm.profileImageUrl?.path ?? vm.profileImageUrl;
-                              // final idPath = vm.idLicenseUrl?.path ?? vm.idLicenseUrl;
-                              // final refs = vm.referenceLettersUrls
-                              //     .map((f) => f.path)
-                              //     .toList();
                               String? getSafePath(dynamic fileOrUrl) {
                                 if (fileOrUrl == null) return null;
                                 final path = fileOrUrl is File
                                     ? fileOrUrl.path
                                     : fileOrUrl.toString();
 
-                                // If it’s a Cloudinary or any http URL, keep it as-is
                                 if (path.startsWith('http://') ||
                                     path.startsWith('https://')) {
                                   return path;
                                 }
-                                return path; // Local file path
+                                return path; 
                               }
 
                               final profilePath = getSafePath(
@@ -203,27 +196,6 @@ class _InspectorSignUpContentState extends State<InspectorSignUpContent> {
                             log('final data: ${saved?.toString()}');
                             if (mounted) {
                               vm.signUp(context: context);
-                              //   //                     ScaffoldMessenger.of(context)
-                              //   //     .showSnackBar(const SnackBar(content: Text('Sign-up successful')));
-                              //   // pinController.clear();
-                              //   //
-                              //   showDialog(
-                              //     context: context,
-                              //     builder: (_) => AlertDialog(
-                              //       title: const Text('Success'),
-                              //       content: const Text(
-                              //         'Your account details have been captured.',
-                              //       ),
-                              //       actions: [
-                              //         TextButton(
-                              //           onPressed: () => context.router.replaceAll([
-                              //             const InspectorDashboardRoute(),
-                              //           ]),
-                              //           child: const Text('OK'),
-                              //         ),
-                              //       ],
-                              //     ),
-                              //   );
                             }
                           }
                         },

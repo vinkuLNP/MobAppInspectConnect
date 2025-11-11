@@ -154,7 +154,6 @@ class _WalletScreenState extends State<WalletScreen> {
         throw Exception('Missing clientSecret in payment intent response.');
       }
 
-      // ✅ Open your custom card entry modal
       await _showCardPaymentSheet(context, clientSecret, amount);
     } catch (e, st) {
       log("❌ makePayment error: $e\n$st");
@@ -210,7 +209,6 @@ class _WalletScreenState extends State<WalletScreen> {
                   ),
                   const SizedBox(height: 16),
 
-                  // Stripe card input field
                   CardField(
                     enablePostalCode: false,
                     decoration: InputDecoration(
@@ -451,15 +449,7 @@ class _WalletHeaderCard extends StatelessWidget {
                   textColor: AppColors.authThemeColor,
                 ),
               ),
-              // const SizedBox(width: 12),
-              // Expanded(
-              //   child: AppButton(
-              //     text: "Withdraw",
-              //     buttonBackgroundColor: Colors.white.withOpacity(0.7),
-              //     textColor: AppColors.authThemeColor,
-              //     onTap: () {},
-              //   ),
-              // ),
+            
             ],
           ),
         ],
@@ -668,7 +658,6 @@ class _PaymentSuccessDialogState extends State<_PaymentSuccessDialog> {
   @override
   void initState() {
     super.initState();
-    // Delay the checkmark animation safely
     Future.delayed(const Duration(milliseconds: 150), () {
       if (mounted) setState(() => showCheck = true);
     });

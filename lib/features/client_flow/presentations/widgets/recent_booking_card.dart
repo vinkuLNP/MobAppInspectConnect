@@ -41,7 +41,6 @@ class RecentBookingViewerCard extends StatelessWidget {
                 Expanded(
                   child: textWidget(
                     text: 'RECENT APPROVED BOOKING',
-                    // bookingListEntity.bookingLocation,
                     color: Colors.white,
                     textOverflow: TextOverflow.ellipsis,
                     fontSize: 14,
@@ -74,11 +73,6 @@ class RecentBookingViewerCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 6),
 
-                // _iconRow(
-                //   Icons.location_on_outlined,
-                //   'Booking location',
-                //   bookingListEntity.bookingLocation,
-                // ),
                 const SizedBox(height: 10),
               ],
             ),

@@ -55,15 +55,3 @@ class ClientInfoEntity {
     required this.countryCode,
   });
 }
-
-// class CertificateSubTypeEntity {
-//   final String id;
-//   final String name;
-//   final int status;
-
-//   CertificateSubTypeEntity({
-//     required this.id,
-//     required this.name,
-//     required this.status,
-//   });
-// }

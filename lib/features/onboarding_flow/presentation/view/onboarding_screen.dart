@@ -177,7 +177,6 @@ class _OnBoardingPageState extends State<OnBoardingPage>
             child: Padding(
               padding: const EdgeInsets.symmetric(
                 horizontal: 24.0,
-                // vertical: 12,
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -292,13 +291,11 @@ class _OnBoardingPageState extends State<OnBoardingPage>
                                 context.pushRoute(
                                   ClientSignInRoute(showBackButton: false),
                                 );
-                                // context.replaceRoute( ClientSignUpRoute(showBackButton: false));
                               } else {
                                 authFlow.setUserType(AuthUserType.inspector);
                                 context.pushRoute(
                                   InspectorSignUpRoute(showBackButton: false),
                                 );
-                                // context.replaceRoute(InspectorSignUpRoute());
                               }
                             },
                           ),
@@ -332,13 +329,11 @@ class _OnBoardingPageState extends State<OnBoardingPage>
                                     context.pushRoute(
                                       ClientSignInRoute(showBackButton: false),
                                     );
-                                    // context.replaceRoute(InspectorSignUpRoute());
                                   }
                                 },
                                 child: textWidget(
                                   text: 'Login',
                                   fontWeight: FontWeight.w500,
-                                  // fontSize: 18,
                                   textDecorationColor: AppColors.whiteColor,
                                   textDecoration: TextDecoration.underline,
 
