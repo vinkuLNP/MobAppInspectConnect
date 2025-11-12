@@ -11,11 +11,6 @@ static Future<AppLocalDatabase> create() async {
 
   final Directory docsDir = await getApplicationDocumentsDirectory();
 final dbDir = Directory(p.join(docsDir.path, 'objectbox'));
-// if (dbDir.existsSync()) {
-//   dbDir.deleteSync(recursive: true); // Delete old database files
-// }
-// dbDir.createSync(recursive: true);
-
   if (!dbDir.existsSync()) {
     dbDir.createSync(recursive: true);
   }
@@ -42,7 +37,6 @@ _store = await openStore(directory: p.join(docsDir.path, 'objectbox'));
   void clearAll<T>() {
     final box = _store!.box<T>();
     box.removeAll();
-    // _store?.close();
   }
 }
 

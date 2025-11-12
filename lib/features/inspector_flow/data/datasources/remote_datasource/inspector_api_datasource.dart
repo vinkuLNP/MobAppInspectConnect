@@ -47,8 +47,6 @@ class InspectorRemoteDataSourceImpl implements InspectorRemoteDataSource {
           final Map<String, dynamic> root = response.body.isEmpty
               ? {}
               : (jsonDecode(response.body) as Map<String, dynamic>);
-          // Backend shape:
-          // { "success": true, "message": "...", "body": { ... user object ... } }
           final List<dynamic> bodyList = root['body'] as List<dynamic>? ?? [];
 
           final List<SubscriptionPlanModel> dtoList = bodyList
@@ -100,15 +98,9 @@ class InspectorRemoteDataSourceImpl implements InspectorRemoteDataSource {
           final Map<String, dynamic> root = response.body.isEmpty
               ? {}
               : (jsonDecode(response.body) as Map<String, dynamic>);
-          // final List<dynamic> bodyList = root['body'] as List<dynamic>? ?? [];
           final Map<String, dynamic> body =
               (root['body'] as Map?)?.cast<String, dynamic>() ??
               <String, dynamic>{};
-
-          // final List<SubscriptionPlanModel> dtoList = bodyList
-          //     .map((e) => SubscriptionPlanModel.fromJson(e))
-          //     .toList();
-
           final UserSubscriptionModel userSubscriptionModel =
               UserSubscriptionModel.fromJson(body);
 

@@ -5,9 +5,9 @@ import 'package:inspect_connect/features/auth_flow/domain/entities/user_location
 
 class AuthUser {
   final String id;
-  final String name;
-  final String emailHashed;
-  final String authToken;
+  final String? name;
+  final String? emailHashed;
+  final String? authToken;
   final int? role;
   final String? phoneNumber;
   final String? countryCode;
@@ -54,9 +54,9 @@ class AuthUser {
 
   const AuthUser({
     required this.id,
-    required this.name,
-    required this.emailHashed,
-    required this.authToken,
+     this.name,
+     this.emailHashed,
+     this.authToken,
     this.role,
     this.phoneNumber,
     this.countryCode,
@@ -99,7 +99,6 @@ class AuthUser {
     this.loginTime,
   });
 
-  // ✅ fromJson factory
   factory AuthUser.fromJson(Map<String, dynamic> json) {
     final loc = json['location'];
     return AuthUser(
@@ -177,7 +176,6 @@ class AuthUser {
     );
   }
 
-  // ✅ toJson
   Map<String, dynamic> toJson() {
     return {
       '_id': id,
@@ -229,7 +227,6 @@ class AuthUser {
               'coordinates': [location!.lng, location!.lat],
             }
           : null,
-      // 'devices': devices.map((e) => e.toJson()).toList(),
     };
   }
 }
@@ -270,7 +267,6 @@ extension AuthUserMapping on AuthUser {
       state: state,
       city: city,
       zipCode: zip,
-      // connectorLinkUrl: connectorLinkUrl,
       createdAt: createdAt,
       updatedAt: updatedAt,
       loginTime: loginTime,

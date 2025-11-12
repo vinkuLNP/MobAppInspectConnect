@@ -20,7 +20,7 @@ class BookingEditScreen extends StatelessWidget {
     log('called');
     return Scaffold(
       backgroundColor:  Colors.grey[100],
-      appBar: const CommonAppBar(title: 'Edit Booking', showBackButton: true,showLogo: false,),
+      appBar:  CommonAppBar(title:isReadOnly ? 'View Booking' : 'Edit Booking', showBackButton: true,showLogo: false,),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16),

@@ -1,3 +1,7 @@
+import 'package:inspect_connect/features/auth_flow/domain/entities/auth_user.dart';
+import 'package:inspect_connect/features/client_flow/data/models/certificate_subtype_model.dart';
+import 'package:inspect_connect/features/client_flow/domain/entities/booking_list_entity.dart';
+
 class CreateBookingResponseModel {
   final bool success;
   final String message;
@@ -18,55 +22,103 @@ class CreateBookingResponseModel {
   }
 }
 
-class BookingData {
-  final String id;
-  final String clientId;
-  final List<String> inspectorIds;
-  final List<String> certificateSubTypeId;
-  final List<String> images;
-  final String description;
-  final String bookingDate;
-  final String bookingTime;
-  final String bookingLocation;
-  final int status;
-  final bool isDeleted;
-  final String createdAt;
-  final String updatedAt;
-  final int v;
+class BookingData extends BookingListEntity {
+  final AuthUser? client;
+  final AuthUser? inspector;
 
-  BookingData({
-    required this.id,
-    required this.clientId,
-    required this.inspectorIds,
-    required this.certificateSubTypeId,
-    required this.images,
-    required this.description,
-    required this.bookingDate,
-    required this.bookingTime,
-    required this.bookingLocation,
-    required this.status,
-    required this.isDeleted,
-    required this.createdAt,
-    required this.updatedAt,
-    required this.v,
+  const BookingData({
+    required super.id,
+    this.client,
+    this.inspector,
+    super.inspectorIds = const [],
+    super.certificateSubTypes = const [],
+    super.images = const [],
+    required super.description,
+    required super.bookingDate,
+    required super.bookingTime,
+    required super.bookingLocation,
+    super.status,
+    super.isDeleted,
+    super.createdAt,
+    super.updatedAt,
+    super.timerStartedAt,
+    super.timerEndedAt,
+    super.timerDuration,
   });
 
   factory BookingData.fromJson(Map<String, dynamic> json) {
+    final rawSubTypes = json['certificateSubTypeId'] ?? [];
+    final parsedSubTypes = <CertificateSubTypeModelData>[];
+
+    if (rawSubTypes is List) {
+      for (final item in rawSubTypes) {
+        if (item is String) {
+          parsedSubTypes.add(
+            CertificateSubTypeModelData(
+              id: item,
+              name: '',
+              status: 0,
+              certificateTypeName: '',
+            ),
+          );
+        } else if (item is Map<String, dynamic>) {
+          parsedSubTypes.add(CertificateSubTypeModelData.fromJson(item));
+        }
+      }
+    }
+
     return BookingData(
       id: json['_id'] ?? '',
-      clientId: json['clientId'] ?? '',
+      client: json['clientId'] is Map<String, dynamic>
+          ? AuthUser.fromJson(json['clientId'])
+          : (json['clientId'] != null
+              ? AuthUser(id: json['clientId'].toString(),emailHashed: json['email'],
+      name: json['name'],
+      phoneNumber: json['phoneNumber'],
+      countryCode: json['countryCode'],)
+              : null),
+      inspector: json['inspectorId'] is Map<String, dynamic>
+          ? AuthUser.fromJson(json['inspectorId'])
+          : (json['inspectorId'] != null
+              ? AuthUser(id: json['inspectorId'].toString())
+              : null),
       inspectorIds: List<String>.from(json['inspectorIds'] ?? []),
-      certificateSubTypeId: List<String>.from(json['certificateSubTypeId'] ?? []),
+      certificateSubTypes: parsedSubTypes,
       images: List<String>.from(json['images'] ?? []),
       description: json['description'] ?? '',
       bookingDate: json['bookingDate'] ?? '',
       bookingTime: json['bookingTime'] ?? '',
       bookingLocation: json['bookingLocation'] ?? '',
-      status: json['status'] ?? 0,
-      isDeleted: json['isDeleted'] ?? false,
-      createdAt: json['createdAt'] ?? '',
-      updatedAt: json['updatedAt'] ?? '',
-      v: json['__v'] ?? 0,
+      status: json['status'],
+      isDeleted: json['isDeleted'],
+      createdAt: json['createdAt'],
+      updatedAt: json['updatedAt'],
+      timerStartedAt: json['timerStartedAt'],
+      timerEndedAt: json['timerEndedAt'],
+      timerDuration: json['timerDuration'],
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      '_id': id,
+      'clientId': client?.toJson(),
+      'inspectorId': inspector?.toJson(),
+      'inspectorIds': inspectorIds,
+      'certificateSubTypeId':
+          certificateSubTypes.map((e) => e.toJson()).toList(),
+      'images': images,
+      'description': description,
+      'bookingDate': bookingDate,
+      'bookingTime': bookingTime,
+      'bookingLocation': bookingLocation,
+      'status': status,
+      'isDeleted': isDeleted,
+      'createdAt': createdAt,
+      'updatedAt': updatedAt,
+      'timerStartedAt': timerStartedAt,
+      'timerEndedAt': timerEndedAt,
+      'timerDuration': timerDuration,
+    };
   }
 }

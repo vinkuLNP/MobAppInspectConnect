@@ -17,19 +17,18 @@ class InspectorSignUpLocalDataSource {
       return list.first;
     } else {
       final entity = InspectorSignUpLocalEntity();
-        // final entity = InspectorSignUpLocalEntity()..id = 1;
       _database.insert(entity);
       return entity;
     }
   }
- Future<void> updateFields(Map<String, dynamic> fields) async {
+
+  Future<void> updateFields(Map<String, dynamic> fields) async {
     final entity = await _getOrCreate();
 
-  log('📝 Before update: ${entity.name.toString()}');
-  log('Updating fields: $fields');
+    log('📝 Before update: ${entity.name.toString()}');
+    log('Updating fields: $fields');
     fields.forEach((k, v) {
       switch (k) {
-        // personal
         case 'name':
           entity.name = v as String?;
           break;
@@ -48,8 +47,6 @@ class InspectorSignUpLocalDataSource {
         case 'mailingAddress':
           entity.mailingAddress = v as String?;
           break;
-
-        // professional
         case 'certificateTypeId':
           entity.certificateTypeId = v as String?;
           break;
@@ -62,15 +59,13 @@ class InspectorSignUpLocalDataSource {
         case 'certificateAgencyIds':
           entity.certificateAgencyIds = List<String>.from(v as Iterable);
           break;
-
-        // service area
         case 'country':
           entity.country = v as String?;
           break;
-            case 'zipCode':
+        case 'zipCode':
           entity.zipCode = v as String?;
           break;
-            case 'workHistoryDescription':
+        case 'workHistoryDescription':
           entity.workHistoryDescription = v as String?;
           break;
         case 'state':
@@ -79,8 +74,6 @@ class InspectorSignUpLocalDataSource {
         case 'city':
           entity.city = v as String?;
           break;
-
-        // additional
         case 'profileImage':
           entity.profileImage = v as String?;
           break;
@@ -96,8 +89,6 @@ class InspectorSignUpLocalDataSource {
         case 'isTruthfully':
           entity.isTruthfully = v as bool?;
           break;
-
-        // location
         case 'locationType':
           entity.locationType = v as String?;
           break;
@@ -105,13 +96,15 @@ class InspectorSignUpLocalDataSource {
           entity.locationName = v as String?;
           break;
         case 'latitude':
-          entity.latitude = (v is double) ? v : (v != null ? double.parse(v.toString()) : null);
+          entity.latitude = (v is double)
+              ? v
+              : (v != null ? double.parse(v.toString()) : null);
           break;
         case 'longitude':
-          entity.longitude = (v is double) ? v : (v != null ? double.parse(v.toString()) : null);
+          entity.longitude = (v is double)
+              ? v
+              : (v != null ? double.parse(v.toString()) : null);
           break;
-
-        // common
         case 'role':
           entity.role = v as int?;
           break;
@@ -124,21 +117,23 @@ class InspectorSignUpLocalDataSource {
       }
     });
 
-    _database.insert(entity); // insert will update if id present
- log('✅ After update: ${entity.name.toString()}-----zipcode ${entity.zipCode.toString()}');
+    _database.insert(entity);
+    log(
+      '✅ After update: ${entity.name.toString()}-----zipcode ${entity.zipCode.toString()}',
+    );
   }
 
-  /// 🔍 Get final record
   Future<InspectorSignUpLocalEntity?> getFullData() async {
     final list = await _database.getAll<InspectorSignUpLocalEntity>();
     if (list != null && list.isNotEmpty) {
-     log('🔍 Retrieved inspector signup data: ${jsonEncode(list.first.toJson())}');
+      log(
+        '🔍 Retrieved inspector signup data: ${jsonEncode(list.first.toJson())}',
+      );
       return list.first;
     }
     return null;
   }
 
-  /// ❌ Clear all inspector signup data
   Future<void> clear() async {
     _database.clear<InspectorSignUpLocalEntity>();
   }

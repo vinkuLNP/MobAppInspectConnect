@@ -12,7 +12,6 @@ Widget appCommonLogoBar({
   child: Row(
     mainAxisAlignment: alignment,
     children: [
-      // SizedBox(width: 10),
       imageAsset(image: appLogo,color: AppColors.whiteColor,height: 30,width: 30,),
       SizedBox(width: 10),
       textWidget(

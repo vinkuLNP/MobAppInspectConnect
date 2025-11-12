@@ -42,7 +42,14 @@ class ClientViewModelProvider extends BaseViewModel {
       notifyListeners();
     }
   }
-
+Future<void> submitSignUp({
+    required GlobalKey<FormState> formKey,
+    required BuildContext context,
+  }) async {
+    if (!(formKey.currentState?.validate() ?? false)) return;
+    startOtpFlow(OtpPurpose.signUp);
+    context.pushRoute(ResetPasswordRoute(showBackButton: true));
+  }
   bool _isSigningIn = false;
   bool get isSigningIn => _isSigningIn;
 
@@ -124,20 +131,6 @@ class ClientViewModelProvider extends BaseViewModel {
     return null;
   }
 
-  Future<void> submitSignUp({
-    required GlobalKey<FormState> formKey,
-    required BuildContext context,
-  }) async {
-    if (!(formKey.currentState?.validate() ?? false)) return;
-    // if (!agreeTnC || !isTruthful) {
-    //   return;
-    // }
-    startOtpFlow(OtpPurpose.signUp);
-    // fullNameCtrl.clear();
-    // phoneCtrl.clear();
-    // emailCtrlSignUp.clear();
-    context.pushRoute(ResetPasswordRoute(showBackButton: true));
-  }
 
   @override
   void dispose() {
@@ -344,7 +337,6 @@ class ClientViewModelProvider extends BaseViewModel {
           log('  email=${existingUser?.email}');
           log('  phone=${existingUser?.phoneNumber}');
 
-          // Merge or replace
           final merged = existingUser != null
               ? existingUser.mergeWithNewData(newUserLocal)
               : newUserLocal;
@@ -394,12 +386,10 @@ class ClientViewModelProvider extends BaseViewModel {
   }) async {
     log('[FETCH_USER_DETAIL] Fetching user details for userId=${user.id}');
 
-    // Get existing local user first
     final existingUser = await locator<AuthLocalDataSource>().getUser();
 
     final localUser = user.toLocalEntity();
 
-    // ✅ Preserve token if API user doesn’t include one
     if (localUser.authToken == null || localUser.authToken!.isEmpty) {
       log('[FETCH_USER_DETAIL] ⚠️ No token in API user — reusing local token.');
       localUser.authToken = existingUser?.authToken;
@@ -486,7 +476,6 @@ class ClientViewModelProvider extends BaseViewModel {
     } finally {
       emailCtrl.clear();
       passwordCtrl.clear();
-      // setSigningIn(false);
     }
   }
 
@@ -560,12 +549,7 @@ class ClientViewModelProvider extends BaseViewModel {
 
     try {
       final email = resetEmailCtrl.text.trim();
-      // final useEmail = email.isNotEmpty;
-
       _resetTargetLabel = email;
-      // useEmail ? email : phoneE164;
-
-      // verifyInit();
       startOtpFlow(OtpPurpose.forgotPassword);
       resetEmailCtrl.clear();
       context.pushRoute(OtpVerificationRoute(addShowButton: true));
@@ -586,89 +570,6 @@ class ClientViewModelProvider extends BaseViewModel {
 
   String deviceToken = '';
   String deviceType = 'windows';
-
-//   Future<void> signIn({
-//     required GlobalKey<FormState> formKey,
-//     required BuildContext context,
-//   }) async {
-//     log('--login-- SignIn Info ----> token=$deviceToken type=$deviceType');
-
-//     setSigningIn(true);
-
-//     try {
-//       deviceToken = await DeviceInfoHelper.getDeviceToken();
-//       deviceType = await DeviceInfoHelper.getDeviceType();
-
-//       final signInUseCase = locator<SignInUseCase>();
-//       log('---- SignIn Info ----> token=$deviceToken type=$deviceType');
-//       final result = await InternetAddress.lookup('google.com');
-//       if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
-//         log('✅ Internet available');
-//       }
-
-//       final state = await executeParamsUseCase<AuthUser, SignInParams>(
-//         useCase: signInUseCase,
-//         query: SignInParams(
-//           email: emailCtrl.text.trim(),
-//           password: passwordCtrl.text.trim(),
-//           deviceToken: deviceToken,
-//           deviceType: deviceType,
-//         ),
-//         launchLoader: true,
-//       );
-
-//       state?.when(
-//         data: (user) async {
-//           await fetchUserDetail(user: user, context: context);
-//           ScaffoldMessenger.of(
-//             context,
-//           ).showSnackBar(const SnackBar(content: Text('Sign-in successful')));
-//           emailCtrl.clear();
-//           passwordCtrl.clear();
-//           // context.router.replaceAll([const ClientDashboardRoute()]);
-
-//            if (user.role == 1) {
-//             context.router.replaceAll([const ClientDashboardRoute()]);
-//           } else {
-//             // context.router.replaceAll([const InspectorDashboardRoute()]);
-//                checkInspectorState(context);
-//           }
-//         },
-//         error: (e) {
-//           ScaffoldMessenger.of(context).showSnackBar(
-//             SnackBar(content: Text(e.message ?? 'Sign-in failed')),
-//           );
-//         },
-//       );
-//     } on SocketException catch (_) {
-//       log('❌ No Internet connection');
-//     } finally {
-//       setSigningIn(false);
-//     }
-//   }
-// Future<void> checkInspectorState(BuildContext context) async {
-//   final localUser = await locator<AuthLocalDataSource>().getUser();
-//   if (localUser == null) {
-//     context.router.replaceAll([const OnBoardingRoute()]);
-//     return;
-//   }
-
-//   final provider = InspectorDashboardProvider();
-//   await provider.initializeUserState(context);
-
-//   switch (provider.status) {
-//     case InspectorStatus.needsSubscription:
-//       context.router.replaceAll([const InspectorDashboardRoute()]);
-//       break;
-//     case InspectorStatus.underReview:
-//     case InspectorStatus.rejected:
-//     case InspectorStatus.approved:
-//       context.router.replaceAll([const InspectorDashboardRoute()]);
-//       break;
-//     default:
-//       context.router.replaceAll([const OnBoardingRoute()]);
-//   }
-// }
  
  Future<void> signIn({
   required GlobalKey<FormState> formKey,
@@ -839,7 +740,6 @@ Future<void> checkInspectorState(BuildContext context) async {
           ScaffoldMessenger.of(
             context,
           ).showSnackBar(const SnackBar(content: Text('Sign-in successful')));
-          // context.router.replaceAll([const HomeRoute()]);
         },
         error: (e) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -854,37 +754,3 @@ Future<void> checkInspectorState(BuildContext context) async {
     }
   }
 }
-   // final localUser = user.toLocalEntity();
-          // await locator<AuthLocalDataSource>().saveUser(localUser);
-          // final userProvider = context.read<UserProvider>();
-          // await userProvider.setUser(localUser);
-
-          // await userProvider.loadUser();
-          // log(user.id);
-          // log(user.token);
-
-          // final fetchUserUseCase = locator<GetUserUseCase>();
-          // final userState =
-          //     await executeParamsUseCase<UserDetail, GetUserParams>(
-          //       useCase: fetchUserUseCase,
-          //       query: GetUserParams(userId: user.id),
-          //       launchLoader: true,
-          //     );
-          // userState?.when(
-          //   data: (userData) async {
-          //     final mergedUser = localUser.mergeWithUserDetail(userData);
-          //     await locator<AuthLocalDataSource>().saveUser(mergedUser);
-
-          //     await userProvider.setUser(mergedUser);
-
-          //     ScaffoldMessenger.of(context).showSnackBar(
-          //       const SnackBar(content: Text('Sign-in successful')),
-          //     );
-          //     emailCtrl.clear();
-          //     passwordCtrl.clear();
-          //     context.router.replaceAll([const ClientDashboardRoute()]);
-          //   },
-          //   error: (e) {
-          //     context.router.replaceAll([const ClientDashboardRoute()]);
-          //   },
-          // );

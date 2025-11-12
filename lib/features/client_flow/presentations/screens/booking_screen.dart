@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
+import 'package:inspect_connect/core/utils/constants/app_constants.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_button.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/features/client_flow/domain/entities/booking_list_entity.dart';
@@ -476,8 +477,8 @@ Widget _buildBookingCard(BuildContext context, BookingListEntity booking) {
 
 
  void _showBookingDetails(BuildContext context, BookingListEntity booking) {
-    final isPending = booking.status == 5;
-    final isApproved = booking.status == 1;
+    final isPending = booking.status == bookingStatusPending;
+    final isApproved = booking.status == bookingStatusAccepted;
 
     showModalBottomSheet(
       context: context,

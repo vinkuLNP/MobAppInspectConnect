@@ -87,8 +87,6 @@ class ProfessionalDetailsStep extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // textWidget(text: title, fontWeight: FontWeight.w600, fontSize: 12),
-          // const SizedBox(height: 3),
           textWidget(text: title, fontWeight: FontWeight.w400, fontSize: 14),
           const SizedBox(height: 8),
           child,
@@ -199,7 +197,6 @@ class ProfessionalDetailsStep extends StatelessWidget {
       ),
       itemCount: canAddMore ? totalDocs + 1 : totalDocs,
       itemBuilder: (ctx, i) {
-        // Existing documents (URLs)
         if (i < prov.existingDocumentUrls.length) {
           final url = prov.existingDocumentUrls[i];
           final name = url.split('/').last;
@@ -211,7 +208,6 @@ class ProfessionalDetailsStep extends StatelessWidget {
           );
         }
 
-        // Newly added documents (File objects)
         final docIndex = i - prov.existingDocumentUrls.length;
         if (docIndex < prov.documents.length) {
           final file = prov.documents[docIndex];
@@ -224,7 +220,6 @@ class ProfessionalDetailsStep extends StatelessWidget {
           );
         }
 
-        // Upload button
         return GestureDetector(
           onTap: () => prov.uploadDocument(ctx),
           child: Container(

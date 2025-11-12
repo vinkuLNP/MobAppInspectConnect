@@ -99,8 +99,6 @@ class _SplashViewState extends State<SplashView>
           await bookingProvider.fetchBookingsList();
           context.router.replace(const ClientDashboardRoute());
         } else if (userProvider.isUserInspector) {
-          // await inspectorProvider.fetchSubscriptionPlans();
-          // context.router.replace(const InspectorDashboardRoute());
           checkInspectorState(context);
         } else {
           context.router.replace(const OnBoardingRoute());

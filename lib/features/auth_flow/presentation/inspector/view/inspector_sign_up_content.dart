@@ -108,7 +108,7 @@ class _InspectorSignUpContentState extends State<InspectorSignUpContent> {
                   onTap:
                       (vm.currentStep == 3 &&
                           (!vm.agreedToTerms || !vm.confirmTruth))
-                      ? null // disables the button
+                      ? null 
                       : () async {
                           final key = steps[vm.currentStep].formKey;
                           final isValid = key.currentState?.validate() ?? false;
@@ -141,9 +141,6 @@ class _InspectorSignUpContentState extends State<InspectorSignUpContent> {
                                 city: vm.city ?? '',
                                 mailingAddress: vm.mailingAddress,
                                 zipCode: vm.zipCode,
-
-                                // lat: vm.serviceArea.latitude,
-                                // lng: vm.serviceArea.longitude,
                               );
                               break;
                             case 3:

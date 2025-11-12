@@ -100,9 +100,12 @@ class AppButton extends StatelessWidget {
                                     height: imageSize,
                                   ),
                           ),
-                    showIcon ? Container(
+                    showIcon
+                        ? Container(
                             margin: EdgeInsets.only(right: iconLeftMargin),
-                            child: icon!) : SizedBox(),
+                            child: icon!,
+                          )
+                        : SizedBox(),
 
                     image == "" || text.isEmpty || !showIcon
                         ? const SizedBox()
