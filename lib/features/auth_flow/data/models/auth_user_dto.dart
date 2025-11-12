@@ -1,102 +1,3 @@
-// import 'package:inspect_connect/features/auth_flow/data/models/device_dto.dart';
-// import 'package:inspect_connect/features/auth_flow/data/models/location_dto.dart';
-// import 'package:inspect_connect/features/auth_flow/domain/entities/auth_user.dart';
-// import 'package:inspect_connect/features/auth_flow/domain/entities/user_device_entity.dart';
-// import 'package:inspect_connect/features/auth_flow/domain/entities/user_location_entity.dart';
-
-// class AuthUserDto {
-//   final String id;
-//   final int? role;
-//   final String emailHashed;
-//   final String name;
-//   final int? status;
-//   final String? phoneNumber;
-//   final String? countryCode;
-//   final bool? phoneOtpVerified;
-//   final bool? emailOtpVerified;
-//   final bool? agreedToTerms;
-//   final bool? isTruthfully;
-//   final String? walletId;
-//   final String? stripeAccountId;
-//   final String? stripeCustomerId;
-//   final String authToken;
-//   final LocationDto location;
-//   final List<DeviceDto> devices;
-
-//   AuthUserDto({
-//     required this.id,
-//     required this.emailHashed,
-//     required this.name,
-//     required this.authToken,
-//     required this.location,
-//     required this.devices,
-//     this.role,
-//     this.status,
-//     this.phoneNumber,
-//     this.countryCode,
-//     this.phoneOtpVerified,
-//     this.emailOtpVerified,
-//     this.agreedToTerms,
-//     this.isTruthfully,
-//     this.walletId,
-//     this.stripeAccountId,
-//     this.stripeCustomerId,
-//   });
-
-//   factory AuthUserDto.fromBody(Map<String, dynamic> b) => AuthUserDto(
-//         id: b['_id']?.toString() ?? '',
-//         role: b['role'] as int?,
-//         emailHashed: b['email'] as String? ?? '',
-//         name: b['name'] as String? ?? '',
-//         status: b['status'] as int?,
-//         phoneNumber: b['phoneNumber'] as String?,
-//         countryCode: b['countryCode'] as String?,
-//         phoneOtpVerified: b['phoneOtpVerified'] as bool?,
-//         emailOtpVerified: b['emailOtpVerified'] as bool?,
-//         agreedToTerms: b['agreedToTerms'] as bool?,
-//         isTruthfully: b['isTruthfully'] as bool?,
-//         walletId: b['walletId'] as String?,
-//         stripeAccountId: b['stripeAccountId'] as String?,
-//         stripeCustomerId: b['stripeCustomerId'] as String?,
-//         authToken: b['authToken'] as String? ?? '',
-//         location: LocationDto.fromJson(b['location'] as Map<String, dynamic>?),
-//         devices: (b['devices'] is List)
-//             ? (b['devices'] as List)
-//                 .whereType<Map<String, dynamic>>()
-//                 .map(DeviceDto.fromJson)
-//                 .toList()
-//             : const [],
-//       );
-
-//   AuthUser toEntity() => AuthUser(
-//         id: id,
-//         name: name,
-//         emailHashed: emailHashed,
-//         authToken: authToken,
-//         role: role,
-//         phoneNumber: phoneNumber,
-//         countryCode: countryCode,
-//         phoneOtpVerified: phoneOtpVerified ?? false,
-//         emailOtpVerified: emailOtpVerified ?? false,
-//         agreedToTerms: agreedToTerms ?? false,
-//         isTruthfully: isTruthfully ?? false,
-//         walletId: walletId,
-//         stripeAccountId: stripeAccountId,
-//         stripeCustomerId: stripeCustomerId,
-//         location: (location.coordinates?.length == 2)
-//             ? UserLocation(
-//                 name: location.locationName,
-//                 lat: location.coordinates![0],
-//                 lng: location.coordinates![1],
-//               )
-//             : null,
-//         devices: devices
-//             .map((d) => UserDevice(token: d.deviceToken, type: d.deviceType))
-//             .toList(),
-//       );
-// }
-
-
 import 'package:inspect_connect/features/auth_flow/data/models/device_dto.dart';
 import 'package:inspect_connect/features/auth_flow/data/models/location_dto.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/auth_user.dart';
@@ -120,8 +21,14 @@ class AuthUserDto {
   final String? stripeAccountId;
   final String? stripeCustomerId;
   final String? authToken;
-
-  // Inspector-specific fields
+  final String? stripeSubscriptionStatus;
+  final String? currentSubscriptionId;
+  final int? currentSubscriptionTrialDays;
+  final int? currentSubscriptionAutoRenew;
+  final bool? stripePayoutsEnabled;
+  final bool? stripeTransfersActive;
+  final int? approvalStatusByAdmin;
+  final String? rejectedReason;
   final bool? bookingInProgress;
   final bool? isDeleted;
   final String? country;
@@ -135,10 +42,12 @@ class AuthUserDto {
   final List<String>? referenceDocuments;
   final String? uploadedIdOrLicenseDocument;
   final String? workHistoryDescription;
-
-  // Shared between both
+  final String? connectorLinkUrl;
   final LocationDto? location;
   final List<DeviceDto>? devices;
+  final String? loginTime;
+  final String? createdAt;
+  final String? updatedAt;
 
   const AuthUserDto({
     required this.id,
@@ -157,6 +66,14 @@ class AuthUserDto {
     this.walletId,
     this.stripeAccountId,
     this.stripeCustomerId,
+    this.stripeSubscriptionStatus,
+    this.currentSubscriptionId,
+    this.currentSubscriptionTrialDays,
+    this.currentSubscriptionAutoRenew,
+    this.stripePayoutsEnabled,
+    this.stripeTransfersActive,
+    this.approvalStatusByAdmin,
+    this.rejectedReason,
     this.bookingInProgress,
     this.isDeleted,
     this.country,
@@ -170,11 +87,14 @@ class AuthUserDto {
     this.referenceDocuments,
     this.uploadedIdOrLicenseDocument,
     this.workHistoryDescription,
+    this.connectorLinkUrl,
     this.location,
     this.devices,
+    this.loginTime,
+    this.createdAt,
+    this.updatedAt,
   });
 
-  /// ✅ Factory constructor to parse from API response
   factory AuthUserDto.fromBody(Map<String, dynamic> json) {
     return AuthUserDto(
       id: json['_id']?.toString() ?? '',
@@ -193,8 +113,14 @@ class AuthUserDto {
       stripeAccountId: json['stripeAccountId'],
       stripeCustomerId: json['stripeCustomerId'],
       authToken: json['authToken'],
-
-      // Inspector-specific
+      stripeSubscriptionStatus: json['stripeSubscriptionStatus'],
+      currentSubscriptionId: json['currentSubscriptionId'],
+      currentSubscriptionTrialDays: json['currentSubscriptionTrialDays'],
+      currentSubscriptionAutoRenew: json['currentSubscriptionAutoRenew'],
+      stripePayoutsEnabled: json['stripePayoutsEnabled'],
+      stripeTransfersActive: json['stripeTransfersActive'],
+      approvalStatusByAdmin: json['approvalStatusByAdmin'],
+      rejectedReason: json['rejectedReason'],
       bookingInProgress: json['bookingInProgress'],
       isDeleted: json['isDeleted'],
       country: json['country'],
@@ -211,8 +137,7 @@ class AuthUserDto {
           (json['referenceDocuments'] is List) ? List<String>.from(json['referenceDocuments']) : [],
       uploadedIdOrLicenseDocument: json['uploadedIdOrLicenseDocument'],
       workHistoryDescription: json['workHistoryDescription'],
-
-      // Common
+      connectorLinkUrl: json['connectorLinkUrl'],
       location: json['location'] != null
           ? LocationDto.fromJson(json['location'])
           : null,
@@ -222,10 +147,12 @@ class AuthUserDto {
               .map(DeviceDto.fromJson)
               .toList()
           : const [],
+      loginTime: json['loginTime'],
+      createdAt: json['createdAt'],
+      updatedAt: json['updatedAt'],
     );
   }
 
-  /// ✅ Convert to domain entity
   AuthUser toEntity() => AuthUser(
         id: id,
         name: name,
@@ -241,6 +168,10 @@ class AuthUserDto {
         walletId: walletId,
         stripeAccountId: stripeAccountId,
         stripeCustomerId: stripeCustomerId,
+        stripeSubscriptionStatus: stripeSubscriptionStatus,
+        currentSubscriptionId: currentSubscriptionId,
+        approvalStatusByAdmin: approvalStatusByAdmin,
+        rejectedReason: rejectedReason,
         location: (location?.coordinates?.length == 2)
             ? UserLocation(
                 name: location?.locationName,

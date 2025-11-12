@@ -244,35 +244,6 @@ class InspectorDashboardProvider extends BaseViewModel {
     }
   }
 
-  // void showPaymentSuccessDialog(BuildContext context) {
-  //   showDialog(
-  //     context: context,
-  //     barrierDismissible: false,
-  //     builder: (_) => AlertDialog(
-  //       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-  //       content: Column(
-  //         mainAxisSize: MainAxisSize.min,
-  //         children:  [
-  //           Icon(Icons.check_circle, color: Colors.green, size: 70),
-  //           SizedBox(height: 10),
-  //           Text(
-  //             "Payment Successful!",
-  //             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-  //           ),
-  //             const SizedBox(height: 16),
-  //         ElevatedButton(
-  //           onPressed: () async {
-  //             Navigator.pop(context); // close dialog
-  //             await checkUserApprovalStatus(context);
-  //           },
-  //           child: const Text('Continue'),
-  //         ),
-  //         ],
-  //       ),
-  //     ),
-  //   );
-  // }
-
   void showPaymentSuccessDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -293,7 +264,6 @@ class InspectorDashboardProvider extends BaseViewModel {
               onPressed: () async {
                 Navigator.pop(context);
 
-                // ✅ Refresh everything
                 final provider = context.read<InspectorDashboardProvider>();
                 await provider.initializeUserState(context);
               },
@@ -311,12 +281,10 @@ class InspectorDashboardProvider extends BaseViewModel {
   }) async {
     log('[FETCH_USER_DETAIL] Fetching user details for userId=${user.id}');
 
-    // Get existing local user first
     final existingUser = await locator<AuthLocalDataSource>().getUser();
 
     final localUser = user.toLocalEntity();
 
-    // ✅ Preserve token if API user doesn’t include one
     if (localUser.authToken == null || localUser.authToken!.isEmpty) {
       log('[FETCH_USER_DETAIL] ⚠️ No token in API user — reusing local token.');
       localUser.authToken = existingUser?.authToken;
@@ -373,46 +341,92 @@ class InspectorDashboardProvider extends BaseViewModel {
   UserSubscriptionModel? subscription;
 
   Future<void> initializeUserState(BuildContext context) async {
+    debugPrint('🔹 [initializeUserState] Starting initialization...');
     isLoading = true;
     notifyListeners();
 
     try {
+      debugPrint('📦 Fetching local user from AuthLocalDataSource...');
       final localUser = await locator<AuthLocalDataSource>().getUser();
+
       if (localUser == null) {
+        debugPrint('⚠️ No local user found. Setting status → unverified');
         status = InspectorStatus.unverified;
         return;
       }
 
       user = localUser.toDomainEntity();
+      debugPrint('✅ Local user found: ${user?.name ?? "no email"}');
+      debugPrint('📱 OTP verified: ${localUser.phoneOtpVerified}');
 
-      // if (localUser.phoneOtpVerified != true) {
-      //   status = InspectorStatus.unverified;
+      if (localUser.phoneOtpVerified != true) {
+        debugPrint('❌ Phone OTP not verified. Setting status → unverified');
+        status = InspectorStatus.unverified;
+        return;
+      }
+
+      debugPrint('💳 Checking subscription status...');
+      debugPrint('   Subscription ID: ${localUser.currentSubscriptionId}');
+      debugPrint(
+        '   Subscription Status: ${localUser.stripeSubscriptionStatus}',
+      );
+
+      // // ✅ No subscription at all
+      // if (localUser.stripeSubscriptionStatus == null ||
+      //     localUser.currentSubscriptionId == null) {
+      //   debugPrint(
+      //     '⚠️ No active subscription found. Setting status → needsSubscription',
+      //   );
+      //   status = InspectorStatus.needsSubscription;
+      //   await fetchSubscriptionPlans();
+      //   debugPrint('📋 Subscription plans fetched successfully.');
       //   return;
       // }
 
-      // if (localUser.stripeSubscriptionStatus == null ||
-      //     localUser.currentSubscriptionId == null) {
+      // // ✅ Subscription exists but is not active (cancelled / incomplete / etc.)
+      // if (localUser.stripeSubscriptionStatus != 'active') {
+      //   debugPrint(
+      //     '⚠️ Subscription is not active (status=${localUser.stripeSubscriptionStatus}). '
+      //     'Redirecting to subscription plan screen...',
+      //   );
       //   status = InspectorStatus.needsSubscription;
       //   await fetchSubscriptionPlans();
       //   return;
       // }
 
+      // // ✅ Active subscription
       // if (localUser.stripeSubscriptionStatus == 'active' &&
       //     localUser.currentSubscriptionId != null) {
+      //   debugPrint(
+      //     '🚀 Active subscription detected. Fetching user detail from remote...',
+      //   );
       //   final userDetail = await fetchAndUpdateUserDetail(localUser, context);
+      //   debugPrint('✅ User detail fetched successfully.');
+      //   debugPrint(
+      //     '👮 Admin Approval Status: ${userDetail.approvalStatusByAdmin}',
+      //   );
 
       //   if (userDetail.approvalStatusByAdmin == 0) {
+      //     debugPrint('🕐 Approval pending. Setting status → underReview');
       //     status = InspectorStatus.underReview;
       //   } else if (userDetail.approvalStatusByAdmin == 2) {
+      //     debugPrint('❌ Approval rejected by admin. Setting status → rejected');
       //     status = InspectorStatus.rejected;
       //   } else if (userDetail.approvalStatusByAdmin == 1) {
+          debugPrint('✅ Approval granted by admin. Setting status → approved');
           status = InspectorStatus.approved;
+      //   } else {
+      //     debugPrint(
+      //       '⚠️ Unknown approval status: ${userDetail.approvalStatusByAdmin}',
+      //     );
       //   }
       // }
-    } catch (e) {
-      debugPrint('initializeUserState error: $e');
+    } catch (e, stack) {
+      debugPrint('🔥 [initializeUserState] Error occurred: $e');
+      debugPrint('📄 Stack Trace: $stack');
     } finally {
       isLoading = false;
+      debugPrint('🏁 [initializeUserState] Initialization complete.');
       notifyListeners();
     }
   }

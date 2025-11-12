@@ -118,7 +118,6 @@ class UserModel extends UserEntity {
   Map<String, dynamic> toJson() => {'_id': id, 'email': email, 'name': name};
 }
 
-/// JSON Helpers
 PaymentsBodyModel paymentsResponseFromJson(String str) =>
     PaymentsBodyModel.fromJson(json.decode(str));
 

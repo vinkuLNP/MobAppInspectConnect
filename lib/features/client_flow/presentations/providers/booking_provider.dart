@@ -232,9 +232,7 @@ class BookingProvider extends BaseViewModel {
         },
         error: (e) {
           if (e.message!.toLowerCase().contains("insufficient")) {
-            // ScaffoldMessenger.of(context).showSnackBar(
-            //   SnackBar(content: Text('${e.message} Recharge Your Wallet Now')),
-            // );
+       
             _showInsufficientFundsDialog(context, e.message!);
           } else {
             ScaffoldMessenger.of(context).showSnackBar(

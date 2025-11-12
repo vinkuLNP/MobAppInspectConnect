@@ -27,14 +27,6 @@ class UserProvider extends BaseViewModel {
 
   final AuthLocalDataSource _local = locator<AuthLocalDataSource>();
 
-  // Future<void> updateUserName(String name) async {
-  //   if (_user == null) return;
-
-  //   _user = _user!.copyWith(name: name);
-  //   notifyListeners();
-
-  //   await locator<AuthLocalDataSource>().saveUser(_user!);
-  // }
 
   bool isLoading = false;
   Future<void> updateUserName(BuildContext context, String name) async {
@@ -56,15 +48,10 @@ class UserProvider extends BaseViewModel {
           notifyListeners();
 
           await locator<AuthLocalDataSource>().saveUser(_user!);
-          // ScaffoldMessenger.of(context).showSnackBar(
-          //   const SnackBar(content: Text('Profile updated successfully')),
-          // );
-          // // Navigator.pop(context);
+       
         },
         error: (e) {
-          // ScaffoldMessenger.of(context).showSnackBar(
-          //   SnackBar(content: Text(e.message ?? 'Profile update failed')),
-          // );
+     
         },
       );
     } finally {

@@ -1,4 +1,3 @@
-// domain/usecases/sign_up_usecase.dart
 import 'package:inspect_connect/core/commondomain/entities/based_api_result/api_result_model.dart';
 import 'package:inspect_connect/core/commondomain/usecases/base_params_usecase.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/auth_user.dart';

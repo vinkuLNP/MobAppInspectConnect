@@ -139,18 +139,7 @@ class _DateTimePickerWidgetState extends State<DateTimePickerWidget> {
         padding:  EdgeInsets.symmetric(horizontal: 16 , vertical: widget.showTimePicker ?  16 : 6),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
-          // gradient: LinearGradient(
-          //   colors: [Colors.deepPurple.shade50, Colors.white],
-          //   begin: Alignment.topLeft,
-          //   end: Alignment.bottomRight,
-          // ),
-          // boxShadow: [
-          //   BoxShadow(
-          //     color: Colors.grey.shade300,
-          //     blurRadius: 12,
-          //     offset: const Offset(0, 6),
-          //   ),
-          // ],
+        
           border: Border.all(color: Colors.grey),
         ),
         child: Row(

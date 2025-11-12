@@ -75,13 +75,4 @@ class HttpRequestContext {
         );
       }
    } 
-  //  else {
-  //       // log('esle cexpetio----------?>>>>e$e');
-
-  //     throw CustomConnectionException(
-  //       exceptionMessage: commonConnectionFailedMessage,
-  //       exceptionCode: ioExceptionStatusCode,
-  //     );
-    // }
-  // }
 }

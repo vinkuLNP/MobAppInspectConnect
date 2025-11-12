@@ -101,20 +101,7 @@ class ProfileScreen extends StatelessWidget {
                                 ),
                               ],
                             ),
-                            // const SizedBox(height: 12),
-                            // Row(
-                            //   children: [
-                            //     const Icon(
-                            //       Icons.location_on,
-                            //       color: Colors.grey,
-                            //     ),
-                            // const SizedBox(width: 8),
-                            // Text(
-                            //   user?.mailingAddress ?? 'N/A',
-                            //   style: const TextStyle(fontSize: 16),
-                            // ),
-                            //   ],
-                            // ),
+                          
                           ],
                         ),
                       ),

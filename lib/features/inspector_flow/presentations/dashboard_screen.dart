@@ -4,6 +4,7 @@ import 'package:inspect_connect/features/auth_flow/data/datasources/local_dataso
 import 'package:inspect_connect/features/client_flow/presentations/providers/user_provider.dart';
 import 'package:inspect_connect/features/inspector_flow/domain/enum/inspector_status.dart';
 import 'package:inspect_connect/features/inspector_flow/presentations/screens/inspector_main_dashboard.dart';
+import 'package:inspect_connect/features/inspector_flow/presentations/screens/subscription_screen.dart';
 import 'package:inspect_connect/features/inspector_flow/presentations/widgets/review_screen.dart';
 import 'package:inspect_connect/features/inspector_flow/providers/inspector_main_provider.dart';
 import 'package:provider/provider.dart';
@@ -18,36 +19,50 @@ class InspectorDashboardView extends StatelessWidget {
       create: (_) => InspectorDashboardProvider()..initializeUserState(context),
       child: Consumer<InspectorDashboardProvider>(
         builder: (context, provider, _) {
-          if (provider.isLoading) {
-            return const Scaffold(
-              body: Center(child: CircularProgressIndicator()),
-            );
-          }
+          Widget content;
 
           switch (provider.status) {
             case InspectorStatus.unverified:
-              return const Scaffold(
+              content = const Scaffold(
                 body: Center(
                   child: Text('Please verify your phone number to continue.'),
                 ),
               );
+              break;
 
             case InspectorStatus.needsSubscription:
-            // return SubscriptionScreen(provider: provider);
+              content = SubscriptionScreen(provider: provider);
+              break;
 
             case InspectorStatus.underReview:
             case InspectorStatus.rejected:
               final user = context.read<UserProvider>().user;
               if (user == null) {
-                return const Scaffold(
+                content = const Scaffold(
                   body: Center(child: Text('User data unavailable')),
                 );
+              } else {
+                content = ApprovalStatusScreen(user: user.toDomainEntity());
               }
-              return ApprovalStatusScreen(user: user.toDomainEntity());
+              break;
 
             case InspectorStatus.approved:
-              return const InspectorMainDashboard();
+              content = const InspectorMainDashboard();
+              break;
           }
+
+          return Stack(
+            children: [
+              content,
+              if (provider.isLoading)
+                Container(
+                  color: Colors.black.withOpacity(0.3),
+                  child: const Center(
+                    child: CircularProgressIndicator(color: Colors.white),
+                  ),
+                ),
+            ],
+          );
         },
       ),
     );

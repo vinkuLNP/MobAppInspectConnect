@@ -4,14 +4,6 @@ import 'package:inspect_connect/core/utils/auto_router_setup/auto_router.dart';
 import 'package:inspect_connect/features/auth_flow/enum/auth_user_enum.dart';
 
 class AuthFlowProvider extends ChangeNotifier {
-  // AuthUserType? _userType;
-
-  // AuthUserType? get userType => _userType;
-
-  // void setUserType(AuthUserType type) {
-  //   _userType = type;
-  //   notifyListeners();
-  // }
    AuthUserType? _currentFlow;
 
   AuthUserType? get currentFlow => _currentFlow;
