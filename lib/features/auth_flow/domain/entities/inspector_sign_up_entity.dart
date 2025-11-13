@@ -4,44 +4,31 @@ import 'package:objectbox/objectbox.dart';
 class InspectorSignUpLocalEntity {
   int id = 0;
 
-  // --- Step 0: Personal Details ---
   String? name;
   String? email;
   String? password;
   String? phoneNumber;
   String? countryCode;
   String? isoCode;
-
-
-  // --- Step 2: Professional Details ---
   String? certificateTypeId;
   String? certificateExpiryDate;
   List<String>? certificateDocuments;
   List<String>? certificateAgencyIds;
-
-  // --- Step 3: Service Area ---
   String? country;
   String? state;
   String? city;
   String? zipCode;
   String? mailingAddress;
-
-  // --- Step 4: Additional Details ---
   String? uploadedIdOrLicenseDocument;
   String? workHistoryDescription;
-
   List<String>? referenceDocuments;
   String? profileImage;
   bool? agreedToTerms;
   bool? isTruthfully;
-
-  // --- Common Fields ---
   int? role;
   String? deviceType;
   String? deviceToken;
-
-  // --- Geo Location ---
-  String? locationType; // e.g. "Point"
+  String? locationType; 
   String? locationName;
   double? latitude;
   double? longitude;
@@ -87,7 +74,6 @@ Map<String, dynamic> toJson() {
         "password": password,
         "phoneNumber": phoneNumber,
         "countryCode": countryCode,
-        // "isoCode":isoCode,
         "certificateTypeId": certificateTypeId,
         "certificateExpiryDate": certificateExpiryDate,
         "certificateDocuments": certificateDocuments,
@@ -96,7 +82,6 @@ Map<String, dynamic> toJson() {
         "state": state,
         "city": city,
         "workHistoryDescription": workHistoryDescription,
-        // "zipCode": zipCode,
         "mailingAddress": mailingAddress,
         "uploadedIdOrLicenseDocument": uploadedIdOrLicenseDocument,
         "referenceDocuments": referenceDocuments,
@@ -111,7 +96,7 @@ Map<String, dynamic> toJson() {
           "locationName": locationName,
           "coordinates": [latitude, longitude],
         },
-      }; // remove all null keys from the map recursively
+      }; 
     map.removeWhere((k, v) => v == null);
 
     return map;

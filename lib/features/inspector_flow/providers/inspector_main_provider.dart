@@ -58,11 +58,6 @@ class InspectorDashboardProvider extends BaseViewModel {
           subscriptionPlans = response;
         },
         error: (e) {
-          // ScaffoldMessenger.of(context).showSnackBar(
-          //   SnackBar(
-          //     content: Text(e.message ?? 'Fetching Booking Detail failed'),
-          //   ),
-          // );
         },
       );
     } finally {
@@ -108,11 +103,6 @@ class InspectorDashboardProvider extends BaseViewModel {
           startPayment(context: context, plan: userSubscriptionModel!);
         },
         error: (e) {
-          // ScaffoldMessenger.of(context).showSnackBar(
-          //   SnackBar(
-          //     content: Text(e.message ?? 'Fetching Booking Detail failed'),
-          //   ),
-          // );
         },
       );
     } finally {
@@ -371,56 +361,53 @@ class InspectorDashboardProvider extends BaseViewModel {
         '   Subscription Status: ${localUser.stripeSubscriptionStatus}',
       );
 
-      // // ✅ No subscription at all
-      // if (localUser.stripeSubscriptionStatus == null ||
-      //     localUser.currentSubscriptionId == null) {
-      //   debugPrint(
-      //     '⚠️ No active subscription found. Setting status → needsSubscription',
-      //   );
-      //   status = InspectorStatus.needsSubscription;
-      //   await fetchSubscriptionPlans();
-      //   debugPrint('📋 Subscription plans fetched successfully.');
-      //   return;
-      // }
+      if (localUser.stripeSubscriptionStatus == null ||
+          localUser.currentSubscriptionId == null) {
+        debugPrint(
+          '⚠️ No active subscription found. Setting status → needsSubscription',
+        );
+        status = InspectorStatus.needsSubscription;
+        await fetchSubscriptionPlans();
+        debugPrint('📋 Subscription plans fetched successfully.');
+        return;
+      }
 
-      // // ✅ Subscription exists but is not active (cancelled / incomplete / etc.)
-      // if (localUser.stripeSubscriptionStatus != 'active') {
-      //   debugPrint(
-      //     '⚠️ Subscription is not active (status=${localUser.stripeSubscriptionStatus}). '
-      //     'Redirecting to subscription plan screen...',
-      //   );
-      //   status = InspectorStatus.needsSubscription;
-      //   await fetchSubscriptionPlans();
-      //   return;
-      // }
+      if (localUser.stripeSubscriptionStatus != 'active') {
+        debugPrint(
+          '⚠️ Subscription is not active (status=${localUser.stripeSubscriptionStatus}). '
+          'Redirecting to subscription plan screen...',
+        );
+        status = InspectorStatus.needsSubscription;
+        await fetchSubscriptionPlans();
+        return;
+      }
 
-      // // ✅ Active subscription
-      // if (localUser.stripeSubscriptionStatus == 'active' &&
-      //     localUser.currentSubscriptionId != null) {
-      //   debugPrint(
-      //     '🚀 Active subscription detected. Fetching user detail from remote...',
-      //   );
-      //   final userDetail = await fetchAndUpdateUserDetail(localUser, context);
-      //   debugPrint('✅ User detail fetched successfully.');
-      //   debugPrint(
-      //     '👮 Admin Approval Status: ${userDetail.approvalStatusByAdmin}',
-      //   );
+      if (localUser.stripeSubscriptionStatus == 'active' &&
+          localUser.currentSubscriptionId != null) {
+        debugPrint(
+          '🚀 Active subscription detected. Fetching user detail from remote...',
+        );
+        final userDetail = await fetchAndUpdateUserDetail(localUser, context);
+        debugPrint('✅ User detail fetched successfully.');
+        debugPrint(
+          '👮 Admin Approval Status: ${userDetail.approvalStatusByAdmin}',
+        );
 
-      //   if (userDetail.approvalStatusByAdmin == 0) {
-      //     debugPrint('🕐 Approval pending. Setting status → underReview');
-      //     status = InspectorStatus.underReview;
-      //   } else if (userDetail.approvalStatusByAdmin == 2) {
-      //     debugPrint('❌ Approval rejected by admin. Setting status → rejected');
-      //     status = InspectorStatus.rejected;
-      //   } else if (userDetail.approvalStatusByAdmin == 1) {
+        if (userDetail.approvalStatusByAdmin == 0) {
+          debugPrint('🕐 Approval pending. Setting status → underReview');
+          status = InspectorStatus.underReview;
+        } else if (userDetail.approvalStatusByAdmin == 2) {
+          debugPrint('❌ Approval rejected by admin. Setting status → rejected');
+          status = InspectorStatus.rejected;
+        } else if (userDetail.approvalStatusByAdmin == 1) {
           debugPrint('✅ Approval granted by admin. Setting status → approved');
           status = InspectorStatus.approved;
-      //   } else {
-      //     debugPrint(
-      //       '⚠️ Unknown approval status: ${userDetail.approvalStatusByAdmin}',
-      //     );
-      //   }
-      // }
+        } else {
+          debugPrint(
+            '⚠️ Unknown approval status: ${userDetail.approvalStatusByAdmin}',
+          );
+        }
+      }
     } catch (e, stack) {
       debugPrint('🔥 [initializeUserState] Error occurred: $e');
       debugPrint('📄 Stack Trace: $stack');

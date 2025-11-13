@@ -1,6 +1,5 @@
 import 'package:inspect_connect/core/commondomain/entities/based_api_result/api_result_model.dart';
 import 'package:inspect_connect/features/client_flow/data/models/booking_detail_model.dart';
-import 'package:inspect_connect/features/client_flow/data/models/booking_list_response_model.dart';
 import 'package:inspect_connect/features/client_flow/data/models/booking_model.dart';
 import 'package:inspect_connect/features/client_flow/data/models/upload_image_model.dart';
 import 'package:inspect_connect/features/client_flow/data/models/user_payment_list_model.dart';
@@ -13,7 +12,7 @@ abstract class ClientUserRepository {
  Future<ApiResultModel<List<CertificateSubTypeEntity>>>  getCertificateSubTypes();
   Future<ApiResultModel<UploadImageResponseModel>> uploadImage({required UploadImageDto filePath});
   Future<ApiResultModel<CreateBookingResponseModel>>  createBooking({required BookingEntity booking});
- Future<ApiResultModel<List<BookingListModel>>>  fetchBookings({
+ Future<ApiResultModel<List<BookingData>>>  fetchBookings({
    required int page,
     required int perPageLimit,
     String? search,
@@ -33,5 +32,9 @@ abstract class ClientUserRepository {
   Future<ApiResultModel<BookingDetailModel>> getBookingDetail(String bookingId);
 Future<ApiResultModel<bool>> deleteBooking(String bookingId);
 Future<ApiResultModel<BookingData>> updateBooking(String bookingId, BookingEntity booking);
+
+Future<ApiResultModel<BookingData>> updateBookingStatus(String bookingId,int status);
+
+Future<ApiResultModel<BookingData>> updateBookingTimer(String bookingId,String action);
 
 }

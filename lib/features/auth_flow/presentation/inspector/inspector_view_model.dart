@@ -308,7 +308,6 @@ class InspectorViewModelProvider extends BaseViewModel {
 
       _resetTargetLabel = useEmail ? email : phoneE164;
 
-      // verifyInit();
       startOtpFlow(OtpPurpose.forgotPassword);
       context.pushRoute(OtpVerificationRoute(addShowButton: true));
     } finally {
@@ -581,7 +580,6 @@ class InspectorViewModelProvider extends BaseViewModel {
             );
             setCertificateType(matched);
           } else {
-            // setCertificateType(certificateType[0]);
             setCertificateType(response.first);
           }
           notifyListeners();
@@ -616,7 +614,6 @@ class InspectorViewModelProvider extends BaseViewModel {
           } else {
             setAgencyType(response.first);
           }
-          // setAgencyType(agencyType[0]);
           notifyListeners();
         },
         error: (e) {},
@@ -674,10 +671,6 @@ class InspectorViewModelProvider extends BaseViewModel {
             );
           },
         );
-        // if (picked != null) {
-        //   profileImage = File(picked.path);
-        //   notifyListeners();
-        // }
       } else {
         setProcessing(true);
         final result = await FilePicker.platform.pickFiles(
@@ -713,13 +706,6 @@ class InspectorViewModelProvider extends BaseViewModel {
               referenceLetters.add(file);
               referenceLettersUrls.add(File(response.fileUrl));
             }
-
-            // documents.add(
-            //   result.files.single.path != null
-            //       ? File(result.files.single.path!)
-            //       : file,
-            // );
-            // uploadedCertificateUrls.add(response.fileUrl);
             notifyListeners();
           },
           error: (e) {
@@ -728,12 +714,6 @@ class InspectorViewModelProvider extends BaseViewModel {
             );
           },
         );
-
-        // if (result != null && result.files.single.path != null) {
-        //   final file = File(result.files.single.path!);
-
-        //   notifyListeners();
-        // }
       }
     } catch (e) {
       log('Error picking file: $e');
@@ -784,8 +764,6 @@ class InspectorViewModelProvider extends BaseViewModel {
     required String city,
     String? mailingAddress,
     String? zipCode,
-    // double? lat,
-    // double? lng,
   }) async {
     await _localDs.updateFields({
       'country': country,
@@ -793,7 +771,6 @@ class InspectorViewModelProvider extends BaseViewModel {
       'city': city,
       if (mailingAddress != null) 'mailingAddress': mailingAddress,
       if (zipCode != null) 'zipCode': zipCode,
-      //         "type": "Point",
       'locationType': 'Point',
       'locationName': 'Midtown',
       'latitude': -73.9857,
@@ -832,21 +809,18 @@ class InspectorViewModelProvider extends BaseViewModel {
     log('📦 Loaded saved data: ${saved?.toString()}');
     if (saved == null) return;
 
-    // Step 1 - Personal
     fullNameCtrl.text = saved.name ?? '';
     phoneCtrl.text = saved.phoneNumber ?? '';
     phoneE164 = saved.phoneNumber;
     emailCtrlSignUp.text = saved.email ?? '';
     passwordCtrlSignUp.text = saved.password ?? '';
     if (saved.phoneNumber != null && saved.phoneNumber!.isNotEmpty) {
-      // Extract dial code & raw number if possible
       final phone = saved.phoneNumber!;
       String dial = saved.countryCode ?? '';
       String iso = saved.isoCode ?? '';
 
       String raw = phone;
 
-      // Try to split country code (assuming format like +911234567890)
       final match = RegExp(r'^\+(\d{1,3})(\d+)$').firstMatch(phone);
       if (match != null) {
         dial = '+${match.group(1)}';
@@ -861,30 +835,17 @@ class InspectorViewModelProvider extends BaseViewModel {
       );
     }
 
-    // Step 2 - Professional
     selectedCertificateTypeId = saved.certificateTypeId;
-    // certificateExpiryDate = .toString();
     setDate(DateTime.parse(saved.certificateExpiryDate.toString()));
-    // uploadedCertificateUrls = saved.certificateDocuments ?? [];
     uploadedCertificateUrls = saved.certificateDocuments ?? [];
     existingDocumentUrls = List.from(uploadedCertificateUrls);
     selectedAgencyIds = saved.certificateAgencyIds ?? [];
     await fetchCertificateTypes(savedId: selectedCertificateTypeId);
-    // Step 3 - Service area
     countryController.text = saved.country.toString();
     stateController.text = saved.state.toString();
     cityController.text = saved.city.toString();
     mailingAddressController.text = saved.mailingAddress.toString();
     zipController.text = saved.zipCode.toString();
-
-    // Step 4 - Additional
-    // if (saved.profileImage != null && saved.profileImage!.isNotEmpty) {
-    //   profileImage = File(saved.profileImage!);
-    // }
-    // if (saved.uploadedIdOrLicenseDocument != null &&
-    //     saved.uploadedIdOrLicenseDocument!.isNotEmpty) {
-    //   idLicense = File(saved.uploadedIdOrLicenseDocument!);
-    // }
     if (saved.profileImage != null &&
         saved.profileImage!.isNotEmpty &&
         saved.profileImage != 'null') {
@@ -902,9 +863,6 @@ class InspectorViewModelProvider extends BaseViewModel {
         .map((e) => File(e))
         .toList();
     workHistoryController.text = saved.workHistoryDescription ?? '';
-    // referenceLetters = (saved.referenceDocuments ?? [])
-    //     .map((e) => File(e))
-    //     .toList();
     agreedToTerms = saved.agreedToTerms ?? false;
     confirmTruth = saved.isTruthfully ?? false;
 
@@ -943,7 +901,6 @@ class InspectorViewModelProvider extends BaseViewModel {
 
       state?.when(
         data: (user) async {
-          // log('[SignUP] ✅ API returned user data:');
           log('  id=${user.id}');
           log('  token=${user.authToken}');
           log('  fullName=${user.name}');

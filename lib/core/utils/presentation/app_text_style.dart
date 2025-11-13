@@ -15,8 +15,6 @@ TextStyle appTextStyle({
 }) => GoogleFonts.poppins(
   decoration: textDecoration,
   decorationColor: textDecorationColor ?? AppColors.black,
-
-  // overflow: textOverflow,
   fontSize: fontSize,
   color: color ?? AppColors.black,
   fontStyle: fontStyle,

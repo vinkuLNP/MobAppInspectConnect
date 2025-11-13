@@ -205,7 +205,6 @@ class UserDetail {
   }
 }
 
-/// ---- Nested Models ----
 
 class Location {
   final String? type;

@@ -61,7 +61,6 @@ class ClientSignInView extends StatelessWidget {
                     if (provider.autoValidate) formKey.currentState?.validate();
                   },
                 ),
-                // const SizedBox(height: 2 ),
                 Align(
                   alignment: Alignment.centerRight,
                   child: TextButton(

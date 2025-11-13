@@ -8,13 +8,14 @@ import 'package:provider/provider.dart';
 class DateTimePickerWidget extends StatefulWidget {
   final DateTime? initialDateTime;
   final ValueChanged<DateTime> onDateTimeSelected;
-  final bool showTimePicker;
+  final bool showTimePicker, viewBooking;
 
   const DateTimePickerWidget({
     super.key,
     this.initialDateTime,
     required this.onDateTimeSelected,
     this.showTimePicker = true,
+    this.viewBooking = false,
   });
 
   @override
@@ -129,17 +130,20 @@ class _DateTimePickerWidgetState extends State<DateTimePickerWidget> {
   @override
   Widget build(BuildContext context) {
     final formatted = DateFormat(
-   widget.showTimePicker ?    'EEE, MMM d • hh:mm a' : 'd MMM, yyyy',
+      widget.showTimePicker ? 'EEE, MMM d • hh:mm a' : 'd MMM, yyyy',
     ).format(selectedDateTime);
 
     return GestureDetector(
       onTap: () => _pickDateTime(context),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 250),
-        padding:  EdgeInsets.symmetric(horizontal: 16 , vertical: widget.showTimePicker ?  16 : 6),
+        padding: EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: widget.showTimePicker ? 16 : 6,
+        ),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
-        
+
           border: Border.all(color: Colors.grey),
         ),
         child: Row(
@@ -157,25 +161,36 @@ class _DateTimePickerWidgetState extends State<DateTimePickerWidget> {
               ),
             ),
             const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  textWidget(
-                    text: formatted,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                  ),
-                  const SizedBox(height: 2),
-                  textWidget(
-                    text:widget
-                    .showTimePicker ?  "Tap to select date & time" : "Tap to choose date",
-                    fontSize: 13,
-                    color: Colors.grey.shade600,
-                  ),
-                ],
+
+            if (widget.viewBooking)
+              Expanded(
+                child: textWidget(
+                  text: formatted,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
-            ),
+            if (!widget.viewBooking)
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    textWidget(
+                      text: formatted,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    const SizedBox(height: 2),
+                    textWidget(
+                      text: widget.showTimePicker
+                          ? "Tap to select date & time"
+                          : "Tap to choose date",
+                      fontSize: 13,
+                      color: Colors.grey.shade600,
+                    ),
+                  ],
+                ),
+              ),
             const Icon(
               Icons.keyboard_arrow_down_rounded,
               color: AppColors.authThemeColor,

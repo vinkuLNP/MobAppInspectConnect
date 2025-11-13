@@ -25,6 +25,8 @@ import 'package:inspect_connect/features/client_flow/domain/usecases/get_certifi
 import 'package:inspect_connect/features/client_flow/domain/usecases/get_user_payments_usecase.dart';
 import 'package:inspect_connect/features/client_flow/domain/usecases/get_user_wallet_amount_usecase.dart';
 import 'package:inspect_connect/features/client_flow/domain/usecases/update_booking_detail_usecase.dart';
+import 'package:inspect_connect/features/client_flow/domain/usecases/update_booking_status.dart';
+import 'package:inspect_connect/features/client_flow/domain/usecases/update_booking_timer.dart';
 import 'package:inspect_connect/features/client_flow/domain/usecases/upload_image_usecase.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/session_manager.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/user_provider.dart';
@@ -78,6 +80,9 @@ void setupLocator() {
   locator.registerLazySingleton(() => UpdateProfileUseCase(locator()));
   locator.registerLazySingleton(() => GetSubscriptionPlansUseCase(locator()));
   locator.registerLazySingleton(() => GetUserSubscriptionDetailUseCase(locator()));
+  locator.registerLazySingleton(() => UpdateBookingStatusUseCase(locator()));
+  locator.registerLazySingleton(() => UpdateBookingTimerUseCase(locator()));
+
 
 
   locator.registerLazySingleton(() => GetAgencyUseCase(locator()));

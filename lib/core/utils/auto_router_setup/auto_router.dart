@@ -36,15 +36,6 @@ class AppRouter extends RootStackRouter {
       ],
     ),
     AutoRoute(page: InspectorSignUpRoute.page),
-
-    // AutoRoute(
-    //   page: InspectorAuthAutoWrapperRoute.page,
-    //   children: [
-    //     AutoRoute(page: InspectorSignInRoute.page, initial: true),
-
-    //     AutoRoute(page: InspectorSignUpRoute.page),
-    //   ],
-    // ),
     AutoRoute(page: ClientDashboardRoute.page),
     AutoRoute(page: InspectorDashboardRoute.page),
 

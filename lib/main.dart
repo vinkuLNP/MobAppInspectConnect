@@ -20,14 +20,11 @@ Future<void> main() async {
   Stripe.publishableKey = stripePublishableKey;
 
   await Stripe.instance.applySettings();
-  // Initialize DI first
   await initAppComponentLocator();
   setupLocator();
-  // Then configure the flavor
   final AppFlavorsHelper configService = locator<AppFlavorsHelper>();
   final ProductFlavor? _productFlavor = EnvironmentConfig.BUILD_VARIANT
       .toProductFlavor();
-  // prodEnvironmentString
   configService.configure(productFlavor: _productFlavor);
   print(' BUILD_VARIANT = ${EnvironmentConfig.BUILD_VARIANT}');
   print(' Base URL = ${configService.baseUrl}');

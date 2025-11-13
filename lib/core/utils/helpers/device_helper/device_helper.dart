@@ -33,7 +33,6 @@ class DeviceInfoHelper {
         return _uuid.v4();
       }
     } catch (e) {
-      // fallback random token
       return _uuid.v4();
     }
   }

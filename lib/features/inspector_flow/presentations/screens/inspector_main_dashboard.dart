@@ -4,10 +4,11 @@ import 'package:inspect_connect/core/utils/constants/app_assets_constants.dart';
 import 'package:inspect_connect/core/utils/presentation/app_assets_widget.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/user_provider.dart';
-import 'package:inspect_connect/features/client_flow/presentations/screens/home_screen.dart';
 import 'package:inspect_connect/features/client_flow/presentations/screens/profile_screen.dart';
 import 'package:inspect_connect/features/client_flow/presentations/widgets/common_app_bar.dart';
 import 'package:inspect_connect/features/inspector_flow/presentations/screens/inspection_screen.dart';
+import 'package:inspect_connect/features/inspector_flow/presentations/screens/other_inspection_listing.dart';
+import 'package:inspect_connect/features/inspector_flow/presentations/screens/requested_inspection_screen.dart';
 import 'package:provider/provider.dart';
 
 class InspectorMainDashboard extends StatefulWidget {
@@ -25,12 +26,8 @@ class _InspectorMainDashboardState extends State<InspectorMainDashboard> {
   void initState() {
     super.initState();
     _pages = [
-      const HomeScreen(),
-      InspectionScreen(
-        onBookNowTapped: () {
-          _onItemTapped(0);
-        },
-      ),
+      const RequestedInspectionScreen(),
+      ApprovedInspectionsScreen(),
       const ProfileScreen(),
     ];
   }
@@ -57,7 +54,7 @@ class _InspectorMainDashboardState extends State<InspectorMainDashboard> {
                   ? 'My Inspections'
                   : _selectedIndex == 2
                   ? 'Profile'
-                  : "Inpector View",
+                  : "New Requests",
             ),
 
       body: _pages[_selectedIndex],
@@ -105,7 +102,18 @@ class _InspectorMainDashboardState extends State<InspectorMainDashboard> {
                           ),
                         ),
                       ),
-                      const SizedBox(width: 60),
+                      Expanded(
+                        child: Align(
+                          alignment: Alignment.center,
+                          child: _buildNavItem(
+                            icon: Icons.remove_from_queue_outlined,
+                            activeIcon: Icons.remove_from_queue,
+                            label: 'Requested',
+                            index: 0,
+                            primary: primary,
+                          ),
+                        ),
+                      ),
                       Expanded(
                         child: Align(
                           alignment: Alignment.center,
@@ -129,139 +137,146 @@ class _InspectorMainDashboardState extends State<InspectorMainDashboard> {
     );
   }
 
-Widget _buildDrawer(BuildContext context) {
-  final user = context.watch<UserProvider>().user;
-  final size = MediaQuery.of(context).size;
+  Widget _buildDrawer(BuildContext context) {
+    final user = context.watch<UserProvider>().user;
+    final size = MediaQuery.of(context).size;
 
-  return Drawer(
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.only(
-        topRight: Radius.circular(16),
-        bottomRight: Radius.circular(16),
+    return Drawer(
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topRight: Radius.circular(16),
+          bottomRight: Radius.circular(16),
+        ),
       ),
-    ),
-    backgroundColor: Colors.grey[200],
-    child: Column(
-      children: [
-        Stack(
-          children: [
-            SizedBox(
-              width: size.width,
-              height: size.height * 0.28,
-              child: imageAsset(
-                image: finalImage,
+      backgroundColor: Colors.grey[200],
+      child: Column(
+        children: [
+          Stack(
+            children: [
+              SizedBox(
                 width: size.width,
                 height: size.height * 0.28,
-                boxFit: BoxFit.cover,
+                child: imageAsset(
+                  image: finalImage,
+                  width: size.width,
+                  height: size.height * 0.28,
+                  boxFit: BoxFit.cover,
+                ),
               ),
-            ),
-            Positioned(
-              left: 20,
-              top: 80,
-              right: 20,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  textWidget(
-                    text: user?.name ?? 'Inspector Name',
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.white,
-                  ),
-                  const SizedBox(height: 4),
-                  textWidget(
-                    text: user?.email ?? 'inspector@email.com',
-                    fontSize: 20,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.white,
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-
-        Expanded(
-          child: ListView(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-            children: [
-              _buildDrawerCard(
-                context,
-                icon: Icons.payment,
-                label: 'Payments',
-                onTap: () {
-                  Navigator.pop(context);
-                },
-              ),
-              const SizedBox(height: 12),
-              _buildDrawerCard(
-                context,
-                icon: Icons.message_outlined,
-                label: 'Messages',
-                onTap: () {
-                  Navigator.pop(context);
-                },
-              ),
-              const SizedBox(height: 12),
-              _buildDrawerCard(
-                context,
-                icon: Icons.attach_money,
-                label: 'Payout List',
-                onTap: () {
-                  Navigator.pop(context);
-                },
-              ),
-              const SizedBox(height: 12),
-              _buildDrawerCard(
-                context,
-                icon: Icons.history,
-                label: 'Past Inspections',
-                onTap: () {
-                  Navigator.pop(context);
-                },
-              ),
-              const SizedBox(height: 12),
-              _buildDrawerCard(
-                context,
-                icon: Icons.logout,
-                label: 'Logout',
-                color: Colors.redAccent,
-                onTap: () {
-                  Navigator.pop(context);
-                },
+              Positioned(
+                left: 20,
+                top: 80,
+                right: 20,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    textWidget(
+                      text: user?.name ?? 'Inspector Name',
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.white,
+                    ),
+                    const SizedBox(height: 4),
+                    textWidget(
+                      text: user?.email ?? 'inspector@email.com',
+                      fontSize: 20,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.white,
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
-        ),
-      ],
-    ),
-  );
-}
-Widget _buildDrawerCard(
-  BuildContext context, {
-  required IconData icon,
-  required String label,
-  VoidCallback? onTap,
-  Color? color,
-}) {
-  return Material(
-    color: Colors.white,
-    borderRadius: BorderRadius.circular(16),
-    child: ListTile(
-      leading: Icon(icon, color: color ?? Colors.black87),
-      title: Text(
-        label,
-        style: TextStyle(
-          fontWeight: FontWeight.w600,
-          color: color ?? Colors.black87,
-        ),
+
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              children: [
+                _buildDrawerCard(
+                  context,
+                  icon: Icons.payment,
+                  label: 'Payments',
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
+                ),
+                const SizedBox(height: 12),
+                _buildDrawerCard(
+                  context,
+                  icon: Icons.message_outlined,
+                  label: 'Messages',
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
+                ),
+                const SizedBox(height: 12),
+                _buildDrawerCard(
+                  context,
+                  icon: Icons.attach_money,
+                  label: 'Payout List',
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
+                ),
+                const SizedBox(height: 12),
+                _buildDrawerCard(
+                  context,
+                  icon: Icons.history,
+                  label: 'Past Inspections',
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => OtherInspectionsScreen(),
+                      ),
+                    );
+                  },
+                ),
+                const SizedBox(height: 12),
+                _buildDrawerCard(
+                  context,
+                  icon: Icons.logout,
+                  label: 'Logout',
+                  color: Colors.redAccent,
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
-      trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      onTap: onTap,
-    ),
-  );
-}
+    );
+  }
+
+  Widget _buildDrawerCard(
+    BuildContext context, {
+    required IconData icon,
+    required String label,
+    VoidCallback? onTap,
+    Color? color,
+  }) {
+    return Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(16),
+      child: ListTile(
+        leading: Icon(icon, color: color ?? Colors.black87),
+        title: Text(
+          label,
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            color: color ?? Colors.black87,
+          ),
+        ),
+        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        onTap: onTap,
+      ),
+    );
+  }
 
   Widget _buildNavItem({
     required IconData icon,

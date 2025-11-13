@@ -99,7 +99,6 @@ class _AdditionalDetailsStepState extends State<AdditionalDetailsStep> {
 
                         CheckboxListTile(
                           value: prov.agreedToTerms,
-                          // onChanged: prov.toggleTerms,
                           onChanged: (val) {
                             prov.toggleTerms(val);
                             setState(() => prov.showValidationError = false);
@@ -119,7 +118,6 @@ class _AdditionalDetailsStepState extends State<AdditionalDetailsStep> {
                         ),
                         CheckboxListTile(
                           value: prov.confirmTruth,
-                          // onChanged: prov.toggleTruth,
                           onChanged: (val) {
                             prov.toggleTruth(val);
                             setState(() => prov.showValidationError = false);
@@ -168,7 +166,6 @@ class _AdditionalDetailsStepState extends State<AdditionalDetailsStep> {
   Widget _buildImageWidget(File file) {
     final path = file.path;
 
-    // Condition 1 — Check if it’s a remote URL
     if (path.startsWith('http://') || path.startsWith('https://')) {
       return Image.network(
         path,
@@ -184,7 +181,6 @@ class _AdditionalDetailsStepState extends State<AdditionalDetailsStep> {
       );
     }
 
-    // Condition 2 — Otherwise, treat it as a local file
     return Image.file(
       file,
       fit: BoxFit.cover,

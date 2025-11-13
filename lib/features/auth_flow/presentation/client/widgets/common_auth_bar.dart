@@ -59,7 +59,6 @@ class CommonAuthBar extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // appCommonLogoBar(height: 50),
                       showBackButton
                           ? IconButton(
                               icon: Icon(Icons.arrow_back),
@@ -75,8 +74,6 @@ class CommonAuthBar extends StatelessWidget {
                         fontSize: 14,
                         color: Colors.white70,
                       ),
-
-                      // const SizedBox(height: 2),
                       textWidget(
                         text: title,
                         fontSize: 22,

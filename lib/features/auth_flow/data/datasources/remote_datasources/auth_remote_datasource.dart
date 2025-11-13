@@ -55,7 +55,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       final ApiResultModel<http.Response> res = await _ctx.makeRequest(
         uri: signInEndPoint,
         httpRequestStrategy: PostRequestStrategy(),
-        // headers: const {'Content-Type': 'application/json', 'Accept': 'application/json'},
         requestData: dto.toJson(),
       );
 
@@ -64,8 +63,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           final Map<String, dynamic> root = response.body.isEmpty
               ? {}
               : (jsonDecode(response.body) as Map<String, dynamic>);
-          // Backend shape:
-          // { "success": true, "message": "...", "body": { ... user object ... } }
           final Map<String, dynamic> body =
               (root['body'] as Map?)?.cast<String, dynamic>() ??
               <String, dynamic>{};
@@ -150,14 +147,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
               (root['body'] as Map?)?.cast<String, dynamic>() ??
               <String, dynamic>{};
           final dto = AuthUserDto.fromBody(body);
-          // final localEntity = AuthUserLocalEntity(
-          //   token: dto.authToken,
-          //   name: dto.name,
-          //   email: dto.emailHashed,
-          //   phoneNumber: dto.phoneNumber,
-          //   countryCode: dto.countryCode,
-          // );
-          // locator<AuthLocalDataSource>().saveUser(localEntity);
           log('------>local user----> localEntity');
           return ApiResultModel<AuthUserDto>.success(data: dto);
         },
@@ -178,22 +167,20 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<ApiResultModel<AuthUserDto>> verifyOtp(VerifyOtpRequestDto dto) async {
     try {
-      // final user = await locator<AuthLocalDataSource>().getUser();
-      // if (user == null || user.token == null) {
-      //   throw Exception('User not found in local storage');
-      // }
-      // log('------>user------------->$user');
-      // log('------>user-------token------>${user.token}');
-      // log('------>user-------phone------>${user.phoneNumber}');
-      // log('------>user-------code------>${user.countryCode}');
+      final user = await locator<AuthLocalDataSource>().getUser();
+      if (user == null || user.authToken == null) {
+        throw Exception('User not found in local storage');
+      }
+      log('------>user------------->$user');
+      log('------>user-------token------>${user.authToken}');
+      log('------>user-------phone------>${user.phoneNumber}');
+      log('------>user-------code------>${user.countryCode}');
 
       final ApiResultModel<http.Response> res = await _ctx.makeRequest(
         uri: verifyOtpndPoint,
         httpRequestStrategy: PostRequestStrategy(),
         headers: {
-          'Authorization':
-              'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5MGRlZmU2YWFiZTQ4NzM4MGVhZDBmZiIsImVtYWlsIjoiVGVzcmVlcmV3cmVydHcxMnRAeW9wbWFpbC5jb20iLCJpYXQiOjE3NjI1MjEwNjMsImV4cCI6MTc2MzEyNTg2M30.H9kQgrb_i8YnxARn3eXkcndaOC1QV1XBZZQc2D7zXp8',
-          // ${user.token}',
+          'Authorization': '${user.authToken}',
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
@@ -205,9 +192,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           final Map<String, dynamic> root = response.body.isEmpty
               ? {}
               : (jsonDecode(response.body) as Map<String, dynamic>);
-          // final Map<String, dynamic> body =
-          //     (root['body'] as Map?)?.cast<String, dynamic>() ??
-          // <String, dynamic>{};
           Map<String, dynamic>? user = root['body']?['user'] ?? root['body'];
           final dto = AuthUserDto.fromBody(user!);
           return ApiResultModel<AuthUserDto>.success(data: dto);
@@ -246,7 +230,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
-        // requestData: dto.toJson(),
       );
 
       return res.when(
@@ -300,8 +283,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           final Map<String, dynamic> root = response.body.isEmpty
               ? {}
               : (jsonDecode(response.body) as Map<String, dynamic>);
-          // Backend shape:
-          // { "success": true, "message": "...", "body": { ... user object ... } }
           final Map<String, dynamic> body =
               (root['body'] as Map?)?.cast<String, dynamic>() ??
               <String, dynamic>{};
@@ -350,8 +331,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           final Map<String, dynamic> root = response.body.isEmpty
               ? {}
               : (jsonDecode(response.body) as Map<String, dynamic>);
-          // Backend shape:
-          // { "success": true, "message": "...", "body": { ... user object ... } }
           final Map<String, dynamic> body =
               (root['body'] as Map?)?.cast<String, dynamic>() ??
               <String, dynamic>{};
@@ -400,8 +379,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           final Map<String, dynamic> root = response.body.isEmpty
               ? {}
               : (jsonDecode(response.body) as Map<String, dynamic>);
-          // Backend shape:
-          // { "success": true, "message": "...", "body": { ... user object ... } }
           final Map<String, dynamic> body =
               (root['body'] as Map?)?.cast<String, dynamic>() ??
               <String, dynamic>{};
@@ -429,8 +406,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       final ApiResultModel<http.Response> res = await _ctx.makeRequest(
         uri: getInspectorCertificateTypesEndPoint,
         httpRequestStrategy: GetRequestStrategy(),
-        // headers: const {'Content-Type': 'application/json', 'Accept': 'application/json'},
-        // requestData: dto.toJson(),
       );
 
       return res.when(
@@ -438,12 +413,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           final Map<String, dynamic> root = response.body.isEmpty
               ? {}
               : (jsonDecode(response.body) as Map<String, dynamic>);
-          // Backend shape:
-          // { "success": true, "message": "...", "body": { ... user object ... } }
-          // final Map<String, dynamic> body =
-          //     (root['body'] as Map?)?.cast<String, dynamic>() ??
-          //     <String, dynamic>{};
-          // final List<dynamic> list = body['certificateSubTypes'] ?? [];
           final List<dynamic> list = (root['body'] as List?) ?? [];
 
           final List<CertificateInspectorTypeModelData> dtoList = list
@@ -476,8 +445,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       final ApiResultModel<http.Response> res = await _ctx.makeRequest(
         uri: getInspectorCertificateTAgenciesEndPoint,
         httpRequestStrategy: GetRequestStrategy(),
-        // headers: const {'Content-Type': 'application/json', 'Accept': 'application/json'},
-        // requestData: dto.toJson(),
       );
 
       return res.when(
@@ -485,13 +452,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           final Map<String, dynamic> root = response.body.isEmpty
               ? {}
               : (jsonDecode(response.body) as Map<String, dynamic>);
-          // Backend shape:
-          // { "success": true, "message": "...", "body": { ... user object ... } }
-          // final Map<String, dynamic> body =
-          //     (root['body'] as Map?)?.cast<String, dynamic>() ??
-          //     <String, dynamic>{};
-          // final List<dynamic> list = body['certificateSubTypes'] ?? [
-          // ];
           final List<dynamic> list = (root['body'] as List?) ?? [];
 
           final List<AgencyModel> dtoList = list

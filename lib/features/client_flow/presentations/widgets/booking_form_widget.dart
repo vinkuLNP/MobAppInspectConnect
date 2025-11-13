@@ -123,16 +123,24 @@ class _BookingFormWidgetState extends State<BookingFormWidget> {
                             child: IgnorePointer(
                               ignoring: widget.isReadOnly,
                               child: DateTimePickerWidget(
-                                initialDateTime: prov.selectedDate.add(
-                                  Duration(
-                                    hours:
-                                        prov.selectedTime?.hour ??
-                                        TimeOfDay.now().hour,
-                                    minutes:
-                                        prov.selectedTime?.minute ??
-                                        TimeOfDay.now().minute,
-                                  ),
-                                ),
+                                viewBooking: widget.isReadOnly,
+                                initialDateTime:
+                                    widget.isEditing &&
+                                        widget.initialBooking != null
+                                    ? _combineBookingDateTime(
+                                        widget.initialBooking.bookingDate,
+                                        widget.initialBooking.bookingTime,
+                                      )
+                                    : prov.selectedDate.add(
+                                        Duration(
+                                          hours:
+                                              prov.selectedTime?.hour ??
+                                              TimeOfDay.now().hour,
+                                          minutes:
+                                              prov.selectedTime?.minute ??
+                                              TimeOfDay.now().minute,
+                                        ),
+                                      ),
                                 onDateTimeSelected: (dt) {
                                   prov.setDate(dt);
                                   prov.setTime(TimeOfDay.fromDateTime(dt));
@@ -376,5 +384,42 @@ class _BookingFormWidgetState extends State<BookingFormWidget> {
         return const SizedBox.shrink();
       },
     );
+  }
+}
+
+DateTime _combineBookingDateTime(String dateStr, String timeStr) {
+  final date = DateTime.parse(dateStr);
+  final offset = _parseBookingTime(timeStr);
+  return date.add(offset);
+}
+
+Duration _parseBookingTime(String timeStr) {
+  if (timeStr.trim().isEmpty) return Duration.zero;
+
+  try {
+    final cleaned = timeStr.toUpperCase().replaceAll('.', '').trim();
+
+    if (cleaned.contains('AM') || cleaned.contains('PM')) {
+      final regex = RegExp(r'(\d{1,2})(?::(\d{2}))?\s*(AM|PM)');
+      final match = regex.firstMatch(cleaned);
+      if (match != null) {
+        int hour = int.parse(match.group(1)!);
+        int minute = int.tryParse(match.group(2) ?? '0') ?? 0;
+        final meridian = match.group(3)!;
+
+        if (meridian == 'PM' && hour != 12) hour += 12;
+        if (meridian == 'AM' && hour == 12) hour = 0;
+
+        return Duration(hours: hour, minutes: minute);
+      }
+    }
+
+    final parts = cleaned.split(':');
+    final hour = int.parse(parts[0]);
+    final minute = parts.length > 1 ? int.parse(parts[1]) : 0;
+    return Duration(hours: hour, minutes: minute);
+  } catch (e) {
+    debugPrint("⛔ Time parse error for '$timeStr' → $e");
+    return Duration.zero;
   }
 }

@@ -1,4 +1,3 @@
-/// timeout request constants
 const String commonErrorUnexpectedMessage =
     'Something went wrong please try again';
 const int timeoutRequestStatusCode = 1000;
@@ -32,10 +31,11 @@ const Duration timeOutDuration = Duration(seconds: 20);
 ///
 // const String devBaseUrl = 'http://localhost:5002/api/v1/';
 // const String devBaseUrl = 'http://10.0.2.2:5002/api/v1/';
-const String devBaseUrl = 'https://inspect-connect-api-auakczg0ave2bqex.westus2-01.azurewebsites.net/api/v1/';
+const String devBaseUrl =
+    'https://inspect-connect-api-auakczg0ave2bqex.westus2-01.azurewebsites.net/api/v1/';
 
-const String stripePublishableKey = "pk_test_51RuoE4A1eZHeCW31LaeAmCLpWw0Zmyme5RfE3HG8Svoum8yGvBmYhm2gatOR6zWhyn0PmQGcJQqE5GtzvEIuAVKN00W26f1it7";
- 
+const String stripePublishableKey =
+    "pk_test_51RuoE4A1eZHeCW31LaeAmCLpWw0Zmyme5RfE3HG8Svoum8yGvBmYhm2gatOR6zWhyn0PmQGcJQqE5GtzvEIuAVKN00W26f1it7";
 
 const String prodBaseUrl = '';
 const String qaBaseUrl = '';
@@ -53,19 +53,18 @@ const String getCertificateSubTypesEndPoint = 'certificate/subTypes';
 const String getInspectorCertificateTypesEndPoint = 'certificate/types';
 const String getInspectorCertificateTAgenciesEndPoint = 'certificate/agencies';
 
-
 const String createBookingEndPoint = 'bookings';
+
+const String bookingStatusEndPoint = 'status';
+const String bookingTimerEndPoint = 'timer';
+
 const String uploadImageEndPoint = 'uploads';
 
 const String walletEndPoint = 'wallet';
 const String paymentEndPOint = 'payments';
 
-
 const String subscriptionEndPoint = 'subscriptionPlans';
 const String userSubscriptionByIdEndPoint = 'subscriptions';
-
-
-
 
 const String appIdValue = '0ae6735afdc6f99d7af23db5d1bd1fbe';
 const String cityNameKey = 'q';
@@ -75,6 +74,16 @@ const String longitudeKey = 'lon';
 /// local database keys
 const String weatherInfoTable = 'WeatherInfo';
 
-
-
+// booking status
+const int bookingStatusPending = 0;
+const int bookingStatusAccepted = 1;
+const int bookingStatusRejected = 2;
+const int bookingStatusCompleted = 3;
+const int bookingStatusCancelledByClient = 4;
+const int bookingStatusExpired = 5;
+const int bookingStatusAwaiting = 6;
+const int bookingStatusCancelledByInspector = 7;
+const int bookingStatusStarted = 8;
+const int bookingStatusPaused = 9;
+const int bookingStatusStoppped = 10;
 
