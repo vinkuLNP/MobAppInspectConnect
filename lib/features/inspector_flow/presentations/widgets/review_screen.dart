@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/basecomponents/base_responsive_widget.dart';
 import 'package:inspect_connect/core/utils/constants/app_assets_constants.dart';
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
+import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/auth_user.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/client/widgets/common_auth_bar.dart';
 import 'package:inspect_connect/features/inspector_flow/providers/inspector_main_provider.dart';
@@ -118,10 +119,10 @@ class ApprovalStatusScreen extends StatelessWidget {
             end: Alignment.bottomRight,
           ),
           borderRadius: BorderRadius.circular(28),
-          border: Border.all(color: Colors.white.withOpacity(0.3), width: 1.5),
+          border: Border.all(color: Colors.white.withValues(alpha:0.3), width: 1.5),
           boxShadow: [
             BoxShadow(
-              color: mainColor.withOpacity(0.35),
+              color: mainColor.withValues(alpha:0.35),
               blurRadius: 20,
               offset: const Offset(0, 8),
             ),
@@ -139,9 +140,9 @@ class ApprovalStatusScreen extends StatelessWidget {
                   height: 90,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Colors.white.withOpacity(0.15),
+                    color: Colors.white.withValues(alpha:0.15),
                     border: Border.all(
-                      color: Colors.white.withOpacity(0.3),
+                      color: Colors.white.withValues(alpha:0.3),
                       width: 2,
                     ),
                   ),
@@ -150,14 +151,13 @@ class ApprovalStatusScreen extends StatelessWidget {
 
                 const SizedBox(height: 20),
 
-                Text(
+               textWidget(
+                        text:
                   title,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
+                  alignment: TextAlign.center,
                     fontSize: 22,
                     fontWeight: FontWeight.w800,
                     color: Colors.white,
-                  ),
                 ),
 
                 const SizedBox(height: 10),
@@ -173,15 +173,13 @@ class ApprovalStatusScreen extends StatelessWidget {
 
                 const SizedBox(height: 16),
 
-                Text(
+                textWidget(text:
                   message,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
+                  alignment: TextAlign.center,
                     fontSize: 15,
                     height: 1.5,
-                    color: Colors.white.withOpacity(0.9),
+                    color: Colors.white.withValues(alpha:0.9),
                     fontWeight: FontWeight.w400,
-                  ),
                 ),
 
                 const SizedBox(height: 28),
@@ -211,15 +209,13 @@ class ApprovalStatusScreen extends StatelessWidget {
                               color: Colors.black,
                             ),
                           )
-                        : Text(
+                        :                         textWidget(text:
                             buttonText,
-                            style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
                   ),
-                ),
               ],
             ),
           ),

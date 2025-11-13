@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_button.dart';
+import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/client/widgets/input_fields.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/user_provider.dart';
 import 'package:inspect_connect/features/client_flow/presentations/widgets/common_app_bar.dart';
@@ -47,14 +48,14 @@ class _AccountSettingsViewState extends State<AccountSettingsView> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Profile updated successfully!')),
+           SnackBar(content:   textWidget(text: 'Profile updated successfully!',color: Colors.white)),
         );
         Navigator.pop(context);
       }
     } catch (e) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('Failed to update: $e')));
+      ).showSnackBar(SnackBar(content:   textWidget(text: 'Failed to update: $e',color: Colors.white)));
     } finally {
       if (mounted) setState(() => isUpdating = false);
     }
@@ -66,42 +67,6 @@ class _AccountSettingsViewState extends State<AccountSettingsView> {
     emailCtrl.dispose();
     phoneCtrl.dispose();
     super.dispose();
-  }
-
-  InputDecoration _inputDecoration({bool readOnly = false}) {
-    final primaryColor = Theme.of(context).colorScheme.primary;
-
-    return InputDecoration(
-      filled: readOnly,
-      fillColor: readOnly ? Colors.grey.shade100 : Colors.white,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: primaryColor, width: 1.2),
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: primaryColor, width: 1.2),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: primaryColor, width: 2),
-      ),
-    );
-  }
-
-  Widget _fieldHeader(String title) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 6),
-      child: Text(
-        title,
-        style: const TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
-          color: Colors.black87,
-        ),
-      ),
-    );
   }
 
   @override

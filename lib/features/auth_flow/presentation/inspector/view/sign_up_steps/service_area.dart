@@ -49,10 +49,10 @@ class _ServiceAreaStepState extends State<ServiceAreaStep> {
           children: [
             const SectionTitle('Address Details'),
             const SizedBox(height: 8),
-            Text(
+          textWidget(text: 
               'Select your Service Area',
-              style: appTextStyle(fontSize: 14, fontWeight: FontWeight.w400),
-            ),
+         fontSize: 14, fontWeight: FontWeight.w400),
+     
             const SizedBox(height: 8),
 
          

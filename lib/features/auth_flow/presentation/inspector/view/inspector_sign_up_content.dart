@@ -11,7 +11,7 @@ import 'package:provider/provider.dart';
 import '../inspector_view_model.dart';
 import 'package:inspect_connect/core/basecomponents/base_responsive_widget.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_button.dart';
-import 'package:inspect_connect/features/auth_flow/presentation/inspector/widgets/common_auth_bar.dart';
+import 'package:inspect_connect/features/auth_flow/presentation/inspector/widgets/inspector_common_auth_bar.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/inspector/widgets/stepper_header.dart';
 
 class InspectorSignUpContent extends StatefulWidget {
@@ -126,8 +126,8 @@ class _InspectorSignUpContentState extends State<InspectorSignUpContent> {
                               await vm.saveProfessionalStep(
                                 certificateTypeId:
                                     vm.selectedCertificateTypeId ?? '',
-                                certificateExpiryDate:
-                                    vm.certificateExpiryDate.toString() ?? '',
+                                certificateExpiryDate:  vm.certificateExpiryDate != '' ?
+                                    vm.certificateExpiryDate.toString() : '',
                                 uploadedCertificateUrls:
                                     vm.uploadedCertificateUrls,
                                 agencyIds: vm.selectedAgencyIds,

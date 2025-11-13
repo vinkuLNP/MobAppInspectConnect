@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/features/inspector_flow/domain/enum/inspector_status.dart';
 import 'package:inspect_connect/features/inspector_flow/providers/inspector_main_provider.dart';
 import 'package:provider/provider.dart';
@@ -164,14 +165,11 @@ Future<void> checkInspectorState(BuildContext context) async {
               position: _textBounceAnimation,
               child: FadeTransition(
                 opacity: _fadeAnimation,
-                child: Text(
+                child: textWidget(text: 
                   "Inspect Connect",
-                  style: TextStyle(
                     fontSize: 24,
                     color: AppColors.whiteColor,
                     fontWeight: FontWeight.bold,
-                    letterSpacing: 1.0,
-                  ),
                 ),
               ),
             ),

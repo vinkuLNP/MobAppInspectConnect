@@ -110,7 +110,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
               onPressed:
                   onNotificationTap ??
                   () => ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: textWidget(text: 'Notifications tapped')),
+                    SnackBar(content: textWidget(text: 'Notifications tapped',color: Colors.white)),
                   ),
             ),
           if (showBookButton)
@@ -122,7 +122,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
               onPressed:
                   onNotificationTap ??
                   () => ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: textWidget(text: 'Notifications tapped')),
+                    SnackBar(content: textWidget(text: 'Notifications tapped',color: Colors.white)),
                   ),
             ),
         ],

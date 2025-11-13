@@ -8,6 +8,7 @@ import 'package:inspect_connect/core/basecomponents/base_view_model.dart';
 import 'package:inspect_connect/core/commondomain/entities/based_api_result/api_result_state.dart';
 import 'package:inspect_connect/core/di/app_component/app_component.dart';
 import 'package:inspect_connect/core/utils/auto_router_setup/auto_router.dart';
+import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/features/auth_flow/data/datasources/local_datasources/auth_local_datasource.dart';
 import 'package:inspect_connect/features/auth_flow/data/datasources/local_datasources/auth_user_local_entity.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/auth_user.dart';
@@ -57,8 +58,7 @@ class InspectorDashboardProvider extends BaseViewModel {
         data: (response) async {
           subscriptionPlans = response;
         },
-        error: (e) {
-        },
+        error: (e) {},
       );
     } finally {
       isLoading = false;
@@ -102,8 +102,7 @@ class InspectorDashboardProvider extends BaseViewModel {
 
           startPayment(context: context, plan: userSubscriptionModel!);
         },
-        error: (e) {
-        },
+        error: (e) {},
       );
     } finally {
       isLoading = false;
@@ -125,35 +124,37 @@ class InspectorDashboardProvider extends BaseViewModel {
       }
 
       /*    final intentResponse = await createPaymentIntent(
-        user.authToken!,
-        plan.amount!.toDouble(),
-        plan.id!,
-        plan.stripeSubscriptionId,
-      );
+       user.authToken!,
+       plan.amount!.toDouble(),
+       plan.id!,
+       plan.stripeSubscriptionId,
+     );
 
-      final clientSecret = intentResponse['body']?['clientSecret'];
-      if (clientSecret == null) {
-        throw Exception('Missing client secret from API');
-      }
 
-      await Stripe.instance.confirmPayment(
-        paymentIntentClientSecret: clientSecret,
-        data: const PaymentMethodParams.card(
-          paymentMethodData: PaymentMethodData(),
-        ),
-      );
+     final clientSecret = intentResponse['body']?['clientSecret'];
+     if (clientSecret == null) {
+       throw Exception('Missing client secret from API');
+     }
+
+
+     await Stripe.instance.confirmPayment(
+       paymentIntentClientSecret: clientSecret,
+       data: const PaymentMethodParams.card(
+         paymentMethodData: PaymentMethodData(),
+       ),
+     );
 */
       showPaymentSuccessDialog(context);
     } on StripeException catch (e) {
       log('⚠️ StripeException: $e');
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Payment canceled')));
+      ).showSnackBar(SnackBar(content: textWidget(text: 'Payment canceled',color: Colors.white)));
     } catch (e, st) {
       log('❌ Payment error: $e\n$st');
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('Payment failed: $e')));
+      ).showSnackBar(SnackBar(content: textWidget(text: 'Payment failed: $e',color: Colors.white)));
     } finally {
       isProcessingPayment = false;
       notifyListeners();
@@ -222,7 +223,9 @@ class InspectorDashboardProvider extends BaseViewModel {
         error: (e) {
           log('[CHECK_USER_STATUS] ❌ Failed: ${e.message}');
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Could not refresh user details')),
+            SnackBar(
+              content: textWidget(text: 'Could not refresh user details',color: Colors.white),
+            ),
           );
         },
       );
@@ -245,9 +248,10 @@ class InspectorDashboardProvider extends BaseViewModel {
           children: [
             const Icon(Icons.check_circle, color: Colors.green, size: 70),
             const SizedBox(height: 10),
-            const Text(
-              "Payment Successful!",
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            textWidget(
+              text: "Payment Successful!",
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
             ),
             const SizedBox(height: 16),
             ElevatedButton(
@@ -257,7 +261,7 @@ class InspectorDashboardProvider extends BaseViewModel {
                 final provider = context.read<InspectorDashboardProvider>();
                 await provider.initializeUserState(context);
               },
-              child: const Text('Continue'),
+              child: textWidget(text: 'Continue'),
             ),
           ],
         ),
@@ -397,7 +401,7 @@ class InspectorDashboardProvider extends BaseViewModel {
           debugPrint('🕐 Approval pending. Setting status → underReview');
           status = InspectorStatus.underReview;
         } else if (userDetail.approvalStatusByAdmin == 2) {
-          debugPrint('❌ Approval rejected by admin. Setting status → rejected');
+          debugPrint('Approval rejected by admin. Setting status → rejected');
           status = InspectorStatus.rejected;
         } else if (userDetail.approvalStatusByAdmin == 1) {
           debugPrint('✅ Approval granted by admin. Setting status → approved');

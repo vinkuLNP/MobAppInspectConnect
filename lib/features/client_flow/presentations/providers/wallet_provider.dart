@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/basecomponents/base_view_model.dart';
 import 'package:inspect_connect/core/commondomain/entities/based_api_result/api_result_state.dart';
 import 'package:inspect_connect/core/di/app_component/app_component.dart';
+import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/features/auth_flow/data/datasources/local_datasources/auth_local_datasource.dart';
 import 'package:inspect_connect/features/client_flow/data/models/user_payment_list_model.dart';
 import 'package:inspect_connect/features/client_flow/data/models/wallet_model.dart';
@@ -65,7 +66,7 @@ class WalletProvider extends BaseViewModel {
         notifyListeners();
       },
       error: (e) => ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.message ?? 'Failed to fetch wallet')),
+        SnackBar(content:   textWidget(text: e.message ?? 'Failed to fetch wallet',color: Colors.white)),
       ),
     );
   }
@@ -101,7 +102,7 @@ class WalletProvider extends BaseViewModel {
         notifyListeners();
       },
       error: (e) => ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.message ?? 'Failed to fetch payments')),
+        SnackBar(content:   textWidget(text: e.message ?? 'Failed to fetch payments',color: Colors.white)),
       ),
     );
 

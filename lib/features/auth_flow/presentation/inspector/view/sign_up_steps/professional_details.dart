@@ -29,12 +29,10 @@ class ProfessionalDetailsStep extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                    textWidget(text: 
                         'Professional Details',
-                        style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
-                        ),
                       ),
                       const SizedBox(height: 8),
                       _section(

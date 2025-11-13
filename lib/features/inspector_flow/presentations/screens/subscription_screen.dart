@@ -39,7 +39,7 @@ class SubscriptionScreen extends StatelessWidget {
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
-                    colors: [Colors.black.withOpacity(0.4), Colors.transparent],
+                    colors: [Colors.black.withValues(alpha:0.4), Colors.transparent],
                   ),
                 ),
               ),

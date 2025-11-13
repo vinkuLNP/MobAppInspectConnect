@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
 import 'package:inspect_connect/core/utils/constants/app_constants.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_button.dart';
+import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
+import 'package:inspect_connect/core/utils/presentation/app_common_widgets.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/booking_provider.dart';
 import 'package:inspect_connect/features/inspector_flow/presentations/widgets/common_inspection_listing.dart';
 import 'package:provider/provider.dart';
@@ -34,14 +36,45 @@ class ApprovedInspectionsScreen extends StatelessWidget {
             final timerDuration = provider.activeTimers[booking.id];
 
             if (status == bookingStatusAccepted) {
-              return AppButton(
-                text: "Start Inspection",
-                onTap: () async {
-                  await provider.startInspectionTimer(
-                    context: context,
-                    bookingId: booking.id,
-                  );
-                },
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  AppButton(
+                    width: MediaQuery.of(context).size.width / 2.8,
+                    isBorder: true,
+                    borderColor: Colors.red,
+                    textColor: Colors.red,
+                    buttonBackgroundColor: AppColors.backgroundColor,
+                    text: "Decline Inspection",
+                    onTap: () => showConfirmationDialog(
+                      context: context,
+                      confirmColor: Colors.redAccent,
+                      icon: Icons.cancel_outlined,
+                      title: "Decline Booking",
+                      message:
+                          "Are you sure you want to decline this booking request?",
+                      confirmText: "Decline",
+                      onConfirm: () async {
+                        Navigator.pop(context);
+                        await provider.updateBookingStatus(
+                          context: context,
+                          bookingId: booking.id,
+                          newStatus: bookingStatusCancelledByInspector,
+                        );
+                      },
+                    ),
+                  ),
+                  AppButton(
+                    width: MediaQuery.of(context).size.width / 2.8,
+                    text: "Start Inspection",
+                    onTap: () async {
+                      await provider.startInspectionTimer(
+                        context: context,
+                        bookingId: booking.id,
+                      );
+                    },
+                  ),
+                ],
               );
             }
 
@@ -50,12 +83,11 @@ class ApprovedInspectionsScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   if (timerDuration != null)
-                    Text(
-                      "Timer: ${provider.formatDuration(timerDuration)}",
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
+                    textWidget(
+                      text: "Timer: ${provider.formatDuration(timerDuration)}",
+
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
                     ),
                   const SizedBox(height: 10),
                   if (!isStopped)
@@ -118,7 +150,7 @@ class ApprovedInspectionsScreen extends StatelessWidget {
 
         if (provider.isUpdatingBooking)
           Container(
-            color: Colors.black.withOpacity(0.3),
+            color: Colors.black.withValues(alpha:0.3),
             child: const Center(
               child: CircularProgressIndicator(color: AppColors.authThemeColor),
             ),

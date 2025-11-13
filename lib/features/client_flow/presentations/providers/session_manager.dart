@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/di/app_component/app_component.dart';
+import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/user_provider.dart';
 import 'package:inspect_connect/core/utils/auto_router_setup/auto_router.dart';
 
@@ -42,8 +43,8 @@ class SessionManager {
         context: navContext,
         barrierDismissible: false,
         builder: (_) => AlertDialog(
-          title: const Text('Session Expired'),
-          content: Text(
+          title:    textWidget(text: 'Session Expired'),
+          content:   textWidget(text: 
             '${reason ?? 'Your session has expired.'} Please log in again.',
           ),
           actions: [
@@ -55,7 +56,7 @@ class SessionManager {
                 Navigator.of(navContext).pop();
                 await _performLogoutSilently();
               },
-              child: const Text('OK'),
+              child:    textWidget(text: 'OK'),
             ),
           ],
         ),

@@ -151,7 +151,7 @@ class _DateTimePickerWidgetState extends State<DateTimePickerWidget> {
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: AppColors.authThemeColor.withOpacity(0.8),
+                color: AppColors.authThemeColor.withValues(alpha:0.8),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: const Icon(
