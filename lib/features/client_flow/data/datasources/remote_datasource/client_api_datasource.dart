@@ -330,10 +330,7 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
         if (sortOrder != null && sortOrder.isNotEmpty) 'sortOrder': sortOrder,
         if (status != null) 'status': status.toString(),
       };
-      final uri = Uri.parse(
-        '$createBookingEndPoint',
-      ).replace(queryParameters: queryParams);
-
+   
       final ApiResultModel<http.Response> res = await _ctx.makeRequest(
         uri: createBookingEndPoint,
         requestData: queryParams,

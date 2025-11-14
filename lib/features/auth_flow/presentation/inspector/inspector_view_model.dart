@@ -7,7 +7,9 @@ import 'package:inspect_connect/core/basecomponents/base_view_model.dart';
 import 'package:inspect_connect/core/commondomain/entities/based_api_result/api_result_state.dart';
 import 'package:inspect_connect/core/di/app_component/app_component.dart';
 import 'package:inspect_connect/core/utils/auto_router_setup/auto_router.dart';
+import 'package:inspect_connect/core/utils/constants/app_colors.dart';
 import 'package:inspect_connect/core/utils/helpers/device_helper/device_helper.dart';
+import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/features/auth_flow/data/datasources/local_datasources/auth_local_datasource.dart';
 import 'package:inspect_connect/features/auth_flow/data/datasources/local_datasources/inspector_local_data_source.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/auth_user.dart';
@@ -383,7 +385,7 @@ class InspectorViewModelProvider extends BaseViewModel {
       final file = File(picker.files.single.path.toString());
       if (await file.length() > 2 * 1024 * 1024) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('File must be under 2 MB')),
+           SnackBar(content: textWidget(text: 'File must be under 2 MB',color: AppColors.backgroundColor,)),
         );
         return;
       }
@@ -411,7 +413,7 @@ class InspectorViewModelProvider extends BaseViewModel {
         },
         error: (e) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(e.message ?? 'Image upload failed')),
+            SnackBar(content: textWidget(text: e.message ?? 'Image upload failed',color: AppColors.backgroundColor,)),
           );
         },
       );
@@ -467,8 +469,8 @@ class InspectorViewModelProvider extends BaseViewModel {
       showValidationError = true;
       notifyListeners();
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please agree to all terms before continuing.'),
+         SnackBar(
+          content: textWidget(text: 'Please agree to all terms before continuing.',color: AppColors.backgroundColor,),
           backgroundColor: Colors.redAccent,
         ),
       );
@@ -486,13 +488,13 @@ class InspectorViewModelProvider extends BaseViewModel {
   bool validate(BuildContext context) {
     if (profileImage == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please upload a profile image')),
+         SnackBar(content: textWidget(text: 'Please upload a profile image',color: AppColors.backgroundColor,)),
       );
       return false;
     }
     if (!agreedToTerms || !confirmTruth) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please agree to all conditions')),
+         SnackBar(content: textWidget(text: 'Please agree to all conditions',color: AppColors.backgroundColor,)),
       );
       return false;
     }
@@ -511,7 +513,7 @@ class InspectorViewModelProvider extends BaseViewModel {
     notifyListeners();
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Profile submitted successfully!')),
+       SnackBar(content: textWidget(text: 'Profile submitted successfully!',color: AppColors.backgroundColor,)),
     );
   }
 
@@ -642,7 +644,7 @@ class InspectorViewModelProvider extends BaseViewModel {
         final file = File(picked.path);
         if (await file.length() > 1 * 1024 * 1024) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('File must be under 1 MB')),
+             SnackBar(content: textWidget(text: 'File must be under 1 MB',color: AppColors.backgroundColor,)),
           );
           return;
         }
@@ -667,7 +669,7 @@ class InspectorViewModelProvider extends BaseViewModel {
           },
           error: (e) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(e.message ?? 'Image upload failed')),
+              SnackBar(content: textWidget(text: e.message ?? 'Image upload failed',color: AppColors.backgroundColor,)),
             );
           },
         );
@@ -681,7 +683,7 @@ class InspectorViewModelProvider extends BaseViewModel {
         final file = File(result.files.single.path.toString());
         if (await file.length() > 2 * 1024 * 1024) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('File must be under 2 MB')),
+             SnackBar(content: textWidget(text: 'File must be under 2 MB',color: AppColors.backgroundColor,)),
           );
           return;
         }
@@ -710,7 +712,7 @@ class InspectorViewModelProvider extends BaseViewModel {
           },
           error: (e) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(e.message ?? 'Image upload failed')),
+              SnackBar(content: textWidget(text: e.message ?? 'Image upload failed',color: AppColors.backgroundColor,)),
             );
           },
         );
@@ -929,14 +931,14 @@ class InspectorViewModelProvider extends BaseViewModel {
 
           ScaffoldMessenger.of(
             context,
-          ).showSnackBar(const SnackBar(content: Text('Verify Your Otp Now')));
+          ).showSnackBar( SnackBar(content: textWidget(text: 'Verify Your Otp Now',color: AppColors.backgroundColor,)));
           context.pushRoute(OtpVerificationRoute(addShowButton: true));
         },
         error: (e) {
           log('[SignUP] ❌ API error: ${e.message}');
           ScaffoldMessenger.of(
             context,
-          ).showSnackBar(SnackBar(content: Text(e.message ?? 'Signup failed')));
+          ).showSnackBar(SnackBar(content: textWidget(text: e.message ?? 'Signup failed',color: AppColors.backgroundColor,)));
         },
       );
     } catch (e, s) {

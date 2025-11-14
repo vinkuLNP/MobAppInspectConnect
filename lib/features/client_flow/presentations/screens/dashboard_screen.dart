@@ -68,7 +68,7 @@ class _ClientDashboardViewState extends State<ClientDashboardView> {
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
+                        color: Colors.black.withValues(alpha:0.1),
                         blurRadius: 12,
                         offset: const Offset(0, 4),
                       ),
@@ -128,7 +128,7 @@ class _ClientDashboardViewState extends State<ClientDashboardView> {
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
+                        color: Colors.black.withValues(alpha:0.2),
                         blurRadius: 10,
                         offset: const Offset(0, 4),
                       ),
@@ -139,7 +139,7 @@ class _ClientDashboardViewState extends State<ClientDashboardView> {
                     size: 32,
                     color: _selectedIndex == 0
                         ? Colors.white
-                        : Colors.white.withOpacity(0.9),
+                        : Colors.white.withValues(alpha:0.9),
                   ),
                 ),
               ),
@@ -153,7 +153,7 @@ class _ClientDashboardViewState extends State<ClientDashboardView> {
                 fontWeight: FontWeight.w600,
                 color: _selectedIndex == 0
                     ? Colors.white
-                    : Colors.white.withOpacity(0.8),
+                    : Colors.white.withValues(alpha:0.8),
               ),
             ),
           ],
@@ -174,13 +174,13 @@ class _ClientDashboardViewState extends State<ClientDashboardView> {
     final iconWidget = Icon(
       isSelected ? activeIcon : icon,
       size: 26,
-      color: isSelected ? Colors.white : Colors.white.withOpacity(0.8),
+      color: isSelected ? Colors.white : Colors.white.withValues(alpha:0.8),
     );
 
     return InkWell(
       borderRadius: BorderRadius.circular(20),
       onTap: () => _onItemTapped(index),
-      splashColor: primary.withOpacity(0.1),
+      splashColor: primary.withValues(alpha:0.1),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         curve: Curves.easeOut,
@@ -204,7 +204,7 @@ class _ClientDashboardViewState extends State<ClientDashboardView> {
               text: label,
               fontSize: 12,
               fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-              color: isSelected ? Colors.white : Colors.white.withOpacity(0.8),
+              color: isSelected ? Colors.white : Colors.white.withValues(alpha:0.8),
             ),
           ],
         ),

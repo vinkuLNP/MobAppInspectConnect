@@ -8,7 +8,9 @@ import 'package:inspect_connect/core/basecomponents/base_view_model.dart';
 import 'package:inspect_connect/core/commondomain/entities/based_api_result/api_result_state.dart';
 import 'package:inspect_connect/core/di/app_component/app_component.dart';
 import 'package:inspect_connect/core/utils/auto_router_setup/auto_router.dart';
+import 'package:inspect_connect/core/utils/constants/app_colors.dart';
 import 'package:inspect_connect/core/utils/helpers/device_helper/device_helper.dart';
+import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/features/auth_flow/data/datasources/local_datasources/auth_local_datasource.dart';
 import 'package:inspect_connect/features/auth_flow/data/datasources/local_datasources/auth_user_local_entity.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/auth_user.dart';
@@ -266,14 +268,14 @@ Future<void> submitSignUp({
 
           ScaffoldMessenger.of(
             context,
-          ).showSnackBar(const SnackBar(content: Text('Verify Your Otp Now')));
+          ).showSnackBar( SnackBar(content: textWidget(text: 'Verify Your Otp Now',color: AppColors.backgroundColor,)));
           context.pushRoute(OtpVerificationRoute(addShowButton: true));
         },
         error: (e) {
           log('[RESET_PASSWORD] ❌ API error: ${e.message}');
           ScaffoldMessenger.of(
             context,
-          ).showSnackBar(SnackBar(content: Text(e.message ?? 'Signup failed')));
+          ).showSnackBar(SnackBar(content: textWidget(text: e.message ?? 'Signup failed',color: AppColors.backgroundColor,)));
         },
       );
     } catch (e, s) {
@@ -355,7 +357,7 @@ Future<void> submitSignUp({
 
           ScaffoldMessenger.of(
             context,
-          ).showSnackBar(const SnackBar(content: Text('Sign-up successful')));
+          ).showSnackBar( SnackBar(content: textWidget(text: 'Sign-up successful',color: AppColors.backgroundColor,)));
           pinController.clear();
           if (user.role == 1) {
             context.router.replaceAll([const ClientDashboardRoute()]);
@@ -366,7 +368,7 @@ Future<void> submitSignUp({
         error: (e) {
           log('[VERIFY] ❌ OTP verification failed: ${e.message}');
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(e.message ?? 'Sign-up failed')),
+            SnackBar(content: textWidget(text: e.message ?? 'Sign-up failed',color: AppColors.backgroundColor,)),
           );
         },
       );
@@ -461,7 +463,7 @@ Future<void> submitSignUp({
       state?.when(
         data: (user) async {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Resend Otp successful')),
+             SnackBar(content: textWidget(text: 'Resend Otp successful',color: AppColors.backgroundColor,)),
           );
 
           pinController.clear();
@@ -469,7 +471,7 @@ Future<void> submitSignUp({
         },
         error: (e) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(e.message ?? 'Sign-in failed')),
+            SnackBar(content: textWidget(text: e.message ?? 'Sign-in failed',color: AppColors.backgroundColor,)),
           );
         },
       );
@@ -624,7 +626,7 @@ Future<void> submitSignUp({
 
         await fetchUserDetail(user: user, context: context);
         ScaffoldMessenger.of(context)
-            .showSnackBar(const SnackBar(content: Text('Sign-in successful')));
+            .showSnackBar( SnackBar(content: textWidget(text: 'Sign-in successful',color: AppColors.backgroundColor,)));
         emailCtrl.clear();
         passwordCtrl.clear();
 
@@ -639,7 +641,7 @@ Future<void> submitSignUp({
       error: (e) {
         log('❌ Sign-in failed: ${e.message}');
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.message ?? 'Sign-in failed')),
+          SnackBar(content: textWidget(text: e.message ?? 'Sign-in failed',color: AppColors.backgroundColor,)),
         );
       },
     );
@@ -739,11 +741,11 @@ Future<void> checkInspectorState(BuildContext context) async {
         data: (user) async {
           ScaffoldMessenger.of(
             context,
-          ).showSnackBar(const SnackBar(content: Text('Sign-in successful')));
+          ).showSnackBar( SnackBar(content: textWidget(text: 'Sign-in successful',color: AppColors.backgroundColor,)));
         },
         error: (e) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(e.message ?? 'Sign-in failed')),
+            SnackBar(content: textWidget(text: e.message ?? 'Sign-in failed',color: AppColors.backgroundColor,)),
           );
         },
       );

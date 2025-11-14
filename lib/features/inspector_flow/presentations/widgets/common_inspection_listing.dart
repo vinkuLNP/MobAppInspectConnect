@@ -106,9 +106,9 @@ class _BaseInspectionListScreenState extends State<BaseInspectionListScreen>
                     });
               // ..sort((a, b) => DateTime.parse(a.bookingDate).compareTo(DateTime.parse(b.bookingDate)));
 
-            if (provider.isFetchingBookings && filteredBookings.isEmpty) {
-  return const Center(child: CircularProgressIndicator());
-} 
+              if (provider.isFetchingBookings && filteredBookings.isEmpty) {
+                return const Center(child: CircularProgressIndicator());
+              }
 
               if (filteredBookings.isEmpty) {
                 return Center(
@@ -226,11 +226,11 @@ class _BaseInspectionListScreenState extends State<BaseInspectionListScreen>
               child: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.9),
+                  color: Colors.white.withValues(alpha:0.9),
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.15),
+                      color: Colors.black.withValues(alpha:0.15),
                       blurRadius: 6,
                     ),
                   ],
@@ -274,7 +274,7 @@ class _BaseInspectionListScreenState extends State<BaseInspectionListScreen>
         }
       },
       borderRadius: BorderRadius.circular(20),
-      splashColor: Colors.blueAccent.withOpacity(0.1),
+      splashColor: Colors.blueAccent.withValues(alpha:0.1),
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 8),
         decoration: BoxDecoration(
@@ -286,7 +286,7 @@ class _BaseInspectionListScreenState extends State<BaseInspectionListScreen>
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha:0.05),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -380,9 +380,9 @@ class _BaseInspectionListScreenState extends State<BaseInspectionListScreen>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.12),
+        color: color.withValues(alpha:0.12),
         borderRadius: BorderRadius.circular(30),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha:0.3)),
       ),
       child: Text(
         label,
@@ -450,5 +450,3 @@ class _BaseInspectionListScreenState extends State<BaseInspectionListScreen>
     }
   }
 }
-
-

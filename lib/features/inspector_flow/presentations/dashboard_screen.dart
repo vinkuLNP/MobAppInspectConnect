@@ -1,5 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/features/auth_flow/data/datasources/local_datasources/auth_user_local_entity.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/user_provider.dart';
 import 'package:inspect_connect/features/inspector_flow/domain/enum/inspector_status.dart';
@@ -23,9 +24,9 @@ class InspectorDashboardView extends StatelessWidget {
 
           switch (provider.status) {
             case InspectorStatus.unverified:
-              content = const Scaffold(
+              content =   Scaffold(
                 body: Center(
-                  child: Text('Please verify your phone number to continue.'),
+                  child: textWidget(text:  'Please verify your phone number to continue.'),
                 ),
               );
               break;
@@ -38,8 +39,8 @@ class InspectorDashboardView extends StatelessWidget {
             case InspectorStatus.rejected:
               final user = context.read<UserProvider>().user;
               if (user == null) {
-                content = const Scaffold(
-                  body: Center(child: Text('User data unavailable')),
+                content =  Scaffold(
+                  body: Center(child: textWidget(text: 'User data unavailable')),
                 );
               } else {
                 content = ApprovalStatusScreen(user: user.toDomainEntity());
@@ -56,7 +57,7 @@ class InspectorDashboardView extends StatelessWidget {
               content,
               if (provider.isLoading)
                 Container(
-                  color: Colors.black.withOpacity(0.3),
+                  color: Colors.black.withValues(alpha:0.3),
                   child: const Center(
                     child: CircularProgressIndicator(color: Colors.white),
                   ),

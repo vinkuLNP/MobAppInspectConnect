@@ -1,9 +1,13 @@
+import 'dart:developer';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/utils/constants/app_assets_constants.dart';
 import 'package:inspect_connect/core/utils/presentation/app_assets_widget.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
+import 'package:inspect_connect/core/utils/presentation/app_common_widgets.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/user_provider.dart';
+import 'package:inspect_connect/features/client_flow/presentations/providers/wallet_provider.dart';
+import 'package:inspect_connect/features/client_flow/presentations/screens/payment_screens/wallet_screen.dart';
 import 'package:inspect_connect/features/client_flow/presentations/screens/profile_screen.dart';
 import 'package:inspect_connect/features/client_flow/presentations/widgets/common_app_bar.dart';
 import 'package:inspect_connect/features/inspector_flow/presentations/screens/inspection_screen.dart';
@@ -81,7 +85,7 @@ class _InspectorMainDashboardState extends State<InspectorMainDashboard> {
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
+                        color: Colors.black.withValues(alpha: 0.1),
                         blurRadius: 12,
                         offset: const Offset(0, 4),
                       ),
@@ -106,8 +110,8 @@ class _InspectorMainDashboardState extends State<InspectorMainDashboard> {
                         child: Align(
                           alignment: Alignment.center,
                           child: _buildNavItem(
-                            icon: Icons.remove_from_queue_outlined,
-                            activeIcon: Icons.remove_from_queue,
+                            icon: Icons.verified_outlined,
+                            activeIcon: Icons.verified_rounded,
                             label: 'Requested',
                             index: 0,
                             primary: primary,
@@ -198,25 +202,17 @@ class _InspectorMainDashboardState extends State<InspectorMainDashboard> {
                   icon: Icons.payment,
                   label: 'Payments',
                   onTap: () {
+                    log('taspppepdddddddd');
                     Navigator.pop(context);
-                  },
-                ),
-                const SizedBox(height: 12),
-                _buildDrawerCard(
-                  context,
-                  icon: Icons.message_outlined,
-                  label: 'Messages',
-                  onTap: () {
-                    Navigator.pop(context);
-                  },
-                ),
-                const SizedBox(height: 12),
-                _buildDrawerCard(
-                  context,
-                  icon: Icons.attach_money,
-                  label: 'Payout List',
-                  onTap: () {
-                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => ChangeNotifierProvider(
+                          create: (_) => WalletProvider(),
+                          child: const WalletScreen(),
+                        ),
+                      ),
+                    );
                   },
                 ),
                 const SizedBox(height: 12),
@@ -242,6 +238,8 @@ class _InspectorMainDashboardState extends State<InspectorMainDashboard> {
                   color: Colors.redAccent,
                   onTap: () {
                     Navigator.pop(context);
+
+                    logOutUser(context);
                   },
                 ),
               ],
@@ -264,12 +262,10 @@ class _InspectorMainDashboardState extends State<InspectorMainDashboard> {
       borderRadius: BorderRadius.circular(16),
       child: ListTile(
         leading: Icon(icon, color: color ?? Colors.black87),
-        title: Text(
-          label,
-          style: TextStyle(
-            fontWeight: FontWeight.w600,
-            color: color ?? Colors.black87,
-          ),
+        title: textWidget(
+          text: label,
+          fontWeight: FontWeight.w600,
+          color: color ?? Colors.black87,
         ),
         trailing: const Icon(Icons.arrow_forward_ios, size: 16),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -290,13 +286,13 @@ class _InspectorMainDashboardState extends State<InspectorMainDashboard> {
     final iconWidget = Icon(
       isSelected ? activeIcon : icon,
       size: 26,
-      color: isSelected ? Colors.white : Colors.white.withOpacity(0.8),
+      color: isSelected ? Colors.white : Colors.white.withValues(alpha: 0.8),
     );
 
     return InkWell(
       borderRadius: BorderRadius.circular(20),
       onTap: () => _onItemTapped(index),
-      splashColor: primary.withOpacity(0.1),
+      splashColor: primary.withValues(alpha: 0.1),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         curve: Curves.easeOut,
@@ -315,7 +311,9 @@ class _InspectorMainDashboardState extends State<InspectorMainDashboard> {
               text: label,
               fontSize: 12,
               fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-              color: isSelected ? Colors.white : Colors.white.withOpacity(0.8),
+              color: isSelected
+                  ? Colors.white
+                  : Colors.white.withValues(alpha: 0.8),
             ),
           ],
         ),

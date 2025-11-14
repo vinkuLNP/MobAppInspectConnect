@@ -38,7 +38,7 @@ class MultipartPutRequestStrategy implements HttpRequestStrategy {
         for (var img in images) {
           if (img is String) {
             if (img.startsWith('http')) {
-              // ✅ Already uploaded image → send as text field
+              // Already uploaded image → send as text field
               request.fields.putIfAbsent('images[]', () => img);
               log('🌐 Existing image URL kept: $img');
             } else {

@@ -74,6 +74,9 @@ class BookingProvider extends BaseViewModel {
     notifyListeners();
   }
 
+  bool isFilterLoading = false;
+  bool isActionProcessing = false;
+
   void setInspectionType(CertificateSubTypeEntity? t) {
     _inspectionType = t;
 
@@ -225,23 +228,23 @@ class BookingProvider extends BaseViewModel {
         data: (response) async {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(
+              content:   textWidget(text: 
                 response.message.isNotEmpty
                     ? response.message
-                    : 'Booking created successfully',
+                    : 'Booking created successfully',color: AppColors.backgroundColor,
               ),
             ),
           );
           clearBookingData();
         },
         error: (e) {
-          if (e.message!.toLowerCase().contains("insufficient")) {
-            _showInsufficientFundsDialog(context, e.message!);
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(e.message ?? 'Booking creation failed')),
-            );
-          }
+          // if (e.message!.toLowerCase().contains("insufficient")) {
+          //   _showInsufficientFundsDialog(context, e.message!);
+          // } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content:   textWidget(text: e.message ?? 'Booking creation failed',color: AppColors.backgroundColor,)),
+          );
+          // }
         },
       );
     } finally {
@@ -285,14 +288,14 @@ class BookingProvider extends BaseViewModel {
           clearBookingDetail();
           updatedBookingData = response;
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Booking Updated successfully.')),
+            SnackBar(content:   textWidget(text: 'Booking Updated successfully.',color: AppColors.backgroundColor,)),
           );
           Navigator.pop(context, true);
           clearFilters();
         },
         error: (e) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(e.message ?? 'Booking creation failed')),
+            SnackBar(content:   textWidget(text: e.message ?? 'Booking creation failed',color: AppColors.backgroundColor,)),
           );
         },
       );
@@ -348,7 +351,7 @@ class BookingProvider extends BaseViewModel {
         error: (e) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(e.message ?? 'Fetching Booking Detail failed'),
+              content:   textWidget(text: e.message ?? 'Fetching Booking Detail failed',color: AppColors.backgroundColor,),
             ),
           );
         },
@@ -386,7 +389,7 @@ class BookingProvider extends BaseViewModel {
         },
         error: (e) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(e.message ?? 'Booking Deletion failed')),
+            SnackBar(content:   textWidget(text: e.message ?? 'Booking Deletion failed',color: AppColors.backgroundColor,)),
           );
         },
       );
@@ -437,7 +440,7 @@ class BookingProvider extends BaseViewModel {
       final file = File(picked.path);
       if (await file.length() > 1 * 1024 * 1024) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('File must be under 1 MB')),
+           SnackBar(content:   textWidget(text: 'File must be under 1 MB',color: AppColors.backgroundColor,)),
         );
         return;
       }
@@ -462,7 +465,7 @@ class BookingProvider extends BaseViewModel {
         },
         error: (e) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(e.message ?? 'Image upload failed')),
+            SnackBar(content:   textWidget(text: e.message ?? 'Image upload failed',color: AppColors.backgroundColor,)),
           );
         },
       );
@@ -520,9 +523,9 @@ class BookingProvider extends BaseViewModel {
 
       if (reset) {
         _currentPage = 1;
-  if (bookings.isEmpty) {
-    isFetchingBookings = true;
-  }
+        if (bookings.isEmpty) {
+          isFetchingBookings = true;
+        }
         notifyListeners();
       }
 
@@ -559,14 +562,12 @@ class BookingProvider extends BaseViewModel {
           } else {
             bookings = response;
           }
-for (var booking in bookings) {
-  final liveDuration = calculateLiveDuration(booking);
-  activeTimers[booking.id] = liveDuration;
+          for (var booking in bookings) {
+            final liveDuration = calculateLiveDuration(booking);
+            activeTimers[booking.id] = liveDuration;
 
-  isTimerRunning[booking.id] =
-      booking.status == bookingStatusStarted;
-}
-
+            isTimerRunning[booking.id] = booking.status == bookingStatusStarted;
+          }
 
           if (response.length < _perPageLimit) {
             hasMoreBookings = false;
@@ -599,11 +600,20 @@ for (var booking in bookings) {
     fetchBookingsList(reset: true);
   }
 
-  void filterByStatus(String? status) {
+  Future<void> filterByStatus(String status) async {
     if (_status == "status") return;
     _status = status;
     _currentPage = 1;
-    fetchBookingsList(reset: true);
+    try {
+      isFilterLoading = true;
+      bookings.clear();
+      notifyListeners();
+
+      await fetchBookingsList(reset: true);
+    } finally {
+      isFilterLoading = false;
+      notifyListeners();
+    }
   }
 
   void sortBookingsByDate({bool ascending = true}) {
@@ -652,7 +662,7 @@ for (var booking in bookings) {
     return '$hour:$minute $period';
   }
 
-  void _showInsufficientFundsDialog(BuildContext context, String message) {
+  void showInsufficientFundsDialog(BuildContext context, String message) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -660,17 +670,17 @@ for (var booking in bookings) {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
-          title: const Text(
+          title:    textWidget(text: 
             'Insufficient Funds',
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          content: Text(
+        fontWeight: FontWeight.bold),
+        
+          content:   textWidget(text: 
             '$message\n\nYou don’t have sufficient funds in your wallet. Please recharge now to continue.',
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
+              child:    textWidget(text: 'Cancel'),
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
@@ -691,7 +701,7 @@ for (var booking in bookings) {
                   ),
                 );
               },
-              child: const Text('Recharge Now'),
+              child:    textWidget(text: 'Recharge Now'),
             ),
           ],
         );
@@ -705,7 +715,7 @@ for (var booking in bookings) {
     required int newStatus,
   }) async {
     try {
-        isUpdatingBooking = true;
+      isUpdatingBooking = true;
       notifyListeners();
       final updateBookingStatusUseCase = locator<UpdateBookingStatusUseCase>();
       final state =
@@ -723,101 +733,103 @@ for (var booking in bookings) {
         data: (response) async {
           updatedBookingData = response;
           final index = bookings.indexWhere((b) => b.id == bookingId);
-if (index != -1) {
-  bookings[index] = updatedBookingData!;
-}
+          if (index != -1) {
+            bookings[index] = updatedBookingData!;
+          }
 
           notifyListeners();
         },
         error: (e) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(e.message ?? 'Booking creation failed')),
+            SnackBar(content:   textWidget(text: e.message ?? 'Booking creation failed',color: AppColors.backgroundColor,)),
           );
         },
       );
     } catch (e) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('Failed: $e')));
+      ).showSnackBar(SnackBar(content:   textWidget(text: 'Failed: $e',color: AppColors.backgroundColor,)));
     } finally {
       isUpdatingBooking = false;
       notifyListeners();
     }
   }
 
-Map<String, Duration> activeTimers = {};
-Map<String, bool> isTimerRunning = {};
-Timer? _timer;
+  Map<String, Duration> activeTimers = {};
+  Map<String, bool> isTimerRunning = {};
+  Timer? _timer;
 
-Future<void> startInspectionTimer({
-  required BuildContext context,
-  required String bookingId,
-}) async {
-  await updateBookingTimer(
-    context: context,
-    bookingId: bookingId,
-    action: "start",
-  );
+  Future<void> startInspectionTimer({
+    required BuildContext context,
+    required String bookingId,
+  }) async {
+    await updateBookingTimer(
+      context: context,
+      bookingId: bookingId,
+      action: "start",
+    );
 
-  final previousSeconds =
-      updatedBookingData?.timerDuration ?? activeTimers[bookingId]?.inSeconds ?? 0;
+    final previousSeconds =
+        updatedBookingData?.timerDuration ??
+        activeTimers[bookingId]?.inSeconds ??
+        0;
 
-  activeTimers[bookingId] = Duration(seconds: previousSeconds);
-  isTimerRunning[bookingId] = true;
-  _startLocalTimer(bookingId);
-  notifyListeners();
-}
-void _startLocalTimer(String _) {
-  _timer?.cancel();
-  _timer = Timer.periodic(const Duration(seconds: 1), (_) {
-    for (final id in isTimerRunning.keys) {
-      if (isTimerRunning[id] == true) {
-        final current = activeTimers[id] ?? Duration.zero;
-        activeTimers[id] = current + const Duration(seconds: 1);
-      }
-    }
+    activeTimers[bookingId] = Duration(seconds: previousSeconds);
+    isTimerRunning[bookingId] = true;
+    _startLocalTimer(bookingId);
     notifyListeners();
-  });
-}
+  }
 
+  void _startLocalTimer(String _) {
+    _timer?.cancel();
+    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
+      for (final id in isTimerRunning.keys) {
+        if (isTimerRunning[id] == true) {
+          final current = activeTimers[id] ?? Duration.zero;
+          activeTimers[id] = current + const Duration(seconds: 1);
+        }
+      }
+      notifyListeners();
+    });
+  }
 
-Future<void> pauseInspectionTimer({
-  required BuildContext context,
-  required String bookingId,
-}) async {
-  await updateBookingTimer(
-    context: context,
-    bookingId: bookingId,
-    action: "pause",
-  );
+  Future<void> pauseInspectionTimer({
+    required BuildContext context,
+    required String bookingId,
+  }) async {
+    await updateBookingTimer(
+      context: context,
+      bookingId: bookingId,
+      action: "pause",
+    );
 
-  isTimerRunning[bookingId] = false;
-  notifyListeners();
-}
+    isTimerRunning[bookingId] = false;
+    notifyListeners();
+  }
 
-Future<void> stopInspectionTimer({
-  required BuildContext context,
-  required String bookingId,
-}) async {
-  await updateBookingTimer(
-    context: context,
-    bookingId: bookingId,
-    action: "stop",
-  );
+  Future<void> stopInspectionTimer({
+    required BuildContext context,
+    required String bookingId,
+  }) async {
+    await updateBookingTimer(
+      context: context,
+      bookingId: bookingId,
+      action: "stop",
+    );
 
-  isTimerRunning[bookingId] = false;
-  _timer?.cancel();
-  notifyListeners();
-}
+    isTimerRunning[bookingId] = false;
+    _timer?.cancel();
+    notifyListeners();
+  }
 
-String formatDuration(Duration duration) {
-  final hours = duration.inHours.toString().padLeft(2, '0');
-  final minutes = (duration.inMinutes % 60).toString().padLeft(2, '0');
-  final seconds = (duration.inSeconds % 60).toString().padLeft(2, '0');
-  return "$hours:$minutes:$seconds";
-}
-bool isUpdatingBooking = false;
+  String formatDuration(Duration duration) {
+    final hours = duration.inHours.toString().padLeft(2, '0');
+    final minutes = (duration.inMinutes % 60).toString().padLeft(2, '0');
+    final seconds = (duration.inSeconds % 60).toString().padLeft(2, '0');
+    return "$hours:$minutes:$seconds";
+  }
 
+  bool isUpdatingBooking = false;
 
   Future<void> updateBookingTimer({
     required BuildContext context,
@@ -841,45 +853,113 @@ bool isUpdatingBooking = false;
 
       state?.when(
         data: (response) async {
-          
           updatedBookingData = response;
-                final index = bookings.indexWhere((b) => b.id == bookingId);
-if (index != -1) {
-  bookings[index] = updatedBookingData!;
-}
+          final index = bookings.indexWhere((b) => b.id == bookingId);
+          if (index != -1) {
+            bookings[index] = updatedBookingData!;
+          }
           notifyListeners();
         },
         error: (e) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(e.message ?? 'Booking creation failed')),
+            SnackBar(content:   textWidget(text: e.message ?? 'Booking creation failed',color: AppColors.backgroundColor,)),
           );
         },
       );
     } catch (e) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('Failed: $e')));
+      ).showSnackBar(SnackBar(content:   textWidget(text: 'Failed: $e',color: AppColors.backgroundColor,)));
     } finally {
       isUpdatingBooking = false;
       notifyListeners();
     }
   }
-  Duration calculateLiveDuration(BookingListEntity booking) {
-  try {
-    if (booking.status == bookingStatusStarted||
-        booking.status == bookingStatusStarted) {
-      final startedAt = DateTime.tryParse(booking.timerStartedAt ?? "");
-      if (startedAt != null) {
-        final now = DateTime.now().toUtc();
-        final baseSeconds = booking.timerDuration ?? 0;
-        final liveElapsed = now.difference(startedAt).inSeconds;
-        return Duration(seconds: baseSeconds + liveElapsed);
-      }
-    }
-    return Duration(seconds: booking.timerDuration ?? 0);
-  } catch (e) {
-    return Duration.zero;
-  }
-}
 
+  Duration calculateLiveDuration(BookingListEntity booking) {
+    try {
+      if (booking.status == bookingStatusStarted ||
+          booking.status == bookingStatusStarted) {
+        final startedAt = DateTime.tryParse(booking.timerStartedAt ?? "");
+        if (startedAt != null) {
+          final now = DateTime.now().toUtc();
+          final baseSeconds = booking.timerDuration ?? 0;
+          final liveElapsed = now.difference(startedAt).inSeconds;
+          return Duration(seconds: baseSeconds + liveElapsed);
+        }
+      }
+      return Duration(seconds: booking.timerDuration ?? 0);
+    } catch (e) {
+      return Duration.zero;
+    }
+  }
+
+  Future<void> approveAndPayBooking(
+    BuildContext context,
+    String bookingId,
+  ) async {
+    try {
+      isActionProcessing = true;
+      notifyListeners();
+      await updateBookingStatus(
+        context: context,
+        bookingId: bookingId,
+        newStatus: bookingStatusCompleted,
+      );
+      ScaffoldMessenger.of(context).showSnackBar(
+         SnackBar(
+          content:   textWidget(text: "Payment successful and booking approved.",color: AppColors.backgroundColor,),
+        ),
+      );
+      fetchBookingsList(reset: true);
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content:   textWidget(text: "Error: $e",color: AppColors.backgroundColor,)));
+    } finally {
+      isActionProcessing = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> disagreeBooking(BuildContext context, String bookingId) async {
+    try {
+      isActionProcessing = true;
+      notifyListeners();
+      await updateBookingStatus(
+        context: context,
+        bookingId: bookingId,
+        newStatus: bookingStatusStoppped,
+      );
+      fetchBookingsList(reset: true);
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content:   textWidget(text: "Error: $e",color: AppColors.backgroundColor,)));
+    } finally {
+      isActionProcessing = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> declineBooking({
+    required BuildContext context,
+    required String bookingId,
+  }) async {
+    try {
+      isUpdatingBooking = true;
+      notifyListeners();
+      isActionProcessing = true;
+      notifyListeners();
+      await updateBookingStatus(
+        context: context,
+        bookingId: bookingId,
+        newStatus: bookingStatusCancelledByInspector,
+      );
+      await fetchBookingsList(reset: true);
+    } finally {
+      isUpdatingBooking = false;
+      notifyListeners();
+    }
+  }
 }

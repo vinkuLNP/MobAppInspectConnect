@@ -10,6 +10,7 @@ class AppButton extends StatelessWidget {
       fontSize,
       imageSize,
       pHorizontal,
+      pVertical,
       iconLeftMargin;
   final Color textColor, buttonBackgroundColor, borderColor;
   final String text, image;
@@ -29,6 +30,7 @@ class AppButton extends StatelessWidget {
     this.image = "",
     this.imageSize = 15,
     this.pHorizontal = 0,
+    this.pVertical = 0,
     required this.onTap,
     this.isElevation = false,
     this.isSvg = false,
@@ -56,7 +58,10 @@ class AppButton extends StatelessWidget {
         child: Container(
           width: width == 0 ? null : width,
           height: height,
-          padding: EdgeInsets.symmetric(horizontal: pHorizontal),
+          padding: EdgeInsets.symmetric(
+            horizontal: pHorizontal,
+            vertical: pVertical,
+          ),
           alignment: Alignment.center,
           decoration: BoxDecoration(
             color: isBorder

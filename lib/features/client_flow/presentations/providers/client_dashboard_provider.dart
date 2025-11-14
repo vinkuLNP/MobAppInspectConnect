@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/basecomponents/base_view_model.dart';
 import 'package:inspect_connect/core/di/app_component/app_component.dart';
+import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/auth_user.dart';
 import 'package:inspect_connect/core/commondomain/entities/based_api_result/api_result_state.dart';
 import 'package:inspect_connect/features/auth_flow/domain/usecases/change_password_usecases.dart';
@@ -34,13 +35,13 @@ class ChangePasswordViewModel extends BaseViewModel {
       state?.when(
         data: (_) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Password updated successfully')),
+             SnackBar(content:   textWidget(text: 'Password updated successfully',color: Colors.white)),
           );
           Navigator.pop(context);
         },
         error: (e) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(e.message ?? 'Password update failed')),
+            SnackBar(content:   textWidget(text: e.message ?? 'Password update failed',color: Colors.white)),
           );
         },
       );

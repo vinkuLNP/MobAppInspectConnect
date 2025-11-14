@@ -110,7 +110,7 @@ class _SubscriptionCarouselState extends State<SubscriptionCarousel> {
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withOpacity(0.25), width: 2),
+        border: Border.all(color: Colors.white.withValues(alpha:0.25), width: 2),
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(24),
@@ -142,7 +142,7 @@ class _SubscriptionCarouselState extends State<SubscriptionCarousel> {
                       vertical: 6,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.greenAccent.withOpacity(0.15),
+                      color: Colors.greenAccent.withValues(alpha:0.15),
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(color: Colors.greenAccent, width: 1),
                     ),

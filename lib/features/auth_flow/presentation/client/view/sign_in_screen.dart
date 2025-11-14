@@ -112,7 +112,7 @@ class ClientSignInView extends StatelessWidget {
                         .toList();
 
                     log('extracted route names: $names');
-                  
+
                     final authFlow = Provider.of<AuthFlowProvider>(
                       context,
                       listen: false,

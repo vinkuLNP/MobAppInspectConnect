@@ -5,6 +5,7 @@ import 'package:inspect_connect/core/utils/auto_router_setup/auto_router.dart';
 import 'package:inspect_connect/core/utils/constants/app_assets_constants.dart';
 import 'package:inspect_connect/core/utils/presentation/app_assets_widget.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
+import 'package:inspect_connect/core/utils/presentation/app_common_widgets.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/user_provider.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/wallet_provider.dart';
 import 'package:inspect_connect/features/client_flow/presentations/screens/payment_screens/wallet_screen.dart';
@@ -45,7 +46,7 @@ class ProfileScreen extends StatelessWidget {
                             begin: Alignment.topCenter,
                             end: Alignment.bottomCenter,
                             colors: [
-                              Colors.black.withOpacity(0.2),
+                              Colors.black.withValues(alpha: 0.2),
                               Colors.transparent,
                             ],
                           ),
@@ -95,13 +96,13 @@ class ProfileScreen extends StatelessWidget {
                               children: [
                                 const Icon(Icons.phone, color: Colors.grey),
                                 const SizedBox(width: 8),
-                                Text(
-                                  '${user?.countryCode ?? ''} ${user?.phoneNumber ?? 'N/A'}',
-                                  style: const TextStyle(fontSize: 16),
+                                textWidget(
+                                  text:
+                                      '${user?.countryCode ?? ''} ${user?.phoneNumber ?? 'N/A'}',
+                                  fontSize: 16,
                                 ),
                               ],
                             ),
-                          
                           ],
                         ),
                       ),
@@ -166,34 +167,6 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  void logOutUser(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: textWidget(text: 'LOG OUT?'),
-        content: textWidget(text: 'Are you sure you want to logout?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: textWidget(text: 'Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              await context.read<UserProvider>().clearUser();
-              if (context.mounted) {
-                ScaffoldMessenger.of(
-                  context,
-                ).showSnackBar(const SnackBar(content: Text('Logged out')));
-                context.router.replaceAll([const OnBoardingRoute()]);
-              }
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
-            child: textWidget(text: 'Log Out'),
-          ),
-        ],
-      ),
-    );
-  }
 
   Widget _buildOptionTile(
     BuildContext context, {
@@ -207,12 +180,10 @@ class ProfileScreen extends StatelessWidget {
       borderRadius: BorderRadius.circular(16),
       child: ListTile(
         leading: Icon(icon, color: color ?? Colors.black87),
-        title: Text(
-          label,
-          style: TextStyle(
-            fontWeight: FontWeight.w600,
-            color: color ?? Colors.black87,
-          ),
+        title: textWidget(
+          text: label,
+          fontWeight: FontWeight.w600,
+          color: color ?? Colors.black87,
         ),
         trailing: const Icon(Icons.arrow_forward_ios, size: 16),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),

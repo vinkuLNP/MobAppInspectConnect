@@ -57,7 +57,7 @@ class PaymentModel extends PaymentEntity {
     return PaymentModel(
       id: json['_id'] ?? '',
       user: UserModel.fromJson(json['userId'] ?? {}),
-      relatedUserId: json['relatedUserId'],
+      // relatedUserId: json['relatedUserId'],
       bookingId: json['bookingId'],
       stripeInvoiceId: json['stripeInvoiceId'],
       stripeSubscriptionId: json['stripeSubscriptionId'],

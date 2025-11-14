@@ -59,7 +59,7 @@ class InspectorCommonAuthBar extends StatelessWidget {
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        Colors.black.withOpacity(0.4),
+                        Colors.black.withValues(alpha:0.4),
                         Colors.transparent,
                       ],
                     ),
