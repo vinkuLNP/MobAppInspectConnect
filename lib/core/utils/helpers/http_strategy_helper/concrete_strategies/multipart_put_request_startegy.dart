@@ -25,20 +25,17 @@ class MultipartPutRequestStrategy implements HttpRequestStrategy {
       final request = http.MultipartRequest('PUT', Uri.parse(uri));
       request.headers.addAll(headers);
 
-      // Attach normal fields (everything except "images")
       requestData.forEach((key, value) {
         if (key != 'images') {
           request.fields[key] = value.toString();
         }
       });
 
-      // Handle "images" separately
       final images = requestData['images'];
       if (images != null && images is List && images.isNotEmpty) {
         for (var img in images) {
           if (img is String) {
             if (img.startsWith('http')) {
-              // Already uploaded image → send as text field
               request.fields.putIfAbsent('images[]', () => img);
               log('🌐 Existing image URL kept: $img');
             } else {

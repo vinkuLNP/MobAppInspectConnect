@@ -131,8 +131,11 @@ class _OtpVerificationViewState extends State<OtpVerificationView> {
                       ? AppColors.authThemeColor
                       : Colors.grey,
                   isDisabled: !vm.canVerify,
-                  onTap: () =>
-                      vm.canVerify ? vm.verify(context: context) : null,
+                  onTap: () {
+                     if(  vm.canVerify)  vm.verify(context: context);
+                     if (!context.mounted) return;
+                  }
+                   
                 ),
 
                 AuthFormSwitchRow(

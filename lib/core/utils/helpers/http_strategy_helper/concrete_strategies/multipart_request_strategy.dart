@@ -30,7 +30,6 @@ final file = File(filePath);
       if (!file.existsSync()) {
         throw Exception(" File does not exist at $filePath");
       }
-      // final file = File(filePath);
       final request = http.MultipartRequest('POST', Uri.parse(uri));
 
       request.headers.addAll({

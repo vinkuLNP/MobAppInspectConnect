@@ -23,12 +23,12 @@ class CreateBookingResponseModel {
 }
 
 class BookingData extends BookingListEntity {
-  final AuthUser? client;
+  final AuthUser? clientUser;
   final AuthUser? inspector;
 
   const BookingData({
     required super.id,
-    this.client,
+    this.clientUser,
     this.inspector,
     super.inspectorIds = const [],
     super.certificateSubTypes = const [],
@@ -69,7 +69,7 @@ class BookingData extends BookingListEntity {
 
     return BookingData(
       id: json['_id'] ?? '',
-      client: json['clientId'] is Map<String, dynamic>
+      clientUser: json['clientId'] is Map<String, dynamic>
           ? AuthUser.fromJson(json['clientId'])
           : (json['clientId'] != null
               ? AuthUser(id: json['clientId'].toString(),emailHashed: json['email'],
@@ -99,26 +99,5 @@ class BookingData extends BookingListEntity {
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      '_id': id,
-      'clientId': client?.toJson(),
-      'inspectorId': inspector?.toJson(),
-      'inspectorIds': inspectorIds,
-      'certificateSubTypeId':
-          certificateSubTypes.map((e) => e.toJson()).toList(),
-      'images': images,
-      'description': description,
-      'bookingDate': bookingDate,
-      'bookingTime': bookingTime,
-      'bookingLocation': bookingLocation,
-      'status': status,
-      'isDeleted': isDeleted,
-      'createdAt': createdAt,
-      'updatedAt': updatedAt,
-      'timerStartedAt': timerStartedAt,
-      'timerEndedAt': timerEndedAt,
-      'timerDuration': timerDuration,
-    };
-  }
+
 }

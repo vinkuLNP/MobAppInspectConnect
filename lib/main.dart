@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:inspect_connect/core/di/app_component/app_component.dart';
 import 'package:inspect_connect/core/utils/auto_router_setup/auto_router.dart';
@@ -23,11 +25,11 @@ Future<void> main() async {
   await initAppComponentLocator();
   setupLocator();
   final AppFlavorsHelper configService = locator<AppFlavorsHelper>();
-  final ProductFlavor? _productFlavor = EnvironmentConfig.BUILD_VARIANT
+  final ProductFlavor? productFlavor = EnvironmentConfig.buildVariant
       .toProductFlavor();
-  configService.configure(productFlavor: _productFlavor);
-  print(' BUILD_VARIANT = ${EnvironmentConfig.BUILD_VARIANT}');
-  print(' Base URL = ${configService.baseUrl}');
+  configService.configure(productFlavor: productFlavor);
+  log(' buildVariant = ${EnvironmentConfig.buildVariant}');
+  log(' Base URL = ${configService.baseUrl}');
 
   SessionManager().navigatorKey = rootNavigatorKey;
 

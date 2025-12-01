@@ -163,7 +163,8 @@ class _SubscriptionCarouselState extends State<SubscriptionCarousel> {
                   physics: const BouncingScrollPhysics(),
                   padding: const EdgeInsets.symmetric(vertical: 10),
                   child: Column(
-                    children: plan.features!.map((feature) {
+                    children: plan.features
+                    .map((feature) {
                       return Padding(
                         padding: const EdgeInsets.symmetric(vertical: 6),
                         child: Row(

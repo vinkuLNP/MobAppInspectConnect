@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -112,7 +113,7 @@ class BookingProvider extends BaseViewModel {
     bool isValid = true;
 
     if (_selectedTime == null) {
-      print("Please select a time");
+      log("Please select a time");
       ScaffoldMessenger.of(cntx).showSnackBar(
         SnackBar(
           content: textWidget(
@@ -228,23 +229,25 @@ class BookingProvider extends BaseViewModel {
         data: (response) async {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content:   textWidget(text: 
-                response.message.isNotEmpty
+              content: textWidget(
+                text: response.message.isNotEmpty
                     ? response.message
-                    : 'Booking created successfully',color: AppColors.backgroundColor,
+                    : 'Booking created successfully',
+                color: AppColors.backgroundColor,
               ),
             ),
           );
           clearBookingData();
         },
         error: (e) {
-          // if (e.message!.toLowerCase().contains("insufficient")) {
-          //   _showInsufficientFundsDialog(context, e.message!);
-          // } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content:   textWidget(text: e.message ?? 'Booking creation failed',color: AppColors.backgroundColor,)),
+            SnackBar(
+              content: textWidget(
+                text: e.message ?? 'Booking creation failed',
+                color: AppColors.backgroundColor,
+              ),
+            ),
           );
-          // }
         },
       );
     } finally {
@@ -288,14 +291,24 @@ class BookingProvider extends BaseViewModel {
           clearBookingDetail();
           updatedBookingData = response;
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content:   textWidget(text: 'Booking Updated successfully.',color: AppColors.backgroundColor,)),
+            SnackBar(
+              content: textWidget(
+                text: 'Booking Updated successfully.',
+                color: AppColors.backgroundColor,
+              ),
+            ),
           );
           Navigator.pop(context, true);
           clearFilters();
         },
         error: (e) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content:   textWidget(text: e.message ?? 'Booking creation failed',color: AppColors.backgroundColor,)),
+            SnackBar(
+              content: textWidget(
+                text: e.message ?? 'Booking creation failed',
+                color: AppColors.backgroundColor,
+              ),
+            ),
           );
         },
       );
@@ -351,7 +364,10 @@ class BookingProvider extends BaseViewModel {
         error: (e) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content:   textWidget(text: e.message ?? 'Fetching Booking Detail failed',color: AppColors.backgroundColor,),
+              content: textWidget(
+                text: e.message ?? 'Fetching Booking Detail failed',
+                color: AppColors.backgroundColor,
+              ),
             ),
           );
         },
@@ -389,7 +405,12 @@ class BookingProvider extends BaseViewModel {
         },
         error: (e) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content:   textWidget(text: e.message ?? 'Booking Deletion failed',color: AppColors.backgroundColor,)),
+            SnackBar(
+              content: textWidget(
+                text: e.message ?? 'Booking Deletion failed',
+                color: AppColors.backgroundColor,
+              ),
+            ),
           );
         },
       );
@@ -422,6 +443,7 @@ class BookingProvider extends BaseViewModel {
         error: (e) {},
       );
     } catch (e) {
+      log(e.toString());
     } finally {
       setProcessing(false);
     }
@@ -439,9 +461,16 @@ class BookingProvider extends BaseViewModel {
 
       final file = File(picked.path);
       if (await file.length() > 1 * 1024 * 1024) {
-        ScaffoldMessenger.of(context).showSnackBar(
-           SnackBar(content:   textWidget(text: 'File must be under 1 MB',color: AppColors.backgroundColor,)),
-        );
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: textWidget(
+                text: 'File must be under 1 MB',
+                color: AppColors.backgroundColor,
+              ),
+            ),
+          );
+        }
         return;
       }
 
@@ -465,11 +494,17 @@ class BookingProvider extends BaseViewModel {
         },
         error: (e) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content:   textWidget(text: e.message ?? 'Image upload failed',color: AppColors.backgroundColor,)),
+            SnackBar(
+              content: textWidget(
+                text: e.message ?? 'Image upload failed',
+                color: AppColors.backgroundColor,
+              ),
+            ),
           );
         },
       );
     } catch (e) {
+      log(e.toString());
     } finally {
       setProcessing(false);
     }
@@ -511,8 +546,8 @@ class BookingProvider extends BaseViewModel {
   String? _searchQuery;
   String? _searchDate;
   String? _status;
-  String _sortBy = 'createdAt';
-  String _sortOrder = 'desc';
+  String sortBy = 'createdAt';
+  String sortOrder = 'desc';
 
   Future<void> fetchBookingsList({
     bool reset = false,
@@ -542,8 +577,8 @@ class BookingProvider extends BaseViewModel {
         page: _currentPage,
         perPageLimit: _perPageLimit,
         search: _searchDate ?? _searchQuery ?? '',
-        sortBy: _sortBy,
-        sortOrder: _sortOrder,
+        sortBy: sortBy,
+        sortOrder: sortOrder,
         status: _status != null && _status!.isNotEmpty
             ? int.tryParse(_status!)
             : null,
@@ -579,6 +614,7 @@ class BookingProvider extends BaseViewModel {
         error: (e) {},
       );
     } catch (e) {
+      log(e.toString());
     } finally {
       isFetchingBookings = false;
       isLoadMoreRunning = false;
@@ -670,17 +706,19 @@ class BookingProvider extends BaseViewModel {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
-          title:    textWidget(text: 
-            'Insufficient Funds',
-        fontWeight: FontWeight.bold),
-        
-          content:   textWidget(text: 
-            '$message\n\nYou don’t have sufficient funds in your wallet. Please recharge now to continue.',
+          title: textWidget(
+            text: 'Insufficient Funds',
+            fontWeight: FontWeight.bold,
+          ),
+
+          content: textWidget(
+            text:
+                '$message\n\nYou don’t have sufficient funds in your wallet. Please recharge now to continue.',
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child:    textWidget(text: 'Cancel'),
+              child: textWidget(text: 'Cancel'),
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
@@ -701,7 +739,7 @@ class BookingProvider extends BaseViewModel {
                   ),
                 );
               },
-              child:    textWidget(text: 'Recharge Now'),
+              child: textWidget(text: 'Recharge Now'),
             ),
           ],
         );
@@ -741,14 +779,26 @@ class BookingProvider extends BaseViewModel {
         },
         error: (e) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content:   textWidget(text: e.message ?? 'Booking creation failed',color: AppColors.backgroundColor,)),
+            SnackBar(
+              content: textWidget(
+                text: e.message ?? 'Booking creation failed',
+                color: AppColors.backgroundColor,
+              ),
+            ),
           );
         },
       );
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content:   textWidget(text: 'Failed: $e',color: AppColors.backgroundColor,)));
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: textWidget(
+              text: 'Failed: $e',
+              color: AppColors.backgroundColor,
+            ),
+          ),
+        );
+      }
     } finally {
       isUpdatingBooking = false;
       notifyListeners();
@@ -862,14 +912,26 @@ class BookingProvider extends BaseViewModel {
         },
         error: (e) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content:   textWidget(text: e.message ?? 'Booking creation failed',color: AppColors.backgroundColor,)),
+            SnackBar(
+              content: textWidget(
+                text: e.message ?? 'Booking creation failed',
+                color: AppColors.backgroundColor,
+              ),
+            ),
           );
         },
       );
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content:   textWidget(text: 'Failed: $e',color: AppColors.backgroundColor,)));
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: textWidget(
+              text: 'Failed: $e',
+              color: AppColors.backgroundColor,
+            ),
+          ),
+        );
+      }
     } finally {
       isUpdatingBooking = false;
       notifyListeners();
@@ -905,17 +967,29 @@ class BookingProvider extends BaseViewModel {
         context: context,
         bookingId: bookingId,
         newStatus: bookingStatusCompleted,
-      );
+      );if(context.mounted){
+
+ 
       ScaffoldMessenger.of(context).showSnackBar(
-         SnackBar(
-          content:   textWidget(text: "Payment successful and booking approved.",color: AppColors.backgroundColor,),
+        SnackBar(
+          content: textWidget(
+            text: "Payment successful and booking approved.",
+            color: AppColors.backgroundColor,
+          ),
         ),
-      );
+      );     }
       fetchBookingsList(reset: true);
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content:   textWidget(text: "Error: $e",color: AppColors.backgroundColor,)));
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: textWidget(
+              text: "Error: $e",
+              color: AppColors.backgroundColor,
+            ),
+          ),
+        );
+      }
     } finally {
       isActionProcessing = false;
       notifyListeners();
@@ -933,9 +1007,16 @@ class BookingProvider extends BaseViewModel {
       );
       fetchBookingsList(reset: true);
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content:   textWidget(text: "Error: $e",color: AppColors.backgroundColor,)));
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: textWidget(
+              text: "Error: $e",
+              color: AppColors.backgroundColor,
+            ),
+          ),
+        );
+      }
     } finally {
       isActionProcessing = false;
       notifyListeners();

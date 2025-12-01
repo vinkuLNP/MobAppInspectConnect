@@ -87,7 +87,9 @@ class _SplashViewState extends State<SplashView>
     _controller.forward();
 
     Future.delayed(const Duration(seconds: 3), () async {
+   
       final user = await locator<AuthLocalDataSource>().getUser();
+         if(mounted){
       final userProvider = context.read<UserProvider>();
       final bookingProvider = context.read<BookingProvider>();
 
@@ -98,35 +100,35 @@ class _SplashViewState extends State<SplashView>
       if (userProvider.isLoggedIn) {
         if (userProvider.isUserClient) {
           await bookingProvider.fetchBookingsList();
-          context.router.replace(const ClientDashboardRoute());
+        if(mounted)   context.router.replace(const ClientDashboardRoute());
         } else if (userProvider.isUserInspector) {
-          checkInspectorState(context);
+        if(mounted)   checkInspectorState(context);
         } else {
-          context.router.replace(const OnBoardingRoute());
+       if(mounted)    context.router.replace(const OnBoardingRoute());
         }
       } else {
-        context.router.replace(const OnBoardingRoute());
+       if(mounted)  context.router.replace(const OnBoardingRoute());
       }
-    });
+   } });
   }
 Future<void> checkInspectorState(BuildContext context) async {
   final localUser = await locator<AuthLocalDataSource>().getUser();
   if (localUser == null) {
-    context.router.replaceAll([const OnBoardingRoute()]);
+    if(context.mounted) context.router.replaceAll([const OnBoardingRoute()]);
     return;
   }
 
   final provider = InspectorDashboardProvider();
-  await provider.initializeUserState(context);
+    if(context.mounted) await provider.initializeUserState(context);
 
   switch (provider.status) {
     case InspectorStatus.needsSubscription:
-      context.router.replaceAll([const InspectorDashboardRoute()]);
+      if(context.mounted)   context.router.replaceAll([const InspectorDashboardRoute()]);
       break;
     case InspectorStatus.underReview:
     case InspectorStatus.rejected:
     case InspectorStatus.approved:
-      context.router.replaceAll([const InspectorDashboardRoute()]);
+      if(context.mounted)   context.router.replaceAll([const InspectorDashboardRoute()]);
       break;
     default:
       context.router.replaceAll([const OnBoardingRoute()]);

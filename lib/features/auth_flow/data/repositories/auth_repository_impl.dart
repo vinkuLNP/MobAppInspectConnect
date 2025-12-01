@@ -1,7 +1,6 @@
 import 'package:inspect_connect/core/commondomain/entities/based_api_result/api_result_model.dart';
 import 'package:inspect_connect/core/commondomain/entities/based_api_result/error_result_model.dart';
 import 'package:inspect_connect/features/auth_flow/data/datasources/remote_datasources/auth_remote_datasource.dart';
-import 'package:inspect_connect/features/auth_flow/data/models/auth_user_dto.dart';
 import 'package:inspect_connect/features/auth_flow/data/models/change_password_dto.dart';
 import 'package:inspect_connect/features/auth_flow/data/models/profile_update_dto.dart';
 import 'package:inspect_connect/features/auth_flow/data/models/resend_otp_request_model.dart';
@@ -13,7 +12,6 @@ import 'package:inspect_connect/features/auth_flow/domain/entities/auth_user.dar
 import 'package:inspect_connect/features/auth_flow/domain/entities/certificate_agency_entity.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/certificate_type_entity.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/inspector_sign_up_entity.dart';
-import 'package:inspect_connect/features/auth_flow/domain/entities/inspector_user.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/user_detail.dart';
 import 'package:inspect_connect/features/auth_flow/domain/repositories/auth_repository.dart';
 

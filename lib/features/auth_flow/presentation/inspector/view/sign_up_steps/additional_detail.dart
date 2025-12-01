@@ -172,7 +172,7 @@ class _AdditionalDetailsStepState extends State<AdditionalDetailsStep> {
         fit: BoxFit.cover,
         width: double.infinity,
         height: double.infinity,
-        errorBuilder: (_, __, ___) =>
+        errorBuilder: (_, _, _) =>
             const Center(child: Icon(Icons.broken_image, color: Colors.grey)),
         loadingBuilder: (context, child, progress) {
           if (progress == null) return child;
@@ -186,7 +186,7 @@ class _AdditionalDetailsStepState extends State<AdditionalDetailsStep> {
       fit: BoxFit.cover,
       width: double.infinity,
       height: double.infinity,
-      errorBuilder: (_, __, ___) =>
+      errorBuilder: (_, _, _) =>
           const Center(child: Icon(Icons.broken_image, color: Colors.grey)),
     );
   }

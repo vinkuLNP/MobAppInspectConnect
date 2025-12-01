@@ -1,29 +1,26 @@
 import 'package:inspect_connect/core/utils/constants/app_constants.dart';
 import 'package:injectable/injectable.dart';
 
-/// this enum will present the list of supported environments
 enum ProductFlavor {
-  DEV,
-  QA,
-  SIT,
-  UAT,
-  PROD,
+  dev,
+  qa,
+  sit,
+  uat,
+  prod,
 }
 
 extension ProductFlavorExtension on ProductFlavor? {
   String setBaseUrl() {
-    print('✅ AppFlavorsHelper configured with baseUrl $ProductFlavor = $devBaseUrl');
-
     switch (this) {
-      case ProductFlavor.DEV:
+      case ProductFlavor.dev:
         return devBaseUrl;
-      case ProductFlavor.QA:
+      case ProductFlavor.qa:
         return qaBaseUrl;
-      case ProductFlavor.SIT:
+      case ProductFlavor.sit:
         return qaBaseUrl;
-      case ProductFlavor.UAT:
+      case ProductFlavor.uat:
         return uatBaseUrl;
-      case ProductFlavor.PROD:
+      case ProductFlavor.prod:
         return prodBaseUrl;
       default:
         return devBaseUrl;
@@ -35,17 +32,17 @@ extension StringExtension on String {
   ProductFlavor? toProductFlavor() {
     switch (this) {
       case devEnvironmentString:
-        return ProductFlavor.DEV;
+        return ProductFlavor.dev;
       case qaEnvironmentString:
-        return ProductFlavor.QA;
+        return ProductFlavor.qa;
       case sitEnvironmentString:
-        return ProductFlavor.SIT;
+        return ProductFlavor.sit;
       case uatEnvironmentString:
-        return ProductFlavor.UAT;
+        return ProductFlavor.uat;
       case prodEnvironmentString:
-        return ProductFlavor.PROD;
+        return ProductFlavor.prod;
       default:
-        return ProductFlavor.DEV;
+        return ProductFlavor.dev;
     }
   }
 }

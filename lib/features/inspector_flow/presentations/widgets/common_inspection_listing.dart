@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_button.dart';
@@ -104,7 +106,6 @@ class _BaseInspectionListScreenState extends State<BaseInspectionListScreen>
 
                       return aDate.compareTo(bDate);
                     });
-              // ..sort((a, b) => DateTime.parse(a.bookingDate).compareTo(DateTime.parse(b.bookingDate)));
 
               if (provider.isFetchingBookings && filteredBookings.isEmpty) {
                 return const Center(child: CircularProgressIndicator());
@@ -268,7 +269,7 @@ class _BaseInspectionListScreenState extends State<BaseInspectionListScreen>
                 await Future.delayed(const Duration(milliseconds: 200));
               });
         } catch (e) {
-          debugPrint("Error fetching booking detail: $e");
+          log("Error fetching booking detail: $e");
         } finally {
           if (mounted) setState(() => _isCardLoading = false);
         }

@@ -27,8 +27,13 @@ class _WalletScreenState extends State<WalletScreen> {
   @override
   void initState() {
     super.initState();
+    if(mounted){
+      
+    }
     Future.microtask(
-      () => context.read<WalletProvider>().init(context: context),
+      () {
+      if(mounted)  context.read<WalletProvider>().init(context: context);
+      } 
     );
   }
 
@@ -152,12 +157,13 @@ class _WalletScreenState extends State<WalletScreen> {
         throw Exception('Missing clientSecret in payment intent response.');
       }
 
-      await _showCardPaymentSheet(context, clientSecret, amount);
+    if(mounted)  await _showCardPaymentSheet(context, clientSecret, amount);
     } catch (e, st) {
       log("❌ makePayment error: $e\n$st");
-      ScaffoldMessenger.of(
+      if(mounted){
+        ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: textWidget(text: 'Payment failed: $e',color: Colors.white)));
+      ).showSnackBar(SnackBar(content: textWidget(text: 'Payment failed: $e',color: Colors.white)));}
     }
   }
 
@@ -240,19 +246,22 @@ class _WalletScreenState extends State<WalletScreen> {
                                 ),
                               );
 
-                              Navigator.pop(context);
-                              _showPaymentSuccess(parentCtx);
+                               if(context.mounted)    Navigator.pop(context);
+                                 if(context.mounted)     _showPaymentSuccess(parentCtx);
                             } on StripeException catch (e) {
                               log("⚠️ Stripe error: $e");
+                                     if(context.mounted) {
+
+                                   
                               ScaffoldMessenger.of(parentCtx).showSnackBar(
                                   SnackBar(
                                   content: textWidget(text: 'Payment canceled',color: Colors.white),
                                 ),
-                              );
-                            } catch (e) {
+                              );  }
+                            } catch (e) {  if(context.mounted) {
                               ScaffoldMessenger.of(parentCtx).showSnackBar(
                                 SnackBar(content: textWidget(text: 'Payment failed: $e',color: Colors.white)),
-                              );
+                              );  }
                             } finally {
                               setState(() => isProcessing = false);
                             }
@@ -288,15 +297,15 @@ class _WalletScreenState extends State<WalletScreen> {
       barrierDismissible: false,
       builder: (_) => const _PaymentSuccessDialog(),
     ).then((_) {
-      walletContext.read<WalletProvider>().refreshAll(walletContext);
+   if(context.mounted)   walletContext.read<WalletProvider>().refreshAll(walletContext);
     });
   }
 
   Future<void> displayPaymentSheet() async {
     try {
       await Stripe.instance.presentPaymentSheet();
-
-      showDialog(
+   if(mounted) {
+     showDialog(
         context: context,
         builder: (_) => AlertDialog(
           shape: RoundedRectangleBorder(
@@ -312,12 +321,15 @@ class _WalletScreenState extends State<WalletScreen> {
           ),
         ),
       );
-    } on StripeException catch (e) {
+   
+   }
+  } on StripeException catch (e) {
       log("⚠️ StripeException: $e");
-      ScaffoldMessenger.of(
+      if(mounted){
+        ScaffoldMessenger.of(
         context,
       ).showSnackBar(  SnackBar(content: textWidget(text: 'Payment canceled',color: Colors.white
-      )));
+      )));}
     } catch (e, stackTrace) {
       log("❌ Unexpected error: $e");
       log("🧩 Stack Trace: $stackTrace");

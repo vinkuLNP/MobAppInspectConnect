@@ -48,14 +48,26 @@ class _AccountSettingsViewState extends State<AccountSettingsView> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-           SnackBar(content:   textWidget(text: 'Profile updated successfully!',color: Colors.white)),
+          SnackBar(
+            content: textWidget(
+              text: 'Profile updated successfully!',
+              color: Colors.white,
+            ),
+          ),
         );
         Navigator.pop(context);
       }
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content:   textWidget(text: 'Failed to update: $e',color: Colors.white)));
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: textWidget(
+              text: 'Failed to update: $e',
+              color: Colors.white,
+            ),
+          ),
+        );
+      }
     } finally {
       if (mounted) setState(() => isUpdating = false);
     }

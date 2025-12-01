@@ -32,8 +32,9 @@ class _InspectorSignUpContentState extends State<InspectorSignUpContent> {
   void initState() {
     super.initState();
     Future.microtask(() {
+      if(mounted){
       final vm = context.read<InspectorViewModelProvider>();
-      vm.loadSavedData();
+      vm.loadSavedData();}
     });
   }
 
@@ -191,7 +192,7 @@ class _InspectorSignUpContentState extends State<InspectorSignUpContent> {
                             await vm.submit();
                             final saved = await vm.getSavedData();
                             log('final data: ${saved?.toString()}');
-                            if (mounted) {
+                            if (context.mounted) {
                               vm.signUp(context: context);
                             }
                           }

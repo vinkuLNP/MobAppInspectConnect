@@ -30,9 +30,9 @@ class HttpRequestContext {
   }
 
   Future<bool> _getConnectionState() async {
-    final bool _result = await connectivityCheckerHelper.checkConnectivity();
-    print('Connectivity check result: $_result');
-    return _result;
+    final bool result = await connectivityCheckerHelper.checkConnectivity();
+    log('Connectivity check result: $result');
+    return result;
   }
 
   Future<ApiResultModel<http.Response>> makeRequest({
@@ -47,14 +47,14 @@ class HttpRequestContext {
         log('⚠️ Connectivity not detected, but attempting network call anyway (possible simulator case)');
 }
       try {
-        print('=====baseUrl====>$baseUrl');
-        print('====uri=====>$uri');
+        log('=====baseUrl====>$baseUrl');
+        log('====uri=====>$uri');
 
-        final String _url = '$baseUrl$uri';
-        print('=========>$_url');
+        final String url = '$baseUrl$uri';
+        log('=========>$url');
 
         return httpRequestStrategy.executeRequest(
-          uri: _url,
+          uri: url,
           headers: _sharedDefaultHeader,
           requestData: requestData,
         );

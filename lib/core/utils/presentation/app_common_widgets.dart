@@ -74,7 +74,7 @@ void logOutUser(BuildContext context) {
   showDialog(
     context: context,
     builder: (_) => AlertDialog(
-      title: textWidget(text: 'LOG OUT?'),
+      title: textWidget(text: 'log OUT?'),
       content: textWidget(text: 'Are you sure you want to logout?'),
       actions: [
         TextButton(
@@ -94,7 +94,7 @@ void logOutUser(BuildContext context) {
           },
           buttonBackgroundColor: Colors.redAccent,
           textColor: AppColors.backgroundColor,
-          text: 'Log Out',
+          text: 'log Out',
         ),
       ],
     ),

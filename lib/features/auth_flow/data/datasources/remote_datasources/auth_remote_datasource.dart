@@ -23,7 +23,7 @@ import 'package:inspect_connect/features/auth_flow/data/models/user_detail_dto.d
 import 'package:inspect_connect/features/auth_flow/data/models/verify_otp_request_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:inspect_connect/features/auth_flow/domain/entities/inspector_sign_up_entity.dart';
-import 'package:inspect_connect/features/auth_flow/domain/entities/inspector_user.dart';
+
 import 'package:inspect_connect/features/auth_flow/domain/entities/user_detail.dart';
 
 abstract class AuthRemoteDataSource {

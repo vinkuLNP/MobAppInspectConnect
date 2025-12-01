@@ -46,7 +46,7 @@ class WalletProvider extends BaseViewModel {
     _currentPage = 1;
     _totalPages = 1;
     await getUserWallet(context: context);
-    await getPaymentList(context: context, reset: true);
+  if(context.mounted)  await getPaymentList(context: context, reset: true);
   }
 
   Future<void> getUserWallet({required BuildContext context}) async {

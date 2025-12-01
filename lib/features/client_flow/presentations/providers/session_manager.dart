@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/di/app_component/app_component.dart';
@@ -14,9 +16,9 @@ class SessionManager {
   bool _isDialogVisible = false;
 
   Future<void> logout({String? reason}) async {
-    debugPrint('🚪 [SessionManager] logout() called. Reason: $reason');
+    log('🚪 [SessionManager] logout() called. Reason: $reason');
     if (_isDialogVisible) {
-      debugPrint(
+      log(
         '⚠️ [SessionManager] Logout dialog already visible — skipping duplicate.',
       );
       return;
@@ -24,12 +26,12 @@ class SessionManager {
     _isDialogVisible = true;
 
     final navContext = navigatorKey?.currentContext;
-    debugPrint(
+    log(
       '🧭 [SessionManager] Navigator context: ${navContext != null ? "✅ Found" : "❌ Null"}',
     );
 
     if (navContext == null) {
-      debugPrint(
+      log(
         '⚠️ [SessionManager] Navigator context is null — performing silent logout.',
       );
       await _performLogoutSilently();
@@ -38,7 +40,7 @@ class SessionManager {
     }
 
     try {
-      debugPrint('🪟 [SessionManager] Showing logout dialog...');
+      log('🪟 [SessionManager] Showing logout dialog...');
       await showDialog(
         context: navContext,
         barrierDismissible: false,
@@ -50,7 +52,7 @@ class SessionManager {
           actions: [
             TextButton(
               onPressed: () async {
-                debugPrint(
+                log(
                   '👋 [SessionManager] OK pressed on dialog. Logging out silently...',
                 );
                 Navigator.of(navContext).pop();
@@ -61,40 +63,40 @@ class SessionManager {
           ],
         ),
       );
-      debugPrint('🪟 [SessionManager] Dialog closed.');
+      log('🪟 [SessionManager] Dialog closed.');
     } catch (e, st) {
-      debugPrint('❌ [SessionManager] Error showing dialog: $e\n$st');
+      log('❌ [SessionManager] Error showing dialog: $e\n$st');
     } finally {
       _isDialogVisible = false;
-      debugPrint('🔚 [SessionManager] Dialog visibility reset.');
+      log('🔚 [SessionManager] Dialog visibility reset.');
     }
   }
 
   Future<void> _performLogoutSilently() async {
-    debugPrint('⚙️ [SessionManager] Performing silent logout...');
+    log('⚙️ [SessionManager] Performing silent logout...');
     try {
       if (!locator.isRegistered<UserProvider>()) {
-        debugPrint('❌ [SessionManager] UserProvider not registered in GetIt.');
+        log('❌ [SessionManager] UserProvider not registered in GetIt.');
         return;
       }
 
       final userProvider = locator<UserProvider>();
-      debugPrint('👤 [SessionManager] Clearing user session...');
+      log('👤 [SessionManager] Clearing user session...');
       await userProvider.clearUser();
-      debugPrint('✅ [SessionManager] User cleared successfully.');
+      log('✅ [SessionManager] User cleared successfully.');
 
       final navContext = navigatorKey?.currentContext;
       if (navContext != null && navContext.mounted) {
-        debugPrint('🔁 [SessionManager] Navigating to OnBoardingRoute...');
+        log('🔁 [SessionManager] Navigating to OnBoardingRoute...');
         navContext.router.replaceAll([const OnBoardingRoute()]);
       } else {
 
-        debugPrint(
+        log(
           '⚠️ [SessionManager] Navigation context missing or unmounted.',
         );
       }
     } catch (e, st) {
-      debugPrint('❌ [SessionManager] Logout failed: $e\n$st');
+      log('❌ [SessionManager] Logout failed: $e\n$st');
     }
   }
 }

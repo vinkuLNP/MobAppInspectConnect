@@ -419,7 +419,7 @@ Duration _parseBookingTime(String timeStr) {
     final minute = parts.length > 1 ? int.parse(parts[1]) : 0;
     return Duration(hours: hour, minutes: minute);
   } catch (e) {
-    debugPrint("⛔ Time parse error for '$timeStr' → $e");
+    log("⛔ Time parse error for '$timeStr' → $e");
     return Duration.zero;
   }
 }

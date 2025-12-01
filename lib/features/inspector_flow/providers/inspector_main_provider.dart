@@ -144,18 +144,20 @@ class InspectorDashboardProvider extends BaseViewModel {
        ),
      );
 */
-      showPaymentSuccessDialog(context);
+   if(context.mounted)   showPaymentSuccessDialog(context);
     } on StripeException catch (e) {
       log('⚠️ StripeException: $e');
+       if(context.mounted){  
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: textWidget(text: 'Payment canceled',color: Colors.white)));
-    } catch (e, st) {
+    }} catch (e, st) {
       log('❌ Payment error: $e\n$st');
+       if(context.mounted){  
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: textWidget(text: 'Payment failed: $e',color: Colors.white)));
-    } finally {
+   } } finally {
       isProcessingPayment = false;
       notifyListeners();
     }
@@ -169,7 +171,7 @@ class InspectorDashboardProvider extends BaseViewModel {
   ) async {
     try {
       log(
-        'totalAmount ${amount.toString()},priceId ${priceId},paymentType $subscriptionId,device ${1},subscriptionId ${subscriptionId},  ',
+        'totalAmount ${amount.toString()},priceId $priceId,paymentType $subscriptionId,device ${1},subscriptionId $subscriptionId,  ',
       );
       final url = Uri.parse('$devBaseUrl/payments/paymentIntent');
       final response = await http.post(
@@ -216,7 +218,7 @@ class InspectorDashboardProvider extends BaseViewModel {
           log('[CHECK_USER_STATUS] ✅ Got updated user detail');
           final mergedUser = localUser.mergeWithUserDetail(userDetail);
           await locator<AuthLocalDataSource>().saveUser(mergedUser);
-          context.read<UserProvider>().setUser(mergedUser);
+         if(context.mounted)  context.read<UserProvider>().setUser(mergedUser);
 
           status = userDetail.approvalStatusByAdmin;
         },
@@ -290,11 +292,11 @@ class InspectorDashboardProvider extends BaseViewModel {
 
     await locator<AuthLocalDataSource>().saveUser(localUser);
     log('[FETCH_USER_DETAIL] Saved local user.');
-
+ if(context.mounted){  
     final userProvider = context.read<UserProvider>();
     await userProvider.setUser(localUser);
     await userProvider.loadUser();
-
+ 
     log(
       '[FETCH_USER_DETAIL] Local user loaded into provider: id=${user.id}, token=${localUser.authToken}',
     );
@@ -328,56 +330,56 @@ class InspectorDashboardProvider extends BaseViewModel {
         context.router.replaceAll([const OnBoardingRoute()]);
       },
     );
-  }
+ }}
 
   InspectorStatus status = InspectorStatus.unverified;
   AuthUser? user;
   UserSubscriptionModel? subscription;
 
   Future<void> initializeUserState(BuildContext context) async {
-    debugPrint('🔹 [initializeUserState] Starting initialization...');
+    log('🔹 [initializeUserState] Starting initialization...');
     isLoading = true;
     notifyListeners();
 
     try {
-      debugPrint('📦 Fetching local user from AuthLocalDataSource...');
+      log('📦 Fetching local user from AuthLocalDataSource...');
       final localUser = await locator<AuthLocalDataSource>().getUser();
 
       if (localUser == null) {
-        debugPrint('⚠️ No local user found. Setting status → unverified');
+        log('⚠️ No local user found. Setting status → unverified');
         status = InspectorStatus.unverified;
         return;
       }
 
       user = localUser.toDomainEntity();
-      debugPrint('✅ Local user found: ${user?.name ?? "no email"}');
-      debugPrint('📱 OTP verified: ${localUser.phoneOtpVerified}');
+      log('✅ Local user found: ${user?.name ?? "no email"}');
+      log('📱 OTP verified: ${localUser.phoneOtpVerified}');
 
       if (localUser.phoneOtpVerified != true) {
-        debugPrint('❌ Phone OTP not verified. Setting status → unverified');
+        log('❌ Phone OTP not verified. Setting status → unverified');
         status = InspectorStatus.unverified;
         return;
       }
 
-      debugPrint('💳 Checking subscription status...');
-      debugPrint('   Subscription ID: ${localUser.currentSubscriptionId}');
-      debugPrint(
+      log('💳 Checking subscription status...');
+      log('   Subscription ID: ${localUser.currentSubscriptionId}');
+      log(
         '   Subscription Status: ${localUser.stripeSubscriptionStatus}',
       );
 
       if (localUser.stripeSubscriptionStatus == null ||
           localUser.currentSubscriptionId == null) {
-        debugPrint(
+        log(
           '⚠️ No active subscription found. Setting status → needsSubscription',
         );
         status = InspectorStatus.needsSubscription;
         await fetchSubscriptionPlans();
-        debugPrint('📋 Subscription plans fetched successfully.');
+        log('📋 Subscription plans fetched successfully.');
         return;
       }
 
       if (localUser.stripeSubscriptionStatus != 'active') {
-        debugPrint(
+        log(
           '⚠️ Subscription is not active (status=${localUser.stripeSubscriptionStatus}). '
           'Redirecting to subscription plan screen...',
         );
@@ -388,36 +390,37 @@ class InspectorDashboardProvider extends BaseViewModel {
 
       if (localUser.stripeSubscriptionStatus == 'active' &&
           localUser.currentSubscriptionId != null) {
-        debugPrint(
+        log(
           '🚀 Active subscription detected. Fetching user detail from remote...',
         );
+         if(context.mounted){  
         final userDetail = await fetchAndUpdateUserDetail(localUser, context);
-        debugPrint('✅ User detail fetched successfully.');
-        debugPrint(
+        log('✅ User detail fetched successfully.');
+        log(
           '👮 Admin Approval Status: ${userDetail.approvalStatusByAdmin}',
         );
 
         if (userDetail.approvalStatusByAdmin == 0) {
-          debugPrint('🕐 Approval pending. Setting status → underReview');
+          log('🕐 Approval pending. Setting status → underReview');
           status = InspectorStatus.underReview;
         } else if (userDetail.approvalStatusByAdmin == 2) {
-          debugPrint('Approval rejected by admin. Setting status → rejected');
+          log('Approval rejected by admin. Setting status → rejected');
           status = InspectorStatus.rejected;
         } else if (userDetail.approvalStatusByAdmin == 1) {
-          debugPrint('✅ Approval granted by admin. Setting status → approved');
+          log('✅ Approval granted by admin. Setting status → approved');
           status = InspectorStatus.approved;
         } else {
-          debugPrint(
+          log(
             '⚠️ Unknown approval status: ${userDetail.approvalStatusByAdmin}',
           );
         }
-      }
+      }}
     } catch (e, stack) {
-      debugPrint('🔥 [initializeUserState] Error occurred: $e');
-      debugPrint('📄 Stack Trace: $stack');
+      log('🔥 [initializeUserState] Error occurred: $e');
+      log('📄 Stack Trace: $stack');
     } finally {
       isLoading = false;
-      debugPrint('🏁 [initializeUserState] Initialization complete.');
+      log('🏁 [initializeUserState] Initialization complete.');
       notifyListeners();
     }
   }
@@ -440,9 +443,9 @@ class InspectorDashboardProvider extends BaseViewModel {
         detail = userDetail;
         final mergedUser = localUser.mergeWithUserDetail(userDetail);
         await locator<AuthLocalDataSource>().saveUser(mergedUser);
-        context.read<UserProvider>().setUser(mergedUser);
+      if(context.mounted)   context.read<UserProvider>().setUser(mergedUser);
       },
-      error: (e) => debugPrint('Failed to fetch user detail: ${e.message}'),
+      error: (e) => log('Failed to fetch user detail: ${e.message}'),
     );
 
     return detail;

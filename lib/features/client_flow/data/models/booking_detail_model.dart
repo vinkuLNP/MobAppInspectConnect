@@ -1,6 +1,4 @@
 import 'package:inspect_connect/features/client_flow/data/models/certificate_subtype_model.dart';
-import 'package:inspect_connect/features/client_flow/domain/entities/certificate_sub_type_entity.dart';
-
 import '../../domain/entities/booking_detail_entity.dart';
 
 class BookingDetailModel extends BookingDetailEntity {

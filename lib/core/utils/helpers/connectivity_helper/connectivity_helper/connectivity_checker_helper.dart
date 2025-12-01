@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:injectable/injectable.dart';
 
@@ -5,7 +7,7 @@ import 'package:injectable/injectable.dart';
 class ConnectivityCheckerHelper {
   Future<bool> checkConnectivity() async {
     final List<ConnectivityResult> result = await Connectivity().checkConnectivity();
-print('Connectivity result: $result');
+log('Connectivity result: $result');
 
     return _handleResult(result);
   }

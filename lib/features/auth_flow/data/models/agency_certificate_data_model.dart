@@ -12,11 +12,6 @@ class CertificateTypeModel extends AgenncyInnerCertificateTypeEntity {
       name: json['name'] ?? '',
     );
   }
-
-  Map<String, dynamic> toJson() => {
-        '_id': id,
-        'name': name,
-      };
 }
 
 class AgencyModel extends AgencyEntity {

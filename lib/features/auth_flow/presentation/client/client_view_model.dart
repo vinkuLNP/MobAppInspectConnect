@@ -44,7 +44,8 @@ class ClientViewModelProvider extends BaseViewModel {
       notifyListeners();
     }
   }
-Future<void> submitSignUp({
+
+  Future<void> submitSignUp({
     required GlobalKey<FormState> formKey,
     required BuildContext context,
   }) async {
@@ -52,6 +53,7 @@ Future<void> submitSignUp({
     startOtpFlow(OtpPurpose.signUp);
     context.pushRoute(ResetPasswordRoute(showBackButton: true));
   }
+
   bool _isSigningIn = false;
   bool get isSigningIn => _isSigningIn;
 
@@ -132,7 +134,6 @@ Future<void> submitSignUp({
     if (v != passwordCtrlSignUp.text) return 'Passwords do not match';
     return null;
   }
-
 
   @override
   void dispose() {
@@ -255,27 +256,40 @@ Future<void> submitSignUp({
 
           await locator<AuthLocalDataSource>().saveUser(localUser);
           log('[RESET_PASSWORD] ✅ Local user saved.');
+          if (context.mounted) {
+            final userProvider = context.read<UserProvider>();
+            await userProvider.setUser(localUser);
+            await userProvider.loadUser();
+          }
 
-          final userProvider = context.read<UserProvider>();
-          await userProvider.setUser(localUser);
-          await userProvider.loadUser();
           log('[RESET_PASSWORD] ✅ User loaded into provider.');
 
           log('[RESET_PASSWORD] Verifying saved data:');
           log('  saved token=${localUser.authToken}');
           log('  saved name=${localUser.name}');
           log('  saved email=${localUser.email}');
-
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar( SnackBar(content: textWidget(text: 'Verify Your Otp Now',color: AppColors.backgroundColor,)));
-          context.pushRoute(OtpVerificationRoute(addShowButton: true));
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: textWidget(
+                  text: 'Verify Your Otp Now',
+                  color: AppColors.backgroundColor,
+                ),
+              ),
+            );
+            context.pushRoute(OtpVerificationRoute(addShowButton: true));
+          }
         },
         error: (e) {
           log('[RESET_PASSWORD] ❌ API error: ${e.message}');
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: textWidget(text: e.message ?? 'Signup failed',color: AppColors.backgroundColor,)));
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: textWidget(
+                text: e.message ?? 'Signup failed',
+                color: AppColors.backgroundColor,
+              ),
+            ),
+          );
         },
       );
     } catch (e, s) {
@@ -352,23 +366,36 @@ Future<void> submitSignUp({
 
           await locator<AuthLocalDataSource>().saveUser(merged);
           log('[VERIFY] ✅ User saved locally after merge.');
-
-          await fetchUserDetail(user: user, context: context);
-
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar( SnackBar(content: textWidget(text: 'Sign-up successful',color: AppColors.backgroundColor,)));
+          if (context.mounted) {
+            await fetchUserDetail(user: user, context: context);
+          }
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: textWidget(
+                  text: 'Sign-up successful',
+                  color: AppColors.backgroundColor,
+                ),
+              ),
+            );
+          }
           pinController.clear();
           if (user.role == 1) {
-            context.router.replaceAll([const ClientDashboardRoute()]);
+            
+             if (context.mounted)  context.router.replaceAll([const ClientDashboardRoute()]);
           } else {
-            context.router.replaceAll([const InspectorDashboardRoute()]);
+             if (context.mounted)  context.router.replaceAll([const InspectorDashboardRoute()]);
           }
         },
         error: (e) {
           log('[VERIFY] ❌ OTP verification failed: ${e.message}');
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: textWidget(text: e.message ?? 'Sign-up failed',color: AppColors.backgroundColor,)),
+            SnackBar(
+              content: textWidget(
+                text: e.message ?? 'Sign-up failed',
+                color: AppColors.backgroundColor,
+              ),
+            ),
           );
         },
       );
@@ -403,7 +430,7 @@ Future<void> submitSignUp({
 
     await locator<AuthLocalDataSource>().saveUser(localUser);
     log('[FETCH_USER_DETAIL] Saved local user.');
-
+if (!context.mounted) return;
     final userProvider = context.read<UserProvider>();
     await userProvider.setUser(localUser);
     await userProvider.loadUser();
@@ -463,7 +490,12 @@ Future<void> submitSignUp({
       state?.when(
         data: (user) async {
           ScaffoldMessenger.of(context).showSnackBar(
-             SnackBar(content: textWidget(text: 'Resend Otp successful',color: AppColors.backgroundColor,)),
+            SnackBar(
+              content: textWidget(
+                text: 'Resend Otp successful',
+                color: AppColors.backgroundColor,
+              ),
+            ),
           );
 
           pinController.clear();
@@ -471,7 +503,12 @@ Future<void> submitSignUp({
         },
         error: (e) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: textWidget(text: e.message ?? 'Sign-in failed',color: AppColors.backgroundColor,)),
+            SnackBar(
+              content: textWidget(
+                text: e.message ?? 'Sign-in failed',
+                color: AppColors.backgroundColor,
+              ),
+            ),
           );
         },
       );
@@ -572,145 +609,160 @@ Future<void> submitSignUp({
 
   String deviceToken = '';
   String deviceType = 'windows';
- 
- Future<void> signIn({
-  required GlobalKey<FormState> formKey,
-  required BuildContext context,
-}) async {
-  log('--login-- SignIn Info ----> token=$deviceToken type=$deviceType');
-  setSigningIn(true);
 
-  try {
-    deviceToken = await DeviceInfoHelper.getDeviceToken();
-    deviceType = await DeviceInfoHelper.getDeviceType();
+  Future<void> signIn({
+    required GlobalKey<FormState> formKey,
+    required BuildContext context,
+  }) async {
+    log('--login-- SignIn Info ----> token=$deviceToken type=$deviceType');
+    setSigningIn(true);
 
-    final signInUseCase = locator<SignInUseCase>();
-    log('---- SignIn Info ----> token=$deviceToken type=$deviceType');
+    try {
+      deviceToken = await DeviceInfoHelper.getDeviceToken();
+      deviceType = await DeviceInfoHelper.getDeviceType();
 
-    final result = await InternetAddress.lookup('google.com');
-    if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
-      log('✅ Internet available');
+      final signInUseCase = locator<SignInUseCase>();
+      log('---- SignIn Info ----> token=$deviceToken type=$deviceType');
+
+      final result = await InternetAddress.lookup('google.com');
+      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+        log('✅ Internet available');
+      }
+
+      final state = await executeParamsUseCase<AuthUser, SignInParams>(
+        useCase: signInUseCase,
+        query: SignInParams(
+          email: emailCtrl.text.trim(),
+          password: passwordCtrl.text.trim(),
+          deviceToken: deviceToken,
+          deviceType: deviceType,
+        ),
+        launchLoader: true,
+      );
+
+      state?.when(
+        data: (user) async {
+          log('✅ Sign-in success!');
+          log('👤 User Response (key fields):');
+          log('   ID: ${user.id}');
+          log('   Name: ${user.name}');
+          log('   Email: ${user.emailHashed}');
+          log('   Role: ${user.role}');
+          log('   Phone OTP Verified: ${user.phoneOtpVerified}');
+          log('   Stripe Subscription ID: ${user.currentSubscriptionId}');
+          log('   Stripe Status: ${user.stripeSubscriptionStatus}');
+          log('   Admin Approval: ${user.approvalStatusByAdmin}');
+          log('---------------------------------------------');
+
+          try {
+            final prettyJson = const JsonEncoder.withIndent(
+              '  ',
+            ).convert(user.toJson());
+            log('🧾 FULL USER DATA DUMP:\n$prettyJson');
+          } catch (e) {
+            log('⚠️ Failed to serialize full user JSON: $e');
+          }
+
+          await fetchUserDetail(user: user, context: context);
+          if (!context.mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: textWidget(
+                text: 'Sign-in successful',
+                color: AppColors.backgroundColor,
+              ),
+            ),
+          );
+          emailCtrl.clear();
+          passwordCtrl.clear();
+
+          if (user.role == 1) {
+            log('➡️ Navigating to ClientDashboardRoute');
+            context.router.replaceAll([const ClientDashboardRoute()]);
+          } else {
+            log('➡️ Navigating to Inspector flow → checkInspectorState()');
+            checkInspectorState(context);
+          }
+        },
+        error: (e) {
+          log('❌ Sign-in failed: ${e.message}');
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: textWidget(
+                text: e.message ?? 'Sign-in failed',
+                color: AppColors.backgroundColor,
+              ),
+            ),
+          );
+        },
+      );
+    } on SocketException catch (_) {
+      log('❌ No Internet connection');
+    } finally {
+      setSigningIn(false);
+      log('🏁 Sign-in process completed.');
+    }
+  }
+
+  Future<void> checkInspectorState(BuildContext context) async {
+    log('🔍 Checking Inspector State...');
+
+    final localUser = await locator<AuthLocalDataSource>().getUser();
+    if (localUser == null) {
+      log('⚠️ No local user found — redirecting to OnBoardingRoute');
+      if (!context.mounted) return;
+      context.router.replaceAll([const OnBoardingRoute()]);
+      return;
     }
 
-    final state = await executeParamsUseCase<AuthUser, SignInParams>(
-      useCase: signInUseCase,
-      query: SignInParams(
-        email: emailCtrl.text.trim(),
-        password: passwordCtrl.text.trim(),
-        deviceToken: deviceToken,
-        deviceType: deviceType,
-      ),
-      launchLoader: true,
-    );
+    log('👤 Local user found: ${localUser.name ?? 'Unknown'}');
+    log('   ID: ${localUser.id}');
+    log('   Email: ${localUser.email}');
+    log('   ApprovalStatus: ${localUser.approvalStatusByAdmin}');
+    log('   StripeSubscriptionStatus: ${localUser.stripeSubscriptionStatus}');
+    log('   CurrentSubscriptionId: ${localUser.currentSubscriptionId}');
+    log('---------------------------------------------');
 
-    state?.when(
-      data: (user) async {
-        log('✅ Sign-in success!');
-        log('👤 User Response (key fields):');
-        log('   ID: ${user.id}');
-        log('   Name: ${user.name}');
-        log('   Email: ${user.emailHashed}');
-        log('   Role: ${user.role}');
-        log('   Phone OTP Verified: ${user.phoneOtpVerified}');
-        log('   Stripe Subscription ID: ${user.currentSubscriptionId}');
-        log('   Stripe Status: ${user.stripeSubscriptionStatus}');
-        log('   Admin Approval: ${user.approvalStatusByAdmin}');
-        log('---------------------------------------------');
+    final provider = InspectorDashboardProvider();
 
-        try {
-          final prettyJson = const JsonEncoder.withIndent('  ').convert(user.toJson());
-          log('🧾 FULL USER DATA DUMP:\n$prettyJson');
-        } catch (e) {
-          log('⚠️ Failed to serialize full user JSON: $e');
-        }
+   if(context.mounted) await provider.initializeUserState(context);
 
-        await fetchUserDetail(user: user, context: context);
-        ScaffoldMessenger.of(context)
-            .showSnackBar( SnackBar(content: textWidget(text: 'Sign-in successful',color: AppColors.backgroundColor,)));
-        emailCtrl.clear();
-        passwordCtrl.clear();
+    log('📊 InspectorDashboardProvider initialized');
+    log('🔸 Current status: ${provider.status}');
 
-        if (user.role == 1) {
-          log('➡️ Navigating to ClientDashboardRoute');
-          context.router.replaceAll([const ClientDashboardRoute()]);
-        } else {
-          log('➡️ Navigating to Inspector flow → checkInspectorState()');
-          checkInspectorState(context);
-        }
-      },
-      error: (e) {
-        log('❌ Sign-in failed: ${e.message}');
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: textWidget(text: e.message ?? 'Sign-in failed',color: AppColors.backgroundColor,)),
+    switch (provider.status) {
+      case InspectorStatus.needsSubscription:
+        log(
+          '➡️ Redirecting: Inspector needs subscription → InspectorDashboardRoute',
         );
-      },
-    );
-  } on SocketException catch (_) {
-    log('❌ No Internet connection');
-  } finally {
-    setSigningIn(false);
-    log('🏁 Sign-in process completed.');
-  }
-}
+     if(context.mounted)   context.router.replaceAll([const InspectorDashboardRoute()]);
+        break;
 
+      case InspectorStatus.underReview:
+        log(
+          '➡️ Redirecting: Inspector under admin review → InspectorDashboardRoute',
+        );
+    if(context.mounted)    context.router.replaceAll([const InspectorDashboardRoute()]);
+        break;
 
+      case InspectorStatus.rejected:
+        log('➡️ Redirecting: Inspector rejected → InspectorDashboardRoute');
+       if(context.mounted) context.router.replaceAll([const InspectorDashboardRoute()]);
+        break;
 
+      case InspectorStatus.approved:
+        log('✅ Inspector approved → InspectorDashboardRoute');
+  if(context.mounted)      context.router.replaceAll([const InspectorDashboardRoute()]);
+        break;
 
-Future<void> checkInspectorState(BuildContext context) async {
-  log('🔍 Checking Inspector State...');
+      default:
+        log('⚠️ Unknown state → Redirecting to OnBoardingRoute');
+        context.router.replaceAll([const OnBoardingRoute()]);
+    }
 
-  final localUser = await locator<AuthLocalDataSource>().getUser();
-  if (localUser == null) {
-    log('⚠️ No local user found — redirecting to OnBoardingRoute');
-    context.router.replaceAll([const OnBoardingRoute()]);
-    return;
-  }
-
-  log('👤 Local user found: ${localUser.name ?? 'Unknown'}');
-  log('   ID: ${localUser.id}');
-  log('   Email: ${localUser.email}');
-  log('   ApprovalStatus: ${localUser.approvalStatusByAdmin}');
-  log('   StripeSubscriptionStatus: ${localUser.stripeSubscriptionStatus}');
-  log('   CurrentSubscriptionId: ${localUser.currentSubscriptionId}');
-  log('---------------------------------------------');
-
-  final provider = InspectorDashboardProvider();
-  await provider.initializeUserState(context);
-
-  log('📊 InspectorDashboardProvider initialized');
-  log('🔸 Current status: ${provider.status}');
-
-  switch (provider.status) {
-    case InspectorStatus.needsSubscription:
-      log('➡️ Redirecting: Inspector needs subscription → InspectorDashboardRoute');
-      context.router.replaceAll([const InspectorDashboardRoute()]);
-      break;
-
-    case InspectorStatus.underReview:
-      log('➡️ Redirecting: Inspector under admin review → InspectorDashboardRoute');
-      context.router.replaceAll([const InspectorDashboardRoute()]);
-      break;
-
-    case InspectorStatus.rejected:
-      log('➡️ Redirecting: Inspector rejected → InspectorDashboardRoute');
-      context.router.replaceAll([const InspectorDashboardRoute()]);
-      break;
-
-    case InspectorStatus.approved:
-      log('✅ Inspector approved → InspectorDashboardRoute');
-      context.router.replaceAll([const InspectorDashboardRoute()]);
-      break;
-
-    default:
-      log('⚠️ Unknown state → Redirecting to OnBoardingRoute');
-      context.router.replaceAll([const OnBoardingRoute()]);
+    log('🏁 checkInspectorState() completed.\n');
   }
 
-  log('🏁 checkInspectorState() completed.\n');
-}
-
- 
- 
   Future<void> forgotPasswordApi({
     required GlobalKey<FormState> formKey,
     required BuildContext context,
@@ -739,13 +791,23 @@ Future<void> checkInspectorState(BuildContext context) async {
 
       state?.when(
         data: (user) async {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar( SnackBar(content: textWidget(text: 'Sign-in successful',color: AppColors.backgroundColor,)));
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: textWidget(
+                text: 'Sign-in successful',
+                color: AppColors.backgroundColor,
+              ),
+            ),
+          );
         },
         error: (e) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: textWidget(text: e.message ?? 'Sign-in failed',color: AppColors.backgroundColor,)),
+            SnackBar(
+              content: textWidget(
+                text: e.message ?? 'Sign-in failed',
+                color: AppColors.backgroundColor,
+              ),
+            ),
           );
         },
       );

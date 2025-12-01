@@ -149,7 +149,7 @@ class _OnBoardingPageState extends State<OnBoardingPage>
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: [Colors.black, Colors.black.withOpacity(0.0)],
+                  colors: [Colors.black, Colors.black.withValues(alpha: 0.0)],
                 ),
               ),
             ),
@@ -164,8 +164,8 @@ class _OnBoardingPageState extends State<OnBoardingPage>
                   end: Alignment.bottomCenter,
                   stops: const [0.45, 0.6, 1.0],
                   colors: [
-                    Colors.black.withOpacity(0.0),
-                    Colors.black.withOpacity(0.85),
+                    Colors.black.withValues(alpha: 0.0),
+                    Colors.black.withValues(alpha: 0.85),
                     Colors.black,
                   ],
                 ),
@@ -175,9 +175,7 @@ class _OnBoardingPageState extends State<OnBoardingPage>
 
           SafeArea(
             child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 24.0,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -283,19 +281,21 @@ class _OnBoardingPageState extends State<OnBoardingPage>
                                 await _videoController.pause();
                                 await _videoController.dispose();
                               } catch (_) {}
+                              if (context.mounted) {
+                                final authFlow = context
+                                    .read<AuthFlowProvider>();
 
-                              final authFlow = context.read<AuthFlowProvider>();
-
-                              if (_isClient == true) {
-                                authFlow.setUserType(AuthUserType.client);
-                                context.pushRoute(
-                                  ClientSignInRoute(showBackButton: false),
-                                );
-                              } else {
-                                authFlow.setUserType(AuthUserType.inspector);
-                                context.pushRoute(
-                                  InspectorSignUpRoute(showBackButton: false),
-                                );
+                                if (_isClient == true) {
+                                  authFlow.setUserType(AuthUserType.client);
+                                  context.pushRoute(
+                                    ClientSignInRoute(showBackButton: false),
+                                  );
+                                } else {
+                                  authFlow.setUserType(AuthUserType.inspector);
+                                  context.pushRoute(
+                                    InspectorSignUpRoute(showBackButton: false),
+                                  );
+                                }
                               }
                             },
                           ),
@@ -313,22 +313,27 @@ class _OnBoardingPageState extends State<OnBoardingPage>
                                     await _videoController.pause();
                                     await _videoController.dispose();
                                   } catch (_) {}
+                                  if (context.mounted) {
+                                    final authFlow = context
+                                        .read<AuthFlowProvider>();
 
-                                  final authFlow = context
-                                      .read<AuthFlowProvider>();
-
-                                  if (_isClient == true) {
-                                    authFlow.setUserType(AuthUserType.client);
-                                    context.pushRoute(
-                                      ClientSignInRoute(showBackButton: false),
-                                    );
-                                  } else {
-                                    authFlow.setUserType(
-                                      AuthUserType.inspector,
-                                    );
-                                    context.pushRoute(
-                                      ClientSignInRoute(showBackButton: false),
-                                    );
+                                    if (_isClient == true) {
+                                      authFlow.setUserType(AuthUserType.client);
+                                      context.pushRoute(
+                                        ClientSignInRoute(
+                                          showBackButton: false,
+                                        ),
+                                      );
+                                    } else {
+                                      authFlow.setUserType(
+                                        AuthUserType.inspector,
+                                      );
+                                      context.pushRoute(
+                                        ClientSignInRoute(
+                                          showBackButton: false,
+                                        ),
+                                      );
+                                    }
                                   }
                                 },
                                 child: textWidget(

@@ -11,21 +11,21 @@ class BaseViewModel extends ChangeNotifier {
 
   StreamController<bool> get toggleLoading => _toggleLoading;
 
-  Future<ApiResultState<Type>?> executeParamsUseCase<Type, Params>({
-    required BaseParamsUseCase<Type, Params> useCase,
+  Future<ApiResultState<DataType>?> executeParamsUseCase<DataType, Params>({
+    required BaseParamsUseCase<DataType, Params> useCase,
     Params? query,
     bool launchLoader = true,
   }) async {
     showLoadingIndicator(launchLoader);
-    final ApiResultModel<Type> apiResult = await useCase(query);
+    final ApiResultModel<DataType> apiResult = await useCase(query);
     return apiResult.when(
-      success: (Type data) {
+      success: (DataType data) {
         showLoadingIndicator(false);
-        return ApiResultState<Type>.data(data: data);
+        return ApiResultState<DataType>.data(data: data);
       },
       failure: (ErrorResultModel errorResultEntity) {
         showLoadingIndicator(false);
-        return ApiResultState<Type>.error(
+        return ApiResultState<DataType>.error(
           errorResultModel: ErrorResultModel(
             message: errorResultEntity.message,
             statusCode: errorResultEntity.statusCode,

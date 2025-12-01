@@ -11,7 +11,6 @@ class ResponsiveUiConfig {
 
   double get screenHeight => _screenHeight;
 
-  ///this method initialize all of our attributes
   void initialize(BuildContext context) {
     _mediaQueryData = MediaQuery.of(context);
     _screenWidth = _mediaQueryData.size.width;

@@ -34,7 +34,7 @@ class PersonalDetailsStep extends StatelessWidget {
         const SizedBox(height: 8),
 
         Consumer<InspectorViewModelProvider>(
-          builder: (_, vm, __) => FormField<String>(
+          builder: (_, vm, _) => FormField<String>(
             validator: (_) {
               final p = vm.phoneRaw ?? '';
               if ((vm.phoneE164 ?? '').isEmpty) return 'Phone is required';
