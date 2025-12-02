@@ -384,12 +384,16 @@ class InspectorViewModelProvider extends BaseViewModel {
       if (picker == null && picker!.files.single.path == null) return;
       final file = File(picker.files.single.path.toString());
       if (await file.length() > 2 * 1024 * 1024) {
-        if(context.mounted){
-
-  
-        ScaffoldMessenger.of(context).showSnackBar(
-           SnackBar(content: textWidget(text: 'File must be under 2 MB',color: AppColors.backgroundColor,)),
-        );}
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: textWidget(
+                text: 'File must be under 2 MB',
+                color: AppColors.backgroundColor,
+              ),
+            ),
+          );
+        }
         return;
       }
       final uploadImage = UploadImageDto(filePath: file.path);
@@ -416,7 +420,12 @@ class InspectorViewModelProvider extends BaseViewModel {
         },
         error: (e) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: textWidget(text: e.message ?? 'Image upload failed',color: AppColors.backgroundColor,)),
+            SnackBar(
+              content: textWidget(
+                text: e.message ?? 'Image upload failed',
+                color: AppColors.backgroundColor,
+              ),
+            ),
           );
         },
       );
@@ -472,8 +481,11 @@ class InspectorViewModelProvider extends BaseViewModel {
       showValidationError = true;
       notifyListeners();
       ScaffoldMessenger.of(context).showSnackBar(
-         SnackBar(
-          content: textWidget(text: 'Please agree to all terms before continuing.',color: AppColors.backgroundColor,),
+        SnackBar(
+          content: textWidget(
+            text: 'Please agree to all terms before continuing.',
+            color: AppColors.backgroundColor,
+          ),
           backgroundColor: Colors.redAccent,
         ),
       );
@@ -491,13 +503,23 @@ class InspectorViewModelProvider extends BaseViewModel {
   bool validate(BuildContext context) {
     if (profileImage == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-         SnackBar(content: textWidget(text: 'Please upload a profile image',color: AppColors.backgroundColor,)),
+        SnackBar(
+          content: textWidget(
+            text: 'Please upload a profile image',
+            color: AppColors.backgroundColor,
+          ),
+        ),
       );
       return false;
     }
     if (!agreedToTerms || !confirmTruth) {
       ScaffoldMessenger.of(context).showSnackBar(
-         SnackBar(content: textWidget(text: 'Please agree to all conditions',color: AppColors.backgroundColor,)),
+        SnackBar(
+          content: textWidget(
+            text: 'Please agree to all conditions',
+            color: AppColors.backgroundColor,
+          ),
+        ),
       );
       return false;
     }
@@ -514,10 +536,16 @@ class InspectorViewModelProvider extends BaseViewModel {
 
     isProcessing = false;
     notifyListeners();
-if(context.mounted){
-    ScaffoldMessenger.of(context).showSnackBar(
-       SnackBar(content: textWidget(text: 'Profile submitted successfully!',color: AppColors.backgroundColor,)),
-    );}
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: textWidget(
+            text: 'Profile submitted successfully!',
+            color: AppColors.backgroundColor,
+          ),
+        ),
+      );
+    }
   }
 
   List<File> idImages = [];
@@ -624,7 +652,8 @@ if(context.mounted){
         },
         error: (e) {},
       );
-    } catch (e) {log(e.toString());
+    } catch (e) {
+      log(e.toString());
     } finally {
       setProcessing(false);
     }
@@ -647,9 +676,16 @@ if(context.mounted){
 
         final file = File(picked.path);
         if (await file.length() > 1 * 1024 * 1024) {
-          if(context.mounted){         ScaffoldMessenger.of(context).showSnackBar(
-             SnackBar(content: textWidget(text: 'File must be under 1 MB',color: AppColors.backgroundColor,)),
-          );}
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: textWidget(
+                  text: 'File must be under 1 MB',
+                  color: AppColors.backgroundColor,
+                ),
+              ),
+            );
+          }
           return;
         }
 
@@ -673,7 +709,12 @@ if(context.mounted){
           },
           error: (e) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: textWidget(text: e.message ?? 'Image upload failed',color: AppColors.backgroundColor,)),
+              SnackBar(
+                content: textWidget(
+                  text: e.message ?? 'Image upload failed',
+                  color: AppColors.backgroundColor,
+                ),
+              ),
             );
           },
         );
@@ -686,10 +727,16 @@ if(context.mounted){
         if (result == null && result!.files.single.path == null) return;
         final file = File(result.files.single.path.toString());
         if (await file.length() > 2 * 1024 * 1024) {
-          if(context.mounted){
-          ScaffoldMessenger.of(context).showSnackBar(
-             SnackBar(content: textWidget(text: 'File must be under 2 MB',color: AppColors.backgroundColor,)),
-          );}
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: textWidget(
+                  text: 'File must be under 2 MB',
+                  color: AppColors.backgroundColor,
+                ),
+              ),
+            );
+          }
           return;
         }
         final uploadImage = UploadImageDto(filePath: file.path);
@@ -717,7 +764,12 @@ if(context.mounted){
           },
           error: (e) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: textWidget(text: e.message ?? 'Image upload failed',color: AppColors.backgroundColor,)),
+              SnackBar(
+                content: textWidget(
+                  text: e.message ?? 'Image upload failed',
+                  color: AppColors.backgroundColor,
+                ),
+              ),
             );
           },
         );
@@ -923,31 +975,40 @@ if(context.mounted){
 
           await locator<AuthLocalDataSource>().saveUser(localUser);
           log('[SignUP] ✅ Local user saved.');
-if(context.mounted){
- final userProvider = context.read<UserProvider>();
-          await userProvider.setUser(localUser);
-          await userProvider.loadUser();
-}
-         
+          if (context.mounted) {
+            final userProvider = context.read<UserProvider>();
+            await userProvider.setUser(localUser);
+            await userProvider.loadUser();
+          }
+
           log('[SignUP] ✅ User loaded into provider.');
 
           log('[SignUP] Verifying saved data:');
           log('  saved token=${localUser.authToken}');
           log('  saved name=${localUser.name}');
           log('  saved email=${localUser.email}');
-if(context.mounted){
-  ScaffoldMessenger.of(
-            context,
-          ).showSnackBar( SnackBar(content: textWidget(text: 'Verify Your Otp Now',color: AppColors.backgroundColor,)));
-          context.pushRoute(OtpVerificationRoute(addShowButton: true));
-}
-        
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: textWidget(
+                  text: 'Verify Your Otp Now',
+                  color: AppColors.backgroundColor,
+                ),
+              ),
+            );
+            context.pushRoute(OtpVerificationRoute(addShowButton: true));
+          }
         },
         error: (e) {
           log('[SignUP] ❌ API error: ${e.message}');
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: textWidget(text: e.message ?? 'Signup failed',color: AppColors.backgroundColor,)));
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: textWidget(
+                text: e.message ?? 'Signup failed',
+                color: AppColors.backgroundColor,
+              ),
+            ),
+          );
         },
       );
     } catch (e, s) {
