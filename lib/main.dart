@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:inspect_connect/core/di/app_component/app_component.dart';
 import 'package:inspect_connect/core/utils/auto_router_setup/auto_router.dart';
@@ -30,7 +31,7 @@ Future<void> main() async {
   configService.configure(productFlavor: productFlavor);
   log(' buildVariant = ${EnvironmentConfig.buildVariant}');
   log(' Base URL = ${configService.baseUrl}');
-
+  await dotenv.load(fileName: ".env");
   SessionManager().navigatorKey = rootNavigatorKey;
 
   runApp(MyApp(appRouter: appRouter));
@@ -55,9 +56,6 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (_) => AuthFlowProvider()),
         ChangeNotifierProvider(create: (_) => ClientViewModelProvider()),
         ChangeNotifierProvider(create: (_) => InspectorDashboardProvider()),
-
-
-        
       ],
       child: MaterialApp.router(
         routerConfig: appRouter.config(),

@@ -70,7 +70,6 @@ class ClientViewModelProvider extends BaseViewModel {
   final fullNameCtrl = TextEditingController();
   final phoneCtrl = TextEditingController();
   final emailCtrlSignUp = TextEditingController();
-  final addressCtrl = TextEditingController();
   final passwordCtrlSignUp = TextEditingController();
   final confirmPasswordCtrl = TextEditingController();
 
@@ -135,6 +134,28 @@ class ClientViewModelProvider extends BaseViewModel {
     return null;
   }
 
+  TextEditingController addressCtrl = TextEditingController();
+  String? placeName;
+  String? pincode;
+  String? city;
+  String? state;
+  String? country;
+  String? placeType;
+  String? selectedLat;
+  String? selectedLng;
+  String? fullAddress;
+
+  void setAddress(String value) {
+    addressCtrl.text = value;
+    log(addressCtrl.text.toString());
+    notifyListeners();
+  }
+
+  String? validateMailingAddress(String? value) {
+    if (value == null || value.isEmpty) return 'Please enter mailing address';
+    return null;
+  }
+
   @override
   void dispose() {
     emailCtrl.dispose();
@@ -186,7 +207,7 @@ class ClientViewModelProvider extends BaseViewModel {
     required BuildContext context,
   }) async {
     if (!(formKey.currentState?.validate() ?? false)) {
-      log('[RESET_PASSWORD] ❌ Form validation failed — aborting.');
+      log('[RESET_PASSWORD] Form validation failed — aborting.');
       return;
     }
 
@@ -215,13 +236,13 @@ class ClientViewModelProvider extends BaseViewModel {
         password: passwordCtrlSignUp.text.trim(),
         deviceToken: deviceToken,
         deviceType: deviceType,
-        mailingAddress: "456 Broadway, New York, NY 10001",
+        mailingAddress: addressCtrl.text.toString(),
         agreedToTerms: true,
         isTruthfully: true,
         location: {
-          "type": "Point",
-          "locationName": "Midtown",
-          "coordinates": [-73.9857, 40.7484],
+          "type": placeType,
+          "locationName": placeName,
+          "coordinates": [selectedLat, selectedLng],
         },
       );
 
@@ -240,7 +261,7 @@ class ClientViewModelProvider extends BaseViewModel {
 
       state?.when(
         data: (user) async {
-          log('[RESET_PASSWORD] ✅ API returned user data:');
+          log('[RESET_PASSWORD]  API returned user data:');
           log('  id=${user.id}');
           log('  token=${user.authToken}');
           log('  fullName=${user.name}');
@@ -255,14 +276,14 @@ class ClientViewModelProvider extends BaseViewModel {
           log('  phone=${localUser.phoneNumber}');
 
           await locator<AuthLocalDataSource>().saveUser(localUser);
-          log('[RESET_PASSWORD] ✅ Local user saved.');
+          log('[RESET_PASSWORD]  Local user saved.');
           if (context.mounted) {
             final userProvider = context.read<UserProvider>();
             await userProvider.setUser(localUser);
             await userProvider.loadUser();
           }
 
-          log('[RESET_PASSWORD] ✅ User loaded into provider.');
+          log('[RESET_PASSWORD]  User loaded into provider.');
 
           log('[RESET_PASSWORD] Verifying saved data:');
           log('  saved token=${localUser.authToken}');
@@ -281,7 +302,7 @@ class ClientViewModelProvider extends BaseViewModel {
           }
         },
         error: (e) {
-          log('[RESET_PASSWORD] ❌ API error: ${e.message}');
+          log('[RESET_PASSWORD] API error: ${e.message}');
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: textWidget(
@@ -293,7 +314,7 @@ class ClientViewModelProvider extends BaseViewModel {
         },
       );
     } catch (e, s) {
-      log('[RESET_PASSWORD] ❌ Exception during reset: $e');
+      log('[RESET_PASSWORD] Exception during reset: $e');
       log('[RESET_PASSWORD] Stacktrace: $s');
     } finally {
       setSigningIn(false);
@@ -311,7 +332,7 @@ class ClientViewModelProvider extends BaseViewModel {
 
       final user = await locator<AuthLocalDataSource>().getUser();
       if (user == null) {
-        log('[VERIFY] ❌ No local user found.');
+        log('[VERIFY] No local user found.');
         throw Exception('User not found in local storage');
       }
 
@@ -333,7 +354,7 @@ class ClientViewModelProvider extends BaseViewModel {
       state?.when(
         data: (user) async {
           log(
-            '[VERIFY] ✅ OTP verification successful, received user from API:@$user',
+            '[VERIFY]  OTP verification successful, received user from API:@$user',
           );
           log('  id=${user.id}');
           log('  iroled=${user.role}');
@@ -365,7 +386,7 @@ class ClientViewModelProvider extends BaseViewModel {
           log('  phone=${merged.phoneNumber}');
 
           await locator<AuthLocalDataSource>().saveUser(merged);
-          log('[VERIFY] ✅ User saved locally after merge.');
+          log('[VERIFY]  User saved locally after merge.');
           if (context.mounted) {
             await fetchUserDetail(user: user, context: context);
           }
@@ -381,14 +402,15 @@ class ClientViewModelProvider extends BaseViewModel {
           }
           pinController.clear();
           if (user.role == 1) {
-            
-             if (context.mounted)  context.router.replaceAll([const ClientDashboardRoute()]);
+            if (context.mounted)
+              context.router.replaceAll([const ClientDashboardRoute()]);
           } else {
-             if (context.mounted)  context.router.replaceAll([const InspectorDashboardRoute()]);
+            if (context.mounted)
+              context.router.replaceAll([const InspectorDashboardRoute()]);
           }
         },
         error: (e) {
-          log('[VERIFY] ❌ OTP verification failed: ${e.message}');
+          log('[VERIFY] OTP verification failed: ${e.message}');
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: textWidget(
@@ -400,7 +422,7 @@ class ClientViewModelProvider extends BaseViewModel {
         },
       );
     } catch (e, s) {
-      log('[VERIFY] ❌ Exception: $e');
+      log('[VERIFY] Exception: $e');
       log('[VERIFY] Stacktrace: $s');
     } finally {
       emailCtrl.clear();
@@ -430,7 +452,7 @@ class ClientViewModelProvider extends BaseViewModel {
 
     await locator<AuthLocalDataSource>().saveUser(localUser);
     log('[FETCH_USER_DETAIL] Saved local user.');
-if (!context.mounted) return;
+    if (!context.mounted) return;
     final userProvider = context.read<UserProvider>();
     await userProvider.setUser(localUser);
     await userProvider.loadUser();
@@ -448,7 +470,7 @@ if (!context.mounted) return;
     userState?.when(
       data: (userData) async {
         log(
-          '[FETCH_USER_DETAIL] ✅ Received user detail from API: ${userData.name} (${userData.email})',
+          '[FETCH_USER_DETAIL]  Received user detail from API: ${userData.name} (${userData.email})',
         );
 
         final mergedUser = localUser.mergeWithUserDetail(userData);
@@ -457,13 +479,13 @@ if (!context.mounted) return;
         );
 
         await locator<AuthLocalDataSource>().saveUser(mergedUser);
-        log('[FETCH_USER_DETAIL] ✅ User detail saved locally after merge.');
+        log('[FETCH_USER_DETAIL]  User detail saved locally after merge.');
 
         await userProvider.setUser(mergedUser);
-        log('[FETCH_USER_DETAIL] ✅ User updated in provider.');
+        log('[FETCH_USER_DETAIL]  User updated in provider.');
       },
       error: (e) {
-        log('[FETCH_USER_DETAIL] ❌ Failed to fetch user detail: ${e.message}');
+        log('[FETCH_USER_DETAIL] Failed to fetch user detail: ${e.message}');
         context.router.replaceAll([const ClientDashboardRoute()]);
       },
     );
@@ -626,7 +648,7 @@ if (!context.mounted) return;
 
       final result = await InternetAddress.lookup('google.com');
       if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
-        log('✅ Internet available');
+        log(' Internet available');
       }
 
       final state = await executeParamsUseCase<AuthUser, SignInParams>(
@@ -642,7 +664,7 @@ if (!context.mounted) return;
 
       state?.when(
         data: (user) async {
-          log('✅ Sign-in success!');
+          log(' Sign-in success!');
           log('👤 User Response (key fields):');
           log('   ID: ${user.id}');
           log('   Name: ${user.name}');
@@ -685,7 +707,7 @@ if (!context.mounted) return;
           }
         },
         error: (e) {
-          log('❌ Sign-in failed: ${e.message}');
+          log('Sign-in failed: ${e.message}');
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: textWidget(
@@ -697,7 +719,7 @@ if (!context.mounted) return;
         },
       );
     } on SocketException catch (_) {
-      log('❌ No Internet connection');
+      log('No Internet connection');
     } finally {
       setSigningIn(false);
       log('🏁 Sign-in process completed.');
@@ -725,7 +747,7 @@ if (!context.mounted) return;
 
     final provider = InspectorDashboardProvider();
 
-   if(context.mounted) await provider.initializeUserState(context);
+    if (context.mounted) await provider.initializeUserState(context);
 
     log('📊 InspectorDashboardProvider initialized');
     log('🔸 Current status: ${provider.status}');
@@ -735,24 +757,28 @@ if (!context.mounted) return;
         log(
           '➡️ Redirecting: Inspector needs subscription → InspectorDashboardRoute',
         );
-     if(context.mounted)   context.router.replaceAll([const InspectorDashboardRoute()]);
+        if (context.mounted)
+          context.router.replaceAll([const InspectorDashboardRoute()]);
         break;
 
       case InspectorStatus.underReview:
         log(
           '➡️ Redirecting: Inspector under admin review → InspectorDashboardRoute',
         );
-    if(context.mounted)    context.router.replaceAll([const InspectorDashboardRoute()]);
+        if (context.mounted)
+          context.router.replaceAll([const InspectorDashboardRoute()]);
         break;
 
       case InspectorStatus.rejected:
         log('➡️ Redirecting: Inspector rejected → InspectorDashboardRoute');
-       if(context.mounted) context.router.replaceAll([const InspectorDashboardRoute()]);
+        if (context.mounted)
+          context.router.replaceAll([const InspectorDashboardRoute()]);
         break;
 
       case InspectorStatus.approved:
-        log('✅ Inspector approved → InspectorDashboardRoute');
-  if(context.mounted)      context.router.replaceAll([const InspectorDashboardRoute()]);
+        log(' Inspector approved → InspectorDashboardRoute');
+        if (context.mounted)
+          context.router.replaceAll([const InspectorDashboardRoute()]);
         break;
 
       default:

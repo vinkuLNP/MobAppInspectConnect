@@ -22,6 +22,7 @@ class _OnBoardingPageState extends State<OnBoardingPage>
   late VideoPlayerController _videoController;
   bool? _isClient;
   bool _showSignInText = false;
+  bool isDisposed = false;
 
   late AnimationController _fadeController;
 
@@ -54,10 +55,13 @@ class _OnBoardingPageState extends State<OnBoardingPage>
 
   @override
   void dispose() {
-    if (_videoController.value.isInitialized) {
-      _videoController.pause();
-    }
-    _videoController.dispose();
+    isDisposed = true;
+    try {
+      if (_videoController.value.isInitialized) {
+        _videoController.pause();
+      }
+      _videoController.dispose();
+    } catch (_) {}
     _fadeController.dispose();
     super.dispose();
   }
@@ -132,7 +136,9 @@ class _OnBoardingPageState extends State<OnBoardingPage>
                         child: SizedBox(
                           width: _videoController.value.size.width,
                           height: _videoController.value.size.height,
-                          child: VideoPlayer(_videoController),
+                          child: !isDisposed
+                              ? VideoPlayer(_videoController)
+                              : SizedBox(),
                         ),
                       ),
                     )
@@ -279,7 +285,6 @@ class _OnBoardingPageState extends State<OnBoardingPage>
                             onTap: () async {
                               try {
                                 await _videoController.pause();
-                                await _videoController.dispose();
                               } catch (_) {}
                               if (context.mounted) {
                                 final authFlow = context

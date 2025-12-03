@@ -1,5 +1,8 @@
+import 'dart:developer';
 import 'package:auto_route/auto_route.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:inspect_connect/core/basecomponents/base_responsive_widget.dart';
+import 'package:inspect_connect/core/utils/app_widgets/common_address_auto_complete_field.dart';
 import 'package:inspect_connect/core/utils/auto_router_setup/auto_router.dart';
 import 'package:inspect_connect/core/utils/constants/app_assets_constants.dart';
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
@@ -14,8 +17,8 @@ import 'package:provider/provider.dart';
 
 @RoutePage()
 class ResetPasswordView extends StatelessWidget {
-    final bool showBackButton;
-  const ResetPasswordView({super.key,required this.showBackButton});
+  final bool showBackButton;
+  const ResetPasswordView({super.key, required this.showBackButton});
 
   @override
   Widget build(BuildContext context) {
@@ -27,13 +30,13 @@ class ResetPasswordView extends StatelessWidget {
         final vm = ctx.watch<ClientViewModelProvider>();
 
         return CommonAuthBar(
-           showBackButton: showBackButton,
+          showBackButton: showBackButton,
           title: vm.otpPurpose == OtpPurpose.forgotPassword
               ? 'Reset Password'
-              : 'Create Password',
+              : 'Create Account',
           subtitle: vm.otpPurpose == OtpPurpose.forgotPassword
               ? 'Enter your new password'
-              : 'Create your password to continue',
+              : 'Enter password and address detail to continue',
           image: finalImage,
           rc: rc,
           form: Form(
@@ -63,19 +66,48 @@ class ResetPasswordView extends StatelessWidget {
                     if (vm.autoValidate) formKey.currentState?.validate();
                   },
                 ),
+                const SizedBox(height: 14),
+                AddressAutocompleteField(
+                  label: "Address",
+                  controller: vm.addressCtrl,
+                  googleApiKey: dotenv.env['GOOGLE_API_KEY']!,
+                  onAddressSelected: (prediction) {
+                    log("Selected: ${prediction.fullText}");
+                    log("address ctrl: ${vm.addressCtrl.text}");
+                  },
+
+                  onFullAddressFetched: (data) {
+                    vm.placeName = data["place_name"];
+                    vm.city = data["city"];
+                    vm.state = data["state"];
+                    vm.country = data["country"];
+                    vm.pincode = data["pincode"];
+                    vm.selectedLat = data["lat"].toString();
+                    vm.selectedLng = data["lng"].toString();
+                    vm.placeType = data["place_type"].toString();
+
+                    log("FULL ADDRESS → $data");
+                  },
+                ),
+
+                // Selected: Amritsar Bus Stand, Mehar Pura, Amritsar, Punjab, India
+                // I/flutter (17600): FULL ADDRESS → {place_name: Amritsar Bus Stand, city: Amritsar, state: Punjab, pincode: 143001, country: India, lat: 31.6298375, lng: 74.8839844, place_type: PlaceType.ESTABLISHMENT}
                 const SizedBox(height: 28),
 
                 AppButton(
                   text: vm.isResetting
                       ? 'Resetting...'
                       : vm.otpPurpose == OtpPurpose.forgotPassword
-                          ? 'Reset Password'
-                          : 'Create Password',
+                      ? 'Reset Password'
+                      : 'Submit',
                   buttonBackgroundColor: AppColors.authThemeColor,
                   borderColor: AppColors.authThemeColor,
                   isLoading: vm.isResetting,
                   isDisabled: vm.isResetting,
                   onTap: () async {
+                    log(vm.selectedLat.toString());
+                    log(vm.selectedLng.toString());
+
                     final isValid = formKey.currentState?.validate() ?? false;
                     if (!isValid) {
                       vm.enableAutoValidate();
@@ -90,7 +122,9 @@ class ResetPasswordView extends StatelessWidget {
                   question: "Already have an account? ",
                   actionText: "Sign In",
                   onTap: () {
-                    context.router.replaceAll([ ClientSignInRoute(showBackButton: false)]);
+                    context.router.replaceAll([
+                      ClientSignInRoute(showBackButton: false),
+                    ]);
                   },
                   actionColor: AppColors.authThemeLightColor,
                 ),
