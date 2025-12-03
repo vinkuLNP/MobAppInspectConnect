@@ -29,11 +29,11 @@ class _DateTimePickerWidgetState extends State<DateTimePickerWidget> {
   void initState() {
     super.initState();
     selectedDateTime =
-        widget.initialDateTime ?? DateTime.now().add(const Duration(hours: 2));
+        widget.initialDateTime ?? DateTime.now().add(const Duration(days: 1));
   }
 
   Future<void> _pickDateTime(BuildContext context) async {
-    final now = DateTime.now();
+    final now = DateTime.now().add(const Duration(days: 1));
     await showDialog(
       context: context,
       barrierDismissible: false,
@@ -57,7 +57,7 @@ class _DateTimePickerWidgetState extends State<DateTimePickerWidget> {
                         child: CalendarDatePicker(
                           initialDate: provider.tempDate,
                           firstDate: now,
-                          lastDate: now.add(const Duration(days: 60)),
+                          lastDate: now.add(const Duration(days: 265)),
                           onDateChanged: provider.setDate,
                         ),
                       ),
@@ -65,18 +65,9 @@ class _DateTimePickerWidgetState extends State<DateTimePickerWidget> {
                       widget.showTimePicker
                           ? ElevatedButton.icon(
                               onPressed: () async {
-                                final isToday = DateUtils.isSameDay(
-                                  provider.tempDate,
-                                  now,
-                                );
-                                final minTime = TimeOfDay.fromDateTime(
-                                  now.add(const Duration(hours: 2)),
-                                );
                                 final picked = await showTimePicker(
                                   context: context,
-                                  initialTime: isToday
-                                      ? minTime
-                                      : provider.tempTime,
+                                  initialTime: provider.tempTime,
                                 );
                                 if (picked != null) provider.setTime(picked);
                               },
@@ -105,8 +96,6 @@ class _DateTimePickerWidgetState extends State<DateTimePickerWidget> {
                   ),
                   ElevatedButton(
                     onPressed: () {
-                      if (!provider.validateDateTime()) return;
-
                       setState(
                         () => selectedDateTime = provider.chosenDateTime,
                       );
@@ -151,7 +140,7 @@ class _DateTimePickerWidgetState extends State<DateTimePickerWidget> {
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: AppColors.authThemeColor.withValues(alpha:0.8),
+                color: AppColors.authThemeColor.withValues(alpha: 0.8),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: const Icon(

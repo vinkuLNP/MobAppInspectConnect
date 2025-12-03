@@ -14,6 +14,7 @@ import 'package:inspect_connect/features/auth_flow/presentation/client/widgets/c
 import 'package:inspect_connect/features/auth_flow/presentation/client/widgets/input_fields.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:inspect_connect/features/auth_flow/utils/text_editor_controller.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:provider/provider.dart';
 
@@ -48,7 +49,7 @@ class ClientSignUpView extends StatelessWidget {
                 AppInputField(
                   label: 'Full Name',
                   hint: 'Full Name',
-                  controller: vm.fullNameCtrl,
+                  controller: fullNameCtrl,
                   validator: vm.validateRequired,
                   onChanged: (_) {
                     if (vm.autoValidate) formKey.currentState?.validate();
@@ -74,7 +75,7 @@ class ClientSignUpView extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           IntlPhoneField(
-                            controller: vm.phoneCtrl,
+                            controller: phoneCtrl,
 
                             style: appTextStyle(fontSize: 12),
                             initialCountryCode: 'IN',
@@ -144,6 +145,7 @@ class ClientSignUpView extends StatelessWidget {
                                     ? '+${country.dialCode}${vm.phoneRaw}'
                                     : '',
                               );
+                              countryCodeCtrl.text = '+${country.dialCode}';
                               if (vm.autoValidate) state.validate();
                             },
                           ),
@@ -165,7 +167,7 @@ class ClientSignUpView extends StatelessWidget {
                 AppInputField(
                   label: 'Email',
                   hint: 'Email',
-                  controller: vm.emailCtrlSignUp,
+                  controller: emailCtrlSignUp,
                   keyboardType: TextInputType.emailAddress,
                   validator: vm.validateEmail,
                   onChanged: (_) {
@@ -182,6 +184,12 @@ class ClientSignUpView extends StatelessWidget {
                       vm.enableAutoValidate();
                       return;
                     }
+                    log('------>${fullNameCtrl.text}');
+                    log('------>${emailCtrlSignUp.text}');
+                    log('------>${phoneCtrl.text}');
+                    log('------>${countryCodeCtrl.text}');
+
+
                     await vm.submitSignUp(formKey: formKey, context: context);
                   },
                   text: 'Sign Up',
@@ -191,9 +199,9 @@ class ClientSignUpView extends StatelessWidget {
                   question: "Already have an account?",
                   actionText: "Sign In",
                   onTap: () {
-                    vm.emailCtrlSignUp.clear();
-                    vm.phoneCtrl.clear();
-                    vm.fullNameCtrl.clear();
+                    emailCtrlSignUp.clear();
+                    phoneCtrl.clear();
+                    fullNameCtrl.clear();
 
                     final stackString = context.router.stack.toString();
                     log('stack raw: $stackString');

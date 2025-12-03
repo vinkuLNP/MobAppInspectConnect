@@ -25,6 +25,7 @@ abstract class AuthRepository {
   required String deviceToken,
   required String deviceType,
   required String mailingAddress,
+  required String zip,
   required bool agreedToTerms,
   required bool isTruthfully,
   required Map<String, dynamic> location,

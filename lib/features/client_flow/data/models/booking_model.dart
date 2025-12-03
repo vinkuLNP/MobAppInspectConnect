@@ -37,6 +37,8 @@ class BookingData extends BookingListEntity {
     required super.bookingDate,
     required super.bookingTime,
     required super.bookingLocation,
+    super.bookingLocationCoordinates,
+    super.bookingLocationZip,
     super.status,
     super.isDeleted,
     super.createdAt,
@@ -44,60 +46,70 @@ class BookingData extends BookingListEntity {
     super.timerStartedAt,
     super.timerEndedAt,
     super.timerDuration,
+    super.finalBillingHours,
+    super.totalBillingAmount,
+    super.platformFee,
+    super.overRideAmount,
+    super.globalCharge,
+    super.finalRaisedAmount,
+    super.showUpFeeApplied,
+    super.showUpFee,
+    super.lateCancellation,
+    super.lateCancellationFee,
   });
 
   factory BookingData.fromJson(Map<String, dynamic> json) {
-    final rawSubTypes = json['certificateSubTypeId'] ?? [];
-    final parsedSubTypes = <CertificateSubTypeModelData>[];
-
-    if (rawSubTypes is List) {
-      for (final item in rawSubTypes) {
-        if (item is String) {
-          parsedSubTypes.add(
-            CertificateSubTypeModelData(
-              id: item,
-              name: '',
-              status: 0,
-              certificateTypeName: '',
-            ),
-          );
-        } else if (item is Map<String, dynamic>) {
-          parsedSubTypes.add(CertificateSubTypeModelData.fromJson(item));
-        }
-      }
-    }
-
     return BookingData(
       id: json['_id'] ?? '',
-      clientUser: json['clientId'] is Map<String, dynamic>
+
+      clientUser: json['clientId'] is Map
           ? AuthUser.fromJson(json['clientId'])
-          : (json['clientId'] != null
-              ? AuthUser(id: json['clientId'].toString(),emailHashed: json['email'],
-      name: json['name'],
-      phoneNumber: json['phoneNumber'],
-      countryCode: json['countryCode'],)
-              : null),
-      inspector: json['inspectorId'] is Map<String, dynamic>
+          : null,
+
+      inspector: json['inspectorId'] is Map
           ? AuthUser.fromJson(json['inspectorId'])
-          : (json['inspectorId'] != null
-              ? AuthUser(id: json['inspectorId'].toString())
-              : null),
+          : null,
+
       inspectorIds: List<String>.from(json['inspectorIds'] ?? []),
-      certificateSubTypes: parsedSubTypes,
+
+      certificateSubTypes: (json['certificateSubTypeId'] as List? ?? [])
+          .map((e) => e is Map<String,dynamic> ? CertificateSubTypeModelData.fromJson(e) : null)
+          .whereType<CertificateSubTypeModelData>()
+          .toList(),
+
       images: List<String>.from(json['images'] ?? []),
+
       description: json['description'] ?? '',
       bookingDate: json['bookingDate'] ?? '',
       bookingTime: json['bookingTime'] ?? '',
       bookingLocation: json['bookingLocation'] ?? '',
+
+      bookingLocationCoordinates: (json['bookingLocationCoordinates'] as List?)
+          ?.map((e) => (e as num).toDouble())
+          .toList(),
+
+      bookingLocationZip: json['bookingLocationZip'],
+
       status: json['status'],
       isDeleted: json['isDeleted'],
+
       createdAt: json['createdAt'],
       updatedAt: json['updatedAt'],
+
       timerStartedAt: json['timerStartedAt'],
       timerEndedAt: json['timerEndedAt'],
       timerDuration: json['timerDuration'],
+
+      finalBillingHours: json['finalBillingHours'],
+      totalBillingAmount: json['totalBillingAmount'],
+      platformFee: json['platformFee'],
+      overRideAmount: json['overRideAmount'],
+      globalCharge: json['globalCharge'],
+      finalRaisedAmount: json['finalRaisedAmount'],
+      showUpFeeApplied: json['showUpFeeApplied'],
+      showUpFee: json['showUpFee'],
+      lateCancellation: json['lateCancellation'],
+      lateCancellationFee: json['lateCancellationFee'],
     );
   }
-
-
 }

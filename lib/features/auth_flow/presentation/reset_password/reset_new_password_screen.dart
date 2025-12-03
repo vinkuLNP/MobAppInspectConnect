@@ -13,6 +13,7 @@ import 'package:inspect_connect/features/auth_flow/presentation/client/widgets/c
 import 'package:inspect_connect/features/auth_flow/presentation/client/widgets/input_fields.dart';
 import 'package:inspect_connect/features/auth_flow/utils/otp_enum.dart';
 import 'package:flutter/material.dart';
+import 'package:inspect_connect/features/auth_flow/utils/text_editor_controller.dart';
 import 'package:provider/provider.dart';
 
 @RoutePage()
@@ -27,7 +28,12 @@ class ResetPasswordView extends StatelessWidget {
     return BaseResponsiveWidget(
       initializeConfig: true,
       buildWidget: (ctx, rc, app) {
-        final vm = ctx.watch<ClientViewModelProvider>();
+
+        final vm = ctx.read<ClientViewModelProvider>();
+   log('----vm-->${fullNameCtrl.text}');
+                    log('---vm--->${emailCtrlSignUp.text}');
+                    log('---v--->${phoneCtrl.text}');
+                    log('------>${countryCodeCtrl.text}');
 
         return CommonAuthBar(
           showBackButton: showBackButton,
@@ -44,78 +50,72 @@ class ResetPasswordView extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                AppPasswordField(
-                  label: 'New Password',
-                  controller: vm.passwordCtrlSignUp,
-                  obscure: vm.obscurePassword,
-                  onToggle: vm.toggleObscurePassword,
-                  validator: vm.validatePassword,
-                  onChanged: (_) {
-                    if (vm.autoValidate) formKey.currentState?.validate();
-                  },
+
+                Consumer<ClientViewModelProvider>(
+                  builder: (_, vm, _) => AppPasswordField(
+                    label: 'New Password',
+                    controller:  passwordCtrlSignUp,
+                    obscure: vm.obscurePassword,
+                    onToggle: vm.toggleObscurePassword,
+                    validator: vm.validatePassword,
+                    onChanged: (_) {
+                      if (vm.autoValidate) formKey.currentState?.validate();
+                    },
+                  ),
                 ),
+
                 const SizedBox(height: 14),
 
-                AppPasswordField(
-                  label: 'Confirm New Password',
-                  controller: vm.confirmPasswordCtrl,
-                  obscure: vm.obscureConfirm,
-                  onToggle: vm.toggleObscureConfirm,
-                  validator: vm.validateConfirmPassword,
-                  onChanged: (_) {
-                    if (vm.autoValidate) formKey.currentState?.validate();
-                  },
+                Consumer<ClientViewModelProvider>(
+                  builder: (_, vm, _) => AppPasswordField(
+                    label: 'Confirm New Password',
+                    controller:  confirmPasswordCtrl,
+                    obscure: vm.obscureConfirm,
+                    onToggle: vm.toggleObscureConfirm,
+                    validator: vm.validateConfirmPassword,
+                    onChanged: (_) {
+                      if (vm.autoValidate) formKey.currentState?.validate();
+                    },
+                  ),
                 ),
+
                 const SizedBox(height: 14),
+
                 AddressAutocompleteField(
                   label: "Address",
-                  controller: vm.addressCtrl,
+                  controller: addressCtrl,
+                  validator: vm.validateMailingAddress,
                   googleApiKey: dotenv.env['GOOGLE_API_KEY']!,
                   onAddressSelected: (prediction) {
                     log("Selected: ${prediction.fullText}");
-                    log("address ctrl: ${vm.addressCtrl.text}");
                   },
-
                   onFullAddressFetched: (data) {
-                    vm.placeName = data["place_name"];
-                    vm.city = data["city"];
-                    vm.state = data["state"];
-                    vm.country = data["country"];
-                    vm.pincode = data["pincode"];
-                    vm.selectedLat = data["lat"].toString();
-                    vm.selectedLng = data["lng"].toString();
-                    vm.placeType = data["place_type"].toString();
-
-                    log("FULL ADDRESS → $data");
+                    vm.setAddressData(data); 
                   },
                 ),
 
-                // Selected: Amritsar Bus Stand, Mehar Pura, Amritsar, Punjab, India
-                // I/flutter (17600): FULL ADDRESS → {place_name: Amritsar Bus Stand, city: Amritsar, state: Punjab, pincode: 143001, country: India, lat: 31.6298375, lng: 74.8839844, place_type: PlaceType.ESTABLISHMENT}
                 const SizedBox(height: 28),
 
-                AppButton(
-                  text: vm.isResetting
-                      ? 'Resetting...'
-                      : vm.otpPurpose == OtpPurpose.forgotPassword
-                      ? 'Reset Password'
-                      : 'Submit',
-                  buttonBackgroundColor: AppColors.authThemeColor,
-                  borderColor: AppColors.authThemeColor,
-                  isLoading: vm.isResetting,
-                  isDisabled: vm.isResetting,
-                  onTap: () async {
-                    log(vm.selectedLat.toString());
-                    log(vm.selectedLng.toString());
-
-                    final isValid = formKey.currentState?.validate() ?? false;
-                    if (!isValid) {
-                      vm.enableAutoValidate();
-                      return;
-                    }
-
-                    await vm.resetPassword(formKey: formKey, context: context);
-                  },
+                Consumer<ClientViewModelProvider>(
+                  builder: (_, vm, _) => AppButton(
+                    text: vm.isResetting
+                        ? 'Resetting...'
+                        : (vm.otpPurpose == OtpPurpose.forgotPassword
+                            ? 'Reset Password'
+                            : 'Submit'),
+                    buttonBackgroundColor: AppColors.authThemeColor,
+                    borderColor: AppColors.authThemeColor,
+                    isLoading: vm.isResetting,
+                    isDisabled: vm.isResetting,
+                    onTap: () async {
+                      final isValid = formKey.currentState?.validate() ?? false;
+                      if (!isValid) {
+                        vm.enableAutoValidate();
+                        return;
+                      }
+                      await vm.resetPassword(formKey: formKey, context: context);
+                    },
+                  ),
                 ),
 
                 AuthFormSwitchRow(

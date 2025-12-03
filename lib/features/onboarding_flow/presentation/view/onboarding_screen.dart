@@ -293,7 +293,7 @@ class _OnBoardingPageState extends State<OnBoardingPage>
                                 if (_isClient == true) {
                                   authFlow.setUserType(AuthUserType.client);
                                   context.pushRoute(
-                                    ClientSignInRoute(showBackButton: false),
+                                    ClientSignUpRoute(showBackButton: false),
                                   );
                                 } else {
                                   authFlow.setUserType(AuthUserType.inspector);

@@ -12,6 +12,7 @@ import 'package:inspect_connect/features/auth_flow/presentation/client/widgets/c
 import 'package:inspect_connect/features/auth_flow/presentation/client/widgets/otp_input_fields.dart';
 import 'package:inspect_connect/features/auth_flow/utils/otp_enum.dart';
 import 'package:flutter/material.dart';
+import 'package:inspect_connect/features/auth_flow/utils/text_editor_controller.dart';
 import 'package:provider/provider.dart';
 
 @RoutePage()
@@ -64,7 +65,7 @@ class _OtpVerificationViewState extends State<OtpVerificationView> {
               children: [
                 PerDigitOtp(
                   length: 6,
-                  controller: vm.pinController,
+                  controller: pinController,
                   boxSize: (rc.screenWidth * 0.08).clamp(44.0, 64.0).toDouble(),
                   boxGap: (rc.screenWidth * 0.04).clamp(8.0, 16.0).toDouble(),
                   themeColor: AppColors.authThemeColor,
