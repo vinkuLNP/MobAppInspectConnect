@@ -22,6 +22,7 @@ import 'package:inspect_connect/features/auth_flow/domain/usecases/sign_in_useca
 import 'package:inspect_connect/features/auth_flow/domain/usecases/sign_up_usecases.dart';
 import 'package:inspect_connect/features/auth_flow/utils/otp_enum.dart';
 import 'package:flutter/material.dart';
+import 'package:inspect_connect/features/auth_flow/utils/text_editor_controller.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/user_provider.dart';
 import 'package:inspect_connect/features/inspector_flow/domain/enum/inspector_status.dart';
 import 'package:inspect_connect/features/inspector_flow/providers/inspector_main_provider.dart';
@@ -29,9 +30,6 @@ import 'package:provider/provider.dart';
 
 class ClientViewModelProvider extends BaseViewModel {
   void init() {}
-
-  final emailCtrl = TextEditingController();
-  final passwordCtrl = TextEditingController();
 
   bool _obscure = true;
   bool get obscure => _obscure;
@@ -66,12 +64,6 @@ class ClientViewModelProvider extends BaseViewModel {
     _obscure = !_obscure;
     notifyListeners();
   }
-
-  final fullNameCtrl = TextEditingController();
-  final phoneCtrl = TextEditingController();
-  final emailCtrlSignUp = TextEditingController();
-  final passwordCtrlSignUp = TextEditingController();
-  final confirmPasswordCtrl = TextEditingController();
 
   bool _obscurePassword = true;
   bool get obscurePassword => _obscurePassword;
@@ -134,7 +126,6 @@ class ClientViewModelProvider extends BaseViewModel {
     return null;
   }
 
-  TextEditingController addressCtrl = TextEditingController();
   String? placeName;
   String? pincode;
   String? city;
@@ -145,14 +136,25 @@ class ClientViewModelProvider extends BaseViewModel {
   String? selectedLng;
   String? fullAddress;
 
-  void setAddress(String value) {
-    addressCtrl.text = value;
+  void setAddressData(Map<String, dynamic> value) {
+    placeName = value["place_name"];
+    city = value["city"];
+    state = value["state"];
+    country = value["country"];
+    pincode = value["pincode"];
+    selectedLat = value["lat"].toString();
+    selectedLng = value["lng"].toString();
+    placeType = value["place_type"].toString();
+
+    log("FULL ADDRESS → $value");
     log(addressCtrl.text.toString());
     notifyListeners();
   }
 
   String? validateMailingAddress(String? value) {
     if (value == null || value.isEmpty) return 'Please enter mailing address';
+    if (value.length < 6) return 'Please enter address of atleast 6 characters';
+
     return null;
   }
 
@@ -170,12 +172,10 @@ class ClientViewModelProvider extends BaseViewModel {
     pinController.dispose();
     focusNode.dispose();
     resetEmailCtrl.dispose();
-    resetPhoneCtrl.dispose();
     _otpPurpose = null;
     super.dispose();
   }
 
-  final pinController = TextEditingController();
   final focusNode = FocusNode();
 
   static const int codeLength = 6;
@@ -231,16 +231,19 @@ class ClientViewModelProvider extends BaseViewModel {
         role: 1,
         email: emailCtrlSignUp.text.trim(),
         name: fullNameCtrl.text.trim(),
-        phoneNumber: phoneRaw ?? '',
-        countryCode: phoneDial ?? "91",
+        phoneNumber: phoneCtrl.text.trim().toString(),
+        countryCode: countryCodeCtrl.text.trim().toString() != ""
+            ? countryCodeCtrl.text.trim().toString()
+            : "+91",
         password: passwordCtrlSignUp.text.trim(),
         deviceToken: deviceToken,
         deviceType: deviceType,
         mailingAddress: addressCtrl.text.toString(),
+        zip: pincode.toString(),
         agreedToTerms: true,
         isTruthfully: true,
         location: {
-          "type": placeType,
+          "type": 'Point',
           "locationName": placeName,
           "coordinates": [selectedLat, selectedLng],
         },
@@ -402,11 +405,13 @@ class ClientViewModelProvider extends BaseViewModel {
           }
           pinController.clear();
           if (user.role == 1) {
-            if (context.mounted)
+            if (context.mounted) {
               context.router.replaceAll([const ClientDashboardRoute()]);
+            }
           } else {
-            if (context.mounted)
+            if (context.mounted) {
               context.router.replaceAll([const InspectorDashboardRoute()]);
+            }
           }
         },
         error: (e) {
@@ -570,15 +575,6 @@ class ClientViewModelProvider extends BaseViewModel {
     phoneRaw = number;
     phoneE164 = e164;
   }
-
-  String? validateIntlPhone() {
-    if ((phoneE164 ?? '').isEmpty) return 'Phone is required';
-    if ((phoneRaw ?? '').length < 6) return 'Enter a valid phone';
-    return null;
-  }
-
-  final resetEmailCtrl = TextEditingController();
-  final resetPhoneCtrl = TextEditingController();
 
   bool _isSendingReset = false;
   bool get isSendingReset => _isSendingReset;
@@ -757,28 +753,32 @@ class ClientViewModelProvider extends BaseViewModel {
         log(
           '➡️ Redirecting: Inspector needs subscription → InspectorDashboardRoute',
         );
-        if (context.mounted)
+        if (context.mounted) {
           context.router.replaceAll([const InspectorDashboardRoute()]);
+        }
         break;
 
       case InspectorStatus.underReview:
         log(
           '➡️ Redirecting: Inspector under admin review → InspectorDashboardRoute',
         );
-        if (context.mounted)
+        if (context.mounted) {
           context.router.replaceAll([const InspectorDashboardRoute()]);
+        }
         break;
 
       case InspectorStatus.rejected:
         log('➡️ Redirecting: Inspector rejected → InspectorDashboardRoute');
-        if (context.mounted)
+        if (context.mounted) {
           context.router.replaceAll([const InspectorDashboardRoute()]);
+        }
         break;
 
       case InspectorStatus.approved:
         log(' Inspector approved → InspectorDashboardRoute');
-        if (context.mounted)
+        if (context.mounted) {
           context.router.replaceAll([const InspectorDashboardRoute()]);
+        }
         break;
 
       default:

@@ -13,6 +13,7 @@ import 'package:inspect_connect/features/auth_flow/presentation/client/widgets/a
 import 'package:inspect_connect/features/auth_flow/presentation/client/widgets/common_auth_bar.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/client/widgets/input_fields.dart';
 import 'package:flutter/material.dart';
+import 'package:inspect_connect/features/auth_flow/utils/text_editor_controller.dart';
 import 'package:provider/provider.dart';
 
 @RoutePage()
@@ -28,7 +29,6 @@ class ClientSignInView extends StatelessWidget {
       initializeConfig: true,
       buildWidget: (ctx, rc, app) {
         final provider = ctx.watch<ClientViewModelProvider>();
-
         return CommonAuthBar(
           title: 'Sign in',
           subtitle: 'Welcome Back',
@@ -42,7 +42,7 @@ class ClientSignInView extends StatelessWidget {
               children: [
                 AppInputField(
                   label: 'Email',
-                  controller: provider.emailCtrl,
+                  controller: emailCtrl,
                   keyboardType: TextInputType.emailAddress,
                   hint: 'example@gmail.com',
                   validator: provider.validateEmail,
@@ -53,7 +53,7 @@ class ClientSignInView extends StatelessWidget {
                 const SizedBox(height: 14),
                 AppPasswordField(
                   label: 'Password',
-                  controller: provider.passwordCtrl,
+                  controller: passwordCtrl,
                   obscure: provider.obscure,
                   onToggle: provider.toggleObscure,
                   validator: provider.validatePassword,
@@ -100,8 +100,8 @@ class ClientSignInView extends StatelessWidget {
                   question: "Don’t have an account? ",
                   actionText: "Sign Up",
                   onTap: () {
-                    provider.passwordCtrl.clear();
-                    provider.emailCtrl.clear();
+                    passwordCtrl.clear();
+                    emailCtrl.clear();
                     final stackString = context.router.stack.toString();
                     log('stack raw: $stackString');
 

@@ -137,3 +137,86 @@ class AppPasswordField extends StatelessWidget {
     );
   }
 }
+
+class BookingInputField extends StatelessWidget {
+  final String label;
+  final TextEditingController controller;
+  final TextInputType keyboardType;
+  final String? Function(String?)? validator;
+  final void Function(String?)? onChanged;
+  final String? hint;
+  final int? maxLength;
+  final int? maxLines;
+  final bool readOnly;
+  final List<TextInputFormatter>? inputFormatters;
+
+  const BookingInputField({
+    super.key,
+    required this.label,
+    required this.controller,
+    this.keyboardType = TextInputType.text,
+    this.validator,
+    this.onChanged,
+    this.inputFormatters = const [],
+    this.hint,
+    this.maxLength,
+    this.maxLines,
+    this.readOnly = false,
+  });
+
+  InputDecoration _bookingDecoration(BuildContext context) => InputDecoration(
+        hintText: hint,
+        filled: true,
+        fillColor: readOnly ? Colors.grey.shade200 : Colors.grey.shade50,
+        counterText: "",
+        errorStyle: appTextStyle(fontSize: 12, color: Colors.red),
+        hintStyle: appTextStyle(fontSize: 12, color: Colors.grey),
+
+        contentPadding:
+            const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Colors.grey.shade300),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Colors.grey.shade300),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppColors.authThemeColor),
+        ),
+      );
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          textWidget(
+            text: label,
+            fontWeight: FontWeight.w600,
+            fontSize: 12,
+          ),
+          const SizedBox(height: 3),
+      
+          TextFormField(
+            controller: controller,
+            readOnly: readOnly,
+            keyboardType: keyboardType,
+            maxLength: maxLength,
+            maxLines: maxLines ?? 1,
+            inputFormatters: inputFormatters,
+            validator: validator,
+            onChanged: onChanged,
+            style: appTextStyle(fontSize: 12),
+            decoration: _bookingDecoration(context),
+          ),
+        ],
+      ),
+    );
+  }
+}

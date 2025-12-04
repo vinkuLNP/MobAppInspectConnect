@@ -7,18 +7,37 @@ class BookingListEntity {
   final List<String> inspectorIds;
   final List<CertificateSubTypeModelData> certificateSubTypes;
   final List<String> images;
+
   final String description;
   final String bookingDate;
   final String bookingTime;
+
   final String bookingLocation;
+  final List<double>? bookingLocationCoordinates;
+  final String? bookingLocationZip;
+
   final int? status;
   final bool? isDeleted;
+
   final String? createdAt;
   final String? updatedAt;
+
   final String? inspectorId;
+
   final String? timerStartedAt;
   final String? timerEndedAt;
   final int? timerDuration;
+
+  final int? finalBillingHours;
+  final String? totalBillingAmount;
+  final String? platformFee;
+  final String? overRideAmount;
+  final String? globalCharge;
+  final int? finalRaisedAmount;
+  final bool? showUpFeeApplied;
+  final String? showUpFee;
+  final bool? lateCancellation;
+  final String? lateCancellationFee;
 
   const BookingListEntity({
     required this.id,
@@ -26,10 +45,12 @@ class BookingListEntity {
     this.inspectorIds = const [],
     this.certificateSubTypes = const [],
     this.images = const [],
-   required this.description,
-   required this.bookingDate,
-   required this.bookingTime,
-   required this.bookingLocation,
+    required this.description,
+    required this.bookingDate,
+    required this.bookingTime,
+    required this.bookingLocation,
+    this.bookingLocationCoordinates,
+    this.bookingLocationZip,
     this.status,
     this.isDeleted,
     this.createdAt,
@@ -38,85 +59,72 @@ class BookingListEntity {
     this.timerStartedAt,
     this.timerEndedAt,
     this.timerDuration,
+    this.finalBillingHours,
+    this.totalBillingAmount,
+    this.platformFee,
+    this.overRideAmount,
+    this.globalCharge,
+    this.finalRaisedAmount,
+    this.showUpFeeApplied,
+    this.showUpFee,
+    this.lateCancellation,
+    this.lateCancellationFee,
   });
 
   factory BookingListEntity.fromJson(Map<String, dynamic> json) {
     return BookingListEntity(
       id: json['_id'] ?? '',
-      client: json['clientId'] != null
-          ? (json['clientId'] is Map
-              ? AuthUser.fromJson(json['clientId'])
-              : AuthUser(id: json['clientId'].toString()))
+
+      client: json['clientId'] is Map
+          ? AuthUser.fromJson(json['clientId'])
           : null,
+
       inspectorIds: List<String>.from(json['inspectorIds'] ?? []),
-      certificateSubTypes: (json['certificateSubTypeId'] as List?)
-              ?.map((e) => CertificateSubTypeModelData.fromJson(e))
-              .toList() ??
-          [],
+
+      certificateSubTypes: (json['certificateSubTypeId'] as List? ?? [])
+          .map(
+            (e) => e is Map<String, dynamic>
+                ? CertificateSubTypeModelData.fromJson(e)
+                : null,
+          )
+          .whereType<CertificateSubTypeModelData>()
+          .toList(),
+
       images: List<String>.from(json['images'] ?? []),
-      description: json['description'],
-      bookingDate: json['bookingDate'],
-      bookingTime: json['bookingTime'],
-      bookingLocation: json['bookingLocation'],
+
+      description: json['description'] ?? '',
+      bookingDate: json['bookingDate'] ?? '',
+      bookingTime: json['bookingTime'] ?? '',
+      bookingLocation: json['bookingLocation'] ?? '',
+
+      bookingLocationCoordinates: (json['bookingLocationCoordinates'] as List?)
+          ?.map((e) => (e as num).toDouble())
+          .toList(),
+
+      bookingLocationZip: json['bookingLocationZip'] ?? '',
+
       status: json['status'],
       isDeleted: json['isDeleted'],
+
       createdAt: json['createdAt'],
       updatedAt: json['updatedAt'],
-      inspectorId: json['inspectorId'],
+
+      inspectorId: json['inspectorId']?.toString(),
+
       timerStartedAt: json['timerStartedAt'],
       timerEndedAt: json['timerEndedAt'],
       timerDuration: json['timerDuration'],
-    );
-  }
 
-  Map<String, dynamic> toJson() {
-    return {
-      '_id': id,
-      'clientId': client?.toJson(),
-      'inspectorIds': inspectorIds,
-      'certificateSubTypeId':
-          certificateSubTypes.map((e) => e.toJson()).toList(),
-      'images': images,
-      'description': description,
-      'bookingDate': bookingDate,
-      'bookingTime': bookingTime,
-      'bookingLocation': bookingLocation,
-      'status': status,
-      'isDeleted': isDeleted,
-      'createdAt': createdAt,
-      'updatedAt': updatedAt,
-      'inspectorId': inspectorId,
-      'timerStartedAt': timerStartedAt,
-      'timerEndedAt': timerEndedAt,
-      'timerDuration': timerDuration,
-    };
-  }
-
-  BookingListEntity copyWith({
-    int? status,
-    String? description,
-    String? bookingDate,
-    String? bookingTime,
-    String? bookingLocation,
-  }) {
-    return BookingListEntity(
-      id: id,
-      client: client,
-      inspectorIds: inspectorIds,
-      certificateSubTypes: certificateSubTypes,
-      images: images,
-      description: description ?? this.description,
-      bookingDate: bookingDate ?? this.bookingDate,
-      bookingTime: bookingTime ?? this.bookingTime,
-      bookingLocation: bookingLocation ?? this.bookingLocation,
-      status: status ?? this.status,
-      isDeleted: isDeleted,
-      createdAt: createdAt,
-      updatedAt: updatedAt,
-      inspectorId: inspectorId,
-      timerStartedAt: timerStartedAt,
-      timerEndedAt: timerEndedAt,
-      timerDuration: timerDuration,
+      finalBillingHours: json['finalBillingHours'],
+      totalBillingAmount: json['totalBillingAmount'],
+      platformFee: json['platformFee'],
+      overRideAmount: json['overRideAmount'],
+      globalCharge: json['globalCharge'],
+      finalRaisedAmount: json['finalRaisedAmount'],
+      showUpFeeApplied: json['showUpFeeApplied'],
+      showUpFee: json['showUpFee'],
+      lateCancellation: json['lateCancellation'],
+      lateCancellationFee: json['lateCancellationFee'],
     );
   }
 }

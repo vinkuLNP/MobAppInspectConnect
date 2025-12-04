@@ -8,4 +8,8 @@ class AppColors {
   static const Color themeColor = Color(0xff1a2c47);
   static const Color authThemeColor = Color(0xFF002A86);
   static const Color authThemeLightColor = Color(0xFF0070F2);
+  static const Color darkShadeAuthColor = Color.fromARGB(255, 1, 67, 141);
+
+  static const Color disableColor = Color.fromARGB(255, 156, 153, 153);
+
 }

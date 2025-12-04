@@ -39,6 +39,8 @@ dependencies:
   country_state_city_pro: ^0.0.6
   carousel_slider: ^5.1.1
   flutter_google_places_sdk: ^0.4.2+1
+  mime: ^2.0.0
+  http_parser: ^4.1.2
 
 
 dev_dependencies:

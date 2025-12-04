@@ -23,28 +23,6 @@ class DateTimePickerProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  bool validateDateTime() {
-    if(!showTimePicker){
-      return true;
-    }
-    final chosenDateTime = DateTime(
-      tempDate.year,
-      tempDate.month,
-      tempDate.day,
-      tempTime.hour,
-      tempTime.minute,
-    );
-
-    if (DateUtils.isSameDay(tempDate, now) &&
-        chosenDateTime.isBefore(now.add(const Duration(hours: 2)))) {
-      errorMessage = "Please select a time at least 2 hours from now.";
-      notifyListeners();
-      return false;
-    }
-
-    return true;
-  }
-
   DateTime get chosenDateTime => DateTime(
         tempDate.year,
         tempDate.month,

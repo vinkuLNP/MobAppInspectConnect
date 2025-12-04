@@ -16,7 +16,8 @@ class CommonAuthBar extends StatelessWidget {
     required this.subtitle,
     required this.form,
     required this.image,
-    required this.showBackButton,this.onBackPressed,
+    required this.showBackButton,
+    this.onBackPressed,
     required this.rc,
     super.key,
   });
@@ -31,11 +32,16 @@ class CommonAuthBar extends StatelessWidget {
               children: [
                 SizedBox(
                   width: rc.screenWidth,
-                  height: rc.screenHeight * 0.35,
+                  height: (rc.screenHeight * 0.35).clamp(300, double.infinity),
                   child: imageAsset(
                     image: image,
                     width: rc.screenWidth,
-                    height: rc.screenHeight * 0.5,
+                    // height: rc.screenHeight * 0.5,
+                    height: (rc.screenHeight * 0.35).clamp(
+                      300,
+                      double.infinity,
+                    ),
+
                     boxFit: BoxFit.cover,
                   ),
                 ),
@@ -47,7 +53,7 @@ class CommonAuthBar extends StatelessWidget {
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        Colors.black.withValues(alpha:0.2),
+                        Colors.black.withValues(alpha: 0.2),
                         Colors.transparent,
                       ],
                     ),
@@ -86,7 +92,7 @@ class CommonAuthBar extends StatelessWidget {
               ],
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
+              padding: const EdgeInsets.only(left: 20,right: 20,bottom: 40),
               child: form,
             ),
           ],

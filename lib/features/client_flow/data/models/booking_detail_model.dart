@@ -12,6 +12,8 @@ class BookingDetailModel extends BookingDetailEntity {
     required super.bookingDate,
     required super.bookingTime,
     required super.bookingLocation,
+    required super.bookingLocationCoordinates,
+    required super.bookingLocationZip,
     required super.status,
     required super.isDeleted,
     required super.createdAt,
@@ -19,6 +21,16 @@ class BookingDetailModel extends BookingDetailEntity {
     super.timerStartedAt,
     super.timerEndedAt,
     super.timerDuration,
+    super.finalBillingHours,
+    super.totalBillingAmount,
+    super.platformFee,
+    super.overRideAmount,
+    super.globalCharge,
+    super.finalRaisedAmount,
+    super.showUpFeeApplied,
+    super.showUpFee,
+    super.lateCancellation,
+    super.lateCancellationFee,
     super.inspector,
   });
 
@@ -26,26 +38,61 @@ class BookingDetailModel extends BookingDetailEntity {
     return BookingDetailModel(
       id: json['_id'] ?? '',
       client: ClientInfoModel.fromJson(json['clientId'] ?? {}),
+
       inspectorIds: List<String>.from(json['inspectorIds'] ?? []),
-      certificateSubTypes: (json['certificateSubTypeId'] as List?)
+
+      certificateSubTypes:
+          (json['certificateSubTypeId'] as List?)
               ?.map((e) => CertificateSubTypeModelData.fromJson(e))
               .toList() ??
           [],
+
       images: List<String>.from(json['images'] ?? []),
       description: json['description'] ?? '',
       bookingDate: json['bookingDate'] ?? '',
       bookingTime: json['bookingTime'] ?? '',
       bookingLocation: json['bookingLocation'] ?? '',
+
+      bookingLocationCoordinates:
+          (json['bookingLocationCoordinates'] as List?)
+              ?.map((e) => (e as num).toDouble())
+              .toList() ??
+          [],
+
+      bookingLocationZip: json['bookingLocationZip'] ?? "",
+
       status: json['status'] ?? 0,
       isDeleted: json['isDeleted'] ?? false,
+
       timerStartedAt: json['timerStartedAt'],
       timerEndedAt: json['timerEndedAt'],
       timerDuration: json['timerDuration'] ?? 0,
+
+      finalBillingHours: (json['finalBillingHours'] as num?)?.toDouble() ?? 0.0,
+
+      totalBillingAmount: json['totalBillingAmount'] ?? "",
+      platformFee: json['platformFee'] ?? "",
+      overRideAmount: json['overRideAmount'] ?? "",
+      globalCharge: json['globalCharge'] ?? "",
+
+      finalRaisedAmount: (json['finalRaisedAmount'] as num?)?.toDouble() ?? 0.0,
+
+      showUpFeeApplied: json['showUpFeeApplied'] ?? false,
+      showUpFee: json['showUpFee'] ?? "",
+
+      lateCancellation: json['lateCancellation'] ?? false,
+      lateCancellationFee: json['lateCancellationFee'] ?? "",
+
       createdAt: json['createdAt'] ?? '',
       updatedAt: json['updatedAt'] ?? '',
+
+      // inspector: (json['inspectorId'] as List?)
+      //     ?.map((e) => ClientInfoModel.fromJson(e as Map<String, dynamic>))
+      //     .toList(),
       inspector: json['inspectorId'] != null
-          ? ClientInfoModel.fromJson(json['inspectorId'])
-          : null,
+    ? ClientInfoModel.fromJson(json['inspectorId'])
+    : null,
+
     );
   }
 
@@ -54,21 +101,48 @@ class BookingDetailModel extends BookingDetailEntity {
       '_id': id,
       'clientId': (client as ClientInfoModel).toJson(),
       'inspectorIds': inspectorIds,
-      'certificateSubTypeId':
-          certificateSubTypes.map((e) => (e as CertificateSubTypeModelData).toJson()).toList(),
+      'certificateSubTypeId': certificateSubTypes
+          .map((e) => (e as CertificateSubTypeModelData).toJson())
+          .toList(),
       'images': images,
       'description': description,
       'bookingDate': bookingDate,
       'bookingTime': bookingTime,
       'bookingLocation': bookingLocation,
+
+      'bookingLocationCoordinates': bookingLocationCoordinates,
+      'bookingLocationZip': bookingLocationZip,
+
       'status': status,
       'isDeleted': isDeleted,
+
       'timerStartedAt': timerStartedAt,
       'timerEndedAt': timerEndedAt,
       'timerDuration': timerDuration,
+
+      'finalBillingHours': finalBillingHours,
+      'totalBillingAmount': totalBillingAmount,
+      'platformFee': platformFee,
+      'overRideAmount': overRideAmount,
+      'globalCharge': globalCharge,
+      'finalRaisedAmount': finalRaisedAmount,
+      'showUpFeeApplied': showUpFeeApplied,
+      'showUpFee': showUpFee,
+      'lateCancellation': lateCancellation,
+      'lateCancellationFee': lateCancellationFee,
+
       'createdAt': createdAt,
       'updatedAt': updatedAt,
-      'inspectorId': inspector != null ? (inspector as ClientInfoModel).toJson() : null,
+
+      // 'inspectorId': inspector != null
+      //     ? (inspector as List)
+      //           .map((e) => (e as ClientInfoModel).toJson())
+      //           .toList()
+      //     : null,
+      'inspectorId': inspector != null
+    ? (inspector as ClientInfoModel).toJson()
+    : null,
+
     };
   }
 }
@@ -93,10 +167,10 @@ class ClientInfoModel extends ClientInfoEntity {
   }
 
   Map<String, dynamic> toJson() => {
-        '_id': id,
-        'email': email,
-        'name': name,
-        'phoneNumber': phoneNumber,
-        'countryCode': countryCode,
-      };
+    '_id': id,
+    'email': email,
+    'name': name,
+    'phoneNumber': phoneNumber,
+    'countryCode': countryCode,
+  };
 }

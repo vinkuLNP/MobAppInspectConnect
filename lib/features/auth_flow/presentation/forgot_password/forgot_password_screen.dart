@@ -8,6 +8,7 @@ import 'package:inspect_connect/features/auth_flow/presentation/client/widgets/a
 import 'package:inspect_connect/features/auth_flow/presentation/client/widgets/common_auth_bar.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/client/widgets/input_fields.dart';
 import 'package:flutter/material.dart';
+import 'package:inspect_connect/features/auth_flow/utils/text_editor_controller.dart';
 import 'package:provider/provider.dart';
 
 @RoutePage()
@@ -41,7 +42,7 @@ class ForgotpPasswordView extends StatelessWidget {
                 AppInputField(
                   label: 'Email',
                   hint: 'example@gmail.com',
-                  controller: provider.resetEmailCtrl,
+                  controller: resetEmailCtrl,
                   keyboardType: TextInputType.emailAddress,
                   validator: (_) => provider.validateEmailOrIntlPhone(),
                   onChanged: (_) {
