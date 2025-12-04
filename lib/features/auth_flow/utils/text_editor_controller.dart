@@ -11,4 +11,6 @@ TextEditingController emailCtrl = TextEditingController();
 TextEditingController passwordCtrl = TextEditingController();
 TextEditingController resetEmailCtrl = TextEditingController();
 TextEditingController countryCodeCtrl = TextEditingController();
-
+TextEditingController countrySearchCtrl = TextEditingController();
+TextEditingController stateSearchCtrl = TextEditingController();
+TextEditingController citySearchCtrl = TextEditingController();

@@ -32,9 +32,10 @@ class _InspectorSignUpContentState extends State<InspectorSignUpContent> {
   void initState() {
     super.initState();
     Future.microtask(() {
-      if(mounted){
-      final vm = context.read<InspectorViewModelProvider>();
-      vm.loadSavedData();}
+      if (mounted) {
+        final vm = context.read<InspectorViewModelProvider>();
+        vm.loadSavedData();
+      }
     });
   }
 
@@ -109,7 +110,7 @@ class _InspectorSignUpContentState extends State<InspectorSignUpContent> {
                   onTap:
                       (vm.currentStep == 3 &&
                           (!vm.agreedToTerms || !vm.confirmTruth))
-                      ? null 
+                      ? null
                       : () async {
                           final key = steps[vm.currentStep].formKey;
                           final isValid = key.currentState?.validate() ?? false;
@@ -127,27 +128,41 @@ class _InspectorSignUpContentState extends State<InspectorSignUpContent> {
                               await vm.saveProfessionalStep(
                                 certificateTypeId:
                                     vm.selectedCertificateTypeId ?? '',
-                                certificateExpiryDate:  vm.certificateExpiryDate != '' ?
-                                    vm.certificateExpiryDate.toString() : '',
+                                certificateExpiryDate:
+                                    vm.certificateExpiryDate != ''
+                                    ? vm.certificateExpiryDate.toString()
+                                    : '',
                                 uploadedCertificateUrls:
                                     vm.uploadedCertificateUrls,
                                 agencyIds: vm.selectedAgencyIds,
                               );
                               break;
                             case 2:
+                              final isValid = vm.validateServiceArea();
+                              if (!isValid) return;
                               vm.saveDataToProvider();
-                              await vm.saveServiceAreaStep(
-                                country: vm.country ?? '',
-                                state: vm.state ?? '',
-                                city: vm.city ?? '',
-                                mailingAddress: vm.mailingAddress,
-                                zipCode: vm.zipCode,
-                              );
+
+                              await vm.generateServiceAreas(
+    countryCode: vm.countryCode.toString(),
+    stateCode: vm.stateCode.toString(),
+    selectedCities: vm.selectedCities,
+  );
+
+  await vm.saveServiceAreaStep(
+    country: vm.country,
+    state: vm.state,
+    city: vm.city ?? '',
+    mailingAddress: vm.mailingAddress,
+    zipCode: vm.zipCode,
+    serviceAreas: vm.serviceAreas,
+  );
+
+                          
                               break;
                             case 3:
                               vm.validateBeforeSubmit(context: ctx);
                               if (!vm.agreedToTerms || !vm.confirmTruth) {
-                                return; 
+                                return;
                               }
                               String? getSafePath(dynamic fileOrUrl) {
                                 if (fileOrUrl == null) return null;
@@ -159,7 +174,7 @@ class _InspectorSignUpContentState extends State<InspectorSignUpContent> {
                                     path.startsWith('https://')) {
                                   return path;
                                 }
-                                return path; 
+                                return path;
                               }
 
                               final profilePath = getSafePath(

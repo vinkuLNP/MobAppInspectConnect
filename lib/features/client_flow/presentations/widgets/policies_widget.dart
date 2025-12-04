@@ -19,7 +19,7 @@ class _PolicyAgreementRowState extends State<PolicyAgreementRow> {
     final prov = Provider.of<BookingProvider>(context);
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+       padding: EdgeInsetsGeometry.only(top: 8,left: 10,right: 10),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

@@ -67,7 +67,7 @@ class _OtpVerificationViewState extends State<OtpVerificationView> {
                   length: 6,
                   controller: pinController,
                   boxSize: (rc.screenWidth * 0.08).clamp(44.0, 64.0).toDouble(),
-                  boxGap: (rc.screenWidth * 0.04).clamp(8.0, 16.0).toDouble(),
+                  boxGap: (rc.screenWidth * 0.03).clamp(6.0, 16.0).toDouble(),
                   themeColor: AppColors.authThemeColor,
                   textStyle: appTextStyle(
                     fontSize: 14,
