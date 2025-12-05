@@ -101,7 +101,7 @@ extension InspectorSignUpEntityMapper on InspectorSignUpLocalEntity {
       "location": {
         "type": locationType,
         "locationName": locationName,
-        "coordinates": [latitude, longitude],
+        "coordinates": [longitude, latitude],
       },
 
       "serviceAreas": serviceAreas.map((s) {
@@ -111,7 +111,7 @@ extension InspectorSignUpEntityMapper on InspectorSignUpLocalEntity {
           "cityName": s.cityName,
           "location": {
             "type": s.locationType,
-            "coordinates": [s.latitude, s.longitude],
+            "coordinates": [s.longitude, s.latitude],
           }
         };
       }).toList(),

@@ -29,10 +29,10 @@ class ProfessionalDetailsStep extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                    textWidget(text: 
-                        'Professional Details',
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
+                      textWidget(
+                        text: 'Professional Details',
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
                       ),
                       const SizedBox(height: 8),
                       _section(
@@ -151,32 +151,44 @@ class ProfessionalDetailsStep extends StatelessWidget {
   );
 
   Widget _documentGrid(InspectorViewModelProvider prov, BuildContext context) {
-    final totalDocs =  prov.documents.length + prov.existingDocumentUrls.length;
+    final totalDocs = prov.documents.length + prov.existingDocumentUrls.length;
     final canAddMore = totalDocs < 5;
 
     if (totalDocs == 0) {
       return GestureDetector(
         onTap: () => prov.uploadDocument(context),
-        child: Container(
-          width: double.infinity,
-          height: 100,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.grey.shade300),
-            color: Colors.grey.shade50,
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.upload_file, size: 32, color: Colors.grey),
-              const SizedBox(height: 8),
-              textWidget(
-                text: "Upload Document",
-                color: Colors.grey,
-                fontSize: 12,
+        child: Column(
+          children: [
+            Container(
+              width: double.infinity,
+              height: 100,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.grey.shade300),
+                color: Colors.grey.shade50,
               ),
-            ],
-          ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.upload_file, size: 32, color: Colors.grey),
+                  const SizedBox(height: 8),
+                  textWidget(
+                    text: "Upload Document",
+                    color: Colors.grey,
+                    fontSize: 12,
+                  ),
+                ],
+              ),
+            ),
+            if (prov.errorMessage != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: Text(
+                  prov.errorMessage!,
+                  style: TextStyle(color: Colors.red, fontSize: 12),
+                ),
+              ),
+          ],
         ),
       );
     }

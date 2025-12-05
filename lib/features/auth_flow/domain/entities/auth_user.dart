@@ -229,6 +229,51 @@ class AuthUser {
           : null,
     };
   }
+  factory AuthUser.fromLocalEntity(AuthUserLocalEntity entity) {
+  return AuthUser(
+    id: entity.id.toString(),
+    name: entity.name,
+    emailHashed: entity.email,
+    authToken: entity.authToken,
+    phoneNumber: entity.phoneNumber,
+    countryCode: entity.countryCode,
+    phoneOtpVerified: entity.phoneOtpVerified ?? false,
+    emailOtpVerified: entity.emailOtpVerified?? false,
+    agreedToTerms: entity.agreedToTerms?? true,
+    isTruthfully: entity.isTruthfully?? true,
+    stripeSubscriptionStatus: entity.stripeSubscriptionStatus,
+    currentSubscriptionId: entity.currentSubscriptionId,
+    currentSubscriptionTrialDays: entity.currentSubscriptionTrialDays,
+    currentSubscriptionAutoRenew: entity.currentSubscriptionAutoRenew,
+    approvalStatusByAdmin: entity.approvalStatusByAdmin,
+    rejectedReason: entity.rejectedReason,
+    location: entity.latitude != null && entity.longitude != null
+        ? UserLocation(
+            name: entity.locationName ?? '',
+            lat: entity.latitude!,
+            lng: entity.longitude!,
+          )
+        : null,
+    devices: [], 
+    createdAt: entity.createdAt,
+    updatedAt: entity.updatedAt,
+    loginTime: entity.loginTime,
+    status: entity.status,
+    mailingAddress: entity.mailingAddress,
+    country: entity.country,
+    state: entity.state,
+    city: entity.city,
+    zip: entity.zipCode,
+    certificateTypeId: entity.certificateTypeId,
+    certificateAgencyIds: entity.certificateAgencyIds,
+    certificateDocuments: entity.certificateDocuments,
+    certificateExpiryDate: entity.certificateExpiryDate,
+    referenceDocuments: entity.referenceDocuments,
+    uploadedIdOrLicenseDocument: entity.uploadedIdOrLicenseDocument,
+    workHistoryDescription: entity.workHistoryDescription,
+  );
+}
+
 }
 
 extension AuthUserMapping on AuthUser {
@@ -281,46 +326,65 @@ extension AuthUserMapping on AuthUser {
   }
 }
 
+
 extension AuthUserLocalEntityMerge on AuthUserLocalEntity {
   AuthUserLocalEntity mergeWithUserDetail(UserDetail detail) {
     return AuthUserLocalEntity(
       authToken: authToken,
-      name: detail.name != null
-          ? detail.name!.isNotEmpty
-                ? detail.name
-                : name
-          : name,
-      email: detail.name != null
-          ? detail.email!.isNotEmpty
-                ? detail.email
-                : email
+      name: detail.name != null && detail.name!.isNotEmpty ? detail.name : name,
+      email: detail.email != null && detail.email!.isNotEmpty
+          ? detail.email
           : email,
       phoneNumber: detail.phoneNumber ?? phoneNumber,
       countryCode: detail.countryCode ?? countryCode,
       mailingAddress: detail.mailingAddress ?? mailingAddress,
       role: role,
       status: detail.status ?? status,
-      phoneOtpVerified: phoneOtpVerified,
-      emailOtpVerified: emailOtpVerified,
-      agreedToTerms: agreedToTerms,
-      isTruthfully: isTruthfully,
-      approvalStatusByAdmin: approvalStatusByAdmin,
-      rejectedReason: rejectedReason,
-      stripeCustomerId: stripeCustomerId,
-      stripeAccountId: stripeAccountId,
-      stripePayoutsEnabled: stripePayoutsEnabled,
-      stripeTransfersActive: stripeTransfersActive,
-      currentSubscriptionTrialDays: currentSubscriptionTrialDays,
-      currentSubscriptionAutoRenew: currentSubscriptionAutoRenew,
-      currentSubscriptionId: currentSubscriptionId,
-      stripeSubscriptionStatus: stripeSubscriptionStatus,
-      walletId: walletId,
-      locationName: locationName,
-      latitude: latitude,
-      longitude: longitude,
-      createdAt: createdAt,
-      updatedAt: updatedAt,
-      loginTime: loginTime,
+      phoneOtpVerified: detail.phoneOtpVerified ?? phoneOtpVerified,
+      emailOtpVerified: detail.emailOtpVerified ?? emailOtpVerified,
+      agreedToTerms: detail.agreedToTerms ?? agreedToTerms,
+      isTruthfully: detail.isTruthfully ?? isTruthfully,
+      approvalStatusByAdmin: detail.approvalStatusByAdmin ?? approvalStatusByAdmin,
+      rejectedReason: detail.rejectedReason ?? rejectedReason,
+      stripeCustomerId: detail.stripeCustomerId ?? stripeCustomerId,
+      stripeAccountId: detail.stripeAccountId ?? stripeAccountId,
+      stripeSubscriptionStatus:
+          detail.stripeSubscriptionStatus ?? stripeSubscriptionStatus,
+      currentSubscriptionId:
+          detail.currentSubscriptionId?.id ?? currentSubscriptionId,
+      currentSubscriptionTrialDays:
+          detail.currentSubscriptionTrialDays ?? currentSubscriptionTrialDays,
+      currentSubscriptionAutoRenew:
+          detail.currentSubscriptionAutoRenew ?? currentSubscriptionAutoRenew,
+      stripePayoutsEnabled: detail.stripePayoutsEnabled ?? stripePayoutsEnabled,
+      stripeTransfersActive: detail.stripeTransfersActive ?? stripeTransfersActive,
+      walletId: detail.walletId ?? walletId,
+      locationName: detail.location?.locationName ?? locationName,
+      latitude: detail.location?.coordinates?[1] ?? latitude,
+      longitude: detail.location?.coordinates?[0] ?? longitude,
+      bookingInProgress: detail.bookingInProgress ?? bookingInProgress,
+      isDeleted: detail.isDeleted ?? isDeleted,
+      createdAt: detail.createdAt != null
+          ? DateTime.tryParse(detail.createdAt!)
+          : createdAt,
+      updatedAt: detail.updatedAt != null
+          ? DateTime.tryParse(detail.updatedAt!)
+          : updatedAt,
+      loginTime: detail.loginTime != null
+          ? DateTime.tryParse(detail.loginTime!)
+          : loginTime,
+      certificateTypeId: detail.certificateTypeId?.id ?? certificateTypeId,
+      certificateAgencyIds: detail.certificateAgencyIds
+              ?.map((e) => e.id ?? '')
+              .toList() ??
+          certificateAgencyIds,
+      certificateDocuments: detail.certificateDocuments ?? certificateDocuments,
+      certificateExpiryDate: detail.certificateExpiryDate ?? certificateExpiryDate,
+      referenceDocuments: detail.referenceDocuments ?? referenceDocuments,
+      uploadedIdOrLicenseDocument:
+          detail.uploadedIdOrLicenseDocument ?? uploadedIdOrLicenseDocument,
+      workHistoryDescription:
+          detail.workHistoryDescription ?? workHistoryDescription,
     );
   }
 }

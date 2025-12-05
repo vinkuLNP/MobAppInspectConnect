@@ -22,11 +22,11 @@ class InspectorSignUpLocalDataSource {
       return entity;
     }
   }
-Future<void> updateFields(Map<String, dynamic> fields) async {
+  Future<void> updateFields(Map<String, dynamic> fields) async {
   final entity = await _getOrCreate();
 
-  log('📝 Before update: ${entity.name.toString()}');
-  log('Updating fields: $fields');
+  entity.serviceAreas.length; 
+  log('Before update:  ${entity.name.toString()} ----- zipCode: ${entity.zipCode.toString()} ----- serviceAreas: ${entity.serviceAreas.length}');
 
   fields.forEach((k, v) {
     switch (k) {
@@ -63,8 +63,8 @@ Future<void> updateFields(Map<String, dynamic> fields) async {
       case 'country':
         entity.country = v as String?;
         break;
+      case 'zip':
       case 'zipCode':
-      case 'zip':  
         entity.zipCode = v as String?;
         break;
       case 'workHistoryDescription':
@@ -77,10 +77,10 @@ Future<void> updateFields(Map<String, dynamic> fields) async {
         entity.city = v as String?;
         break;
       case 'profileImage':
-        entity.profileImage = v as String?;
+        if (v != null) entity.profileImage = v as String?;
         break;
       case 'uploadedIdOrLicenseDocument':
-        entity.uploadedIdOrLicenseDocument = v as String?;
+        if (v != null) entity.uploadedIdOrLicenseDocument = v as String?;
         break;
       case 'referenceDocuments':
         entity.referenceDocuments = List<String>.from(v as Iterable);
@@ -98,14 +98,10 @@ Future<void> updateFields(Map<String, dynamic> fields) async {
         entity.locationName = v as String?;
         break;
       case 'latitude':
-        entity.latitude = (v is double)
-            ? v
-            : (v != null ? double.parse(v.toString()) : null);
+        entity.latitude = (v is double) ? v : double.tryParse(v.toString());
         break;
       case 'longitude':
-        entity.longitude = (v is double)
-            ? v
-            : (v != null ? double.parse(v.toString()) : null);
+        entity.longitude = (v is double) ? v : double.tryParse(v.toString());
         break;
       case 'role':
         entity.role = v as int?;
@@ -118,45 +114,43 @@ Future<void> updateFields(Map<String, dynamic> fields) async {
         break;
 
       case 'serviceAreas':
-  if (v is Iterable) {
-    entity.serviceAreas.clear();
-
-    for (var s in v) {
-      if (s is Map<String, dynamic>) {
-        final location = s['location'] as Map<String, dynamic>?;
-
-        final serviceArea = ServiceAreaLocalEntity(
-          countryCode: s['countryCode'] as String?,
-          stateCode: s['stateCode'] as String?,
-          cityName: s['cityName'] as String?,
-          locationType: location?['type'] as String?,
-          latitude: (location != null && location['coordinates'] != null)
-              ? double.tryParse(location['coordinates'][0].toString())
-              : null,
-          longitude: (location != null && location['coordinates'] != null)
-              ? double.tryParse(location['coordinates'][1].toString())
-              : null,
-        );
-
-        serviceArea.inspector.target = entity;
-
-        entity.serviceAreas.add(serviceArea);
-      }
+        if (v is Iterable) {
+           for (var old in entity.serviceAreas) {
+      _database.removeServiceArea(old.id);
     }
-  }
-  break;
 
+          entity.serviceAreas.clear();
+          for (var s in v) {
+            final loc = s['location'] as Map<String, dynamic>?;
+
+            final sa = ServiceAreaLocalEntity(
+              countryCode: s['countryCode'] as String?,
+              stateCode: s['stateCode'] as String?,
+              cityName: s['cityName'] as String?,
+              locationType: loc?['type'] as String?,
+              latitude: (loc != null)
+                  ? double.tryParse(loc['coordinates'][1].toString())
+                  : null,
+              longitude: (loc != null)
+                  ? double.tryParse(loc['coordinates'][0].toString())
+                  : null,
+            );
+
+            sa.inspector.target = entity;
+              _database.saveServiceArea(sa);
+            entity.serviceAreas.add(sa);
+          }
+        }
+        break;
     }
   });
 
-_database.saveInspector(entity);
-
-
+  _database.saveInspector(entity);
 
   log(
-    '✅ After update: ${entity.name.toString()} ----- zipCode: ${entity.zipCode.toString()} ----- serviceAreas: ${entity.serviceAreas.length}',
-  );
+    'After update: ${entity.name.toString()} ----- zipCode: ${entity.zipCode.toString()} ----- serviceAreas: ${entity.serviceAreas.iterator}',);
 }
+
   Future<InspectorSignUpLocalEntity?> getFullData() async {
     final list = await _database.getAll<InspectorSignUpLocalEntity>();
     if (list != null && list.isNotEmpty) {

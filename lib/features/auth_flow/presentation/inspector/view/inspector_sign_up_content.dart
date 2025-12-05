@@ -125,6 +125,17 @@ class _InspectorSignUpContentState extends State<InspectorSignUpContent> {
                               log('💾 Personal details saved');
                               break;
                             case 1:
+                              if (!vm.validateProfessionalDetails()) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      vm.errorMessage ?? "Invalid input",
+                                    ),
+                                  ),
+                                );
+                                return;
+                              }
+
                               await vm.saveProfessionalStep(
                                 certificateTypeId:
                                     vm.selectedCertificateTypeId ?? '',
@@ -143,25 +154,24 @@ class _InspectorSignUpContentState extends State<InspectorSignUpContent> {
                               vm.saveDataToProvider();
 
                               await vm.generateServiceAreas(
-    countryCode: vm.countryCode.toString(),
-    stateCode: vm.stateCode.toString(),
-    selectedCities: vm.selectedCities,
-  );
+                                countryCode: vm.countryCode.toString(),
+                                stateCode: vm.stateCode.toString(),
+                                selectedCities: vm.selectedCities,
+                              );
 
-  await vm.saveServiceAreaStep(
-    country: vm.country,
-    state: vm.state,
-    city: vm.city ?? '',
-    mailingAddress: vm.mailingAddress,
-    zipCode: vm.zipCode,
-    serviceAreas: vm.serviceAreas,
-  );
+                              await vm.saveServiceAreaStep(
+                                country: vm.country,
+                                state: vm.state,
+                                city: vm.city ?? '',
+                                mailingAddress: vm.mailingAddress,
+                                zipCode: vm.zipCode,
+                                serviceAreas: vm.serviceAreas,
+                              );
 
-                          
                               break;
                             case 3:
                               vm.validateBeforeSubmit(context: ctx);
-                              if (!vm.agreedToTerms || !vm.confirmTruth) {
+                              if (!vm.agreedToTerms || !vm.confirmTruth ) {
                                 return;
                               }
                               String? getSafePath(dynamic fileOrUrl) {

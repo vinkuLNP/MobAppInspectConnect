@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:inspect_connect/features/auth_flow/domain/entities/inspector_sign_up_entity.dart';
+import 'package:inspect_connect/features/auth_flow/domain/entities/service_area_entity.dart';
 import 'package:inspect_connect/objectbox.g.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
@@ -10,6 +11,14 @@ class AppLocalDatabase {
 
 void saveInspector(InspectorSignUpLocalEntity entity) {
   store!.box<InspectorSignUpLocalEntity>().put(entity);
+}
+void saveServiceArea(ServiceAreaLocalEntity entity) {
+  store!.box<ServiceAreaLocalEntity>().put(entity);
+}
+
+
+void removeServiceArea(int id) {
+  store!.box<ServiceAreaLocalEntity>().remove(id);
 }
 
 

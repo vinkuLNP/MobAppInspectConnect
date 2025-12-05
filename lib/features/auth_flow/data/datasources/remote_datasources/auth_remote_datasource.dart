@@ -66,7 +66,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           final Map<String, dynamic> body =
               (root['body'] as Map?)?.cast<String, dynamic>() ??
               <String, dynamic>{};
-              log('--------------->body$body');
+          log('--------------->body$body');
           final dto = AuthUserDto.fromBody(body);
           return ApiResultModel<AuthUserDto>.success(data: dto);
         },

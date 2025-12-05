@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:country_state_city/country_state_city.dart' as csc;
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
@@ -22,54 +20,13 @@ class ServiceAreaStep extends StatefulWidget {
 }
 
 class _ServiceAreaStepState extends State<ServiceAreaStep> {
-  List<csc.Country>? cachedCountries;
-  Map<String, List<csc.State>> cachedStates = {};
-  Map<String, List<csc.City>> cachedCities = {};
-  String? selectedCountryCode;
-  String? selectedStateCode;
-  List<String> selectedCityNames = [];
-  bool loadingCountries = false;
-  bool loadingStates = false;
-  bool loadingCities = false;
-
-  @override
-  void initState() {
-    super.initState();
-    loadCountries();
-
-    Future.microtask(() async {
-      final vm = context.read<InspectorViewModelProvider>();
-
-      await vm.setUserCurrentLocation();
-    });
-  }
-
-  Future<void> loadCountries() async {
-    if (cachedCountries != null) return;
-    setState(() => loadingCountries = true);
-    cachedCountries = await csc.getAllCountries();
-    setState(() => loadingCountries = false);
-  }
-
-  Future<void> loadStates(String countryCode) async {
-    if (cachedStates.containsKey(countryCode)) return;
-    setState(() => loadingStates = true);
-    cachedStates[countryCode] = await csc.getStatesOfCountry(countryCode);
-    setState(() => loadingStates = false);
-  }
-
-  Future<void> loadCities(String countryCode) async {
-    if (cachedCities.containsKey(countryCode)) return;
-    setState(() => loadingCities = true);
-    cachedCities[countryCode] = await csc.getCountryCities(countryCode);
-    setState(() => loadingCities = false);
-  }
-
   void openCitySelectionDialog() async {
-    if (selectedCountryCode == null || selectedStateCode == null) return;
+    final vm = widget.vm;
 
-    final cities = (cachedCities[selectedCountryCode] ?? [])
-        .where((c) => c.stateCode == selectedStateCode)
+    if (vm.selectedCountryCode == null || vm.selectedStateCode == null) return;
+
+    final cities = (vm.cachedCities[widget.vm.selectedCountryCode] ?? [])
+        .where((c) => c.stateCode == vm.selectedStateCode)
         .toList();
 
     final selected = await showMultiSelectSearchDialog<csc.City>(
@@ -78,21 +35,20 @@ class _ServiceAreaStepState extends State<ServiceAreaStep> {
       itemAsString: (c) => c.name,
       title: "Select Cities",
       initiallySelected: cities
-          .where((c) => selectedCityNames.contains(c.name))
+          .where((c) => vm.selectedCityNames.contains(c.name))
           .toList(),
     );
 
-    setState(() {
-      selectedCityNames = selected.map((c) => c.name).toList();
+    vm.selectedCityNames = selected.map((c) => c.name).toList();
 
-      widget.vm.selectedCities
-        ..clear()
-        ..addAll(selectedCityNames);
+    vm.selectedCities
+      ..clear()
+      ..addAll(vm.selectedCityNames);
 
-      if (selectedCityNames.isNotEmpty) {
-        widget.vm.clearCityErrors();
-      }
-    });
+    if (vm.selectedCityNames.isNotEmpty) {
+      vm.clearCityErrors();
+    }
+    vm.selectCities(selected.map((c) => c.name).toList());
   }
 
   @override
@@ -116,35 +72,29 @@ class _ServiceAreaStepState extends State<ServiceAreaStep> {
               children: [
                 AppSelectorField(
                   label: "Country",
-                  value: selectedCountryCode == null
+                  value: vm.selectedCountryCode == null
                       ? "Select Country"
-                      : cachedCountries!
+                      : vm.cachedCountries!
                             .firstWhere(
-                              (c) => c.isoCode == selectedCountryCode!,
+                              (c) => c.isoCode == vm.selectedCountryCode!,
                             )
                             .name,
                   onTap: () async {
-                    if (cachedCountries == null) return;
+                    if (vm.cachedCountries == null) return;
 
                     final selected =
                         await showSearchableListDialog<csc.Country>(
                           context: context,
-                          items: cachedCountries!,
+                          items: vm.cachedCountries!,
                           itemAsString: (c) => c.name,
                           title: "Country",
                         );
 
                     if (selected != null) {
-                      setState(() {
-                        selectedCountryCode = selected.isoCode;
-                        selectedStateCode = null;
-                        selectedCityNames.clear();
-                      });
-log(selected.toString());
+                      vm.selectCountry(selected.isoCode);
+                      await vm.loadStates(selected.isoCode);
+                      await vm.loadCities(selected.isoCode);
                       widget.vm.setCountry(selected.isoCode);
-
-                      await loadStates(selected.isoCode);
-                      await loadCities(selected.isoCode);
                     }
                   },
                 ),
@@ -165,15 +115,18 @@ log(selected.toString());
               children: [
                 AppSelectorField(
                   label: "State",
-                  value: selectedStateCode == null
+                  value: vm.selectedStateCode == null
                       ? "Select State"
-                      : cachedStates[selectedCountryCode]!
-                            .firstWhere((s) => s.isoCode == selectedStateCode!)
+                      : vm.cachedStates[vm.selectedCountryCode]!
+                            .firstWhere(
+                              (s) => s.isoCode == vm.selectedStateCode!,
+                            )
                             .name,
                   onTap: () async {
-                    if (selectedCountryCode == null) return;
+                    if (vm.selectedCountryCode == null) return;
 
-                    final states = cachedStates[selectedCountryCode] ?? [];
+                    final states =
+                        vm.cachedStates[vm.selectedCountryCode] ?? [];
                     if (states.isEmpty) return;
 
                     final selected = await showSearchableListDialog<csc.State>(
@@ -184,10 +137,9 @@ log(selected.toString());
                     );
 
                     if (selected != null) {
-                      setState(() {
-                        selectedStateCode = selected.isoCode;
-                        selectedCityNames.clear();
-                      });
+                      vm.selectState(selected.isoCode);
+                      vm.selectedStateCode = selected.isoCode;
+                      vm.selectedCityNames.clear();
                       widget.vm.setState(selected.isoCode);
                     }
                   },
@@ -240,7 +192,7 @@ log(selected.toString());
                     border: Border.all(color: Colors.grey.shade400),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: selectedCityNames.isEmpty
+                  child: vm.selectedCityNames.isEmpty
                       ? textWidget(
                           text: "No cities selected",
                           color: Colors.grey,
@@ -248,21 +200,20 @@ log(selected.toString());
                       : Wrap(
                           spacing: 6,
                           runSpacing: 6,
-                          children: selectedCityNames.map((city) {
+                          children: vm.selectedCityNames.map((city) {
                             return Chip(
                               backgroundColor: AppColors.selectionColor,
                               label: textWidget(text: city),
                               deleteIcon: const Icon(Icons.close, size: 18),
                               onDeleted: () {
-                                setState(() {
-                                  selectedCityNames.remove(city);
-                                  widget.vm.selectedCities.remove(city);
-                                  if (selectedCityNames.isNotEmpty) {
-                                    widget.vm.clearCityErrors();
-                                  } else {
-                                    widget.vm.validateServiceArea();
-                                  }
-                                });
+                                vm.removeCity(city);
+                                vm.selectedCityNames.remove(city);
+                                widget.vm.selectedCities.remove(city);
+                                if (vm.selectedCityNames.isNotEmpty) {
+                                  widget.vm.clearCityErrors();
+                                } else {
+                                  widget.vm.validateServiceArea();
+                                }
                               },
                             );
                           }).toList(),
