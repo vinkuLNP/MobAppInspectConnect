@@ -144,20 +144,28 @@ class InspectorDashboardProvider extends BaseViewModel {
        ),
      );
 */
-   if(context.mounted)   showPaymentSuccessDialog(context);
+      if (context.mounted) showPaymentSuccessDialog(context);
     } on StripeException catch (e) {
       log('⚠️ StripeException: $e');
-       if(context.mounted){  
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: textWidget(text: 'Payment canceled',color: Colors.white)));
-    }} catch (e, st) {
-      log('❌ Payment error: $e\n$st');
-       if(context.mounted){  
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: textWidget(text: 'Payment failed: $e',color: Colors.white)));
-   } } finally {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: textWidget(text: 'Payment canceled', color: Colors.white),
+          ),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: textWidget(
+              text: 'Payment failed: $e',
+              color: Colors.white,
+            ),
+          ),
+        );
+      }
+    } finally {
       isProcessingPayment = false;
       notifyListeners();
     }
@@ -170,9 +178,6 @@ class InspectorDashboardProvider extends BaseViewModel {
     String subscriptionId,
   ) async {
     try {
-      log(
-        'totalAmount ${amount.toString()},priceId $priceId,paymentType $subscriptionId,device ${1},subscriptionId $subscriptionId,  ',
-      );
       final url = Uri.parse('$devBaseUrl/payments/paymentIntent');
       final response = await http.post(
         url,
@@ -188,10 +193,8 @@ class InspectorDashboardProvider extends BaseViewModel {
       );
 
       final decoded = json.decode(response.body);
-      log("📩 createPaymentIntent response: $decoded");
       return decoded;
-    } catch (e, st) {
-      log('❌ createPaymentIntent error: $e\n$st');
+    } catch (e) {
       rethrow;
     }
   }
@@ -200,7 +203,6 @@ class InspectorDashboardProvider extends BaseViewModel {
     try {
       final localUser = await locator<AuthLocalDataSource>().getUser();
       if (localUser == null || localUser.authToken == null) {
-        log('[CHECK_USER_STATUS] ❌ No local user/token found');
         return null;
       }
 
@@ -215,26 +217,26 @@ class InspectorDashboardProvider extends BaseViewModel {
 
       await result?.when(
         data: (userDetail) async {
-          log('[CHECK_USER_STATUS] ✅ Got updated user detail');
           final mergedUser = localUser.mergeWithUserDetail(userDetail);
           await locator<AuthLocalDataSource>().saveUser(mergedUser);
-         if(context.mounted)  context.read<UserProvider>().setUser(mergedUser);
+          if (context.mounted) context.read<UserProvider>().setUser(mergedUser);
 
           status = userDetail.approvalStatusByAdmin;
         },
         error: (e) {
-          log('[CHECK_USER_STATUS] ❌ Failed: ${e.message}');
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: textWidget(text: 'Could not refresh user details',color: Colors.white),
+              content: textWidget(
+                text: 'Could not refresh user details',
+                color: Colors.white,
+              ),
             ),
           );
         },
       );
 
       return status;
-    } catch (e, st) {
-      log('[CHECK_USER_STATUS] ❌ Exception: $e\n$st');
+    } catch (e) {
       return null;
     }
   }
@@ -275,152 +277,92 @@ class InspectorDashboardProvider extends BaseViewModel {
     required AuthUser user,
     required BuildContext context,
   }) async {
-    log('[FETCH_USER_DETAIL] Fetching user details for userId=${user.id}');
-
     final existingUser = await locator<AuthLocalDataSource>().getUser();
 
     final localUser = user.toLocalEntity();
 
     if (localUser.authToken == null || localUser.authToken!.isEmpty) {
-      log('[FETCH_USER_DETAIL] ⚠️ No token in API user — reusing local token.');
       localUser.authToken = existingUser?.authToken;
     }
 
-    log(
-      '[FETCH_USER_DETAIL] Local entity before save: token=${localUser.authToken}, name=${localUser.name}',
-    );
-
     await locator<AuthLocalDataSource>().saveUser(localUser);
-    log('[FETCH_USER_DETAIL] Saved local user.');
- if(context.mounted){  
-    final userProvider = context.read<UserProvider>();
-    await userProvider.setUser(localUser);
-    await userProvider.loadUser();
- 
-    log(
-      '[FETCH_USER_DETAIL] Local user loaded into provider: id=${user.id}, token=${localUser.authToken}',
-    );
-    final fetchUserUseCase = locator<GetUserUseCase>();
-    final userState = await executeParamsUseCase<UserDetail, GetUserParams>(
-      useCase: fetchUserUseCase,
-      query: GetUserParams(userId: user.id),
-      launchLoader: true,
-    );
+    if (context.mounted) {
+      final userProvider = context.read<UserProvider>();
+      await userProvider.setUser(localUser);
+      await userProvider.loadUser();
 
-    userState?.when(
-      data: (userData) async {
-        log(
-          '[FETCH_USER_DETAIL] ✅ Received user detail from API: ${userData.name} (${userData.email})',
-        );
+      final fetchUserUseCase = locator<GetUserUseCase>();
+      final userState = await executeParamsUseCase<UserDetail, GetUserParams>(
+        useCase: fetchUserUseCase,
+        query: GetUserParams(userId: user.id),
+        launchLoader: true,
+      );
 
-        final mergedUser = localUser.mergeWithUserDetail(userData);
-        log(
-          '[FETCH_USER_DETAIL] Merged user detail: token=${mergedUser.authToken}, name=${mergedUser.name}',
-        );
+      userState?.when(
+        data: (userData) async {
+          final mergedUser = localUser.mergeWithUserDetail(userData);
 
-        await locator<AuthLocalDataSource>().saveUser(mergedUser);
-        log('[FETCH_USER_DETAIL] ✅ User detail saved locally after merge.');
+          await locator<AuthLocalDataSource>().saveUser(mergedUser);
 
-        await userProvider.setUser(mergedUser);
-        log('[FETCH_USER_DETAIL] ✅ User updated in provider.');
-      },
-      error: (e) {
-        log('[FETCH_USER_DETAIL] ❌ Failed to fetch user detail: ${e.message}');
-
-        context.router.replaceAll([const OnBoardingRoute()]);
-      },
-    );
- }}
+          await userProvider.setUser(mergedUser);
+        },
+        error: (e) {
+          context.router.replaceAll([const OnBoardingRoute()]);
+        },
+      );
+    }
+  }
 
   InspectorStatus status = InspectorStatus.unverified;
   AuthUser? user;
   UserSubscriptionModel? subscription;
 
   Future<void> initializeUserState(BuildContext context) async {
-    log('🔹 [initializeUserState] Starting initialization...');
     isLoading = true;
     notifyListeners();
 
     try {
-      log('📦 Fetching local user from AuthLocalDataSource...');
       final localUser = await locator<AuthLocalDataSource>().getUser();
 
       if (localUser == null) {
-        log('⚠️ No local user found. Setting status → unverified');
         status = InspectorStatus.unverified;
         return;
       }
 
-      user = localUser.toDomainEntity();
-      log('✅ Local user found: ${user?.name ?? "no email"}');
-      log('📱 OTP verified: ${localUser.phoneOtpVerified}');
+      final userDetail = await fetchAndUpdateUserDetail(localUser, context);
 
-      if (localUser.phoneOtpVerified != true) {
-        log('❌ Phone OTP not verified. Setting status → unverified');
+      final mergedUser = localUser.mergeWithUserDetail(userDetail);
+
+      user = AuthUser.fromLocalEntity(mergedUser);
+
+      if (mergedUser.phoneOtpVerified != true) {
         status = InspectorStatus.unverified;
         return;
       }
 
-      log('💳 Checking subscription status...');
-      log('   Subscription ID: ${localUser.currentSubscriptionId}');
-      log(
-        '   Subscription Status: ${localUser.stripeSubscriptionStatus}',
-      );
-
-      if (localUser.stripeSubscriptionStatus == null ||
-          localUser.currentSubscriptionId == null) {
-        log(
-          '⚠️ No active subscription found. Setting status → needsSubscription',
-        );
-        status = InspectorStatus.needsSubscription;
-        await fetchSubscriptionPlans();
-        log('📋 Subscription plans fetched successfully.');
-        return;
-      }
-
-      if (localUser.stripeSubscriptionStatus != 'active') {
-        log(
-          '⚠️ Subscription is not active (status=${localUser.stripeSubscriptionStatus}). '
-          'Redirecting to subscription plan screen...',
-        );
+      if (mergedUser.stripeSubscriptionStatus != 'active' ||
+          mergedUser.currentSubscriptionId == null) {
         status = InspectorStatus.needsSubscription;
         await fetchSubscriptionPlans();
         return;
       }
 
-      if (localUser.stripeSubscriptionStatus == 'active' &&
-          localUser.currentSubscriptionId != null) {
-        log(
-          '🚀 Active subscription detected. Fetching user detail from remote...',
-        );
-         if(context.mounted){  
-        final userDetail = await fetchAndUpdateUserDetail(localUser, context);
-        log('✅ User detail fetched successfully.');
-        log(
-          '👮 Admin Approval Status: ${userDetail.approvalStatusByAdmin}',
-        );
-
-        if (userDetail.approvalStatusByAdmin == 0) {
-          log('🕐 Approval pending. Setting status → underReview');
+      switch (mergedUser.approvalStatusByAdmin) {
+        case 0:
           status = InspectorStatus.underReview;
-        } else if (userDetail.approvalStatusByAdmin == 2) {
-          log('Approval rejected by admin. Setting status → rejected');
-          status = InspectorStatus.rejected;
-        } else if (userDetail.approvalStatusByAdmin == 1) {
-          log('✅ Approval granted by admin. Setting status → approved');
+          break;
+        case 1:
           status = InspectorStatus.approved;
-        } else {
-          log(
-            '⚠️ Unknown approval status: ${userDetail.approvalStatusByAdmin}',
-          );
-        }
-      }}
-    } catch (e, stack) {
-      log('🔥 [initializeUserState] Error occurred: $e');
-      log('📄 Stack Trace: $stack');
+          break;
+        case 2:
+          status = InspectorStatus.rejected;
+          break;
+        default:
+      }
+    } catch (e) {
+      log('[initializeUserState] Error occurred: $e');
     } finally {
       isLoading = false;
-      log('🏁 [initializeUserState] Initialization complete.');
       notifyListeners();
     }
   }
@@ -438,14 +380,42 @@ class InspectorDashboardProvider extends BaseViewModel {
 
     late UserDetail detail;
 
-    result?.when(
+    await result?.when(
       data: (userDetail) async {
         detail = userDetail;
         final mergedUser = localUser.mergeWithUserDetail(userDetail);
+
         await locator<AuthLocalDataSource>().saveUser(mergedUser);
-      if(context.mounted)   context.read<UserProvider>().setUser(mergedUser);
+
+        if (context.mounted) {
+          context.read<UserProvider>().setUser(mergedUser);
+        }
       },
-      error: (e) => log('Failed to fetch user detail: ${e.message}'),
+      error: (e) {
+        detail = UserDetail(
+          id: localUser.id.toString(),
+          name: localUser.name,
+          email: localUser.email,
+          phoneNumber: localUser.phoneNumber,
+          countryCode: localUser.countryCode,
+          phoneOtpVerified: localUser.phoneOtpVerified,
+          emailOtpVerified: localUser.emailOtpVerified,
+          agreedToTerms: localUser.agreedToTerms,
+          isTruthfully: localUser.isTruthfully,
+          stripeSubscriptionStatus: localUser.stripeSubscriptionStatus,
+          currentSubscriptionId: localUser.currentSubscriptionId != null
+              ? CurrentSubscription(id: localUser.currentSubscriptionId)
+              : null,
+          approvalStatusByAdmin: localUser.approvalStatusByAdmin,
+          location: localUser.latitude != null && localUser.longitude != null
+              ? Location(
+                  type: 'Point',
+                  locationName: localUser.locationName,
+                  coordinates: [localUser.latitude!, localUser.longitude!],
+                )
+              : null,
+        );
+      },
     );
 
     return detail;

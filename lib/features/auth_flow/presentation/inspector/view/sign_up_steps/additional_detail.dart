@@ -92,7 +92,7 @@ class _AdditionalDetailsStepState extends State<AdditionalDetailsStep> {
 
                         AppInputField(
                           controller: prov.workHistoryController,
-                          label: 'Work History Description(Optional)',
+                          label: 'Work History Description',
                           maxLines: 4,
                           hint: 'Enter work experience details...',
                         ),

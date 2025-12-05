@@ -237,6 +237,27 @@ class InspectorViewModelProvider extends BaseViewModel {
     _startCooldown();
   }
 
+  String? errorMessage;
+
+  bool validateProfessionalDetails() {
+    final totalDocs = documents.length + existingDocumentUrls.length;
+
+    if (certificateInspectorType == null) {
+      errorMessage = "Please select a certificate type";
+      notifyListeners();
+      return false;
+    }
+
+    if (totalDocs == 0 || uploadedCertificateUrls == []) {
+      errorMessage = "Please upload at least one certification document";
+      notifyListeners();
+      return false;
+    }
+
+    errorMessage = null;
+    return true;
+  }
+
   void _startCooldown() {
     _secondsLeft = resendCooldownSec;
     _timer?.cancel();
@@ -587,6 +608,9 @@ class InspectorViewModelProvider extends BaseViewModel {
   void setCertificateType(CertificateInspectorTypeEntity? t) {
     _certificateInspectorType = t;
     selectedCertificateTypeId = t?.id;
+    log('------------id. ${t!.id.toString()}');
+    log('------------name. ${t.name.toString()}');
+
     fetchCertificateAgencies();
     notifyListeners();
   }
@@ -628,6 +652,7 @@ class InspectorViewModelProvider extends BaseViewModel {
 
           CertificateInspectorTypeModelData selectedType;
           if (savedId != null) {
+            log(savedId);
             selectedType = modelList.firstWhere(
               (e) => e.id == savedId,
               orElse: () => modelList.first,
@@ -806,7 +831,12 @@ class InspectorViewModelProvider extends BaseViewModel {
   }
 
   Future<void> savePersonalStep() async {
-    fetchCertificateTypes();
+    if (selectedCertificateTypeId != null) {
+      await fetchCertificateTypes(savedId: selectedCertificateTypeId);
+    } else {
+      fetchCertificateTypes();
+    }
+
     final deviceToken = await DeviceInfoHelper.getDeviceToken();
     final deviceType = await DeviceInfoHelper.getDeviceType();
     await _localDs.updateFields({
@@ -846,12 +876,12 @@ class InspectorViewModelProvider extends BaseViewModel {
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
-        return; 
+        return;
       }
     }
 
     if (permission == LocationPermission.deniedForever) {
-      return; 
+      return;
     }
 
     Position pos = await Geolocator.getCurrentPosition(
@@ -902,6 +932,9 @@ class InspectorViewModelProvider extends BaseViewModel {
 
     if (serviceAreas != null) {
       fieldsToUpdate['serviceAreas'] = serviceAreas.map((s) {
+        log('latidit---------------${s.latitude.toString()}');
+        log('ngto---------------${s.longitude.toString()}');
+
         return {
           "countryCode": s.countryCode,
           "stateCode": s.stateCode,
@@ -1004,10 +1037,122 @@ class InspectorViewModelProvider extends BaseViewModel {
     workHistoryController.text = saved.workHistoryDescription ?? '';
     agreedToTerms = saved.agreedToTerms ?? false;
     confirmTruth = saved.isTruthfully ?? false;
-    serviceAreas = saved.serviceAreas ;
+    serviceAreas = saved.serviceAreas;
+    if (saved.serviceAreas != [] && saved.serviceAreas.isNotEmpty) {
+      final areas = saved.serviceAreas;
+loadCountries();
+
+      final savedCountryCode = areas.first.countryCode;
+      final savedStateCode = areas.first.stateCode;
+
+      countryCode = savedCountryCode;
+      stateCode = savedStateCode;
+
+      selectedCountryCode = savedCountryCode;
+      selectedStateCode = savedStateCode;
+      selectedCities = areas
+          .map((e) => e.cityName)
+          .whereType<String>()
+          .toList();
+      selectedCityNames = List.from(selectedCities);
+
+      countryError = null;
+      stateError = null;
+      cityError = null;
+      await loadStates(savedCountryCode.toString());
+      await loadCities(savedCountryCode.toString());
+      setUserCurrentLocation();
+
+      notifyListeners();
+    }
 
     notifyListeners();
   }
+
+
+
+
+
+ String? selectedCountryCode;
+  String? selectedStateCode;
+  List<String> selectedCityNames = [];
+
+List<csc.Country>? cachedCountries;
+Map<String, List<csc.State>> cachedStates = {};
+Map<String, List<csc.City>> cachedCities = {};
+
+bool loadingCountries = false;
+bool loadingStates = false;
+bool loadingCities = false;
+
+Future<void> loadCountries() async {
+  if (cachedCountries != null) return;
+  loadingCountries = true;
+  notifyListeners();
+
+  cachedCountries = await csc.getAllCountries();
+
+  loadingCountries = false;
+  notifyListeners();
+}
+
+Future<void> loadStates(String countryCode) async {
+  if (cachedStates.containsKey(countryCode)) return;
+  loadingStates = true;
+  notifyListeners();
+
+  cachedStates[countryCode] = await csc.getStatesOfCountry(countryCode);
+
+  loadingStates = false;
+  notifyListeners();
+}
+
+Future<void> loadCities(String countryCode) async {
+  if (cachedCities.containsKey(countryCode)) return;
+  loadingCities = true;
+  notifyListeners();
+
+  cachedCities[countryCode] = await csc.getCountryCities(countryCode);
+
+  loadingCities = false;
+  notifyListeners();
+}
+
+void selectCountry(String code) {
+  selectedCountryCode = code;
+  selectedStateCode = null;
+  selectedCityNames.clear();
+  selectedCities.clear();
+  countryError = null;
+  notifyListeners();
+}
+
+void selectState(String code) {
+  selectedStateCode = code;
+  selectedCityNames.clear();
+  selectedCities.clear();
+  stateError = null;
+  notifyListeners();
+}
+
+void selectCities(List<String> names) {
+  selectedCityNames = names;
+  selectedCities = List.from(names);
+  if (names.isNotEmpty) clearCityErrors();
+  notifyListeners();
+}
+
+void removeCity(String city) {
+  selectedCityNames.remove(city);
+  selectedCities.remove(city);
+
+  if (selectedCityNames.isEmpty) {
+    validateServiceArea();
+  }
+  notifyListeners();
+}
+
+
 
   Future<void> signUp({required BuildContext context}) async {
     _isResetting = true;
@@ -1179,33 +1324,32 @@ class InspectorViewModelProvider extends BaseViewModel {
   }
 
   Future<void> generateServiceAreas({
-  required String countryCode,
-  required String stateCode,
-  required List<String> selectedCities,
-}) async {
-  serviceAreas.clear();
+    required String countryCode,
+    required String stateCode,
+    required List<String> selectedCities,
+  }) async {
+    serviceAreas.clear();
 
-  final allCities = (await csc.getCountryCities(countryCode))
-      .where((c) => c.stateCode == stateCode)
-      .toList();
+    final allCities = (await csc.getCountryCities(
+      countryCode,
+    )).where((c) => c.stateCode == stateCode).toList();
 
-  for (final cityName in selectedCities) {
-    final city = allCities.firstWhere(
-      (c) => c.name == cityName,
-      orElse: () => throw Exception("City $cityName not found in $stateCode"),
-    );
+    for (final cityName in selectedCities) {
+      final city = allCities.firstWhere(
+        (c) => c.name == cityName,
+        orElse: () => throw Exception("City $cityName not found in $stateCode"),
+      );
 
-    serviceAreas.add(
-      ServiceAreaLocalEntity(
-        countryCode: countryCode,   
-        stateCode: stateCode,       
-        cityName: cityName,
-        locationType: "Point",
-        latitude: double.tryParse(city.latitude.toString()),
-        longitude: double.tryParse(city.longitude.toString()),
-      ),
-    );
+      serviceAreas.add(
+        ServiceAreaLocalEntity(
+          countryCode: countryCode,
+          stateCode: stateCode,
+          cityName: cityName,
+          locationType: "Point",
+          latitude: double.tryParse(city.latitude.toString()),
+          longitude: double.tryParse(city.longitude.toString()),
+        ),
+      );
+    }
   }
-}
-
 }

@@ -16,6 +16,7 @@ import 'package:objectbox_flutter_libs/objectbox_flutter_libs.dart';
 
 import 'features/auth_flow/data/datasources/local_datasources/auth_user_local_entity.dart';
 import 'features/auth_flow/domain/entities/inspector_sign_up_entity.dart';
+import 'features/auth_flow/domain/entities/service_area_entity.dart';
 
 export 'package:objectbox/objectbox.dart'; // so that callers only have to import this file
 
@@ -50,6 +51,7 @@ final _entities = <obx_int.ModelEntity>[
         type: 11,
         flags: 520,
         indexId: const obx_int.IdUid(1, 1381949025203565816),
+        relationField: 'user',
         relationTarget: 'AuthUserLocalEntity',
       ),
     ],
@@ -59,7 +61,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
     id: const obx_int.IdUid(2, 7510821947055321623),
     name: 'AuthUserLocalEntity',
-    lastPropertyId: const obx_int.IdUid(43, 5105618599375191812),
+    lastPropertyId: const obx_int.IdUid(44, 8768948039023014530),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
@@ -320,6 +322,12 @@ final _entities = <obx_int.ModelEntity>[
         type: 10,
         flags: 0,
       ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(44, 8768948039023014530),
+        name: 'zipCode',
+        type: 9,
+        flags: 0,
+      ),
     ],
     relations: <obx_int.ModelRelation>[],
     backlinks: <obx_int.ModelBacklink>[
@@ -512,6 +520,73 @@ final _entities = <obx_int.ModelEntity>[
       ),
     ],
     relations: <obx_int.ModelRelation>[],
+    backlinks: <obx_int.ModelBacklink>[
+      obx_int.ModelBacklink(
+        name: 'serviceAreas',
+        srcEntity: 'ServiceAreaLocalEntity',
+        srcField: 'inspector',
+      ),
+    ],
+  ),
+  obx_int.ModelEntity(
+    id: const obx_int.IdUid(4, 9029954651202435050),
+    name: 'ServiceAreaLocalEntity',
+    lastPropertyId: const obx_int.IdUid(8, 2799346839572520102),
+    flags: 0,
+    properties: <obx_int.ModelProperty>[
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(1, 7019449212180121812),
+        name: 'id',
+        type: 6,
+        flags: 1,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(2, 2300943570772507507),
+        name: 'countryCode',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(3, 1194465841916251761),
+        name: 'stateCode',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(4, 7668761717699029621),
+        name: 'cityName',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(5, 1519549142572183652),
+        name: 'locationType',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(6, 595672076555757210),
+        name: 'latitude',
+        type: 8,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(7, 3415925726551865863),
+        name: 'longitude',
+        type: 8,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(8, 2799346839572520102),
+        name: 'inspectorId',
+        type: 11,
+        flags: 520,
+        indexId: const obx_int.IdUid(2, 7437307085727159997),
+        relationField: 'inspector',
+        relationTarget: 'InspectorSignUpLocalEntity',
+      ),
+    ],
+    relations: <obx_int.ModelRelation>[],
     backlinks: <obx_int.ModelBacklink>[],
   ),
 ];
@@ -554,8 +629,8 @@ Future<obx.Store> openStore({
 obx_int.ModelDefinition getObjectBoxModel() {
   final model = obx_int.ModelInfo(
     entities: _entities,
-    lastEntityId: const obx_int.IdUid(3, 9109420249064471506),
-    lastIndexId: const obx_int.IdUid(1, 1381949025203565816),
+    lastEntityId: const obx_int.IdUid(4, 9029954651202435050),
+    lastIndexId: const obx_int.IdUid(2, 7437307085727159997),
     lastRelationId: const obx_int.IdUid(0, 0),
     lastSequenceId: const obx_int.IdUid(0, 0),
     retiredEntityUids: const [],
@@ -716,7 +791,10 @@ obx_int.ModelDefinition getObjectBoxModel() {
             object.workHistoryDescription == null
             ? null
             : fbb.writeString(object.workHistoryDescription!);
-        fbb.startTable(44);
+        final zipCodeOffset = object.zipCode == null
+            ? null
+            : fbb.writeString(object.zipCode!);
+        fbb.startTable(45);
         fbb.addInt64(0, object.id);
         fbb.addOffset(1, authTokenOffset);
         fbb.addOffset(2, nameOffset);
@@ -760,6 +838,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
         fbb.addOffset(40, uploadedIdOrLicenseDocumentOffset);
         fbb.addOffset(41, workHistoryDescriptionOffset);
         fbb.addInt64(42, object.loginTime?.millisecondsSinceEpoch);
+        fbb.addOffset(43, zipCodeOffset);
         fbb.finish(fbb.endTable());
         return object.id;
       },
@@ -901,6 +980,9 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final cityParam = const fb.StringReader(
           asciiOptimization: true,
         ).vTableGetNullable(buffer, rootOffset, 72);
+        final zipCodeParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGetNullable(buffer, rootOffset, 90);
         final certificateTypeIdParam = const fb.StringReader(
           asciiOptimization: true,
         ).vTableGetNullable(buffer, rootOffset, 74);
@@ -961,6 +1043,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
           country: countryParam,
           state: stateParam,
           city: cityParam,
+          zipCode: zipCodeParam,
           certificateTypeId: certificateTypeIdParam,
           certificateAgencyIds: certificateAgencyIdsParam,
           certificateDocuments: certificateDocumentsParam,
@@ -985,7 +1068,13 @@ obx_int.ModelDefinition getObjectBoxModel() {
         obx_int.EntityDefinition<InspectorSignUpLocalEntity>(
           model: _entities[2],
           toOneRelations: (InspectorSignUpLocalEntity object) => [],
-          toManyRelations: (InspectorSignUpLocalEntity object) => {},
+          toManyRelations: (InspectorSignUpLocalEntity object) => {
+            obx_int.RelInfo<ServiceAreaLocalEntity>.toOneBacklink(
+              8,
+              object.id,
+              (ServiceAreaLocalEntity srcObject) => srcObject.inspector,
+            ): object.serviceAreas,
+          },
           getId: (InspectorSignUpLocalEntity object) => object.id,
           setId: (InspectorSignUpLocalEntity object, int id) {
             object.id = id;
@@ -1134,18 +1223,15 @@ obx_int.ModelDefinition getObjectBoxModel() {
             final countryCodeParam = const fb.StringReader(
               asciiOptimization: true,
             ).vTableGetNullable(buffer, rootOffset, 14);
+            final isoCodeParam = const fb.StringReader(
+              asciiOptimization: true,
+            ).vTableGetNullable(buffer, rootOffset, 16);
             final certificateTypeIdParam = const fb.StringReader(
               asciiOptimization: true,
             ).vTableGetNullable(buffer, rootOffset, 18);
             final certificateExpiryDateParam = const fb.StringReader(
               asciiOptimization: true,
             ).vTableGetNullable(buffer, rootOffset, 20);
-            final workHistoryDescriptionParam = const fb.StringReader(
-              asciiOptimization: true,
-            ).vTableGetNullable(buffer, rootOffset, 38);
-            final zipCodeParam = const fb.StringReader(
-              asciiOptimization: true,
-            ).vTableGetNullable(buffer, rootOffset, 32);
             final certificateDocumentsParam = const fb.ListReader<String>(
               fb.StringReader(asciiOptimization: true),
               lazy: false,
@@ -1163,12 +1249,18 @@ obx_int.ModelDefinition getObjectBoxModel() {
             final cityParam = const fb.StringReader(
               asciiOptimization: true,
             ).vTableGetNullable(buffer, rootOffset, 30);
+            final zipCodeParam = const fb.StringReader(
+              asciiOptimization: true,
+            ).vTableGetNullable(buffer, rootOffset, 32);
             final mailingAddressParam = const fb.StringReader(
               asciiOptimization: true,
             ).vTableGetNullable(buffer, rootOffset, 34);
             final uploadedIdOrLicenseDocumentParam = const fb.StringReader(
               asciiOptimization: true,
             ).vTableGetNullable(buffer, rootOffset, 36);
+            final workHistoryDescriptionParam = const fb.StringReader(
+              asciiOptimization: true,
+            ).vTableGetNullable(buffer, rootOffset, 38);
             final referenceDocumentsParam = const fb.ListReader<String>(
               fb.StringReader(asciiOptimization: true),
               lazy: false,
@@ -1208,9 +1300,6 @@ obx_int.ModelDefinition getObjectBoxModel() {
               rootOffset,
               58,
             );
-            final isoCodeParam = const fb.StringReader(
-              asciiOptimization: true,
-            ).vTableGetNullable(buffer, rootOffset, 16);
             final longitudeParam = const fb.Float64Reader().vTableGetNullable(
               buffer,
               rootOffset,
@@ -1223,17 +1312,18 @@ obx_int.ModelDefinition getObjectBoxModel() {
               password: passwordParam,
               phoneNumber: phoneNumberParam,
               countryCode: countryCodeParam,
+              isoCode: isoCodeParam,
               certificateTypeId: certificateTypeIdParam,
               certificateExpiryDate: certificateExpiryDateParam,
-              workHistoryDescription: workHistoryDescriptionParam,
-              zipCode: zipCodeParam,
               certificateDocuments: certificateDocumentsParam,
               certificateAgencyIds: certificateAgencyIdsParam,
               country: countryParam,
               state: stateParam,
               city: cityParam,
+              zipCode: zipCodeParam,
               mailingAddress: mailingAddressParam,
               uploadedIdOrLicenseDocument: uploadedIdOrLicenseDocumentParam,
+              workHistoryDescription: workHistoryDescriptionParam,
               referenceDocuments: referenceDocumentsParam,
               profileImage: profileImageParam,
               agreedToTerms: agreedToTermsParam,
@@ -1244,13 +1334,103 @@ obx_int.ModelDefinition getObjectBoxModel() {
               locationType: locationTypeParam,
               locationName: locationNameParam,
               latitude: latitudeParam,
-              isoCode: isoCodeParam,
               longitude: longitudeParam,
             );
-
+            obx_int.InternalToManyAccess.setRelInfo<InspectorSignUpLocalEntity>(
+              object.serviceAreas,
+              store,
+              obx_int.RelInfo<ServiceAreaLocalEntity>.toOneBacklink(
+                8,
+                object.id,
+                (ServiceAreaLocalEntity srcObject) => srcObject.inspector,
+              ),
+            );
             return object;
           },
         ),
+    ServiceAreaLocalEntity: obx_int.EntityDefinition<ServiceAreaLocalEntity>(
+      model: _entities[3],
+      toOneRelations: (ServiceAreaLocalEntity object) => [object.inspector],
+      toManyRelations: (ServiceAreaLocalEntity object) => {},
+      getId: (ServiceAreaLocalEntity object) => object.id,
+      setId: (ServiceAreaLocalEntity object, int id) {
+        object.id = id;
+      },
+      objectToFB: (ServiceAreaLocalEntity object, fb.Builder fbb) {
+        final countryCodeOffset = object.countryCode == null
+            ? null
+            : fbb.writeString(object.countryCode!);
+        final stateCodeOffset = object.stateCode == null
+            ? null
+            : fbb.writeString(object.stateCode!);
+        final cityNameOffset = object.cityName == null
+            ? null
+            : fbb.writeString(object.cityName!);
+        final locationTypeOffset = object.locationType == null
+            ? null
+            : fbb.writeString(object.locationType!);
+        fbb.startTable(9);
+        fbb.addInt64(0, object.id);
+        fbb.addOffset(1, countryCodeOffset);
+        fbb.addOffset(2, stateCodeOffset);
+        fbb.addOffset(3, cityNameOffset);
+        fbb.addOffset(4, locationTypeOffset);
+        fbb.addFloat64(5, object.latitude);
+        fbb.addFloat64(6, object.longitude);
+        fbb.addInt64(7, object.inspector.targetId);
+        fbb.finish(fbb.endTable());
+        return object.id;
+      },
+      objectFromFB: (obx.Store store, ByteData fbData) {
+        final buffer = fb.BufferContext(fbData);
+        final rootOffset = buffer.derefObject(0);
+        final idParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          4,
+          0,
+        );
+        final countryCodeParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGetNullable(buffer, rootOffset, 6);
+        final stateCodeParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGetNullable(buffer, rootOffset, 8);
+        final cityNameParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGetNullable(buffer, rootOffset, 10);
+        final locationTypeParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGetNullable(buffer, rootOffset, 12);
+        final latitudeParam = const fb.Float64Reader().vTableGetNullable(
+          buffer,
+          rootOffset,
+          14,
+        );
+        final longitudeParam = const fb.Float64Reader().vTableGetNullable(
+          buffer,
+          rootOffset,
+          16,
+        );
+        final object = ServiceAreaLocalEntity(
+          id: idParam,
+          countryCode: countryCodeParam,
+          stateCode: stateCodeParam,
+          cityName: cityNameParam,
+          locationType: locationTypeParam,
+          latitude: latitudeParam,
+          longitude: longitudeParam,
+        );
+        object.inspector.targetId = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          18,
+          0,
+        );
+        object.inspector.attach(store);
+        return object;
+      },
+    ),
   };
 
   return obx_int.ModelDefinition(model, bindings);
@@ -1501,6 +1681,11 @@ class AuthUserLocalEntity_ {
     _entities[1].properties[42],
   );
 
+  /// See [AuthUserLocalEntity.zipCode].
+  static final zipCode = obx.QueryStringProperty<AuthUserLocalEntity>(
+    _entities[1].properties[43],
+  );
+
   /// see [AuthUserLocalEntity.devices]
   static final devices =
       obx.QueryBacklinkToMany<AuthUserDeviceEntity, AuthUserLocalEntity>(
@@ -1670,4 +1855,56 @@ class InspectorSignUpLocalEntity_ {
   static final longitude = obx.QueryDoubleProperty<InspectorSignUpLocalEntity>(
     _entities[2].properties[28],
   );
+
+  /// see [InspectorSignUpLocalEntity.serviceAreas]
+  static final serviceAreas =
+      obx.QueryBacklinkToMany<
+        ServiceAreaLocalEntity,
+        InspectorSignUpLocalEntity
+      >(ServiceAreaLocalEntity_.inspector);
+}
+
+/// [ServiceAreaLocalEntity] entity fields to define ObjectBox queries.
+class ServiceAreaLocalEntity_ {
+  /// See [ServiceAreaLocalEntity.id].
+  static final id = obx.QueryIntegerProperty<ServiceAreaLocalEntity>(
+    _entities[3].properties[0],
+  );
+
+  /// See [ServiceAreaLocalEntity.countryCode].
+  static final countryCode = obx.QueryStringProperty<ServiceAreaLocalEntity>(
+    _entities[3].properties[1],
+  );
+
+  /// See [ServiceAreaLocalEntity.stateCode].
+  static final stateCode = obx.QueryStringProperty<ServiceAreaLocalEntity>(
+    _entities[3].properties[2],
+  );
+
+  /// See [ServiceAreaLocalEntity.cityName].
+  static final cityName = obx.QueryStringProperty<ServiceAreaLocalEntity>(
+    _entities[3].properties[3],
+  );
+
+  /// See [ServiceAreaLocalEntity.locationType].
+  static final locationType = obx.QueryStringProperty<ServiceAreaLocalEntity>(
+    _entities[3].properties[4],
+  );
+
+  /// See [ServiceAreaLocalEntity.latitude].
+  static final latitude = obx.QueryDoubleProperty<ServiceAreaLocalEntity>(
+    _entities[3].properties[5],
+  );
+
+  /// See [ServiceAreaLocalEntity.longitude].
+  static final longitude = obx.QueryDoubleProperty<ServiceAreaLocalEntity>(
+    _entities[3].properties[6],
+  );
+
+  /// See [ServiceAreaLocalEntity.inspector].
+  static final inspector =
+      obx.QueryRelationToOne<
+        ServiceAreaLocalEntity,
+        InspectorSignUpLocalEntity
+      >(_entities[3].properties[7]);
 }

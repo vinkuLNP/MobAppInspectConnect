@@ -131,8 +131,11 @@ class UserDetail {
       loginTime: body['loginTime'],
       stripeSubscriptionStatus: body['stripeSubscriptionStatus'],
       currentSubscriptionId: body['currentSubscriptionId'] != null
-          ? CurrentSubscription.fromJson(body['currentSubscriptionId'])
-          : null,
+    ? (body['currentSubscriptionId'] is String
+        ? CurrentSubscription(id: body['currentSubscriptionId'])
+        : CurrentSubscription.fromJson(body['currentSubscriptionId']))
+    : null,
+
       currentSubscriptionTrialDays: body['currentSubscriptionTrialDays'],
       currentSubscriptionAutoRenew: body['currentSubscriptionAutoRenew'],
       approvalStatusByAdmin: body['approvalStatusByAdmin'],

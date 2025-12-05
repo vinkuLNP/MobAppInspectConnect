@@ -37,7 +37,7 @@
     },
     {
       "id": "2:7510821947055321623",
-      "lastPropertyId": "43:5105618599375191812",
+      "lastPropertyId": "44:8768948039023014530",
       "name": "AuthUserLocalEntity",
       "properties": [
         {
@@ -255,6 +255,11 @@
           "id": "43:5105618599375191812",
           "name": "loginTime",
           "type": 10
+        },
+        {
+          "id": "44:8768948039023014530",
+          "name": "zipCode",
+          "type": 9
         }
       ],
       "relations": []
@@ -412,10 +417,62 @@
         }
       ],
       "relations": []
+    },
+    {
+      "id": "4:9029954651202435050",
+      "lastPropertyId": "8:2799346839572520102",
+      "name": "ServiceAreaLocalEntity",
+      "properties": [
+        {
+          "id": "1:7019449212180121812",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:2300943570772507507",
+          "name": "countryCode",
+          "type": 9
+        },
+        {
+          "id": "3:1194465841916251761",
+          "name": "stateCode",
+          "type": 9
+        },
+        {
+          "id": "4:7668761717699029621",
+          "name": "cityName",
+          "type": 9
+        },
+        {
+          "id": "5:1519549142572183652",
+          "name": "locationType",
+          "type": 9
+        },
+        {
+          "id": "6:595672076555757210",
+          "name": "latitude",
+          "type": 8
+        },
+        {
+          "id": "7:3415925726551865863",
+          "name": "longitude",
+          "type": 8
+        },
+        {
+          "id": "8:2799346839572520102",
+          "name": "inspectorId",
+          "indexId": "2:7437307085727159997",
+          "type": 11,
+          "flags": 520,
+          "relationTarget": "InspectorSignUpLocalEntity"
+        }
+      ],
+      "relations": []
     }
   ],
-  "lastEntityId": "3:9109420249064471506",
-  "lastIndexId": "1:1381949025203565816",
+  "lastEntityId": "4:9029954651202435050",
+  "lastIndexId": "2:7437307085727159997",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",
   "modelVersion": 5,
