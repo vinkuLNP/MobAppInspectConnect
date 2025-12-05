@@ -36,7 +36,6 @@ class CommonAuthBar extends StatelessWidget {
                   child: imageAsset(
                     image: image,
                     width: rc.screenWidth,
-                    // height: rc.screenHeight * 0.5,
                     height: (rc.screenHeight * 0.35).clamp(
                       300,
                       double.infinity,

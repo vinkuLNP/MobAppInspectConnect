@@ -35,7 +35,6 @@ class BookingDetailEntity {
   final String updatedAt;
 
   final ClientInfoEntity? inspector;
-  // final List<ClientInfoEntity>? inspector;
 
 
   BookingDetailEntity({

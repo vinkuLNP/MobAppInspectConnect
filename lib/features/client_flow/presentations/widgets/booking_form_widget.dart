@@ -193,7 +193,7 @@ class _BookingFormWidgetState extends State<BookingFormWidget> {
                           widget.isReadOnly
                               ? SizedBox.shrink()
                               : PolicyAgreementRow(),
-                          const SizedBox(height: 24),
+                          const SizedBox(height: 10),
                           if (!widget.isReadOnly)
                             Padding(
                               padding: const EdgeInsets.symmetric(
@@ -264,17 +264,32 @@ class _BookingFormWidgetState extends State<BookingFormWidget> {
 
   Widget _inspectionTypeDropdown(BookingProvider prov) {
     return DropdownButtonFormField<CertificateSubTypeEntity>(
-      decoration: _inputDecoration('Select inspection type'),
-      initialValue: prov.inspectionType,
+      isDense: true,
+      decoration: _inputDecoration('Select inspection type').copyWith(
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 10,
+          vertical: 14,
+        ),
+      ),
       style: appTextStyle(fontSize: 12),
-      items: prov.subTypes
-          .map(
-            (subType) => DropdownMenuItem<CertificateSubTypeEntity>(
-              value: subType,
-              child: textWidget(text: subType.name, fontSize: 12),
+      initialValue: prov.inspectionType,
+
+      items: prov.subTypes.map((subType) {
+        return DropdownMenuItem<CertificateSubTypeEntity>(
+          value: subType,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: 250, minWidth: 50),
+            child: Text(
+              subType.name,
+              softWrap: true,
+              maxLines: 2,
+              overflow: TextOverflow.visible,
+              style: appTextStyle(fontSize: 12),
             ),
-          )
-          .toList(),
+          ),
+        );
+      }).toList(),
+
       onChanged: widget.isReadOnly ? null : prov.setInspectionType,
     );
   }

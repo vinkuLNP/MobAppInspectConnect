@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 import 'package:auto_route/auto_route.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:inspect_connect/core/basecomponents/base_view_model.dart';
 import 'package:inspect_connect/core/commondomain/entities/based_api_result/api_result_state.dart';
@@ -12,10 +14,12 @@ import 'package:inspect_connect/core/utils/helpers/device_helper/device_helper.d
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/features/auth_flow/data/datasources/local_datasources/auth_local_datasource.dart';
 import 'package:inspect_connect/features/auth_flow/data/datasources/local_datasources/inspector_local_data_source.dart';
+import 'package:inspect_connect/features/auth_flow/data/models/certificate_inspector_type_datamodel.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/auth_user.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/certificate_agency_entity.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/certificate_type_entity.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/inspector_sign_up_entity.dart';
+import 'package:inspect_connect/features/auth_flow/domain/entities/service_area_entity.dart';
 import 'package:inspect_connect/features/auth_flow/domain/usecases/agency_type_usecase.dart';
 import 'package:inspect_connect/features/auth_flow/domain/usecases/certificate_type_usecase.dart';
 import 'package:inspect_connect/features/auth_flow/domain/usecases/inspector_signup_case.dart';
@@ -27,6 +31,7 @@ import 'package:inspect_connect/features/client_flow/domain/entities/upload_imag
 import 'package:inspect_connect/features/client_flow/domain/usecases/upload_image_usecase.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/user_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:country_state_city/country_state_city.dart' as csc;
 
 class InspectorViewModelProvider extends BaseViewModel {
   final InspectorSignUpLocalDataSource _localDs =
@@ -101,11 +106,10 @@ class InspectorViewModelProvider extends BaseViewModel {
     mailingAddress = mailingAddressController.text;
   }
 
-  String? country;
-  String? state;
   String? city;
   String? mailingAddress;
   String? zipCode;
+  List<ServiceAreaLocalEntity> serviceAreas = [];
 
   bool _obscurePassword = true;
   bool get obscurePassword => _obscurePassword;
@@ -596,7 +600,9 @@ class InspectorViewModelProvider extends BaseViewModel {
   Future<void> fetchCertificateTypes({String? savedId}) async {
     try {
       setProcessing(true);
+
       final getSubTypesUseCase = locator<GetCertificateTypeUseCase>();
+
       final state =
           await executeParamsUseCase<
             List<CertificateInspectorTypeEntity>,
@@ -605,22 +611,40 @@ class InspectorViewModelProvider extends BaseViewModel {
 
       state?.when(
         data: (response) {
-          certificateType = response;
+          final modelList = response
+              .map(
+                (e) => CertificateInspectorTypeModelData(
+                  id: e.id,
+                  name: e.name,
+                  status: e.status,
+                  createdAt: e.createdAt,
+                  updatedAt: e.updatedAt,
+                  v: e.v,
+                ),
+              )
+              .toList();
+
+          certificateType = modelList;
+
+          CertificateInspectorTypeModelData selectedType;
           if (savedId != null) {
-            final matched = response.firstWhere(
+            selectedType = modelList.firstWhere(
               (e) => e.id == savedId,
-              orElse: () => response.first,
+              orElse: () => modelList.first,
             );
-            setCertificateType(matched);
           } else {
-            setCertificateType(response.first);
+            selectedType = modelList.first;
           }
+
+          setCertificateType(selectedType);
           notifyListeners();
         },
-        error: (e) {},
+        error: (e) {
+          log("Error fetching certificate types: $e");
+        },
       );
     } catch (e) {
-      log(e.toString());
+      log("Exception in fetchCertificateTypes: $e");
     } finally {
       setProcessing(false);
     }
@@ -817,24 +841,80 @@ class InspectorViewModelProvider extends BaseViewModel {
     });
   }
 
+  Future<void> setUserCurrentLocation() async {
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return; 
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      return; 
+    }
+
+    Position pos = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high,
+    );
+
+    final lat = pos.latitude;
+    final lng = pos.longitude;
+
+    final placemarks = await placemarkFromCoordinates(lat, lng);
+    final p = placemarks.first;
+
+    userCurrentCountry = p.isoCountryCode ?? "";
+    userCurrentState = p.administrativeArea ?? "";
+    userCurrentCity = p.locality ?? "";
+
+    userCurrentLat = lat;
+    userCurrentLng = lng;
+
+    notifyListeners();
+  }
+
+  double? userCurrentLat;
+  double? userCurrentLng;
+  String userCurrentCountry = '';
+  String userCurrentState = '';
+  String userCurrentCity = '';
+
   Future<void> saveServiceAreaStep({
     required String country,
     required String state,
     required String city,
     String? mailingAddress,
     String? zipCode,
+    required List<ServiceAreaLocalEntity>? serviceAreas,
   }) async {
-    await _localDs.updateFields({
-      'country': country,
-      'state': state,
-      'city': city,
+    final fieldsToUpdate = {
+      'country': userCurrentCountry,
+      'state': userCurrentState,
+      'city': userCurrentCity,
       if (mailingAddress != null) 'mailingAddress': mailingAddress,
       if (zipCode != null) 'zipCode': zipCode,
       'locationType': 'Point',
       'locationName': 'Midtown',
-      'latitude': -73.9857,
-      'longitude': 40.7484,
-    });
+      'latitude': userCurrentLat,
+      'longitude': userCurrentLng,
+    };
+
+    if (serviceAreas != null) {
+      fieldsToUpdate['serviceAreas'] = serviceAreas.map((s) {
+        return {
+          "countryCode": s.countryCode,
+          "stateCode": s.stateCode,
+          "cityName": s.cityName,
+          "location": {
+            "type": s.locationType ?? "Point",
+            "coordinates": [s.longitude, s.latitude],
+          },
+        };
+      }).toList();
+    }
+
+    await _localDs.updateFields(fieldsToUpdate);
   }
 
   Future<void> saveAdditionalStep({
@@ -924,6 +1004,7 @@ class InspectorViewModelProvider extends BaseViewModel {
     workHistoryController.text = saved.workHistoryDescription ?? '';
     agreedToTerms = saved.agreedToTerms ?? false;
     confirmTruth = saved.isTruthfully ?? false;
+    serviceAreas = saved.serviceAreas ;
 
     notifyListeners();
   }
@@ -1021,4 +1102,110 @@ class InspectorViewModelProvider extends BaseViewModel {
       log('[SignUP] 🧹 Cleanup complete.');
     }
   }
+
+  String country = '';
+  String state = '';
+  List<String> cities = [];
+  List<String> selectedCities = [];
+  String? countryCode;
+  String? stateCode;
+
+  void setCountry(String value) {
+    log(value);
+    countryCode = value;
+    stateCode = null;
+    cities = [];
+    selectedCities.clear();
+    countryError = null;
+    notifyListeners();
+  }
+
+  void setState(String value) {
+    stateCode = value;
+    cities = [];
+    selectedCities.clear();
+    stateError = null;
+    notifyListeners();
+  }
+
+  void toggleCity(String city) {
+    if (selectedCities.contains(city)) {
+      selectedCities.remove(city);
+    } else {
+      selectedCities.add(city);
+      cityError = null;
+    }
+
+    notifyListeners();
+  }
+
+  String? countryError;
+  String? stateError;
+  String? cityError;
+  String? zipError;
+  String? mailingAddressError;
+  void clearCityErrors() {
+    cityError = null;
+    notifyListeners();
+  }
+
+  bool validateServiceArea() {
+    countryError = countryCode == null ? "Please select a country" : null;
+    stateError = stateCode == null ? "Please select a state" : null;
+    cityError = selectedCities.isEmpty ? "Select at least 1 city" : null;
+
+    zipError = _validateZip(zipController.text);
+    mailingAddressError = _validateAddress(mailingAddressController.text);
+
+    notifyListeners();
+
+    return countryError == null &&
+        stateError == null &&
+        cityError == null &&
+        zipError == null &&
+        mailingAddressError == null;
+  }
+
+  String? _validateAddress(String? value) {
+    if (value == null || value.isEmpty) return "Please enter mailing address";
+    return null;
+  }
+
+  String? _validateZip(String? value) {
+    if (value == null || value.isEmpty) return "Please enter zip code";
+    final numeric = RegExp(r"^[0-9]+$");
+    if (!numeric.hasMatch(value)) return "Zip must be numeric";
+    return null;
+  }
+
+  Future<void> generateServiceAreas({
+  required String countryCode,
+  required String stateCode,
+  required List<String> selectedCities,
+}) async {
+  serviceAreas.clear();
+
+  final allCities = (await csc.getCountryCities(countryCode))
+      .where((c) => c.stateCode == stateCode)
+      .toList();
+
+  for (final cityName in selectedCities) {
+    final city = allCities.firstWhere(
+      (c) => c.name == cityName,
+      orElse: () => throw Exception("City $cityName not found in $stateCode"),
+    );
+
+    serviceAreas.add(
+      ServiceAreaLocalEntity(
+        countryCode: countryCode,   
+        stateCode: stateCode,       
+        cityName: cityName,
+        locationType: "Point",
+        latitude: double.tryParse(city.latitude.toString()),
+        longitude: double.tryParse(city.longitude.toString()),
+      ),
+    );
+  }
+}
+
 }

@@ -16,3 +16,6 @@ class CertificateInspectorTypeEntity {
     this.v
   });
 }
+
+
+

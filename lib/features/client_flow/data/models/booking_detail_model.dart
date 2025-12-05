@@ -86,9 +86,6 @@ class BookingDetailModel extends BookingDetailEntity {
       createdAt: json['createdAt'] ?? '',
       updatedAt: json['updatedAt'] ?? '',
 
-      // inspector: (json['inspectorId'] as List?)
-      //     ?.map((e) => ClientInfoModel.fromJson(e as Map<String, dynamic>))
-      //     .toList(),
       inspector: json['inspectorId'] != null
     ? ClientInfoModel.fromJson(json['inspectorId'])
     : null,
@@ -134,11 +131,6 @@ class BookingDetailModel extends BookingDetailEntity {
       'createdAt': createdAt,
       'updatedAt': updatedAt,
 
-      // 'inspectorId': inspector != null
-      //     ? (inspector as List)
-      //           .map((e) => (e as ClientInfoModel).toJson())
-      //           .toList()
-      //     : null,
       'inspectorId': inspector != null
     ? (inspector as ClientInfoModel).toJson()
     : null,

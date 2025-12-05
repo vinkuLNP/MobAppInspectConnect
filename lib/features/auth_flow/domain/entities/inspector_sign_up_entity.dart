@@ -1,8 +1,9 @@
+import 'package:inspect_connect/features/auth_flow/domain/entities/service_area_entity.dart';
 import 'package:objectbox/objectbox.dart';
 
 @Entity()
 class InspectorSignUpLocalEntity {
-  int id = 0;
+  int id;
 
   String? name;
   String? email;
@@ -28,10 +29,14 @@ class InspectorSignUpLocalEntity {
   int? role;
   String? deviceType;
   String? deviceToken;
-  String? locationType; 
+
+  String? locationType;
   String? locationName;
   double? latitude;
   double? longitude;
+
+  @Backlink('inspector')
+  final serviceAreas = ToMany<ServiceAreaLocalEntity>();
 
   InspectorSignUpLocalEntity({
     this.id = 0,
@@ -40,17 +45,18 @@ class InspectorSignUpLocalEntity {
     this.password,
     this.phoneNumber,
     this.countryCode,
+    this.isoCode,
     this.certificateTypeId,
     this.certificateExpiryDate,
-    this.workHistoryDescription,
-    this.zipCode,
     this.certificateDocuments,
     this.certificateAgencyIds,
     this.country,
     this.state,
     this.city,
+    this.zipCode,
     this.mailingAddress,
     this.uploadedIdOrLicenseDocument,
+    this.workHistoryDescription,
     this.referenceDocuments,
     this.profileImage,
     this.agreedToTerms,
@@ -61,43 +67,57 @@ class InspectorSignUpLocalEntity {
     this.locationType,
     this.locationName,
     this.latitude,
-    this.isoCode,
     this.longitude,
   });
-  
 }
 extension InspectorSignUpEntityMapper on InspectorSignUpLocalEntity {
-Map<String, dynamic> toJson() {
+  Map<String, dynamic> toJson() {
     final map = <String, dynamic>{
-        "name": name,
-        "email": email,
-        "password": password,
-        "phoneNumber": phoneNumber,
-        "countryCode": countryCode,
-        "certificateTypeId": certificateTypeId,
-        "certificateExpiryDate": certificateExpiryDate,
-        "certificateDocuments": certificateDocuments,
-        "certificateAgencyIds": certificateAgencyIds,
-        "country": country,
-        "state": state,
-        "city": city,
-        "workHistoryDescription": workHistoryDescription,
-        "mailingAddress": mailingAddress,
-        "uploadedIdOrLicenseDocument": uploadedIdOrLicenseDocument,
-        "referenceDocuments": referenceDocuments,
-        "profileImage": profileImage,
-        "agreedToTerms": agreedToTerms,
-        "isTruthfully": isTruthfully,
-        "role": role,
-        "deviceType": deviceType,
-        "deviceToken": deviceToken,
-        "location": {
-          "type": locationType,
-          "locationName": locationName,
-          "coordinates": [latitude, longitude],
-        },
-      }; 
-    map.removeWhere((k, v) => v == null);
+      "name": name,
+      "email": email,
+      "password": password,
+      "phoneNumber": phoneNumber,
+      "countryCode": countryCode,
+      "isoCode": isoCode,
+      "certificateTypeId": certificateTypeId,
+      "certificateExpiryDate": certificateExpiryDate,
+      "certificateDocuments": certificateDocuments,
+      "certificateAgencyIds": certificateAgencyIds,
+      "country": country,
+      "state": state,
+      "city": city,
+      "zip": zipCode,
+      "mailingAddress": mailingAddress,
+      "uploadedIdOrLicenseDocument": uploadedIdOrLicenseDocument,
+      "workHistoryDescription": workHistoryDescription,
+      "referenceDocuments": referenceDocuments,
+      "profileImage": profileImage,
+      "agreedToTerms": agreedToTerms,
+      "isTruthfully": isTruthfully,
+      "role": role,
+      "deviceType": deviceType,
+      "deviceToken": deviceToken,
 
+      "location": {
+        "type": locationType,
+        "locationName": locationName,
+        "coordinates": [latitude, longitude],
+      },
+
+      "serviceAreas": serviceAreas.map((s) {
+        return {
+          "countryCode": s.countryCode,
+          "stateCode": s.stateCode,
+          "cityName": s.cityName,
+          "location": {
+            "type": s.locationType,
+            "coordinates": [s.latitude, s.longitude],
+          }
+        };
+      }).toList(),
+    };
+
+    map.removeWhere((k, v) => v == null);
     return map;
-}}
+  }
+}
