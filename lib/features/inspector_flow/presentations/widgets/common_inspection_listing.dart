@@ -264,6 +264,7 @@ class _BaseInspectionListScreenState extends State<BaseInspectionListScreen>
                 context: context,
                 bookingId: booking.id,
                 isEditable: false,
+                isInspectorView: true,
               )
               .then((_) async {
                 await Future.delayed(const Duration(milliseconds: 200));
@@ -304,6 +305,7 @@ class _BaseInspectionListScreenState extends State<BaseInspectionListScreen>
                   Flexible(
                     child: Text(
                       booking.bookingLocation,
+                      maxLines: 3,
                       style: theme.textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w600,
                         color: Colors.grey[900],

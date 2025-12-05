@@ -18,6 +18,7 @@ class BookingDetailModel extends BookingDetailEntity {
     required super.isDeleted,
     required super.createdAt,
     required super.updatedAt,
+    required super.totalPaidToInspector,
     super.timerStartedAt,
     super.timerEndedAt,
     super.timerDuration,
@@ -38,7 +39,7 @@ class BookingDetailModel extends BookingDetailEntity {
     return BookingDetailModel(
       id: json['_id'] ?? '',
       client: ClientInfoModel.fromJson(json['clientId'] ?? {}),
-
+totalPaidToInspector : json['totalPaidToInspector'] ?? "",
       inspectorIds: List<String>.from(json['inspectorIds'] ?? []),
 
       certificateSubTypes:
@@ -106,7 +107,7 @@ class BookingDetailModel extends BookingDetailEntity {
       'bookingDate': bookingDate,
       'bookingTime': bookingTime,
       'bookingLocation': bookingLocation,
-
+'totalPaidToInspector':totalPaidToInspector,
       'bookingLocationCoordinates': bookingLocationCoordinates,
       'bookingLocationZip': bookingLocationZip,
 

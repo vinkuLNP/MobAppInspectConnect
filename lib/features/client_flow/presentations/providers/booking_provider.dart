@@ -17,6 +17,7 @@ import 'package:inspect_connect/features/client_flow/domain/entities/booking_ent
 import 'package:inspect_connect/features/client_flow/domain/entities/booking_list_entity.dart';
 import 'package:inspect_connect/features/client_flow/domain/entities/certificate_sub_type_entity.dart';
 import 'package:inspect_connect/features/client_flow/domain/entities/upload_image_dto.dart';
+import 'package:inspect_connect/features/client_flow/domain/usecases/apply_show_up_fee.dart';
 import 'package:inspect_connect/features/client_flow/domain/usecases/create_booking_usecase.dart';
 import 'package:inspect_connect/features/client_flow/domain/usecases/delete_booking_usecase.dart';
 import 'package:inspect_connect/features/client_flow/domain/usecases/fetch_booking_list_usecase.dart';
@@ -48,7 +49,6 @@ class BookingProvider extends BaseViewModel {
   BookingData? updatedBookingData;
   BookingDetailModel? bookingDetailModel;
 
-
   Future<void> init() async {
     isLoading = true;
     notifyListeners();
@@ -65,8 +65,7 @@ class BookingProvider extends BaseViewModel {
     super.dispose();
   }
 
-
-// -----------------------------------------------------Create Booking-----------------------------------------------------
+  // -----------------------------------------------------Create Booking-----------------------------------------------------
 
   String? placeName;
   String? pincode;
@@ -79,7 +78,7 @@ class BookingProvider extends BaseViewModel {
   String? fullAddress;
   bool agreedToPolicies = false;
 
-    Future<void> fetchCertificateSubTypes() async {
+  Future<void> fetchCertificateSubTypes() async {
     try {
       setProcessing(true);
       final getSubTypesUseCase = locator<GetCertificateSubTypesUseCase>();
@@ -103,8 +102,6 @@ class BookingProvider extends BaseViewModel {
       setProcessing(false);
     }
   }
-
-
 
   void setDate(DateTime d) {
     _selectedDate = DateTime(d.year, d.month, d.day);
@@ -254,8 +251,7 @@ class BookingProvider extends BaseViewModel {
     }
     return true;
   }
-  
-  
+
   Future<void> uploadImage(BuildContext context) async {
     try {
       if (images.length >= 5) return;
@@ -469,11 +465,10 @@ class BookingProvider extends BaseViewModel {
     }
   }
 
-    void clearBookingDetail() {
+  void clearBookingDetail() {
     bookingDetailModel = null;
     notifyListeners();
   }
-
 
   Future<void> deleteBookingDetail({
     required BuildContext context,
@@ -516,14 +511,9 @@ class BookingProvider extends BaseViewModel {
     }
   }
 
-
-
-
-
-// -----------------------------------------------------View Bookings -----------------------------------------------------
+  // -----------------------------------------------------View Bookings -----------------------------------------------------
 
   List<BookingListEntity> bookings = [];
-
 
   void resetBookings() {
     bookings.clear();
@@ -531,12 +521,10 @@ class BookingProvider extends BaseViewModel {
     hasMoreBookings = true;
     notifyListeners();
   }
-  
-  
+
   bool isFilterLoading = false;
   bool isActionProcessing = false;
   List<CertificateSubTypeEntity> subTypes = [];
-
 
   bool isLoading = false;
 
@@ -544,6 +532,7 @@ class BookingProvider extends BaseViewModel {
     required BuildContext context,
     required String bookingId,
     required bool isEditable,
+    required bool isInspectorView
   }) async {
     try {
       isLoadingBookingDetail = true;
@@ -568,14 +557,17 @@ class BookingProvider extends BaseViewModel {
       state?.when(
         data: (response) async {
           clearBookingDetail();
+          log(response.toString());
+          log(response.showUpFeeApplied.toString());
           bookingDetailModel = response;
           Navigator.push(
             context,
             MaterialPageRoute(
               builder: (_) => BookingEditScreen(
-                booking: bookingDetailModel,
+                booking: response,
                 isEdiatble: isEditable,
                 isReadOnly: !isEditable,
+                isInspectorView: isInspectorView,
               ),
             ),
           ).then((result) {
@@ -600,7 +592,6 @@ class BookingProvider extends BaseViewModel {
       notifyListeners();
     }
   }
-
 
   int _currentPage = 1;
   bool isFetchingBookings = false;
@@ -667,7 +658,7 @@ class BookingProvider extends BaseViewModel {
 
             isTimerRunning[booking.id] = booking.status == bookingStatusStarted;
           }
-_ensureGlobalTimerRunning();
+          _ensureGlobalTimerRunning();
           if (response.length < _perPageLimit) {
             hasMoreBookings = false;
           } else {
@@ -762,27 +753,24 @@ _ensureGlobalTimerRunning();
     return '$hour:$minute $period';
   }
 
+  //----------------------------------------------------- Update booking Status-----------------------------------------------------
 
-
-
-//----------------------------------------------------- Update booking Status-----------------------------------------------------
-
-
- Future<void> toggleShowUpFee({
-  required BuildContext context,
-  required String bookingId,
-  required bool apply,
-}) async {
-  try {
-    isUpdatingBooking = true;
-    notifyListeners();
-  } catch (e) {
-log(e.toString());  } finally {
-    isUpdatingBooking = false;
-    notifyListeners();
+  Future<void> toggleShowUpFee({
+    required BuildContext context,
+    required String bookingId,
+    required bool apply,
+  }) async {
+    try {
+      isUpdatingBooking = true;
+      notifyListeners();
+    } catch (e) {
+      log(e.toString());
+    } finally {
+      isUpdatingBooking = false;
+      notifyListeners();
+    }
   }
-}
- 
+
   Future<void> updateBookingStatus({
     required BuildContext context,
     required String bookingId,
@@ -866,22 +854,104 @@ log(e.toString());  } finally {
     notifyListeners();
   }
 
-  void _startLocalTimer(String _) {
-      _ensureGlobalTimerRunning();
-  }
-void _ensureGlobalTimerRunning() {
-  if (_timer != null && _timer!.isActive) return;
+  Map<String, bool> showUpFeeStatusMap = {};
 
-  _timer = Timer.periodic(const Duration(seconds: 1), (_) {
-    for (final id in isTimerRunning.keys) {
-      if (isTimerRunning[id] == true) {
-        final current = activeTimers[id] ?? Duration.zero;
-        activeTimers[id] = current + const Duration(seconds: 1);
+  Future<void> updateShowUpFeeStatus({
+    required BuildContext context,
+    required String bookingId,
+    required bool showUpFeeApplied,
+  }) async {
+    try {
+      isUpdatingBooking = true;
+      notifyListeners();
+      final showUpFeeStatusUseCase = locator<ShowUpFeeStatusUseCase>();
+      final state =
+          await executeParamsUseCase<BookingData, ShowUpFeeStatusParams>(
+            useCase: showUpFeeStatusUseCase,
+
+            query: ShowUpFeeStatusParams(
+              showUpFeeApplied: showUpFeeApplied,
+              bookingId: bookingId,
+            ),
+            launchLoader: false,
+          );
+
+      state?.when(
+        data: (response) async {
+          updatedBookingData = response;
+          final index = bookings.indexWhere((b) => b.id == bookingId);
+          if (index != -1) {
+            bookings = [...bookings]..[index] = updatedBookingData!;
+          }
+          showUpFeeStatusMap[bookingId] = showUpFeeApplied;
+          notifyListeners();
+        },
+        error: (e) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: textWidget(
+                text: e.message ?? 'Show Up fee Status failed to update.',
+                color: AppColors.backgroundColor,
+              ),
+            ),
+          );
+        },
+      );
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: textWidget(
+              text: 'Failed: $e',
+              color: AppColors.backgroundColor,
+            ),
+          ),
+        );
       }
+    } finally {
+      isUpdatingBooking = false;
+      notifyListeners();
     }
-    notifyListeners();
-  });
-}
+  }
+
+  List<BookingListEntity> getFilteredBookings(List<int> filterStatuses) {
+    final now = DateTime.now();
+    final filtered = bookings
+        .where((b) => filterStatuses.contains(b.status))
+        .toList();
+
+    filtered.sort((a, b) {
+      final aDate = DateTime.parse(a.bookingDate);
+      final bDate = DateTime.parse(b.bookingDate);
+      final aIsPast = aDate.isBefore(now);
+      final bIsPast = bDate.isBefore(now);
+
+      if (aIsPast && !bIsPast) return 1;
+      if (!aIsPast && bIsPast) return -1;
+
+      return aDate.compareTo(bDate);
+    });
+
+    return filtered;
+  }
+
+  void _startLocalTimer(String _) {
+    _ensureGlobalTimerRunning();
+  }
+
+  void _ensureGlobalTimerRunning() {
+    if (_timer != null && _timer!.isActive) return;
+
+    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
+      for (final id in isTimerRunning.keys) {
+        if (isTimerRunning[id] == true) {
+          final current = activeTimers[id] ?? Duration.zero;
+          activeTimers[id] = current + const Duration(seconds: 1);
+        }
+      }
+      notifyListeners();
+    });
+  }
 
   Future<void> pauseInspectionTimer({
     required BuildContext context,

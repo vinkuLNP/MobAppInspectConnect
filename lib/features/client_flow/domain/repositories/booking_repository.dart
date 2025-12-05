@@ -34,6 +34,8 @@ Future<ApiResultModel<bool>> deleteBooking(String bookingId);
 Future<ApiResultModel<BookingData>> updateBooking(String bookingId, BookingEntity booking);
 
 Future<ApiResultModel<BookingData>> updateBookingStatus(String bookingId,int status);
+Future<ApiResultModel<BookingData>> showUpFeeStatus(String bookingId,bool showUpFeeApplied);
+
 
 Future<ApiResultModel<BookingData>> updateBookingTimer(String bookingId,String action);
 

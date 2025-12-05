@@ -100,3 +100,122 @@ void logOutUser(BuildContext context) {
     ),
   );
 }
+
+void showRaiseAmountSheet({
+  required BuildContext context,
+  required Function(int amount) onConfirm,
+}) {
+  final List<int> amounts = [5, 10, 15, 20, 25];
+  int selectedAmount = amounts.first;
+
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    ),
+    builder: (context) {
+      return StatefulBuilder(
+        builder: (context, setState) {
+          return Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  "Select Raise Amount",
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+
+                const SizedBox(height: 20),
+
+                GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: amounts.length,
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
+                    mainAxisSpacing: 12,
+                    crossAxisSpacing: 12,
+                    childAspectRatio: 1.8,
+                  ),
+                  itemBuilder: (context, index) {
+                    bool isSelected = selectedAmount == amounts[index];
+
+                    return GestureDetector(
+                      onTap: () {
+                        setState(() => selectedAmount = amounts[index]);
+                      },
+                      child: Container(
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          color: isSelected
+                              ? AppColors.authThemeColor
+                              : Colors.white,
+                          border: Border.all(
+                            color: isSelected
+                                ? AppColors.authThemeColor
+                                : Colors.grey.shade400,
+                          ),
+                        ),
+                        child: Text(
+                          "\$${amounts[index]}",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: isSelected ? Colors.white : Colors.black,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+
+                const SizedBox(height: 15),
+
+                const Text(
+                  "This amount will be added to the booking charge and requires client approval.",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 13, color: Colors.grey),
+                ),
+
+                const SizedBox(height: 20),
+
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text("Cancel"),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.authThemeColor,
+                        ),
+                        onPressed: () {
+                          Navigator.pop(context);
+                          onConfirm(selectedAmount);
+                        },
+                        child: const Text("Confirm & Raise"),
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 10),
+              ],
+            ),
+          );
+        },
+      );
+    },
+  );
+}
+

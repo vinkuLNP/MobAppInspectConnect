@@ -56,6 +56,11 @@ abstract class BookingRemoteDataSource {
     String bookingId,
     int status,
   );
+  Future<ApiResultModel<BookingData>> showUpFeeStatus(
+    String bookingId,
+    bool status,
+  );
+  
   Future<ApiResultModel<BookingData>> updateBookingTimer(
     String bookingId,
     String action,
@@ -394,6 +399,7 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
           final Map<String, dynamic> body =
               (root['body'] as Map?)?.cast<String, dynamic>() ?? {};
           final model = BookingDetailModel.fromJson(body);
+          log('----------api called-----${response.body.toString()}');
           return ApiResultModel<BookingDetailModel>.success(data: model);
         },
         failure: (e) =>
@@ -508,6 +514,54 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
           'Accept': 'application/json',
         },
         requestData: {"status": status},
+      );
+
+      return res.when(
+        success: (response) {
+          final Map<String, dynamic> root = response.body.isEmpty
+              ? {}
+              : (jsonDecode(response.body) as Map<String, dynamic>);
+          final Map<String, dynamic> body =
+              (root['body'] as Map?)?.cast<String, dynamic>() ?? {};
+          final dto = BookingData.fromJson(body);
+          return ApiResultModel<BookingData>.success(data: dto);
+        },
+        failure: (e) =>
+            ApiResultModel<BookingData>.failure(errorResultEntity: e),
+      );
+    } catch (e) {
+      log('updateBooking error: $e');
+      return const ApiResultModel.failure(
+        errorResultEntity: ErrorResultModel(
+          message: "Network error occurred",
+          statusCode: 500,
+        ),
+      );
+    }
+  }
+
+
+
+  @override
+  Future<ApiResultModel<BookingData>> showUpFeeStatus(
+    String bookingId,
+    bool status,
+  ) async {
+    try {
+      final user = await locator<AuthLocalDataSource>().getUser();
+      if (user == null || user.authToken == null) {
+        throw Exception('User not found in local storage');
+      }
+
+      final ApiResultModel<http.Response> res = await _ctx.makeRequest(
+        uri: "$createBookingEndPoint/$bookingId",
+        httpRequestStrategy: PutRequestStrategy(),
+        headers: {
+          'Authorization': 'Bearer ${user.authToken}',
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        requestData: {"showUpFeeApplied": status,"_id":bookingId},
       );
 
       return res.when(
