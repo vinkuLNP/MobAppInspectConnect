@@ -6,6 +6,7 @@ import 'package:inspect_connect/features/auth_flow/domain/entities/user_location
 class AuthUser {
   final String id;
   final String? name;
+  final String? userId;
   final String? emailHashed;
   final String? authToken;
   final int? role;
@@ -55,6 +56,7 @@ class AuthUser {
   const AuthUser({
     required this.id,
      this.name,
+     this.userId,
      this.emailHashed,
      this.authToken,
     this.role,
@@ -103,6 +105,7 @@ class AuthUser {
     final loc = json['location'];
     return AuthUser(
       id: json['_id'] ?? '',
+      userId: json['_id'] ?? '',
       name: json['name'] ?? '',
       emailHashed: json['email'] ?? '',
       authToken: json['authToken'] ?? '',
@@ -233,6 +236,7 @@ class AuthUser {
   return AuthUser(
     id: entity.id.toString(),
     name: entity.name,
+    userId: entity.userId,
     emailHashed: entity.email,
     authToken: entity.authToken,
     phoneNumber: entity.phoneNumber,
@@ -281,6 +285,7 @@ extension AuthUserMapping on AuthUser {
     return AuthUserLocalEntity(
       authToken: authToken,
       name: name,
+      userId: userId,
       email: emailHashed,
       phoneNumber: phoneNumber,
       countryCode: countryCode,
@@ -331,6 +336,7 @@ extension AuthUserLocalEntityMerge on AuthUserLocalEntity {
   AuthUserLocalEntity mergeWithUserDetail(UserDetail detail) {
     return AuthUserLocalEntity(
       authToken: authToken,
+      userId: detail.userId,
       name: detail.name != null && detail.name!.isNotEmpty ? detail.name : name,
       email: detail.email != null && detail.email!.isNotEmpty
           ? detail.email

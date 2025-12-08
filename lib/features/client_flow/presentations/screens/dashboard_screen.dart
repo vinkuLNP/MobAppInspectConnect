@@ -1,10 +1,15 @@
 import 'dart:ui';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:inspect_connect/core/di/app_component/app_component.dart';
+import 'package:inspect_connect/core/di/app_sockets/app_socket.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
+import 'package:inspect_connect/features/client_flow/presentations/providers/booking_provider.dart';
+import 'package:inspect_connect/features/client_flow/presentations/providers/user_provider.dart';
 import 'package:inspect_connect/features/client_flow/presentations/screens/booking_screen.dart';
 import 'package:inspect_connect/features/client_flow/presentations/screens/home_screen.dart';
 import 'package:inspect_connect/features/client_flow/presentations/screens/profile_screen.dart';
+import 'package:provider/provider.dart';
 
 @RoutePage()
 class ClientDashboardView extends StatefulWidget {
@@ -30,6 +35,13 @@ class _ClientDashboardViewState extends State<ClientDashboardView> {
       ),
       ProfileScreen(),
     ];
+    final socket = locator<SocketService>();
+    socket.initSocket();
+       final user = context.read<UserProvider>().user;
+  socket.connectUser(user!.userId.toString());
+
+  Provider.of<BookingProvider>(context, listen: false)
+      .listenSocketEvents(socket);
   }
 
   void _onItemTapped(int index) {

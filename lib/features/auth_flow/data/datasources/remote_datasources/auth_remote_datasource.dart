@@ -217,7 +217,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       if (user == null || user.authToken == null) {
         throw Exception('User not found in local storage');
       }
-      log('------>user------------->$user');
+      log('------>user---user ca;;ed---------->$user');
       log('------>user-------token------>${user.authToken}');
       log('------>user-------phone------>${user.phoneNumber}');
       log('------>user-------code------>${user.countryCode}');
@@ -240,6 +240,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           final Map<String, dynamic> body =
               (root['body'] as Map?)?.cast<String, dynamic>() ??
               <String, dynamic>{};
+              log('----------datat calling----->${body.toString()}');
+
+              log('----------datat calling----->${jsonDecode(response.body).toString()}');
+
           final dto = UserDetail.fromJson(body);
           return ApiResultModel<UserDetail>.success(data: dto);
         },

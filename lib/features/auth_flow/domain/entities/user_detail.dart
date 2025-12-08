@@ -1,5 +1,7 @@
 class UserDetail {
   final String id;
+  final String? userId;
+
   final String? role;
   final String? email;
   final String? name;
@@ -48,6 +50,7 @@ class UserDetail {
 
   const UserDetail({
     required this.id,
+    this.userId,
     this.role,
     this.email,
     this.name,
@@ -97,6 +100,8 @@ class UserDetail {
     final body = json['body'] ?? json;
     return UserDetail(
       id: body['_id'] ?? '',
+      userId: body['_id'] ?? '',
+
       role: body['role']?.toString(),
       email: body['email'],
       name: body['name'],

@@ -1,4 +1,5 @@
 import 'package:inspect_connect/core/di/app_component/app_component.config.dart';
+import 'package:inspect_connect/core/di/app_sockets/app_socket.dart';
 import 'package:inspect_connect/features/auth_flow/data/datasources/remote_datasources/auth_remote_datasource.dart';
 import 'package:inspect_connect/features/auth_flow/data/repositories/auth_repository_impl.dart';
 import 'package:inspect_connect/features/auth_flow/domain/repositories/auth_repository.dart';
@@ -93,6 +94,7 @@ void setupLocator() {
   locator.registerLazySingleton(() => InspectorSignUpUseCase(locator()));
 
   locator.registerLazySingleton(() => FetchBookingsUseCase(locator()));
+locator.registerLazySingleton<SocketService>(() => SocketService());
 
   locator.registerLazySingleton(() => UploadImageUseCase(locator()));
   locator.registerLazySingleton<UserProvider>(() => UserProvider());

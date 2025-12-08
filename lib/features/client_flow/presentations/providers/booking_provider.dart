@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:inspect_connect/core/basecomponents/base_view_model.dart';
 import 'package:inspect_connect/core/commondomain/entities/based_api_result/api_result_state.dart';
 import 'package:inspect_connect/core/di/app_component/app_component.dart';
+import 'package:inspect_connect/core/di/app_sockets/app_socket.dart';
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
 import 'package:inspect_connect/core/utils/constants/app_constants.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
@@ -377,6 +378,10 @@ class BookingProvider extends BaseViewModel {
               ),
             ),
           );
+          final socket = locator<SocketService>();
+          log('----------------jopinresponse.body.id');
+          socket.joinBookingRoom(response.body.id);
+          listenRaiseInspectionClient(socket, context);
           clearBookingData();
         },
         error: (e) {
@@ -394,6 +399,8 @@ class BookingProvider extends BaseViewModel {
       setProcessing(false);
     }
   }
+
+  
 
   Future<void> updateBooking({
     required BuildContext context,
@@ -532,7 +539,7 @@ class BookingProvider extends BaseViewModel {
     required BuildContext context,
     required String bookingId,
     required bool isEditable,
-    required bool isInspectorView
+    required bool isInspectorView,
   }) async {
     try {
       isLoadingBookingDetail = true;
@@ -1152,5 +1159,94 @@ class BookingProvider extends BaseViewModel {
       isUpdatingBooking = false;
       notifyListeners();
     }
+  }
+
+  void listenRaiseInspectionClient(SocketService socket, BuildContext context) {
+    socket.onRaiseInspectionRequest = (payload) {
+      final bookingId = payload["bookingId"];
+      final raisedAmount = payload["raisedAmount"];
+      final agreedToRaise = payload["agreedToRaise"];
+      if (agreedToRaise == 0) {
+        _showRaisePopup(context, bookingId, raisedAmount);
+      }
+
+      notifyListeners();
+    };
+  }
+
+  void listenRaiseInspectionInspector(SocketService socket) {
+    socket.onRaiseInspectionRequest = (payload) {
+      final status = payload["agreedToRaise"]; // 1 = accepted, 2 = rejected
+
+      if (status == 1) {
+        log("Customer ACCEPTED the raise");
+      } else if (status == 2) {
+        log("Customer REJECTED the raise");
+      }
+
+      notifyListeners();
+    };
+  }
+
+  void listenSocketEvents(SocketService socket) {
+    socket.onBookingStatusUpdated = (payload) {
+      final bookingId = payload["bookingId"];
+      final newStatus = payload["status"];
+
+      final index = bookings.indexWhere((b) => b.id == bookingId);
+      if (index != -1) {
+        bookings[index] = bookings[index].copyWith(status: newStatus);
+        notifyListeners();
+      }
+    };
+
+    socket.onBookingJoined = (bookingId) {
+      log("📌 Joined room for booking $bookingId");
+    };
+
+    socket.onBookingLeft = (bookingId) {
+      log("📌 Left room for booking $bookingId");
+    };
+  }
+
+  void _showRaisePopup(
+    BuildContext context,
+    String bookingId,
+    int raisedAmount,
+  ) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) {
+        return AlertDialog(
+          title: const Text("Inspector Raised Amount"),
+          content: Text("Requested Raise Amount : \$${raisedAmount}"),
+          actions: [
+            TextButton(
+              child: const Text("Reject"),
+              onPressed: () {
+                locator<SocketService>().sendRaiseInspectionRequest({
+                  "bookingId": bookingId,
+                  "raisedAmount": raisedAmount,
+                  "agreedToRaise": 2,
+                });
+                Navigator.pop(context);
+              },
+            ),
+            ElevatedButton(
+              child: const Text("Accept"),
+              onPressed: () {
+                locator<SocketService>().sendRaiseInspectionRequest({
+                  "bookingId": bookingId,
+                  "raisedAmount": raisedAmount,
+                  "agreedToRaise": 1,
+                });
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 }

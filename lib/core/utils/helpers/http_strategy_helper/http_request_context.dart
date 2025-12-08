@@ -53,7 +53,7 @@ class HttpRequestContext {
         final String url = '$baseUrl$uri';
         log('=========>$url');
 
-        return httpRequestStrategy.executeRequest(
+        return await httpRequestStrategy.executeRequest(
           uri: url,
           headers: _sharedDefaultHeader,
           requestData: requestData,
