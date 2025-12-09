@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/di/app_component/app_component.dart';
 import 'package:inspect_connect/core/di/app_sockets/app_socket.dart';
+import 'package:inspect_connect/core/di/app_sockets/socket_service.dart';
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
 import 'package:inspect_connect/core/utils/constants/app_constants.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_button.dart';
@@ -42,12 +43,22 @@ class RequestedInspectionScreen extends StatelessWidget {
                     final socket = locator<SocketService>();
                     final user = context.read<UserProvider>().user;
                     log(amount.toString());
-                    socket.sendRaiseInspectionRequest({
-                      "bookingId": booking.id,
-                      "raisedAmount": amount,
-                      "agreedToRaise": 0,
-                      "inspectorId": user!.userId,
-                    });
+
+                    final provider = context.read<BookingProvider>();
+
+                    provider.listenRaiseInspectionClient(socket, context);
+                    AppSocket().raiseInspectionRequest({
+  "bookingId": booking.id,
+  "inspectorId":user!.userId,
+  "agreedToRaise": 0, 
+  "raisedAmount": amount,
+});
+                    // socket.sendRaiseInspectionRequest({
+                    //   "bookingId": booking.id,
+                    //   "raisedAmount": amount,
+                    //   "agreedToRaise": 0,
+                    //   "inspectorId": user!.userId,
+                    // });
                   },
                 );
               },
@@ -80,9 +91,8 @@ class RequestedInspectionScreen extends StatelessWidget {
                           bookingId: booking.id,
                           newStatus: bookingStatusAccepted,
                         );
-                                final socket = locator<SocketService>();
+                        final socket = locator<SocketService>();
                         socket.leaveBookingRoom(booking.id);
-
                       },
                     ),
                   ),
@@ -112,7 +122,7 @@ class RequestedInspectionScreen extends StatelessWidget {
                           bookingId: booking.id,
                           newStatus: bookingStatusRejected,
                         );
-                               final socket = locator<SocketService>();
+                        final socket = locator<SocketService>();
                         socket.leaveBookingRoom(booking.id);
                       },
                     ),

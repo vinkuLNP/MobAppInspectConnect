@@ -1,7 +1,7 @@
 import 'dart:developer';
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:inspect_connect/core/di/app_sockets/app_socket.dart';
+import 'package:inspect_connect/core/di/app_sockets/socket_service.dart';
 import 'package:inspect_connect/core/utils/constants/app_assets_constants.dart';
 import 'package:inspect_connect/core/utils/presentation/app_assets_widget.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
@@ -47,6 +47,11 @@ final socket = locator<SocketService>();
       .listenSocketEvents(socket);
        Provider.of<BookingProvider>(context, listen: false)
       .listenRaiseInspectionInspector(socket);
+
+        final provider = context.read<BookingProvider>();
+
+  provider.listenRaiseInspectionClient(socket, context);  
+
     
   }
 

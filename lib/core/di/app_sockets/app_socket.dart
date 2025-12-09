@@ -1,109 +1,57 @@
-import 'dart:developer';
-import 'dart:io';
+import 'package:inspect_connect/core/di/app_sockets/socket_service.dart';
 
-import 'package:socket_io_client/socket_io_client.dart' as io;
+class AppSocket {
+  AppSocket._privateConstructor();
 
-class SocketService {
-  io.Socket? socket;
+  static final AppSocket _instance = AppSocket._privateConstructor();
 
-  Function(Map<String, dynamic>)? onBookingStatusUpdated;
-  Function(String)? onBookingJoined;
-  Function(String)? onBookingLeft;
+  factory AppSocket() => _instance;
 
-  void initSocket() {
-    socket = io.io(
-      // 'http://<YOUR_IP>:5002',
-      Platform.isIOS ? 'http://localhost:5002' : 'http://10.0.2.2:5002',
-      {
-        'transports': ['websocket'],
-        'autoConnect': false,
-      },
-    );
+  final SocketService _socketService = SocketService();
 
-    socket!.connect();
+  SocketService get service => _socketService;
 
-    socket!.onConnect((_) {
-      log(" SOCKET CONNECTED");
-    });
-
-    socket!.onDisconnect((_) {
-      log(" SOCKET DISCONNECTED");
-    });
-
-    _initializeListeners();
+  void init() {
+    _socketService.initSocket();
   }
-
-  // LISTENERS FROM SERVER
-  void _initializeListeners() {
-    socket!.on("booking_join_room_listener", (data) {
-      log("📥 booking_join_room_listener => $data");
-      if (onBookingJoined != null) {
-        onBookingJoined!(data["bookingId"]);
-      }
-    });
-    socket!.on("raise_inspection_request", (data) {
-      log("📩 Raise Request Received: $data");
-      if (onRaiseInspectionRequest != null) {
-        onRaiseInspectionRequest!(Map<String, dynamic>.from(data));
-      }
-    });
-    socket!.on("booking_leave_room_listener", (data) {
-      log("📥 booking_leave_room_listener => $data");
-      if (onBookingLeft != null) {
-        onBookingLeft!(data["bookingId"]);
-      }
-    });
-    socket!.on("booking_status_update_listener", (data) {
-      log("📥 booking_status_update_listener => $data");
-      if (onBookingStatusUpdated != null) {
-        onBookingStatusUpdated!(Map<String, dynamic>.from(data));
-      }
-    });
-  }
-
-  // SENDERS TO SERVER
 
   void connectUser(String userId) {
-    socket!.emit("connect_user", {"userId": userId});
-    log("📤 connect_user => $userId");
+    _socketService.connectUser(userId);
   }
 
   void disconnectUser(String userId) {
-    socket!.emit("disconnect_user", {"userId": userId});
-    log("📤 disconnect_user => $userId");
+    _socketService.disconnectUser(userId);
   }
 
   void joinBookingRoom(String bookingId) {
-    socket!.emit("booking_join_room", {"bookingId": bookingId});
-    log("📤 booking_join_room => $bookingId");
+    _socketService.joinBookingRoom(bookingId);
   }
 
   void leaveBookingRoom(String bookingId) {
-    socket!.emit("booking_leave_room", {"bookingId": bookingId});
-    log("📤 booking_leave_room => $bookingId");
+    _socketService.leaveBookingRoom(bookingId);
   }
 
-  void sendBookingStatusUpdate({
-    required String bookingId,
-    required String userId,
-    required int status,
-  }) {
-    final payload = {
-      "bookingId": bookingId,
-      "userId": userId,
-      "status": status,
-    };
-
-    socket!.emit("booking_status_update", payload);
-    log("📤 booking_status_update => $payload");
+  void raiseInspectionRequest(Map<String, dynamic> payload) {
+    _socketService.raiseInspectionRequest(payload);
   }
 
-  void dispose() {
-    socket?.disconnect();
+  void updateBookingStatus(Map<String, dynamic> payload) {
+    _socketService.updateBookingStatus(payload);
   }
 
-  Function(Map<String, dynamic>)? onRaiseInspectionRequest;
-  void sendRaiseInspectionRequest(Map<String, dynamic> payload) {
-    socket!.emit("raise=inspection=request", payload);
+  void bookingCreationNotification(Map<String, dynamic> payload) {
+    _socketService.bookingCreationNotification(payload);
+  }
+
+  void on(String event, Function(dynamic) callback) {
+    _socketService.onEvent(event, callback);
+  }
+
+  void off(String event) {
+    _socketService.offEvent(event);
+  }
+
+  void emitTestEvent() {
+    _socketService.emitTestEvent();
   }
 }

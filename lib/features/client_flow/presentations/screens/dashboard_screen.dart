@@ -1,8 +1,9 @@
+import 'dart:developer';
 import 'dart:ui';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/di/app_component/app_component.dart';
-import 'package:inspect_connect/core/di/app_sockets/app_socket.dart';
+import 'package:inspect_connect/core/di/app_sockets/socket_service.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/booking_provider.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/user_provider.dart';
@@ -42,6 +43,17 @@ class _ClientDashboardViewState extends State<ClientDashboardView> {
 
   Provider.of<BookingProvider>(context, listen: false)
       .listenSocketEvents(socket);
+
+
+
+// Listen for test responses
+socket.socket?.on("test_event", (data) {
+  log("✅ Received from server: $data");
+});
+
+// Send a test event
+socket.emitTestEvent();
+
   }
 
   void _onItemTapped(int index) {

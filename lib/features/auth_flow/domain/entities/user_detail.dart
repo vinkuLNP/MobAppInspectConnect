@@ -1,7 +1,6 @@
 class UserDetail {
   final String id;
-  final String? userId;
-
+  final String userId;
   final String? role;
   final String? email;
   final String? name;
@@ -50,7 +49,7 @@ class UserDetail {
 
   const UserDetail({
     required this.id,
-    this.userId,
+   required this.userId,
     this.role,
     this.email,
     this.name,

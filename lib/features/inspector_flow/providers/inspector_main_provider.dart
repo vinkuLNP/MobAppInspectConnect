@@ -394,6 +394,7 @@ class InspectorDashboardProvider extends BaseViewModel {
       error: (e) {
         detail = UserDetail(
           id: localUser.id.toString(),
+          userId: localUser.userId.toString(),
           name: localUser.name,
           email: localUser.email,
           phoneNumber: localUser.phoneNumber,
