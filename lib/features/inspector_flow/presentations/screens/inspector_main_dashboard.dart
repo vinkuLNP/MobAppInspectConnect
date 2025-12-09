@@ -1,10 +1,12 @@
 import 'dart:developer';
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:inspect_connect/core/di/app_sockets/app_socket.dart';
 import 'package:inspect_connect/core/utils/constants/app_assets_constants.dart';
 import 'package:inspect_connect/core/utils/presentation/app_assets_widget.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_widgets.dart';
+import 'package:inspect_connect/features/client_flow/presentations/providers/booking_provider.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/user_provider.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/wallet_provider.dart';
 import 'package:inspect_connect/features/client_flow/presentations/screens/payment_screens/wallet_screen.dart';
@@ -14,6 +16,8 @@ import 'package:inspect_connect/features/inspector_flow/presentations/screens/in
 import 'package:inspect_connect/features/inspector_flow/presentations/screens/other_inspection_listing.dart';
 import 'package:inspect_connect/features/inspector_flow/presentations/screens/requested_inspection_screen.dart';
 import 'package:provider/provider.dart';
+
+import '../../../../core/di/app_component/app_component.dart';
 
 class InspectorMainDashboard extends StatefulWidget {
   const InspectorMainDashboard({super.key});
@@ -25,7 +29,7 @@ class InspectorMainDashboard extends StatefulWidget {
 class _InspectorMainDashboardState extends State<InspectorMainDashboard> {
   int _selectedIndex = 0;
   late List<Widget> _pages;
-
+final socket = locator<SocketService>();
   @override
   void initState() {
     super.initState();
@@ -33,7 +37,17 @@ class _InspectorMainDashboardState extends State<InspectorMainDashboard> {
       const RequestedInspectionScreen(),
       ApprovedInspectionsScreen(),
       const ProfileScreen(),
+      
     ];
+     socket.initSocket();
+       final user = context.read<UserProvider>().user;
+  socket.connectUser(user!.userId.toString());
+
+  Provider.of<BookingProvider>(context, listen: false)
+      .listenSocketEvents(socket);
+       Provider.of<BookingProvider>(context, listen: false)
+      .listenRaiseInspectionInspector(socket);
+    
   }
 
   void _onItemTapped(int index) {

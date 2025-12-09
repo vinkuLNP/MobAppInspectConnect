@@ -1,11 +1,14 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:inspect_connect/core/di/app_component/app_component.dart';
+import 'package:inspect_connect/core/di/app_sockets/app_socket.dart';
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
 import 'package:inspect_connect/core/utils/constants/app_constants.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_button.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_widgets.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/booking_provider.dart';
+import 'package:inspect_connect/features/client_flow/presentations/providers/user_provider.dart';
 import 'package:inspect_connect/features/inspector_flow/presentations/widgets/common_inspection_listing.dart';
 import 'package:provider/provider.dart';
 
@@ -33,19 +36,21 @@ class RequestedInspectionScreen extends StatelessWidget {
               iconLeftMargin: 10,
               buttonBackgroundColor: AppColors.authThemeColor,
               onTap: () {
-             showRaiseAmountSheet(
-    context: context,
-    onConfirm: (amount) async {
-      log(amount.toString());
-      // await provider.toggleShowUpFee(
-      //   context: context,
-      //   bookingId: booking.id,
-      //   apply: true,
-      //   amount: amount, // pass amount
-      // );
-    },
-  );
-   },
+                showRaiseAmountSheet(
+                  context: context,
+                  onConfirm: (amount) async {
+                    final socket = locator<SocketService>();
+                    final user = context.read<UserProvider>().user;
+                    log(amount.toString());
+                    socket.sendRaiseInspectionRequest({
+                      "bookingId": booking.id,
+                      "raisedAmount": amount,
+                      "agreedToRaise": 0,
+                      "inspectorId": user!.userId,
+                    });
+                  },
+                );
+              },
             ),
 
             const SizedBox(height: 10),
@@ -75,6 +80,9 @@ class RequestedInspectionScreen extends StatelessWidget {
                           bookingId: booking.id,
                           newStatus: bookingStatusAccepted,
                         );
+                                final socket = locator<SocketService>();
+                        socket.leaveBookingRoom(booking.id);
+
                       },
                     ),
                   ),
@@ -104,6 +112,8 @@ class RequestedInspectionScreen extends StatelessWidget {
                           bookingId: booking.id,
                           newStatus: bookingStatusRejected,
                         );
+                               final socket = locator<SocketService>();
+                        socket.leaveBookingRoom(booking.id);
                       },
                     ),
                     buttonBackgroundColor: AppColors.backgroundColor,
@@ -119,6 +129,4 @@ class RequestedInspectionScreen extends StatelessWidget {
       },
     );
   }
-
-
 }
