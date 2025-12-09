@@ -8,11 +8,13 @@ import 'package:inspect_connect/features/client_flow/presentations/widgets/view_
 class BookingEditScreen extends StatelessWidget {
   final dynamic booking;
   final bool isEdiatble, isReadOnly;
+  final bool isInspectorView;
   const BookingEditScreen({
     super.key,
     required this.booking,
     required this.isEdiatble,
     required this.isReadOnly,
+    this.isInspectorView = false,
   });
 
   @override
@@ -29,7 +31,7 @@ class BookingEditScreen extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: isReadOnly
-              ? ViewBookingDetailsScreen(booking: booking)
+              ? ViewBookingDetailsScreen(booking: booking,isInspectorView: isInspectorView,)
               : BookingFormWidget(
                   isEditing: true,
                   isReadOnly: isReadOnly,

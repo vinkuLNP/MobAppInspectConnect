@@ -7,7 +7,13 @@ import 'package:inspect_connect/features/client_flow/data/models/booking_detail_
 class ViewBookingDetailsScreen extends StatelessWidget {
   final BookingDetailModel booking;
 
-  const ViewBookingDetailsScreen({super.key, required this.booking});
+  final bool isInspectorView;
+
+  const ViewBookingDetailsScreen({
+    super.key,
+    required this.booking,
+    this.isInspectorView = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +24,6 @@ class ViewBookingDetailsScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _imageSection(),
-
             const SizedBox(height: 20),
             _section(
               title: "Inspection Information",
@@ -48,53 +53,102 @@ class ViewBookingDetailsScreen extends StatelessWidget {
               ),
             ),
 
-            _section(
-              title: "Billing & Fees",
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _infoRow(
-                    "Platform Fee",
-                    '\$${booking.platformFee.toString()}',
+            isInspectorView
+                ? _payoutInformationSection()
+                : _financialInformationSection(),
+            isInspectorView
+                ? _section(
+                    title: "Client Details",
+                    child: booking.inspector == null
+                        ? _infoRow("Client", "--")
+                        : Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _infoRow("Client Name", booking.client.name),
+                              _infoRow("Email", booking.client.email),
+                              _infoRow(
+                                "Phone",
+                                "${booking.client.countryCode} ${booking.client.phoneNumber}",
+                              ),
+                            ],
+                          ),
+                  )
+                : _section(
+                    title: "Inspector Details",
+                    child: booking.inspector == null
+                        ? _infoRow("Inspector", "--")
+                        : Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _infoRow(
+                                "Inspector Name",
+                                booking.inspector!.name,
+                              ),
+                              _infoRow("Email", booking.inspector!.email),
+                              _infoRow(
+                                "Phone",
+                                "${booking.inspector!.countryCode} ${booking.inspector!.phoneNumber}",
+                              ),
+                            ],
+                          ),
                   ),
-                  _infoRow(
-                    "Global Charge",
-                    '\$${booking.globalCharge.toString()}',
-                  ),
-                  _infoRow(
-                    "Show-Up Fee Applied",
-                    booking.showUpFeeApplied ? "Yes" : "No",
-                  ),
-                  if (booking.showUpFeeApplied)
-                    _infoRow("Show-Up Fee", booking.showUpFee.toString()),
-                  _infoRow(
-                    "Late Cancellation",
-                    booking.lateCancellation ? "Yes" : "No",
-                  ),
-                ],
-              ),
-            ),
-
-            _section(
-              title: "Inspector Details",
-              child: booking.inspector == null
-                  ? _infoRow("Inspector", "--")
-                  : Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _infoRow("Inspector Name", booking.inspector!.name),
-                        _infoRow("Email", booking.inspector!.email),
-                        _infoRow(
-                          "Phone",
-                          "${booking.inspector!.countryCode} ${booking.inspector!.phoneNumber}",
-                        ),
-                      ],
-                    ),
-            ),
 
             const SizedBox(height: 20),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _financialInformationSection() {
+    return _section(
+      title: "Financial Information",
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _infoRow("Show Up Fee", _formatMoneyFromDynamic(booking.showUpFee)),
+          _infoRow(
+            "Platform Fee",
+            _formatMoneyFromDynamic(booking.platformFee),
+          ),
+          _infoRow(
+            "Global Charge (per hour)",
+            _formatMoneyFromDynamic(booking.globalCharge),
+          ),
+          _infoRow(
+            "Show-Up Fee Applied",
+            booking.showUpFeeApplied ? "Yes" : "No",
+          ),
+          _infoRow(
+            "Late Cancellation",
+            booking.lateCancellation ? "Yes" : "No",
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _payoutInformationSection() {
+    final double ratePerHour = _parseToDouble(booking.globalCharge);
+    final double minPayout4h = ratePerHour * 4;
+    final double maxPayout8h = ratePerHour * 8;
+
+    final String totalPayout =
+        (booking.totalPaidToInspector == "" ||
+            booking.totalPaidToInspector.toString().isEmpty)
+        ? "N/A"
+        : _formatMoneyFromDynamic(booking.totalPaidToInspector);
+
+    return _section(
+      title: "Payout Information",
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _infoRow("Payout Rate (per hour)", _formatMoney(ratePerHour)),
+          _infoRow("Minimum Payout (4 hours)", _formatMoney(minPayout4h)),
+          _infoRow("Maximum Payout (8 hours)", _formatMoney(maxPayout8h)),
+          _infoRow("Total Payout Amount after deductions", totalPayout),
+        ],
       ),
     );
   }
@@ -192,5 +246,21 @@ class ViewBookingDetailsScreen extends StatelessWidget {
     } catch (_) {
       return date;
     }
+  }
+
+  double _parseToDouble(dynamic value) {
+    if (value == null) return 0;
+    if (value is num) return value.toDouble();
+    return double.tryParse(value.toString()) ?? 0;
+  }
+
+  String _formatMoney(double amount) {
+    return "\$${amount.toStringAsFixed(1)}";
+  }
+
+  String _formatMoneyFromDynamic(dynamic value) {
+    final double amount = _parseToDouble(value);
+    if (amount == 0) return "\$0.0";
+    return _formatMoney(amount);
   }
 }

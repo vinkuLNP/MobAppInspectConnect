@@ -406,7 +406,7 @@ class _BookingsScreenState extends State<BookingsScreen> {
                 padding: const EdgeInsets.all(10),
                 margin: const EdgeInsets.only(bottom: 15),
                 decoration: BoxDecoration(
-                  color: primary.withValues(alpha:0.1),
+                  color: primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(Icons.filter_alt_rounded, color: primary, size: 24),
@@ -430,7 +430,7 @@ class _BookingsScreenState extends State<BookingsScreen> {
           borderRadius: BorderRadius.circular(18),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withValues(alpha:0.15),
+              color: Colors.grey.withValues(alpha: 0.15),
               blurRadius: 8,
               offset: const Offset(0, 3),
             ),
@@ -456,49 +456,57 @@ class _BookingsScreenState extends State<BookingsScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Expanded(
+                        Flexible(
+                          flex: 6,
                           child: textWidget(
                             text: booking.bookingLocation,
+                            maxLine: 3,
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
+                            textOverflow: TextOverflow.ellipsis,
                           ),
                         ),
                         const SizedBox(width: 8),
 
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: color.withValues(alpha:0.15),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: color.withValues(alpha:0.5)),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                _statusIcon(booking.status!),
-                                size: 16,
-                                color: color,
+                        Flexible(
+                          flex: 4,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: color.withValues(alpha: 0.15),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: color.withValues(alpha: 0.5),
                               ),
-                              const SizedBox(width: 4),
-                              textWidget(
-                                text: _statusLabel(booking.status),
-                                fontSize: 12,
-                                color: color,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ],
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  _statusIcon(booking.status!),
+                                  size: 16,
+                                  color: color,
+                                ),
+                                const SizedBox(width: 4),
+                                Flexible(
+                                  child: textWidget(
+                                    text: _statusLabel(booking.status),
+                                    fontSize: 12,
+                                    color: color,
+                                    fontWeight: FontWeight.w600,
+                                    textOverflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ],
                     ),
-
                     Row(
                       children: [
                         Icon(
@@ -629,9 +637,11 @@ class _BookingsScreenState extends State<BookingsScreen> {
                       horizontal: 12,
                     ),
                     decoration: BoxDecoration(
-                      color: themeColor.withValues(alpha:0.08),
+                      color: themeColor.withValues(alpha: 0.08),
                       borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: themeColor.withValues(alpha:0.2)),
+                      border: Border.all(
+                        color: themeColor.withValues(alpha: 0.2),
+                      ),
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -865,6 +875,7 @@ class _BookingsScreenState extends State<BookingsScreen> {
                     context: context,
                     bookingId: booking.id,
                     isEditable: isPending,
+                    isInspectorView: false,
                   );
                 },
               ),
@@ -888,10 +899,12 @@ class _BookingsScreenState extends State<BookingsScreen> {
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: _statusColor(booking.status).withValues(alpha:0.1),
+                    color: _statusColor(booking.status).withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
-                      color: _statusColor(booking.status).withValues(alpha:0.4),
+                      color: _statusColor(
+                        booking.status,
+                      ).withValues(alpha: 0.4),
                     ),
                   ),
                   child: Row(

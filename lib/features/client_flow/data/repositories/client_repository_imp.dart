@@ -101,6 +101,10 @@ Future<ApiResultModel<BookingData>> updateBookingStatus(String bookingId, int st
   return remote.updateBookingStatus(bookingId, status);
 }
 @override
+Future<ApiResultModel<BookingData>> showUpFeeStatus(String bookingId, bool status) {
+  return remote.showUpFeeStatus(bookingId, status);
+}
+@override
 Future<ApiResultModel<BookingData>> updateBookingTimer(String bookingId, String action) {
   return remote.updateBookingTimer(bookingId, action);
 }

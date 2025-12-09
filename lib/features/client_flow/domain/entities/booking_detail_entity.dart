@@ -10,6 +10,8 @@ class BookingDetailEntity {
   final String bookingDate;
   final String bookingTime;
   final String bookingLocation;
+  final String totalPaidToInspector;
+
 
   final List<double> bookingLocationCoordinates;
   final String bookingLocationZip;
@@ -44,6 +46,7 @@ class BookingDetailEntity {
     required this.certificateSubTypes,
     required this.images,
     required this.description,
+    required this.totalPaidToInspector,
     required this.bookingDate,
     required this.bookingTime,
     required this.bookingLocation,

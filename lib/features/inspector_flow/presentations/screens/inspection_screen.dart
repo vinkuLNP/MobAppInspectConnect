@@ -34,9 +34,12 @@ class ApprovedInspectionsScreen extends StatelessWidget {
 
             final isRunning = provider.isTimerRunning[booking.id] ?? false;
             final timerDuration = provider.activeTimers[booking.id];
+            final bool showUpFeeApplied =
+                provider.showUpFeeStatusMap[booking.id] ??
+                booking.showUpFeeApplied ??
+                false;
 
             if (status == bookingStatusAccepted) {
-              final bool showUpFeeApplied = booking.showUpFeeApplied ?? true;
               return Column(
                 children: [
                   AppButton(
@@ -65,10 +68,10 @@ class ApprovedInspectionsScreen extends StatelessWidget {
                             : "Apply Fee",
                         onConfirm: () async {
                           Navigator.pop(context);
-                          await provider.toggleShowUpFee(
+                          await provider.updateShowUpFeeStatus(
                             context: context,
                             bookingId: booking.id,
-                            apply: !showUpFeeApplied,
+                            showUpFeeApplied: !showUpFeeApplied,
                           );
                         },
                       );
@@ -172,16 +175,59 @@ class ApprovedInspectionsScreen extends StatelessWidget {
                     ),
                   const SizedBox(height: 8),
                   if (isStopped)
-                    AppButton(
-                      text: "Complete Inspection",
-                      buttonBackgroundColor: AppColors.authThemeColor,
-                      onTap: () async {
-                        await provider.updateBookingStatus(
-                          context: context,
-                          bookingId: booking.id,
-                          newStatus: bookingStatusAwaiting,
-                        );
-                      },
+                    Row(
+                      children: [
+                        Expanded(
+                          child: AppButton(
+                            text: showUpFeeApplied
+                                ? "Cancel Show-Up Fee"
+                                : "Apply Show-Up Fee",
+                            buttonBackgroundColor: showUpFeeApplied
+                                ? AppColors.darkShadeAuthColor
+                                : AppColors.authThemeColor,
+                            onTap: () {
+                              showConfirmationDialog(
+                                context: context,
+                                icon: showUpFeeApplied
+                                    ? Icons.undo
+                                    : Icons.attach_money,
+                                confirmColor: AppColors.authThemeColor,
+                                title: showUpFeeApplied
+                                    ? "Cancel Show-Up Fee"
+                                    : "Apply Show-Up Fee",
+                                message: showUpFeeApplied
+                                    ? "Do you want to cancel the applied Show-Up Fee?"
+                                    : "Are you sure you want to apply a Show-Up Fee to this booking?",
+                                confirmText: showUpFeeApplied
+                                    ? "Cancel Fee"
+                                    : "Apply Fee",
+                                onConfirm: () async {
+                                  Navigator.pop(context);
+                                  await provider.updateShowUpFeeStatus(
+                                    context: context,
+                                    bookingId: booking.id,
+                                    showUpFeeApplied: !showUpFeeApplied,
+                                  );
+                                },
+                              );
+                            },
+                          ),
+                        ),
+                        SizedBox(width: 8),
+                        Expanded(
+                          child: AppButton(
+                            text: "Complete Inspection",
+                            buttonBackgroundColor: AppColors.authThemeColor,
+                            onTap: () async {
+                              await provider.updateBookingStatus(
+                                context: context,
+                                bookingId: booking.id,
+                                newStatus: bookingStatusAwaiting,
+                              );
+                            },
+                          ),
+                        ),
+                      ],
                     ),
                 ],
               );
