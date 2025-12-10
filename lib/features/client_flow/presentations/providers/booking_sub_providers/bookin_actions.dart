@@ -2,8 +2,8 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/commondomain/entities/based_api_result/api_result_state.dart';
 import 'package:inspect_connect/core/di/app_component/app_component.dart';
-import 'package:inspect_connect/core/di/app_sockets/app_socket.dart';
 import 'package:inspect_connect/core/di/app_sockets/socket_service.dart';
+import 'package:inspect_connect/core/utils/constants/app_colors.dart';
 import 'package:inspect_connect/core/utils/constants/app_constants.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/features/auth_flow/data/datasources/local_datasources/auth_local_datasource.dart';
@@ -21,7 +21,7 @@ import 'package:inspect_connect/features/client_flow/presentations/screens/booki
 
 class BookingActionsService {
   final BookingProvider provider;
-
+  final SocketService socket = locator<SocketService>();
   BookingActionsService(this.provider);
 
   void clearBookingDetail() {
@@ -64,7 +64,7 @@ class BookingActionsService {
         bookingLocationCoordinates: [
           provider.selectedLng != '' && provider.selectedLng != null
               ? provider.selectedLng.toString()
-              : '-97.7431',
+              : '76.691',
           provider.selectedLat != '' && provider.selectedLat != null
               ? provider.selectedLat.toString()
               : '30.2672',
@@ -88,6 +88,7 @@ class BookingActionsService {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: textWidget(
+                  color: AppColors.whiteColor,
                   text: response.message.isNotEmpty
                       ? response.message
                       : 'Booking created successfully',
@@ -95,13 +96,13 @@ class BookingActionsService {
               ),
             );
           }
-          final socket = locator<SocketService>();
-          AppSocket().bookingCreationNotification({
-            "bookingId": response.body.id,
-            "inspectorIds": response.body.inspector!.id,
-          });
-          socket.joinBookingRoom(response.body.id);
-          provider.listenRaiseInspectionClient(socket, context);
+          log('Booking created with ID: ${response.body.id}');
+          final inspectorIds = response.body.inspectorIds;
+          await handleBookingCreated(
+            context: context,
+            bookingId: response.body.id,
+            inspectorIds: inspectorIds,
+          );
           clearBookingData();
         },
         error: (e) {
@@ -109,6 +110,7 @@ class BookingActionsService {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: textWidget(
+                  color: AppColors.whiteColor,
                   text: e.message ?? 'Booking creation failed',
                 ),
               ),
@@ -121,6 +123,50 @@ class BookingActionsService {
     } finally {
       provider.setProcessing(false);
     }
+  }
+
+  Future<void> handleBookingCreated({
+    required BuildContext context,
+    required String bookingId,
+    required List<String> inspectorIds,
+  }) async {
+    try {
+      log('handleBookingCreated: bookingId= $bookingId');
+      socket.bookingCreationNotification({
+        'bookingId': bookingId,
+        'inspectorIds': inspectorIds,
+      });
+
+      socket.joinBookingRoom(bookingId);
+      provider.currentBookingId = bookingId;
+    } catch (e) {
+      log('BookingActionsService.handleBookingCreated error: \$e');
+    }
+  }
+
+  Future<void> updateBoookingStatusSocket({
+    required String bookingId,
+    required String inspectorId,
+    required int status,
+  }) async {
+    socket.updateBookingStatus({
+      'bookingId': bookingId,
+      'userId': inspectorId,
+      'status': status,
+    });
+  }
+
+  Future<void> inspectorRaiseAmount({
+    required String bookingId,
+    required String inspectorId,
+    required int raisedAmount,
+  }) async {
+    socket.raiseInspectionRequest({
+      'bookingId': bookingId,
+      'inspectorId': inspectorId,
+      'raisedAmount': raisedAmount,
+      'agreedToRaise': 0,
+    });
   }
 
   Future<void> updateBooking({
@@ -172,7 +218,10 @@ class BookingActionsService {
           if (context.mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: textWidget(text: 'Booking Updated successfully.'),
+                content: textWidget(
+                  color: AppColors.whiteColor,
+                  text: 'Booking Updated successfully.',
+                ),
               ),
             );
           }
@@ -183,7 +232,10 @@ class BookingActionsService {
           if (context.mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: textWidget(text: e.message ?? 'Booking update failed'),
+                content: textWidget(
+                  color: AppColors.whiteColor,
+                  text: e.message ?? 'Booking update failed',
+                ),
               ),
             );
           }
@@ -226,6 +278,7 @@ class BookingActionsService {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: textWidget(
+                  color: AppColors.whiteColor,
                   text: e.message ?? 'Booking Deletion failed',
                 ),
               ),
@@ -285,6 +338,7 @@ class BookingActionsService {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: textWidget(
+                  color: AppColors.whiteColor,
                   text: e.message ?? 'Fetching Booking Detail failed',
                 ),
               ),
@@ -301,6 +355,7 @@ class BookingActionsService {
   Future<void> updateBookingStatus({
     required BuildContext context,
     required String bookingId,
+    required String userId,
     required int newStatus,
   }) async {
     try {
@@ -324,13 +379,26 @@ class BookingActionsService {
           if (index != -1) {
             provider.bookings[index] = provider.updatedBookingData!;
           }
+          await updateBoookingStatusSocket(
+            bookingId: bookingId,
+            inspectorId: userId,
+            status: newStatus,
+          );
+          if (newStatus == bookingStatusAccepted ||
+              newStatus == bookingStatusRejected) {
+            socket.leaveBookingRoom(bookingId);
+          }
+
           provider.notify();
         },
         error: (e) {
           if (context.mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: textWidget(text: e.message ?? 'Booking update failed'),
+                content: textWidget(
+                  color: AppColors.whiteColor,
+                  text: e.message ?? 'Booking update failed',
+                ),
               ),
             );
           }
@@ -338,9 +406,14 @@ class BookingActionsService {
       );
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: textWidget(text: 'Failed: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: textWidget(
+              color: AppColors.whiteColor,
+              text: 'Failed: $e',
+            ),
+          ),
+        );
       }
     } finally {
       provider.isUpdatingBooking = false;
@@ -383,6 +456,7 @@ class BookingActionsService {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: textWidget(
+                  color: AppColors.whiteColor,
                   text: e.message ?? 'Show Up fee Status failed to update.',
                 ),
               ),
@@ -392,9 +466,14 @@ class BookingActionsService {
       );
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: textWidget(text: 'Failed: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: textWidget(
+              color: AppColors.whiteColor,
+              text: 'Failed: $e',
+            ),
+          ),
+        );
       }
     } finally {
       provider.isUpdatingBooking = false;
@@ -405,6 +484,7 @@ class BookingActionsService {
   Future<void> approveAndPayBooking(
     BuildContext context,
     String bookingId,
+    String userId,
   ) async {
     try {
       provider.isActionProcessing = true;
@@ -413,11 +493,13 @@ class BookingActionsService {
         context: context,
         bookingId: bookingId,
         newStatus: bookingStatusCompleted,
+        userId: userId,
       );
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: textWidget(
+              color: AppColors.whiteColor,
               text: "Payment successful and booking approved.",
             ),
           ),
@@ -426,9 +508,11 @@ class BookingActionsService {
       provider.fetchBookingsList(reset: true);
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: textWidget(text: "Error: $e")));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: textWidget(color: AppColors.whiteColor, text: "Error: $e"),
+          ),
+        );
       }
     } finally {
       provider.isActionProcessing = false;
@@ -436,7 +520,11 @@ class BookingActionsService {
     }
   }
 
-  Future<void> disagreeBooking(BuildContext context, String bookingId) async {
+  Future<void> disagreeBooking(
+    BuildContext context,
+    String bookingId,
+    String userId,
+  ) async {
     try {
       provider.isActionProcessing = true;
       provider.notify();
@@ -444,13 +532,16 @@ class BookingActionsService {
         context: context,
         bookingId: bookingId,
         newStatus: bookingStatusStoppped,
+        userId: userId,
       );
       provider.fetchBookingsList(reset: true);
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: textWidget(text: "Error: $e")));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: textWidget(color: AppColors.whiteColor, text: "Error: $e"),
+          ),
+        );
       }
     } finally {
       provider.isActionProcessing = false;
@@ -461,6 +552,7 @@ class BookingActionsService {
   Future<void> declineBooking({
     required BuildContext context,
     required String bookingId,
+    required String userId,
   }) async {
     try {
       provider.isUpdatingBooking = true;
@@ -471,6 +563,7 @@ class BookingActionsService {
         context: context,
         bookingId: bookingId,
         newStatus: bookingStatusCancelledByInspector,
+        userId: userId,
       );
       await provider.fetchBookingsList(reset: true);
     } finally {

@@ -5,6 +5,7 @@ import 'package:inspect_connect/core/utils/presentation/app_common_button.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_widgets.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/booking_provider.dart';
+import 'package:inspect_connect/features/client_flow/presentations/providers/user_provider.dart';
 import 'package:inspect_connect/features/inspector_flow/presentations/widgets/common_inspection_listing.dart';
 import 'package:provider/provider.dart';
 
@@ -99,11 +100,13 @@ class ApprovedInspectionsScreen extends StatelessWidget {
                               "Are you sure you want to decline this booking request?",
                           confirmText: "Decline",
                           onConfirm: () async {
+                       final user = context.read<UserProvider>().user;
                             Navigator.pop(context);
                             await provider.updateBookingStatus(
                               context: context,
                               bookingId: booking.id,
                               newStatus: bookingStatusCancelledByInspector,
+                              userId: user!.userId,
                             );
                           },
                         ),
@@ -219,10 +222,12 @@ class ApprovedInspectionsScreen extends StatelessWidget {
                             text: "Complete Inspection",
                             buttonBackgroundColor: AppColors.authThemeColor,
                             onTap: () async {
+                              final user = context.read<UserProvider>().user;
                               await provider.updateBookingStatus(
                                 context: context,
                                 bookingId: booking.id,
                                 newStatus: bookingStatusAwaiting,
+                                userId: user!.userId,
                               );
                             },
                           ),

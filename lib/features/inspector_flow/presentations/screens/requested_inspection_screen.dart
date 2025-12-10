@@ -1,9 +1,6 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:inspect_connect/core/di/app_component/app_component.dart';
-import 'package:inspect_connect/core/di/app_sockets/app_socket.dart';
-import 'package:inspect_connect/core/di/app_sockets/socket_service.dart';
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
 import 'package:inspect_connect/core/utils/constants/app_constants.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_button.dart';
@@ -40,25 +37,13 @@ class RequestedInspectionScreen extends StatelessWidget {
                 showRaiseAmountSheet(
                   context: context,
                   onConfirm: (amount) async {
-                    final socket = locator<SocketService>();
                     final user = context.read<UserProvider>().user;
                     log(amount.toString());
-
-                    final provider = context.read<BookingProvider>();
-
-                    provider.listenRaiseInspectionClient(socket, context);
-                    AppSocket().raiseInspectionRequest({
-  "bookingId": booking.id,
-  "inspectorId":user!.userId,
-  "agreedToRaise": 0, 
-  "raisedAmount": amount,
-});
-                    // socket.sendRaiseInspectionRequest({
-                    //   "bookingId": booking.id,
-                    //   "raisedAmount": amount,
-                    //   "agreedToRaise": 0,
-                    //   "inspectorId": user!.userId,
-                    // });
+                    provider.actionsService.inspectorRaiseAmount(
+                      bookingId: booking.id,
+                      inspectorId: user!.userId,
+                      raisedAmount: amount,
+                    );
                   },
                 );
               },
@@ -85,14 +70,14 @@ class RequestedInspectionScreen extends StatelessWidget {
                       confirmColor: AppColors.authThemeColor,
                       icon: Icons.check_circle_outline,
                       onConfirm: () async {
+                        final user = context.read<UserProvider>().user;
                         Navigator.pop(context);
                         await provider.updateBookingStatus(
                           context: context,
                           bookingId: booking.id,
                           newStatus: bookingStatusAccepted,
+                          userId: user!.userId,
                         );
-                        final socket = locator<SocketService>();
-                        socket.leaveBookingRoom(booking.id);
                       },
                     ),
                   ),
@@ -116,14 +101,15 @@ class RequestedInspectionScreen extends StatelessWidget {
                       confirmColor: Colors.redAccent,
                       icon: Icons.cancel_outlined,
                       onConfirm: () async {
+                        final user = context.read<UserProvider>().user;
+
                         Navigator.pop(context);
                         await provider.updateBookingStatus(
                           context: context,
                           bookingId: booking.id,
                           newStatus: bookingStatusRejected,
+                          userId: user!.userId,
                         );
-                        final socket = locator<SocketService>();
-                        socket.leaveBookingRoom(booking.id);
                       },
                     ),
                     buttonBackgroundColor: AppColors.backgroundColor,

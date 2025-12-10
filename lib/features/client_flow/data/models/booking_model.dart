@@ -70,7 +70,17 @@ class BookingData extends BookingListEntity {
           ? AuthUser.fromJson(json['inspectorId'])
           : null,
 
-      inspectorIds: List<String>.from(json['inspectorIds'] ?? []),
+   inspectorIds: (json['inspectors'] as List<dynamic>? ?? [])
+    .map((item) {
+      if (item is Map && item['inspectorId'] is Map) {
+        return (item['inspectorId']['_id'] ?? '').toString();
+      }
+      return null;
+    })
+    .where((id) => id != null && id.isNotEmpty)
+    .cast<String>()
+    .toList(),
+
 
       certificateSubTypes: (json['certificateSubTypeId'] as List? ?? [])
           .map((e) => e is Map<String,dynamic> ? CertificateSubTypeModelData.fromJson(e) : null)

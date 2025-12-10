@@ -272,7 +272,7 @@ class _BookingFormWidgetState extends State<BookingFormWidget> {
         ),
       ),
       style: appTextStyle(fontSize: 12),
-      initialValue: prov.inspectionType,
+      initialValue: prov.provInspectionType,
 
       items: prov.subTypes.map((subType) {
         return DropdownMenuItem<CertificateSubTypeEntity>(
