@@ -6,7 +6,7 @@ import 'package:inspect_connect/features/auth_flow/domain/entities/user_location
 class AuthUser {
   final String id;
   final String? name;
-  final String? userId;
+  final String userId;
   final String? emailHashed;
   final String? authToken;
   final int? role;
@@ -56,7 +56,7 @@ class AuthUser {
   const AuthUser({
     required this.id,
      this.name,
-     this.userId,
+   required  this.userId,
      this.emailHashed,
      this.authToken,
     this.role,

@@ -44,7 +44,7 @@ class UserProvider extends BaseViewModel {
 
       state?.when(
         data: (_) async {
-          _user = _user!.copyWith(name: name);
+          _user = _user!.copyWith(name: name,userId: user!.userId);
           notifyListeners();
 
           await locator<AuthLocalDataSource>().saveUser(_user!);

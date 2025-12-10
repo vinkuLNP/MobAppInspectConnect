@@ -37,7 +37,7 @@
     },
     {
       "id": "2:7510821947055321623",
-      "lastPropertyId": "44:8768948039023014530",
+      "lastPropertyId": "45:5289162330176025876",
       "name": "AuthUserLocalEntity",
       "properties": [
         {
@@ -259,6 +259,11 @@
         {
           "id": "44:8768948039023014530",
           "name": "zipCode",
+          "type": 9
+        },
+        {
+          "id": "45:5289162330176025876",
+          "name": "userId",
           "type": 9
         }
       ],

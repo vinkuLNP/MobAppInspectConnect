@@ -61,7 +61,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
     id: const obx_int.IdUid(2, 7510821947055321623),
     name: 'AuthUserLocalEntity',
-    lastPropertyId: const obx_int.IdUid(44, 8768948039023014530),
+    lastPropertyId: const obx_int.IdUid(45, 5289162330176025876),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
@@ -325,6 +325,12 @@ final _entities = <obx_int.ModelEntity>[
       obx_int.ModelProperty(
         id: const obx_int.IdUid(44, 8768948039023014530),
         name: 'zipCode',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(45, 5289162330176025876),
+        name: 'userId',
         type: 9,
         flags: 0,
       ),
@@ -794,7 +800,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final zipCodeOffset = object.zipCode == null
             ? null
             : fbb.writeString(object.zipCode!);
-        fbb.startTable(45);
+        final userIdOffset = fbb.writeString(object.userId);
+        fbb.startTable(46);
         fbb.addInt64(0, object.id);
         fbb.addOffset(1, authTokenOffset);
         fbb.addOffset(2, nameOffset);
@@ -839,6 +846,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
         fbb.addOffset(41, workHistoryDescriptionOffset);
         fbb.addInt64(42, object.loginTime?.millisecondsSinceEpoch);
         fbb.addOffset(43, zipCodeOffset);
+        fbb.addOffset(44, userIdOffset);
         fbb.finish(fbb.endTable());
         return object.id;
       },
@@ -863,6 +871,9 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final authTokenParam = const fb.StringReader(
           asciiOptimization: true,
         ).vTableGetNullable(buffer, rootOffset, 6);
+        final userIdParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 92, '');
         final nameParam = const fb.StringReader(
           asciiOptimization: true,
         ).vTableGetNullable(buffer, rootOffset, 8);
@@ -1009,6 +1020,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
         ).vTableGetNullable(buffer, rootOffset, 86);
         final object = AuthUserLocalEntity(
           authToken: authTokenParam,
+          userId: userIdParam,
           name: nameParam,
           email: emailParam,
           phoneNumber: phoneNumberParam,
@@ -1684,6 +1696,11 @@ class AuthUserLocalEntity_ {
   /// See [AuthUserLocalEntity.zipCode].
   static final zipCode = obx.QueryStringProperty<AuthUserLocalEntity>(
     _entities[1].properties[43],
+  );
+
+  /// See [AuthUserLocalEntity.userId].
+  static final userId = obx.QueryStringProperty<AuthUserLocalEntity>(
+    _entities[1].properties[44],
   );
 
   /// see [AuthUserLocalEntity.devices]

@@ -108,6 +108,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
             email: dto.email,
             phoneNumber: dto.phoneNumber,
             countryCode: dto.countryCode,
+            userId: dto.userId,
           );
           locator<AuthLocalDataSource>().saveUser(localEntity);
           log('------>local user----> localEntity');

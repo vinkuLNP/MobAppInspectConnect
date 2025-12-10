@@ -6,8 +6,8 @@ import 'package:objectbox/objectbox.dart';
 @Entity()
 class AuthUserLocalEntity {
   int id = 0;
+  String userId;
   String? authToken;
-  String? userId;
   String? name;
   String? email;
   String? phoneNumber;
@@ -57,7 +57,7 @@ class AuthUserLocalEntity {
 
   AuthUserLocalEntity({
     this.authToken,
-    this.userId,
+   required this.userId,
     this.name,
     this.email,
     this.phoneNumber,
@@ -105,7 +105,7 @@ class AuthUserLocalEntity {
   AuthUserLocalEntity copyWith({
     String? name,
     String? email,
-    String? userId,
+   required String userId,
     String? authToken,
     int? role,
     String? phoneNumber,
@@ -124,7 +124,7 @@ class AuthUserLocalEntity {
     return AuthUserLocalEntity(
       name: name ?? this.name,
       email: email ?? this.email,
-      userId: userId ?? this.userId,
+      userId: userId ,
       authToken: authToken ?? this.authToken,
       role: role ?? this.role,
       phoneNumber: phoneNumber ?? this.phoneNumber,
@@ -231,7 +231,7 @@ extension AuthUserLocalMapping on AuthUserLocalEntity {
   AuthUser toDomainEntity() {
     return AuthUser(
       id: id.toString(),
-      userId: userId ?? '',
+      userId: userId ,
       name: name ?? '',
       emailHashed: email ?? '',
       authToken: authToken ?? '',
@@ -283,7 +283,7 @@ extension AuthUserLocalEntityMergeData on AuthUserLocalEntity {
   AuthUserLocalEntity mergeWithNewData(AuthUserLocalEntity newUser) {
     final merged =
         AuthUserLocalEntity(
-          userId: newUser.userId ?? userId,
+          userId: newUser.userId ,
             name: newUser.name ?? name,
             email: newUser.email ?? email,
             phoneNumber: newUser.phoneNumber ?? phoneNumber,

@@ -1,5 +1,5 @@
 import 'package:inspect_connect/core/di/app_component/app_component.config.dart';
-import 'package:inspect_connect/core/di/app_sockets/app_socket.dart';
+import 'package:inspect_connect/core/di/app_sockets/socket_service.dart';
 import 'package:inspect_connect/features/auth_flow/data/datasources/remote_datasources/auth_remote_datasource.dart';
 import 'package:inspect_connect/features/auth_flow/data/repositories/auth_repository_impl.dart';
 import 'package:inspect_connect/features/auth_flow/domain/repositories/auth_repository.dart';

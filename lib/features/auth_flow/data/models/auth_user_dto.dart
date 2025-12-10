@@ -6,6 +6,7 @@ import 'package:inspect_connect/features/auth_flow/domain/entities/user_location
 
 class AuthUserDto {
   final String id;
+  final String userId;
   final int? role;
   final String email;
   final String name;
@@ -51,6 +52,7 @@ class AuthUserDto {
 
   const AuthUserDto({
     required this.id,
+    required this.userId,
     required this.email,
     required this.name,
     this.profileImage,
@@ -98,6 +100,7 @@ class AuthUserDto {
   factory AuthUserDto.fromBody(Map<String, dynamic> json) {
     return AuthUserDto(
       id: json['_id']?.toString() ?? '',
+      userId: json['_id']?.toString() ?? '',
       role: json['role'] as int?,
       email: json['email'] ?? '',
       name: json['name'] ?? '',
@@ -156,6 +159,7 @@ class AuthUserDto {
   AuthUser toEntity() => AuthUser(
         id: id,
         name: name,
+        userId: userId,
         emailHashed: email,
         authToken: authToken ?? '',
         role: role,
