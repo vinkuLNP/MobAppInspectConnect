@@ -1,5 +1,5 @@
-// dart format width=80
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// dart format width=80
 
 // **************************************************************************
 // InjectableConfigGenerator
@@ -26,6 +26,8 @@ import 'package:inspect_connect/features/auth_flow/data/datasources/local_dataso
     as _i168;
 import 'package:inspect_connect/features/auth_flow/data/datasources/local_datasources/auth_local_datasource.dart'
     as _i19;
+import 'package:inspect_connect/features/auth_flow/data/datasources/local_datasources/inspector_local_data_source.dart'
+    as _i1038;
 
 extension GetItInjectableX on _i174.GetIt {
   // initializes the registration of main-scope dependencies inside of GetIt
@@ -42,14 +44,17 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i320.ConnectivityCheckerHelper>(
       () => _i320.ConnectivityCheckerHelper(),
     );
-    gh.singleton<_i251.ResponsiveUiConfig>(() => _i251.ResponsiveUiConfig());
-    gh.singleton<_i807.AppFlavorsHelper>(() => _i807.AppFlavorsHelper());
     gh.singleton<_i238.AppConfigurations>(() => _i238.AppConfigurations());
+    gh.singleton<_i807.AppFlavorsHelper>(() => _i807.AppFlavorsHelper());
+    gh.singleton<_i251.ResponsiveUiConfig>(() => _i251.ResponsiveUiConfig());
     gh.factory<_i1009.HttpRequestContext>(
       () => _i1009.HttpRequestContext(gh<_i320.ConnectivityCheckerHelper>()),
     );
     gh.factory<_i19.AuthLocalDataSource>(
       () => _i19.AuthLocalDataSource(gh<_i168.AppLocalDatabase>()),
+    );
+    gh.factory<_i1038.InspectorSignUpLocalDataSource>(
+      () => _i1038.InspectorSignUpLocalDataSource(gh<_i168.AppLocalDatabase>()),
     );
     return this;
   }

@@ -1,5 +1,6 @@
 import 'package:inspect_connect/core/basecomponents/base_responsive_widget.dart';
 import 'package:inspect_connect/core/basecomponents/base_view_model.dart';
+import 'package:inspect_connect/core/utils/constants/app_colors.dart';
 import 'package:inspect_connect/core/utils/constants/app_constants.dart';
 import 'package:inspect_connect/core/utils/helpers/app_configurations_helper/app_configurations_helper.dart';
 import 'package:inspect_connect/core/utils/helpers/connectivity_helper/connectivity_helper/connectivity_checker_helper.dart';
@@ -7,6 +8,7 @@ import 'package:inspect_connect/core/utils/helpers/extension_functions/size_exte
 import 'package:inspect_connect/core/utils/helpers/responsive_ui_helper/responsive_config.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:provider/provider.dart';
 
 class BaseViewModelView<T> extends StatefulWidget {
@@ -37,21 +39,23 @@ class _BaseViewModelViewState<T> extends State<BaseViewModelView<T>> {
   }
 
   void checkInternetAvailability() {
-  ConnectivityCheckerHelper.listenToConnectivityChanged().listen(
-    (List<ConnectivityResult> connectivityResults) {
+    ConnectivityCheckerHelper.listenToConnectivityChanged().listen((
+      List<ConnectivityResult> connectivityResults,
+    ) {
       if (!connectivityResults.contains(ConnectivityResult.mobile) &&
           !connectivityResults.contains(ConnectivityResult.wifi)) {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(commonConnectionFailedMessage),
+          SnackBar(
+            content: textWidget(
+              text: commonConnectionFailedMessage,
+              color: AppColors.backgroundColor,
+            ),
           ),
         );
       }
-    },
-  );
-}
-
+    });
+  }
 
   void toggleLoadingWidget(T provider) {
     (provider as BaseViewModel).toggleLoading.stream.listen((bool show) {
@@ -74,36 +78,38 @@ class _BaseViewModelViewState<T> extends State<BaseViewModelView<T>> {
             widget.buildWidget(provider),
             if (_showLoader)
               BaseResponsiveWidget(
-                buildWidget: (BuildContext context,
-                    ResponsiveUiConfig responsiveUiConfig,
-                    AppConfigurations appConfigurations) {
-                  return AnimatedOpacity(
-                    opacity: 1,
-                    duration: const Duration(milliseconds: 200),
-                    child: Container(
-                      width: responsiveUiConfig.screenWidth,
-                      height: responsiveUiConfig.screenHeight,
-                      color: Colors.transparent,
-                      child: Center(
+                buildWidget:
+                    (
+                      BuildContext context,
+                      ResponsiveUiConfig responsiveUiConfig,
+                      AppConfigurations appConfigurations,
+                    ) {
+                      return AnimatedOpacity(
+                        opacity: 1,
+                        duration: const Duration(milliseconds: 200),
                         child: Container(
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: appConfigurations.appTheme.primaryColor,
-                          ),
-                          padding: EdgeInsets.all(
-                            15.w,
-                          ),
-                          width: 70.w,
-                          height: 70.w,
-                          child: CircularProgressIndicator(
-                            color:
-                                appConfigurations.appTheme.backgroundLightColor,
+                          width: responsiveUiConfig.screenWidth,
+                          height: responsiveUiConfig.screenHeight,
+                          color: Colors.transparent,
+                          child: Center(
+                            child: Container(
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: appConfigurations.appTheme.primaryColor,
+                              ),
+                              padding: EdgeInsets.all(15.w),
+                              width: 70.w,
+                              height: 70.w,
+                              child: CircularProgressIndicator(
+                                color: appConfigurations
+                                    .appTheme
+                                    .backgroundLightColor,
+                              ),
+                            ),
                           ),
                         ),
-                      ),
-                    ),
-                  );
-                },
+                      );
+                    },
               ),
           ],
         );

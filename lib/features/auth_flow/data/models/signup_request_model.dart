@@ -8,6 +8,7 @@ class SignUpRequestDto {
   final String deviceToken;
   final String deviceType;
   final String mailingAddress;
+  final String zip;
   final bool agreedToTerms;
   final bool isTruthfully;
   final Map<String, dynamic> location;
@@ -22,6 +23,7 @@ class SignUpRequestDto {
     required this.deviceToken,
     required this.deviceType,
     required this.mailingAddress,
+    required this.zip,
     required this.agreedToTerms,
     required this.isTruthfully,
     required this.location,
@@ -37,6 +39,7 @@ class SignUpRequestDto {
         "deviceToken": deviceToken,
         "deviceType": deviceType,
         "mailingAddress": mailingAddress,
+        "zip":zip,
         "agreedToTerms": agreedToTerms,
         "isTruthfully": isTruthfully,
         "location": location,

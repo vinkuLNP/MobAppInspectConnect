@@ -1,7 +1,6 @@
 import 'package:inspect_connect/core/commondomain/entities/based_api_result/api_result_model.dart';
 import 'package:inspect_connect/features/client_flow/data/datasources/remote_datasource/client_api_datasource.dart';
 import 'package:inspect_connect/features/client_flow/data/models/booking_detail_model.dart';
-import 'package:inspect_connect/features/client_flow/data/models/booking_list_response_model.dart';
 import 'package:inspect_connect/features/client_flow/data/models/booking_model.dart';
 import 'package:inspect_connect/features/client_flow/data/models/upload_image_model.dart';
 import 'package:inspect_connect/features/client_flow/data/models/user_payment_list_model.dart';
@@ -43,7 +42,7 @@ class ClientUserRepositoryImpl implements ClientUserRepository {
   }
 
   @override
-  Future<ApiResultModel<List<BookingListModel>>> fetchBookings({
+  Future<ApiResultModel<List<BookingData>>> fetchBookings({
     required int page,
     required int perPageLimit,
     String? search,
@@ -95,6 +94,19 @@ Future<ApiResultModel<bool>> deleteBooking(String bookingId) {
 @override
 Future<ApiResultModel<BookingData>> updateBooking(String bookingId, BookingEntity booking) {
   return remote.updateBooking(bookingId, booking);
+}
+
+@override
+Future<ApiResultModel<BookingData>> updateBookingStatus(String bookingId, int status) {
+  return remote.updateBookingStatus(bookingId, status);
+}
+@override
+Future<ApiResultModel<BookingData>> showUpFeeStatus(String bookingId, bool status) {
+  return remote.showUpFeeStatus(bookingId, status);
+}
+@override
+Future<ApiResultModel<BookingData>> updateBookingTimer(String bookingId, String action) {
+  return remote.updateBookingTimer(bookingId, action);
 }
 
 }

@@ -1,5 +1,8 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:inspect_connect/features/auth_flow/enum/auth_user_enum.dart';
+import 'package:inspect_connect/features/auth_flow/presentation/auth_user_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
 import 'package:inspect_connect/core/utils/auto_router_setup/auto_router.dart';
@@ -19,6 +22,7 @@ class _OnBoardingPageState extends State<OnBoardingPage>
   late VideoPlayerController _videoController;
   bool? _isClient;
   bool _showSignInText = false;
+  bool isDisposed = false;
 
   late AnimationController _fadeController;
 
@@ -32,20 +36,32 @@ class _OnBoardingPageState extends State<OnBoardingPage>
     _loadVideo('assets/videos/onboarding_video.mp4');
   }
 
+  bool _isVideoInitialized = false;
+
   Future<void> _loadVideo(String assetPath) async {
+    if (_isVideoInitialized) return;
+    _isVideoInitialized = true;
+
     _videoController = VideoPlayerController.asset(assetPath);
     await _videoController.initialize();
     _videoController
       ..setLooping(true)
       ..setVolume(0)
       ..play();
+
     if (mounted) setState(() {});
     _fadeController.forward();
   }
 
   @override
   void dispose() {
-    _videoController.dispose();
+    isDisposed = true;
+    try {
+      if (_videoController.value.isInitialized) {
+        _videoController.pause();
+      }
+      _videoController.dispose();
+    } catch (_) {}
     _fadeController.dispose();
     super.dispose();
   }
@@ -120,7 +136,9 @@ class _OnBoardingPageState extends State<OnBoardingPage>
                         child: SizedBox(
                           width: _videoController.value.size.width,
                           height: _videoController.value.size.height,
-                          child: VideoPlayer(_videoController),
+                          child: !isDisposed
+                              ? VideoPlayer(_videoController)
+                              : SizedBox(),
                         ),
                       ),
                     )
@@ -137,7 +155,7 @@ class _OnBoardingPageState extends State<OnBoardingPage>
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: [Colors.black, Colors.black.withOpacity(0.0)],
+                  colors: [Colors.black, Colors.black.withValues(alpha: 0.0)],
                 ),
               ),
             ),
@@ -152,8 +170,8 @@ class _OnBoardingPageState extends State<OnBoardingPage>
                   end: Alignment.bottomCenter,
                   stops: const [0.45, 0.6, 1.0],
                   colors: [
-                    Colors.black.withOpacity(0.0),
-                    Colors.black.withOpacity(0.85),
+                    Colors.black.withValues(alpha: 0.0),
+                    Colors.black.withValues(alpha: 0.85),
                     Colors.black,
                   ],
                 ),
@@ -163,10 +181,7 @@ class _OnBoardingPageState extends State<OnBoardingPage>
 
           SafeArea(
             child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 24.0,
-                // vertical: 12,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -267,11 +282,25 @@ class _OnBoardingPageState extends State<OnBoardingPage>
                             height: 40,
                             buttonBackgroundColor: const Color(0xFF0070F2),
                             text: "Create Account",
-                            onTap: () {
-                              if (_isClient == true) {
-                                context.replaceRoute( ClientSignUpRoute(showBackButton: false));
-                              } else {
-                                context.replaceRoute( InspectorSignUpRoute());
+                            onTap: () async {
+                              try {
+                                await _videoController.pause();
+                              } catch (_) {}
+                              if (context.mounted) {
+                                final authFlow = context
+                                    .read<AuthFlowProvider>();
+
+                                if (_isClient == true) {
+                                  authFlow.setUserType(AuthUserType.client);
+                                  context.pushRoute(
+                                    ClientSignUpRoute(showBackButton: false),
+                                  );
+                                } else {
+                                  authFlow.setUserType(AuthUserType.inspector);
+                                  context.pushRoute(
+                                    InspectorSignUpRoute(showBackButton: false),
+                                  );
+                                }
                               }
                             },
                           ),
@@ -284,15 +313,37 @@ class _OnBoardingPageState extends State<OnBoardingPage>
                                 color: AppColors.whiteColor,
                               ),
                               GestureDetector(
-                                onTap: () {
-                                  context.replaceRoute(
-                                     ClientSignInRoute(showBackButton: false),
-                                  );
+                                onTap: () async {
+                                  try {
+                                    await _videoController.pause();
+                                    await _videoController.dispose();
+                                  } catch (_) {}
+                                  if (context.mounted) {
+                                    final authFlow = context
+                                        .read<AuthFlowProvider>();
+
+                                    if (_isClient == true) {
+                                      authFlow.setUserType(AuthUserType.client);
+                                      context.pushRoute(
+                                        ClientSignInRoute(
+                                          showBackButton: false,
+                                        ),
+                                      );
+                                    } else {
+                                      authFlow.setUserType(
+                                        AuthUserType.inspector,
+                                      );
+                                      context.pushRoute(
+                                        ClientSignInRoute(
+                                          showBackButton: false,
+                                        ),
+                                      );
+                                    }
+                                  }
                                 },
                                 child: textWidget(
                                   text: 'Login',
                                   fontWeight: FontWeight.w500,
-                                  // fontSize: 18,
                                   textDecorationColor: AppColors.whiteColor,
                                   textDecoration: TextDecoration.underline,
 

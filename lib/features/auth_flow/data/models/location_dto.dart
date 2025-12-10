@@ -1,7 +1,7 @@
 class LocationDto {
   final String? type;
   final String? locationName;
-  final List<double>? coordinates; // [lat, lng]
+  final List<double>? coordinates; 
 
   LocationDto({this.type, this.locationName, this.coordinates});
 

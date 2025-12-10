@@ -6,7 +6,7 @@ class CertificateSubTypeModelData extends CertificateSubTypeEntity {
     required super.id,
     required super.name,
     required super.status,
-    required super.certificateTypeName
+    required super.certificateTypeName,
   });
 
   factory CertificateSubTypeModelData.fromJson(Map<String, dynamic> json) {
@@ -14,8 +14,9 @@ class CertificateSubTypeModelData extends CertificateSubTypeEntity {
       id: json['_id'] ?? '',
       name: json['name'] ?? '',
       status: json['status'] ?? 0,
-      certificateTypeName: json['certificateTypeId'] == [] || json['certificateTypeId'] == null ? "" : json['certificateTypeId']['name']?? "",
-
+      certificateTypeName: json['certificateTypeId'] is Map
+          ? json['certificateTypeId']['name'] ?? ''
+          : '',
     );
   }
 
@@ -23,5 +24,6 @@ class CertificateSubTypeModelData extends CertificateSubTypeEntity {
         '_id': id,
         'name': name,
         'status': status,
+        'certificateTypeName': certificateTypeName,
       };
 }

@@ -12,18 +12,21 @@ class UserProvider extends BaseViewModel {
 
   AuthUserLocalEntity? get user => _user;
 
-  bool get isLoggedIn => _user != null && _user?.token != null;
+  bool get isLoggedIn =>
+      _user != null &&
+      _user?.authToken != null &&
+      _user?.phoneOtpVerified == true;
+
+       bool get isUserClient =>
+      _user != null &&
+      _user?.role == 1;
+
+       bool get isUserInspector =>
+      _user != null &&
+      _user?.role == 2;
 
   final AuthLocalDataSource _local = locator<AuthLocalDataSource>();
 
-  // Future<void> updateUserName(String name) async {
-  //   if (_user == null) return;
-
-  //   _user = _user!.copyWith(name: name);
-  //   notifyListeners();
-
-  //   await locator<AuthLocalDataSource>().saveUser(_user!);
-  // }
 
   bool isLoading = false;
   Future<void> updateUserName(BuildContext context, String name) async {
@@ -41,19 +44,14 @@ class UserProvider extends BaseViewModel {
 
       state?.when(
         data: (_) async {
-          _user = _user!.copyWith(name: name);
+          _user = _user!.copyWith(name: name,userId: user!.userId);
           notifyListeners();
 
           await locator<AuthLocalDataSource>().saveUser(_user!);
-          // ScaffoldMessenger.of(context).showSnackBar(
-          //   const SnackBar(content: Text('Profile updated successfully')),
-          // );
-          // // Navigator.pop(context);
+       
         },
         error: (e) {
-          // ScaffoldMessenger.of(context).showSnackBar(
-          //   SnackBar(content: Text(e.message ?? 'Profile update failed')),
-          // );
+     
         },
       );
     } finally {
@@ -81,7 +79,7 @@ class UserProvider extends BaseViewModel {
 
   Future<void> refreshUser() async {
     final fresh = await _local.getUser();
-    if (fresh?.token != _user?.token) {
+    if (fresh?.authToken != _user?.authToken) {
       _user = fresh;
       notifyListeners();
     }

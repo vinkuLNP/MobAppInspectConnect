@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/core/utils/presentation/app_text_style.dart';
+import 'package:inspect_connect/features/auth_flow/domain/entities/certificate_agency_entity.dart';
+import 'package:inspect_connect/features/auth_flow/domain/entities/certificate_type_entity.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/inspector/inspector_view_model.dart';
 import 'package:inspect_connect/features/client_flow/presentations/widgets/select_time_widget.dart';
 import 'package:provider/provider.dart';
@@ -18,102 +20,58 @@ class ProfessionalDetailsStep extends StatelessWidget {
       value: vm,
       child: Consumer<InspectorViewModelProvider>(
         builder: (context, prov, _) {
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          return Stack(
             children: [
-              Text(
-                'Professional Details',
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
-              ),
-              const SizedBox(height: 8),
-              _section(
-                title: 'Certificate Type',
-                child: _inspectionTypeDropdown(prov),
-              ),
-        const SizedBox(height: 6),
+              AbsorbPointer(
+                absorbing: prov.isProcessing,
+                child: Opacity(
+                  opacity: prov.isProcessing ? 0.6 : 1.0,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      textWidget(
+                        text: 'Professional Details',
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                      const SizedBox(height: 8),
+                      _section(
+                        title: 'Certificate Type',
+                        child: _inspectionTypeDropdown(prov),
+                      ),
+                      const SizedBox(height: 6),
 
-              _section(
-                title: 'Certifying Agencies ',
-                child: _inspectionTypeDropdown(prov),
-              ),
-        const SizedBox(height: 6),
+                      _section(
+                        title: 'Certifying Agencies ',
+                        child: _agencyTypeDropdown(prov),
+                      ),
+                      const SizedBox(height: 6),
 
-              _section(
-                title: 'Select Expiration Date',
-                child: IgnorePointer(
-                  ignoring: false,
-                  // widget.isReadOnly,
-                  child: DateTimePickerWidget(
-                    showTimePicker: false,
-                    initialDateTime: DateTime.now(),
-                    // prov.selectedDate.add(
-                    //   Duration(
-                    //     hours:
-                    //         prov.selectedTime?.hour ??
-                    //         TimeOfDay.now().hour,
-                    //     minutes:
-                    //         prov.selectedTime?.minute ??
-                    //         TimeOfDay.now().minute,
-                    //   ),
-                    // ),
-                    onDateTimeSelected: (dt) {
-                      // prov.setDate(dt);
-                      // prov.setTime(TimeOfDay.fromDateTime(dt));
-                    },
+                      _section(
+                        title: 'Select Expiration Date',
+                        child: IgnorePointer(
+                          ignoring: false,
+                          child: DateTimePickerWidget(
+                            showTimePicker: false,
+                            initialDateTime: prov.certificateExpiryDateShow,
+                            onDateTimeSelected: (dt) {
+                              prov.setDate(dt);
+                            },
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      _section(
+                        title: 'Upload Certification Documents (max 5)',
+                        child: _documentGrid(prov, context),
+                      ),
+                    ],
                   ),
                 ),
               ),
-        const SizedBox(height: 6),
 
-              _section(
-                title: 'Upload Certification Documents (max 5)',
-                child: _documentGrid(prov, context),
-              ),
-
-              // FormField<bool>(
-              //   // validator: (_) => p.uploadedCount == 0
-              //   //     ? 'Please upload at least one document'
-              //   //     : null,
-              //   builder: (state) => Column(
-              //     crossAxisAlignment: CrossAxisAlignment.start,
-              //     children: [
-              //       OutlinedButton.icon(
-              //         icon: const Icon(Icons.upload_rounded),
-              //         label: const Text('Upload Certification Documents'),
-              //         onPressed: () async {
-              //           await vm.pickCertificationFiles();
-              //           state.didChange(true);
-              //         },
-              //         style: OutlinedButton.styleFrom(
-              //           padding: const EdgeInsets.symmetric(
-              //             horizontal: 16,
-              //             vertical: 14,
-              //           ),
-              //         ),
-              //       ),
-              //       const SizedBox(height: 8),
-              //       Text(
-              //         '${vm.uploadedCount} file(s) uploaded',
-              //         // style: theme.textTheme.bodyMedium?.copyWith(
-              //         //   color: theme.colorScheme.onSurfaceVariant,
-              //         // ),
-              //       ),
-              //       if (state.hasError) ...[
-              //         const SizedBox(height: 6),
-              //         Text(
-              //           state.errorText!,
-              //           style: TextStyle(
-              //             // color: theme.colorScheme.error,
-              //             fontSize: 12,
-              //           ),
-              //         ),
-                    // ],
-                  // ],
-                // ),
-              // ),
+              if (prov.isProcessing)
+                const Center(child: CircularProgressIndicator()),
             ],
           );
         },
@@ -127,53 +85,46 @@ class ProfessionalDetailsStep extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // textWidget(text: title, fontWeight: FontWeight.w600, fontSize: 12),
-          // const SizedBox(height: 3),
-           textWidget(text: title, fontWeight: FontWeight.w400, fontSize: 14),
-        const SizedBox(height: 8),
+          textWidget(text: title, fontWeight: FontWeight.w400, fontSize: 14),
+          const SizedBox(height: 8),
           child,
         ],
       ),
     );
   }
 
-  Widget _inspectionTypeDropdown(InspectorViewModelProvider prov) {
-    // return DropdownButtonFormField<CertificateSubTypeEntity>(
-    //   decoration: _inputDecoration('Select inspection type'),
-    //   initialValue: prov.inspectionType,
-    //   style: appTextStyle(fontSize: 12),
-    //   items: prov.subTypes
-    //       .map(
-    //         (subType) => DropdownMenuItem<CertificateSubTypeEntity>(
-    //           value: subType,
-    //           child: textWidget(text: subType.name, fontSize: 12),
-    //         ),
-    //       )
-    //       .toList(),
-    //   onChanged: widget.isReadOnly ? null : prov.setInspectionType,
-    // );
-    return DropdownButtonFormField<String>(
-      decoration: _inputDecoration('Select inspection type'),
-      initialValue: 'type 1',
+  Widget _agencyTypeDropdown(InspectorViewModelProvider prov) {
+    return DropdownButtonFormField<AgencyEntity>(
+      decoration: _inputDecoration('Select Certifying Agencies'),
+      initialValue: prov.agencyTypeData,
+
       style: appTextStyle(fontSize: 12),
-      items: ['type 1', 'type 2', 'type 3']
+      items: prov.agencyType
           .map(
-            (subType) => DropdownMenuItem<String>(
+            (subType) => DropdownMenuItem<AgencyEntity>(
               value: subType,
-              child: textWidget(text: subType, fontSize: 12),
+              child: textWidget(text: subType.name, fontSize: 12),
             ),
           )
           .toList(),
-      // prov.subTypes
-      //     .map(
-      //       (subType) => DropdownMenuItem<CertificateSubTypeEntity>(
-      //         value: subType,
-      //         child: textWidget(text: subType.name, fontSize: 12),
-      //       ),
-      //     )
-      //     .toList(),
-      // onChanged:  prov.setInspectionType,
-      onChanged: (value) {},
+      onChanged: null,
+    );
+  }
+
+  Widget _inspectionTypeDropdown(InspectorViewModelProvider prov) {
+    return DropdownButtonFormField<CertificateInspectorTypeEntity>(
+      decoration: _inputDecoration('Select Certificate Type'),
+      initialValue: prov.certificateInspectorType,
+      style: appTextStyle(fontSize: 12),
+      items: prov.certificateType
+          .map(
+            (subType) => DropdownMenuItem<CertificateInspectorTypeEntity>(
+              value: subType,
+              child: textWidget(text: subType.name, fontSize: 12),
+            ),
+          )
+          .toList(),
+      onChanged: prov.setCertificateType,
     );
   }
 
@@ -200,48 +151,62 @@ class ProfessionalDetailsStep extends StatelessWidget {
   );
 
   Widget _documentGrid(InspectorViewModelProvider prov, BuildContext context) {
-    final totalDocs = prov.documents.length;
+    final totalDocs = prov.documents.length + prov.existingDocumentUrls.length;
     final canAddMore = totalDocs < 5;
 
     if (totalDocs == 0) {
       return GestureDetector(
         onTap: () => prov.uploadDocument(context),
-        child: Container(
-          width: double.infinity,
-          height: 100,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.grey.shade300),
-            color: Colors.grey.shade50,
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.upload_file, size: 32, color: Colors.grey),
-              const SizedBox(height: 8),
-              textWidget(
-                text: "Upload Document",
-                color: Colors.grey,
-                fontSize: 12,
+        child: Column(
+          children: [
+            Container(
+              width: double.infinity,
+              height: 100,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.grey.shade300),
+                color: Colors.grey.shade50,
               ),
-            ],
-          ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.upload_file, size: 32, color: Colors.grey),
+                  const SizedBox(height: 8),
+                  textWidget(
+                    text: "Upload Document",
+                    color: Colors.grey,
+                    fontSize: 12,
+                  ),
+                ],
+              ),
+            ),
+            if (prov.errorMessage != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: Text(
+                  prov.errorMessage!,
+                  style: TextStyle(color: Colors.red, fontSize: 12),
+                ),
+              ),
+          ],
         ),
       );
     }
+    const spacing = 8.0;
 
     return GridView.builder(
+      padding: EdgeInsets.zero,
+
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        mainAxisSpacing: 8,
-        crossAxisSpacing: 8,
+        mainAxisSpacing: spacing,
+        crossAxisSpacing: spacing,
         childAspectRatio: 3,
       ),
       itemCount: canAddMore ? totalDocs + 1 : totalDocs,
       itemBuilder: (ctx, i) {
-        // Existing documents (URLs)
         if (i < prov.existingDocumentUrls.length) {
           final url = prov.existingDocumentUrls[i];
           final name = url.split('/').last;
@@ -253,7 +218,6 @@ class ProfessionalDetailsStep extends StatelessWidget {
           );
         }
 
-        // Newly added documents (File objects)
         final docIndex = i - prov.existingDocumentUrls.length;
         if (docIndex < prov.documents.length) {
           final file = prov.documents[docIndex];
@@ -266,7 +230,6 @@ class ProfessionalDetailsStep extends StatelessWidget {
           );
         }
 
-        // Upload button
         return GestureDetector(
           onTap: () => prov.uploadDocument(ctx),
           child: Container(

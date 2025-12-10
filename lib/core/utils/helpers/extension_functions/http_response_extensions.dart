@@ -11,10 +11,10 @@ extension ExtensionOnHttpResponse on http.Response {
     bool enableAutoLogout = true,
   }) {
     if (statusCode >= 200 && statusCode < 300) {
-      log('✅ SUCCESS ru[${statusCode}] → ${request?.url}');
+      log('✅ SUCCESS ru[$statusCode] → ${request?.url}');
       return ApiResultModel<http.Response>.success(data: this);
     } else {
-      log('❌ ERROR [${statusCode}] → ${request?.url}');
+      log('❌ ERROR [$statusCode] → ${request?.url}');
       log('📨 Response Body: $body');
 
       String? message;
@@ -28,7 +28,6 @@ extension ExtensionOnHttpResponse on http.Response {
           if (decoded is Map<String, dynamic>) {
             log('body.isNotEmpty 12');
 
-            // look for common keys like 'message', 'error', or 'detail'
             message =
                 decoded['message'] ??
                 decoded['error'] ??
@@ -37,7 +36,7 @@ extension ExtensionOnHttpResponse on http.Response {
           } else {
             log('body.isNotEmpty 123, $body');
 
-            message = body; // fallback raw string
+            message = body;
           }
         } else {
           message = 'Empty response from server';

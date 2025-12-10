@@ -9,13 +9,31 @@ import 'package:inspect_connect/features/auth_flow/data/models/signup_request_mo
 import 'package:inspect_connect/features/auth_flow/data/models/user_detail_dto.dart';
 import 'package:inspect_connect/features/auth_flow/data/models/verify_otp_request_model.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/auth_user.dart';
+import 'package:inspect_connect/features/auth_flow/domain/entities/certificate_agency_entity.dart';
+import 'package:inspect_connect/features/auth_flow/domain/entities/certificate_type_entity.dart';
+import 'package:inspect_connect/features/auth_flow/domain/entities/inspector_sign_up_entity.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/user_detail.dart';
 import 'package:inspect_connect/features/auth_flow/domain/repositories/auth_repository.dart';
-import 'package:inspect_connect/features/auth_flow/domain/usecases/update_profile_usecase.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDataSource _remote;
   AuthRepositoryImpl(this._remote);
+
+
+  @override
+  Future<ApiResultModel<List<CertificateInspectorTypeEntity>>>
+  getCertificateTypes() {
+    return _remote.getCertificateType();
+  }
+
+
+
+  @override
+  Future<ApiResultModel<List<AgencyEntity>>>
+  getCertificateAgency() {
+    return _remote.getCertificateAgency();
+  }
+
 
   @override
   Future<ApiResultModel<AuthUser>> signIn({
@@ -52,6 +70,34 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
 
+  @override
+Future<ApiResultModel<AuthUser>> inspectorSignUp({
+  required InspectorSignUpLocalEntity inspectorSignUpLocalEntity
+}) async {
+  final res = await _remote.inspectorSignUp(
+    inspectorSignUpLocalEntity
+  );
+
+  return res.when(
+    success: (dto) {
+      try {
+         final user = dto.toEntity(); 
+        return ApiResultModel.success(data: user);
+      } catch (e) {
+        return const ApiResultModel.failure(
+          errorResultEntity: ErrorResultModel(
+            message: "Parsing error",
+            statusCode: 500,
+          ),
+        );
+      }
+    },
+    failure: (err) =>
+        ApiResultModel<AuthUser>.failure(errorResultEntity: err),
+  );
+}
+
+
 
   @override
 Future<ApiResultModel<AuthUser>> signUp({
@@ -64,6 +110,7 @@ Future<ApiResultModel<AuthUser>> signUp({
   required String deviceToken,
   required String deviceType,
   required String mailingAddress,
+  required String zip,
   required bool agreedToTerms,
   required bool isTruthfully,
   required Map<String, dynamic> location,
@@ -79,6 +126,7 @@ Future<ApiResultModel<AuthUser>> signUp({
       deviceToken: deviceToken,
       deviceType: deviceType,
       mailingAddress: mailingAddress,
+      zip: zip,
       agreedToTerms: agreedToTerms,
       isTruthfully: isTruthfully,
       location: location,

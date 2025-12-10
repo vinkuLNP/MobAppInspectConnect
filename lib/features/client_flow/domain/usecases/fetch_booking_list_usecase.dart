@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:inspect_connect/core/commondomain/entities/based_api_result/api_result_model.dart';
 import 'package:inspect_connect/core/commondomain/usecases/base_params_usecase.dart';
-import 'package:inspect_connect/features/client_flow/data/models/booking_list_response_model.dart';
+import 'package:inspect_connect/features/client_flow/data/models/booking_model.dart';
 import 'package:inspect_connect/features/client_flow/domain/repositories/booking_repository.dart';
 
 class FetchBookingsParams extends Equatable {
@@ -25,12 +25,12 @@ class FetchBookingsParams extends Equatable {
   List<Object?> get props => [page, perPageLimit, search, sortBy, sortOrder, status];
 }
 
-class FetchBookingsUseCase extends BaseParamsUseCase<List<BookingListModel>, FetchBookingsParams> {
+class FetchBookingsUseCase extends BaseParamsUseCase<List<BookingData>, FetchBookingsParams> {
   final ClientUserRepository _repo;
   FetchBookingsUseCase(this._repo);
 
   @override
-  Future<ApiResultModel<List<BookingListModel>>> call(FetchBookingsParams? p) {
+  Future<ApiResultModel<List<BookingData>>> call(FetchBookingsParams? p) {
     return _repo.fetchBookings(
       page: p!.page,
       perPageLimit: p.perPageLimit,

@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 
-//   Added => type == 'charge' || status == 'paid';
-//   Deducted => type == 'platform_fee' || status == 'succeeded';
-
 class PaymentsBodyEntity {
   final List<PaymentEntity> payments;
   final int totalCount;

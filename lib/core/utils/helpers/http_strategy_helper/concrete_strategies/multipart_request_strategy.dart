@@ -28,9 +28,8 @@ class MultipartPostRequestStrategy implements HttpRequestStrategy {
       }
 final file = File(filePath);
       if (!file.existsSync()) {
-        throw Exception("❌ File does not exist at $filePath");
+        throw Exception(" File does not exist at $filePath");
       }
-      // final file = File(filePath);
       final request = http.MultipartRequest('POST', Uri.parse(uri));
 
       request.headers.addAll({
@@ -57,7 +56,7 @@ final file = File(filePath);
 
       return response.performHttpRequest();
     } catch (e) {
-      log('❌ Multipart upload error: $e');
+      log(' Multipart upload error: $e');
       return const ApiResultModel.failure(
         errorResultEntity: ErrorResultModel(
           message: "Multipart upload failed",

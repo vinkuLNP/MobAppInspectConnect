@@ -11,7 +11,9 @@ import 'package:inspect_connect/core/utils/helpers/http_strategy_helper/concrete
 import 'package:inspect_connect/core/utils/helpers/http_strategy_helper/http_request_context.dart';
 import 'package:inspect_connect/features/auth_flow/data/datasources/local_datasources/auth_user_local_entity.dart';
 import 'package:inspect_connect/features/auth_flow/data/datasources/local_datasources/auth_local_datasource.dart';
+import 'package:inspect_connect/features/auth_flow/data/models/agency_certificate_data_model.dart';
 import 'package:inspect_connect/features/auth_flow/data/models/auth_user_dto.dart';
+import 'package:inspect_connect/features/auth_flow/data/models/certificate_inspector_type_datamodel.dart';
 import 'package:inspect_connect/features/auth_flow/data/models/change_password_dto.dart';
 import 'package:inspect_connect/features/auth_flow/data/models/profile_update_dto.dart';
 import 'package:inspect_connect/features/auth_flow/data/models/resend_otp_request_model.dart';
@@ -20,6 +22,8 @@ import 'package:inspect_connect/features/auth_flow/data/models/signup_request_mo
 import 'package:inspect_connect/features/auth_flow/data/models/user_detail_dto.dart';
 import 'package:inspect_connect/features/auth_flow/data/models/verify_otp_request_model.dart';
 import 'package:http/http.dart' as http;
+import 'package:inspect_connect/features/auth_flow/domain/entities/inspector_sign_up_entity.dart';
+
 import 'package:inspect_connect/features/auth_flow/domain/entities/user_detail.dart';
 
 abstract class AuthRemoteDataSource {
@@ -28,11 +32,17 @@ abstract class AuthRemoteDataSource {
   Future<ApiResultModel<AuthUserDto>> verifyOtp(VerifyOtpRequestDto dto);
   Future<ApiResultModel<AuthUserDto>> resendOtp(ResendOtpRequestDto dto);
   Future<ApiResultModel<AuthUserDto>> changePassword(ChangePasswordDto dto);
+  Future<ApiResultModel<AuthUserDto>> inspectorSignUp(
+    InspectorSignUpLocalEntity dto,
+  );
+
   Future<ApiResultModel<AuthUserDto>> updateProfile(ProfileUpdateDto dto);
 
   Future<ApiResultModel<UserDetail>> fetchUserDetail(UserDetailDto dto);
 
-
+  Future<ApiResultModel<List<CertificateInspectorTypeModelData>>>
+  getCertificateType();
+  Future<ApiResultModel<List<AgencyModel>>> getCertificateAgency();
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -45,7 +55,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       final ApiResultModel<http.Response> res = await _ctx.makeRequest(
         uri: signInEndPoint,
         httpRequestStrategy: PostRequestStrategy(),
-        // headers: const {'Content-Type': 'application/json', 'Accept': 'application/json'},
         requestData: dto.toJson(),
       );
 
@@ -54,11 +63,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           final Map<String, dynamic> root = response.body.isEmpty
               ? {}
               : (jsonDecode(response.body) as Map<String, dynamic>);
-          // Backend shape:
-          // { "success": true, "message": "...", "body": { ... user object ... } }
           final Map<String, dynamic> body =
               (root['body'] as Map?)?.cast<String, dynamic>() ??
               <String, dynamic>{};
+          log('--------------->body$body');
           final dto = AuthUserDto.fromBody(body);
           return ApiResultModel<AuthUserDto>.success(data: dto);
         },
@@ -95,13 +103,51 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
               <String, dynamic>{};
           final dto = AuthUserDto.fromBody(body);
           final localEntity = AuthUserLocalEntity(
-            token: dto.authToken,
+            authToken: dto.authToken,
             name: dto.name,
-            email: dto.emailHashed,
+            email: dto.email,
             phoneNumber: dto.phoneNumber,
             countryCode: dto.countryCode,
+            userId: dto.userId,
           );
           locator<AuthLocalDataSource>().saveUser(localEntity);
+          log('------>local user----> localEntity');
+          return ApiResultModel<AuthUserDto>.success(data: dto);
+        },
+        failure: (ErrorResultModel e) =>
+            ApiResultModel<AuthUserDto>.failure(errorResultEntity: e),
+      );
+    } catch (e) {
+      log('signup error: $e');
+      return const ApiResultModel.failure(
+        errorResultEntity: ErrorResultModel(
+          message: "Network error occurred",
+          statusCode: 500,
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<ApiResultModel<AuthUserDto>> inspectorSignUp(
+    InspectorSignUpLocalEntity dto,
+  ) async {
+    try {
+      final ApiResultModel<http.Response> res = await _ctx.makeRequest(
+        uri: signUpEndPoint,
+        httpRequestStrategy: PostRequestStrategy(),
+        requestData: dto.toJson(),
+      );
+
+      return res.when(
+        success: (http.Response response) {
+          final Map<String, dynamic> root = response.body.isEmpty
+              ? {}
+              : (jsonDecode(response.body) as Map<String, dynamic>);
+          final Map<String, dynamic> body =
+              (root['body'] as Map?)?.cast<String, dynamic>() ??
+              <String, dynamic>{};
+          final dto = AuthUserDto.fromBody(body);
           log('------>local user----> localEntity');
           return ApiResultModel<AuthUserDto>.success(data: dto);
         },
@@ -123,11 +169,11 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   Future<ApiResultModel<AuthUserDto>> verifyOtp(VerifyOtpRequestDto dto) async {
     try {
       final user = await locator<AuthLocalDataSource>().getUser();
-      if (user == null || user.token == null) {
+      if (user == null || user.authToken == null) {
         throw Exception('User not found in local storage');
       }
       log('------>user------------->$user');
-      log('------>user-------token------>${user.token}');
+      log('------>user-------token------>${user.authToken}');
       log('------>user-------phone------>${user.phoneNumber}');
       log('------>user-------code------>${user.countryCode}');
 
@@ -135,7 +181,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         uri: verifyOtpndPoint,
         httpRequestStrategy: PostRequestStrategy(),
         headers: {
-          'Authorization': 'Bearer ${user.token}',
+          'Authorization': '${user.authToken}',
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
@@ -147,10 +193,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           final Map<String, dynamic> root = response.body.isEmpty
               ? {}
               : (jsonDecode(response.body) as Map<String, dynamic>);
-          // final Map<String, dynamic> body =
-          //     (root['body'] as Map?)?.cast<String, dynamic>() ??
-              // <String, dynamic>{};
-                Map<String, dynamic>? user = root['body']?['user'] ?? root['body'];
+          Map<String, dynamic>? user = root['body']?['user'] ?? root['body'];
           final dto = AuthUserDto.fromBody(user!);
           return ApiResultModel<AuthUserDto>.success(data: dto);
         },
@@ -168,16 +211,15 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     }
   }
 
-
   @override
   Future<ApiResultModel<UserDetail>> fetchUserDetail(UserDetailDto dto) async {
     try {
       final user = await locator<AuthLocalDataSource>().getUser();
-      if (user == null || user.token == null) {
+      if (user == null || user.authToken == null) {
         throw Exception('User not found in local storage');
       }
-      log('------>user------------->$user');
-      log('------>user-------token------>${user.token}');
+      log('------>user---user ca;;ed---------->$user');
+      log('------>user-------token------>${user.authToken}');
       log('------>user-------phone------>${user.phoneNumber}');
       log('------>user-------code------>${user.countryCode}');
 
@@ -185,11 +227,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         uri: updateUser,
         httpRequestStrategy: GetRequestStrategy(),
         headers: {
-          'Authorization': 'Bearer ${user.token}',
+          'Authorization': 'Bearer ${user.authToken}',
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
-        requestData: dto.toJson(),
       );
 
       return res.when(
@@ -200,6 +241,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           final Map<String, dynamic> body =
               (root['body'] as Map?)?.cast<String, dynamic>() ??
               <String, dynamic>{};
+              log('----------datat calling----->${body.toString()}');
+
+              log('----------datat calling----->${jsonDecode(response.body).toString()}');
+
           final dto = UserDetail.fromJson(body);
           return ApiResultModel<UserDetail>.success(data: dto);
         },
@@ -220,21 +265,21 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<ApiResultModel<AuthUserDto>> resendOtp(ResendOtpRequestDto dto) async {
     try {
-       final user = await locator<AuthLocalDataSource>().getUser();
-      if (user == null || user.token == null) {
+      final user = await locator<AuthLocalDataSource>().getUser();
+      if (user == null || user.authToken == null) {
         throw Exception('User not found in local storage');
       }
       log('------>user------------->$user');
-      log('------>user-------token------>${user.token}');
+      log('------>user-------token------>${user.authToken}');
       log('------>user-------phone------>${user.phoneNumber}');
       log('------>user-------code------>${user.countryCode}');
       final ApiResultModel<http.Response> res = await _ctx.makeRequest(
         uri: resendOtpEndPoint,
         httpRequestStrategy: PostRequestStrategy(),
-         headers: {
-          'Authorization': 'Bearer ${user.token}',
+        headers: {
+          'Authorization': 'Bearer ${user.authToken}',
           'Content-Type': 'application/json',
-         },
+        },
         requestData: dto.toJson(),
       );
 
@@ -243,8 +288,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           final Map<String, dynamic> root = response.body.isEmpty
               ? {}
               : (jsonDecode(response.body) as Map<String, dynamic>);
-          // Backend shape:
-          // { "success": true, "message": "...", "body": { ... user object ... } }
           final Map<String, dynamic> body =
               (root['body'] as Map?)?.cast<String, dynamic>() ??
               <String, dynamic>{};
@@ -265,25 +308,26 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     }
   }
 
-
- @override
-  Future<ApiResultModel<AuthUserDto>> changePassword(ChangePasswordDto dto) async {
+  @override
+  Future<ApiResultModel<AuthUserDto>> changePassword(
+    ChangePasswordDto dto,
+  ) async {
     try {
-       final user = await locator<AuthLocalDataSource>().getUser();
-      if (user == null || user.token == null) {
+      final user = await locator<AuthLocalDataSource>().getUser();
+      if (user == null || user.authToken == null) {
         throw Exception('User not found in local storage');
       }
       log('------>user------------->$user');
-      log('------>user-------token------>${user.token}');
+      log('------>user-------token------>${user.authToken}');
       log('------>user-------phone------>${user.phoneNumber}');
       log('------>user-------dto------>${dto.toJson()}');
       final ApiResultModel<http.Response> res = await _ctx.makeRequest(
         uri: changePasswordEndPoint,
         httpRequestStrategy: PutRequestStrategy(),
-         headers: {
-          'Authorization': 'Bearer ${user.token}',
+        headers: {
+          'Authorization': 'Bearer ${user.authToken}',
           'Content-Type': 'application/json',
-         },
+        },
         requestData: dto.toJson(),
       );
 
@@ -292,8 +336,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           final Map<String, dynamic> root = response.body.isEmpty
               ? {}
               : (jsonDecode(response.body) as Map<String, dynamic>);
-          // Backend shape:
-          // { "success": true, "message": "...", "body": { ... user object ... } }
           final Map<String, dynamic> body =
               (root['body'] as Map?)?.cast<String, dynamic>() ??
               <String, dynamic>{};
@@ -314,25 +356,26 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     }
   }
 
-
- @override
-  Future<ApiResultModel<AuthUserDto>> updateProfile(ProfileUpdateDto dto) async {
+  @override
+  Future<ApiResultModel<AuthUserDto>> updateProfile(
+    ProfileUpdateDto dto,
+  ) async {
     try {
-       final user = await locator<AuthLocalDataSource>().getUser();
-      if (user == null || user.token == null) {
+      final user = await locator<AuthLocalDataSource>().getUser();
+      if (user == null || user.authToken == null) {
         throw Exception('User not found in local storage');
       }
       log('------>user------------->$user');
-      log('------>user-------token------>${user.token}');
+      log('------>user-------token------>${user.authToken}');
       log('------>user-------phone------>${user.phoneNumber}');
       log('------>user-------dto------>${dto.toJson()}');
       final ApiResultModel<http.Response> res = await _ctx.makeRequest(
         uri: updateUser,
         httpRequestStrategy: PutRequestStrategy(),
-         headers: {
-          'Authorization': 'Bearer ${user.token}',
+        headers: {
+          'Authorization': 'Bearer ${user.authToken}',
           'Content-Type': 'application/json',
-         },
+        },
         requestData: dto.toJson(),
       );
 
@@ -341,8 +384,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           final Map<String, dynamic> root = response.body.isEmpty
               ? {}
               : (jsonDecode(response.body) as Map<String, dynamic>);
-          // Backend shape:
-          // { "success": true, "message": "...", "body": { ... user object ... } }
           final Map<String, dynamic> body =
               (root['body'] as Map?)?.cast<String, dynamic>() ??
               <String, dynamic>{};
@@ -363,8 +404,78 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     }
   }
 
+  @override
+  Future<ApiResultModel<List<CertificateInspectorTypeModelData>>>
+  getCertificateType() async {
+    try {
+      final ApiResultModel<http.Response> res = await _ctx.makeRequest(
+        uri: getInspectorCertificateTypesEndPoint,
+        httpRequestStrategy: GetRequestStrategy(),
+      );
 
+      return res.when(
+        success: (http.Response response) {
+          final Map<String, dynamic> root = response.body.isEmpty
+              ? {}
+              : (jsonDecode(response.body) as Map<String, dynamic>);
+          final List<dynamic> list = (root['body'] as List?) ?? [];
 
+          final List<CertificateInspectorTypeModelData> dtoList = list
+              .map((e) => CertificateInspectorTypeModelData.fromJson(e))
+              .toList();
+
+          return ApiResultModel<
+            List<CertificateInspectorTypeModelData>
+          >.success(data: dtoList);
+        },
+        failure: (ErrorResultModel e) =>
+            ApiResultModel<List<CertificateInspectorTypeModelData>>.failure(
+              errorResultEntity: e,
+            ),
+      );
+    } catch (e) {
+      log('autoremoteresopoonse------> $e');
+      return const ApiResultModel.failure(
+        errorResultEntity: ErrorResultModel(
+          message: "Network error occurred",
+          statusCode: 500,
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<ApiResultModel<List<AgencyModel>>> getCertificateAgency() async {
+    try {
+      final ApiResultModel<http.Response> res = await _ctx.makeRequest(
+        uri: getInspectorCertificateTAgenciesEndPoint,
+        httpRequestStrategy: GetRequestStrategy(),
+      );
+
+      return res.when(
+        success: (http.Response response) {
+          final Map<String, dynamic> root = response.body.isEmpty
+              ? {}
+              : (jsonDecode(response.body) as Map<String, dynamic>);
+          final List<dynamic> list = (root['body'] as List?) ?? [];
+
+          final List<AgencyModel> dtoList = list
+              .map((e) => AgencyModel.fromJson(e))
+              .toList();
+
+          return ApiResultModel<List<AgencyModel>>.success(data: dtoList);
+        },
+        failure: (ErrorResultModel e) =>
+            ApiResultModel<List<AgencyModel>>.failure(errorResultEntity: e),
+      );
+    } catch (e) {
+      log('autoremoteresopoonse------> $e');
+      return const ApiResultModel.failure(
+        errorResultEntity: ErrorResultModel(
+          message: "Network error occurred",
+          statusCode: 500,
+        ),
+      );
+    }
+  }
 }
-
-

@@ -1,4 +1,3 @@
-// domain/usecases/sign_up_usecase.dart
 import 'package:inspect_connect/core/commondomain/entities/based_api_result/api_result_model.dart';
 import 'package:inspect_connect/core/commondomain/usecases/base_params_usecase.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/auth_user.dart';
@@ -15,6 +14,7 @@ class SignUpParams extends Equatable {
   final String deviceToken;
   final String deviceType;
   final String mailingAddress;
+  final String zip;
   final bool agreedToTerms;
   final bool isTruthfully;
   final Map<String, dynamic> location;
@@ -29,6 +29,7 @@ class SignUpParams extends Equatable {
     required this.deviceToken,
     required this.deviceType,
     required this.mailingAddress,
+    required this.zip,
     required this.agreedToTerms,
     required this.isTruthfully,
     required this.location,
@@ -45,6 +46,7 @@ class SignUpParams extends Equatable {
         deviceToken,
         deviceType,
         mailingAddress,
+        zip,
         agreedToTerms,
         isTruthfully,
         location,
@@ -67,9 +69,12 @@ class SignUpUseCase extends BaseParamsUseCase<AuthUser, SignUpParams> {
       deviceToken: params.deviceToken,
       deviceType: params.deviceType,
       mailingAddress: params.mailingAddress,
+      zip: params.zip,
       agreedToTerms: params.agreedToTerms,
       isTruthfully: params.isTruthfully,
       location: params.location,
     );
   }
 }
+
+

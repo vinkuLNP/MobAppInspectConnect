@@ -1,11 +1,14 @@
 import 'dart:developer';
-
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:inspect_connect/core/utils/app_widgets/common_address_auto_complete_field.dart';
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_button.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/core/utils/presentation/app_text_style.dart';
+import 'package:inspect_connect/features/auth_flow/presentation/client/widgets/input_fields.dart';
 import 'package:inspect_connect/features/client_flow/domain/entities/certificate_sub_type_entity.dart';
+import 'package:inspect_connect/features/client_flow/presentations/widgets/policies_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:inspect_connect/features/client_flow/data/models/booking_detail_model.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/booking_provider.dart';
@@ -94,6 +97,8 @@ class _BookingFormWidgetState extends State<BookingFormWidget> {
       value: provider,
       child: Consumer<BookingProvider>(
         builder: (context, prov, _) {
+          final now = DateTime.now();
+
           return Stack(
             children: [
               AbsorbPointer(
@@ -123,16 +128,21 @@ class _BookingFormWidgetState extends State<BookingFormWidget> {
                             child: IgnorePointer(
                               ignoring: widget.isReadOnly,
                               child: DateTimePickerWidget(
-                                initialDateTime: prov.selectedDate.add(
-                                  Duration(
-                                    hours:
-                                        prov.selectedTime?.hour ??
-                                        TimeOfDay.now().hour,
-                                    minutes:
-                                        prov.selectedTime?.minute ??
-                                        TimeOfDay.now().minute,
-                                  ),
-                                ),
+                                viewBooking: widget.isReadOnly,
+                                initialDateTime:
+                                    widget.isEditing &&
+                                        widget.initialBooking != null
+                                    ? _combineBookingDateTime(
+                                        widget.initialBooking.bookingDate,
+                                        widget.initialBooking.bookingTime,
+                                      )
+                                    : DateTime(
+                                        prov.selectedDate.year,
+                                        prov.selectedDate.month,
+                                        prov.selectedDate.day,
+                                        prov.selectedTime?.hour ?? now.hour,
+                                        prov.selectedTime?.minute ?? now.minute,
+                                      ),
                                 onDateTimeSelected: (dt) {
                                   prov.setDate(dt);
                                   prov.setTime(TimeOfDay.fromDateTime(dt));
@@ -146,67 +156,81 @@ class _BookingFormWidgetState extends State<BookingFormWidget> {
                             child: _inspectionTypeDropdown(prov),
                           ),
 
-                          _section(
-                            title: 'Location',
-                            child: TextFormField(
-                              style: appTextStyle(fontSize: 12),
-                              enabled: !widget.isReadOnly,
-                              readOnly: widget.isReadOnly,
-                              onChanged: widget.isReadOnly
-                                  ? null
-                                  : prov.setLocation,
-
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 6,
+                            ),
+                            child: AddressAutocompleteField(
+                              label: "Address",
+                              style: AddressFieldStyle.bookingInput,
                               controller: prov.locationController,
-                              decoration: _inputDecoration('Enter location'),
+                              googleApiKey: dotenv.env['GOOGLE_API_KEY']!,
+                              onAddressSelected: (prediction) {
+                                log("Selected: ${prediction.fullText}");
+                              },
+                              onChanged: prov.setLocation,
+                              onFullAddressFetched: (data) {
+                                prov.setAddressData(data);
+                              },
                             ),
                           ),
-
-                          _section(
-                            title: 'Description',
-                            child: TextFormField(
-                              controller: prov.descriptionController,
-                              maxLines: 4,
-                              style: appTextStyle(fontSize: 12),
-                              decoration: _inputDecoration('Add details...'),
-                              enabled: !widget.isReadOnly,
-                              readOnly: widget.isReadOnly,
-                              onChanged: widget.isReadOnly
-                                  ? null
-                                  : prov.setDescription,
-                            ),
+                          BookingInputField(
+                            label: 'Description',
+                            controller: prov.descriptionController,
+                            readOnly: widget.isReadOnly,
+                            maxLines: 4,
+                            onChanged: widget.isReadOnly
+                                ? null
+                                : prov.setDescription,
+                            hint: 'Add details...',
                           ),
 
                           _section(
                             title: 'Upload Images (max 5)',
                             child: _imageGrid(prov, context),
                           ),
-                          const SizedBox(height: 24),
+                          widget.isReadOnly
+                              ? SizedBox.shrink()
+                              : PolicyAgreementRow(),
+                          const SizedBox(height: 10),
                           if (!widget.isReadOnly)
                             Padding(
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 16.0,
                               ),
-                              child: AppButton(
-                                text: widget.isEditing
-                                    ? 'Save Changes'
-                                    : 'Confirm Booking',
-                                onTap: prov.isProcessing
-                                    ? null
-                                    : () {
-                                        if (!prov.validate(cntx: context)) {
-                                          return;
-                                        }
-
-                                        if (widget.isEditing) {
-                                          prov.updateBooking(
-                                            context: context,
-                                            bookingId:
-                                                widget.initialBooking?.id,
-                                          );
-                                        } else {
-                                          prov.createBooking(context: context);
-                                        }
-                                      },
+                              child: IgnorePointer(
+                                ignoring: !prov.agreedToPolicies,
+                                child: AppButton(
+                                  buttonBackgroundColor: prov.agreedToPolicies
+                                      ? AppColors.authThemeColor
+                                      : AppColors.disableColor,
+                                  borderColor: prov.agreedToPolicies
+                                      ? AppColors.authThemeColor
+                                      : AppColors.disableColor,
+                                  text: widget.isEditing
+                                      ? 'Save Changes'
+                                      : 'Confirm Booking',
+                                  onTap: prov.isProcessing
+                                      ? null
+                                      : () {
+                                          if (!prov.validate(cntx: context)) {
+                                            return;
+                                          }
+                                          log(prov.locationController.text);
+                                          if (widget.isEditing) {
+                                            prov.updateBooking(
+                                              context: context,
+                                              bookingId:
+                                                  widget.initialBooking?.id,
+                                            );
+                                          } else {
+                                            prov.createBooking(
+                                              context: context,
+                                            );
+                                          }
+                                        },
+                                ),
                               ),
                             ),
                         ],
@@ -240,17 +264,32 @@ class _BookingFormWidgetState extends State<BookingFormWidget> {
 
   Widget _inspectionTypeDropdown(BookingProvider prov) {
     return DropdownButtonFormField<CertificateSubTypeEntity>(
-      decoration: _inputDecoration('Select inspection type'),
-      initialValue: prov.inspectionType,
+      isDense: true,
+      decoration: _inputDecoration('Select inspection type').copyWith(
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 10,
+          vertical: 14,
+        ),
+      ),
       style: appTextStyle(fontSize: 12),
-      items: prov.subTypes
-          .map(
-            (subType) => DropdownMenuItem<CertificateSubTypeEntity>(
-              value: subType,
-              child: textWidget(text: subType.name, fontSize: 12),
+      initialValue: prov.provInspectionType,
+
+      items: prov.subTypes.map((subType) {
+        return DropdownMenuItem<CertificateSubTypeEntity>(
+          value: subType,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: 250, minWidth: 50),
+            child: Text(
+              subType.name,
+              softWrap: true,
+              maxLines: 2,
+              overflow: TextOverflow.visible,
+              style: appTextStyle(fontSize: 12),
             ),
-          )
-          .toList(),
+          ),
+        );
+      }).toList(),
+
       onChanged: widget.isReadOnly ? null : prov.setInspectionType,
     );
   }
@@ -376,5 +415,42 @@ class _BookingFormWidgetState extends State<BookingFormWidget> {
         return const SizedBox.shrink();
       },
     );
+  }
+}
+
+DateTime _combineBookingDateTime(String dateStr, String timeStr) {
+  final date = DateTime.parse(dateStr);
+  final offset = _parseBookingTime(timeStr);
+  return date.add(offset);
+}
+
+Duration _parseBookingTime(String timeStr) {
+  if (timeStr.trim().isEmpty) return Duration.zero;
+
+  try {
+    final cleaned = timeStr.toUpperCase().replaceAll('.', '').trim();
+
+    if (cleaned.contains('AM') || cleaned.contains('PM')) {
+      final regex = RegExp(r'(\d{1,2})(?::(\d{2}))?\s*(AM|PM)');
+      final match = regex.firstMatch(cleaned);
+      if (match != null) {
+        int hour = int.parse(match.group(1)!);
+        int minute = int.tryParse(match.group(2) ?? '0') ?? 0;
+        final meridian = match.group(3)!;
+
+        if (meridian == 'PM' && hour != 12) hour += 12;
+        if (meridian == 'AM' && hour == 12) hour = 0;
+
+        return Duration(hours: hour, minutes: minute);
+      }
+    }
+
+    final parts = cleaned.split(':');
+    final hour = int.parse(parts[0]);
+    final minute = parts.length > 1 ? int.parse(parts[1]) : 0;
+    return Duration(hours: hour, minutes: minute);
+  } catch (e) {
+    log("⛔ Time parse error for '$timeStr' → $e");
+    return Duration.zero;
   }
 }

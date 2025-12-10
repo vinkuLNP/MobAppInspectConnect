@@ -1,184 +1,121 @@
+import 'dart:async';
+import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:inspect_connect/core/basecomponents/base_view_model.dart';
-import 'package:inspect_connect/core/commondomain/entities/based_api_result/api_result_state.dart';
-import 'package:inspect_connect/core/di/app_component/app_component.dart';
-import 'package:inspect_connect/core/utils/constants/app_colors.dart';
-import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
-import 'package:inspect_connect/features/auth_flow/data/datasources/local_datasources/auth_local_datasource.dart';
 import 'package:inspect_connect/features/client_flow/data/models/booking_detail_model.dart';
 import 'package:inspect_connect/features/client_flow/data/models/booking_model.dart';
-import 'package:inspect_connect/features/client_flow/data/models/upload_image_model.dart';
-import 'package:inspect_connect/features/client_flow/domain/entities/booking_entity.dart';
 import 'package:inspect_connect/features/client_flow/domain/entities/booking_list_entity.dart';
 import 'package:inspect_connect/features/client_flow/domain/entities/certificate_sub_type_entity.dart';
-import 'package:inspect_connect/features/client_flow/domain/entities/upload_image_dto.dart';
-import 'package:inspect_connect/features/client_flow/domain/usecases/create_booking_usecase.dart';
-import 'package:inspect_connect/features/client_flow/domain/usecases/delete_booking_usecase.dart';
-import 'package:inspect_connect/features/client_flow/domain/usecases/fetch_booking_list_usecase.dart';
-import 'package:inspect_connect/features/client_flow/domain/usecases/get_booking_Detail_usecase.dart';
-import 'package:inspect_connect/features/client_flow/domain/usecases/get_certificate_subtype_usecase.dart';
-import 'package:inspect_connect/features/client_flow/domain/usecases/update_booking_detail_usecase.dart';
-import 'package:inspect_connect/features/client_flow/domain/usecases/upload_image_usecase.dart';
-import 'package:inspect_connect/features/client_flow/presentations/providers/wallet_provider.dart';
-import 'package:inspect_connect/features/client_flow/presentations/screens/booking_edit_screen.dart';
-import 'package:inspect_connect/features/client_flow/presentations/screens/payment_screens/wallet_screen.dart';
-import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
+import 'package:inspect_connect/features/client_flow/presentations/providers/booking_sub_providers/bookin_actions.dart';
+import 'package:inspect_connect/features/client_flow/presentations/providers/booking_sub_providers/booking_filters.dart';
+import 'package:inspect_connect/features/client_flow/presentations/providers/booking_sub_providers/booking_images.dart';
+import 'package:inspect_connect/features/client_flow/presentations/providers/booking_sub_providers/booking_timers.dart';
 
 class BookingProvider extends BaseViewModel {
-  DateTime _selectedDate = DateTime.now();
-  TimeOfDay? _selectedTime;
+  DateTime provSelectedDate = DateTime.now();
+  TimeOfDay? provSelectedTime;
   String? formattedTime;
 
-  CertificateSubTypeEntity? _inspectionType;
+  CertificateSubTypeEntity? provInspectionType;
   String? location;
-  String description = '';
-  final List<File> images = [];
+  String? description;
+
+  List<File> images = [];
+  List<String> uploadedUrls = [];
   final TextEditingController locationController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
-  DateTime get selectedDate => _selectedDate;
-  TimeOfDay? get selectedTime => _selectedTime;
-  CertificateSubTypeEntity? get inspectionType => _inspectionType;
-  String? get getLocation => location;
-  bool isLoadingBookingDetail = false;
-
-  void setDate(DateTime d) {
-    _selectedDate = DateTime(d.year, d.month, d.day);
-    notifyListeners();
-  }
-
   List<String> existingImageUrls = [];
-
-  void removeExistingImageAt(int index) {
-    existingImageUrls.removeAt(index);
-    uploadedUrls.removeAt(index);
-    notifyListeners();
-  }
-
+  String? currentBookingId;
   bool isProcessing = false;
-
-  void setProcessing(bool value) {
-    isProcessing = value;
-    notifyListeners();
-  }
-
-  void setTime(TimeOfDay t) {
-    _selectedTime = t;
-    formattedTime = formatTimeForApi(_selectedTime!);
-    notifyListeners();
-  }
-
-  void setInspectionType(CertificateSubTypeEntity? t) {
-    _inspectionType = t;
-
-    notifyListeners();
-  }
-
-  void setLocation(String? l) {
-    location = l;
-    if (locationController.text != l) {
-      locationController.text = l ?? '';
-    }
-    notifyListeners();
-  }
-
-  void setDescription(String v) {
-    description = v;
-    if (descriptionController.text != v) {
-      descriptionController.text = v;
-    }
-    notifyListeners();
-  }
-
-  final ImagePicker _picker = ImagePicker();
-
-  void removeImageAt(int idx) {
-    if (idx >= 0 && idx < images.length) {
-      images.removeAt(idx);
-      notifyListeners();
-    }
-  }
-
-  bool validate({required BuildContext cntx}) {
-    bool isValid = true;
-
-    if (_selectedTime == null) {
-      print("Please select a time");
-      ScaffoldMessenger.of(cntx).showSnackBar(
-        SnackBar(
-          content: textWidget(
-            text: 'Please select a time',
-            color: AppColors.backgroundColor,
-          ),
-        ),
-      );
-      isValid = false;
-    }
-
-    if (_inspectionType == null) {
-      ScaffoldMessenger.of(cntx).showSnackBar(
-        SnackBar(
-          content: textWidget(
-            text:"Please select an inspection type",
-            color: AppColors.backgroundColor,
-          ),
-        ),
-      );
-      isValid = false;
-    }
-
-    if (location == null) {
-    ScaffoldMessenger.of(cntx).showSnackBar(
-        SnackBar(
-          content: textWidget(
-            text:"Please select a location",
-            color: AppColors.backgroundColor,
-          ),
-        ),
-      );
-      isValid = false;
-    }
-
-    if (description == '' || description.trim().isEmpty) {
-     ScaffoldMessenger.of(cntx).showSnackBar(
-        SnackBar(
-          content: textWidget(
-            text:"Please enter a description",
-            color: AppColors.backgroundColor,
-          ),
-        ),
-      );
-      isValid = false;
-    }
-
-    if (uploadedUrls.isEmpty) {
-     ScaffoldMessenger.of(cntx).showSnackBar(
-        SnackBar(
-          content: textWidget(
-            text:"Please add at least one image",
-            color: AppColors.backgroundColor,
-          ),
-        ),
-      );
-      isValid = false;
-    }
-
-    return isValid;
-  }
-
-  List<CertificateSubTypeEntity> subTypes = [];
+  bool isLoadingBookingDetail = false;
+  bool isLoading = false;
+  bool isActionProcessing = false;
+  bool isUpdatingBooking = false;
   BookingData? updatedBookingData;
   BookingDetailModel? bookingDetailModel;
+  List<BookingListEntity> bookings = [];
+  Map<String, Duration> activeTimers = {};
+  Map<String, bool> isTimerRunning = {};
+  Map<String, bool> showUpFeeStatusMap = {};
+  Timer? timer;
+  int currentPage = 1;
+  bool hasMoreBookings = true;
+  bool isFetchingBookings = false;
+  bool isLoadMoreRunning = false;
+  bool isFilterLoading = false;
+  DateTime get selectedDate => provSelectedDate;
+  TimeOfDay? get selectedTime => provSelectedTime;
+  CertificateSubTypeEntity? get inspectionType => provInspectionType;
+  String? get getLocation => location;
 
-  bool isLoading = false;
+  List<CertificateSubTypeEntity> subTypes = [];
+  String? searchQuery;
+  String? searchDate;
+  String? status;
+  String sortBy = 'createdAt';
+  String sortOrder = 'desc';
+  final int perPageLimit = 10;
+
+  String? placeName,
+      pincode,
+      city,
+      state,
+      country,
+      placeType,
+      selectedLat,
+      selectedLng,
+      fullAddress;
+  bool agreedToPolicies = false;
+
+  final ImagePicker picker = ImagePicker();
+
+  late final BookingImagesService imagesService;
+  late final BookingTimerService timerService;
+  late final BookingActionsService actionsService;
+  late final BookingFiltersService filtersService;
+
+  BookingProvider() {
+    imagesService = BookingImagesService(this);
+    timerService = BookingTimerService(this);
+    actionsService = BookingActionsService(this);
+    filtersService = BookingFiltersService(this, timerService);
+  }
+
+  void onBookingAssigned({String? bookingId, dynamic inspectors}) {
+    log('Provider: booking assigned: \$bookingId');
+    //  show notification
+    notifyListeners();
+  }
+
+  void onRaiseInspectionUpdate(dynamic data) {
+    log('Provider: onRaiseInspectionUpdate: $data');
+    notifyListeners();
+  }
+
+  void onBookingStatusUpdated({
+    dynamic status,
+    String? bookingId,
+    String? message,
+  }) {
+    log(
+      'Provider: onBookingStatusUpdated status=\$status bookingId=\$bookingId',
+    );
+    // Update local booking list or UI
+    notifyListeners();
+  }
+
+  void onBookingCompleted({String? bookingId, dynamic payload}) {
+    log('Provider: onBookingCompleted bookingId=\$bookingId');
+    // Handle completion UI
+    notifyListeners();
+  }
 
   Future<void> init() async {
     isLoading = true;
     notifyListeners();
-    fetchCertificateSubTypes();
-
+    await fetchCertificateSubTypes();
     isLoading = false;
     notifyListeners();
   }
@@ -187,514 +124,182 @@ class BookingProvider extends BaseViewModel {
   void dispose() {
     locationController.dispose();
     descriptionController.dispose();
+    timerService.dispose();
     super.dispose();
   }
 
-  Future<void> createBooking({required BuildContext context}) async {
-    try {
-      setProcessing(true);
-      final user = await locator<AuthLocalDataSource>().getUser();
-      if (user == null || user.token == null) {
-        throw Exception('User not found in local storage');
-      }
-      final booking = BookingEntity(
-        bookingDate: _selectedDate.toIso8601String().split('T').first,
-        bookingTime: formattedTime!,
-        bookingLocation: location!,
-        certificateSubTypeId: _inspectionType!.id,
-        images: uploadedUrls,
-        description: description,
-      );
-      final createBookingUseCase = locator<CreateBookingUseCase>();
-      final state =
-          await executeParamsUseCase<
-            CreateBookingResponseModel,
-            CreateBookingParams
-          >(
-            useCase: createBookingUseCase,
-
-            query: CreateBookingParams(bookingEntity: booking),
-            launchLoader: true,
-          );
-
-      state?.when(
-        data: (response) async {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                response.message.isNotEmpty
-                    ? response.message
-                    : 'Booking created successfully',
-              ),
-            ),
-          );
-          clearBookingData();
-        },
-        error: (e) {
-          if (e.message!.toLowerCase().contains("insufficient")) {
-            // ScaffoldMessenger.of(context).showSnackBar(
-            //   SnackBar(content: Text('${e.message} Recharge Your Wallet Now')),
-            // );
-            _showInsufficientFundsDialog(context, e.message!);
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(e.message ?? 'Booking creation failed')),
-            );
-          }
-        },
-      );
-    } finally {
-      setProcessing(false);
-    }
+  void notify() {
+    notifyListeners();
   }
+
+  void setProcessing(bool value) {
+    isProcessing = value;
+    notifyListeners();
+  }
+
+  Future<void> fetchCertificateSubTypes() =>
+      filtersService.fetchCertificateSubTypes();
+
+  void setDate(DateTime d) => filtersService.setDate(d);
+
+  void setTime(TimeOfDay t) => filtersService.setTime(t);
+
+  void setInspectionType(CertificateSubTypeEntity? t) =>
+      filtersService.setInspectionType(t);
+
+  void setLocation(String? l) => filtersService.setLocation(l);
+
+  void setDescription(String? v) => filtersService.setDescription(v);
+
+  void setAgreePolicy(bool val) => filtersService.setAgreePolicy(val);
+
+  void setAddressData(Map<String, dynamic> value) =>
+      filtersService.setAddressData(value);
+
+  bool validate({required BuildContext cntx}) =>
+      filtersService.validate(cntx: cntx);
+
+  Future<void> uploadImage(BuildContext context) =>
+      imagesService.uploadImage(context);
+
+  void removeImageAt(int idx) => imagesService.removeImageAt(idx);
+
+  void removeExistingImageAt(int idx) =>
+      imagesService.removeExistingImageAt(idx);
+
+  Future<void> createBooking({required BuildContext context}) =>
+      actionsService.createBooking(context: context);
 
   Future<void> updateBooking({
     required BuildContext context,
     required String bookingId,
-  }) async {
-    try {
-      setProcessing(true);
-      final user = await locator<AuthLocalDataSource>().getUser();
-      if (user == null || user.token == null) {
-        throw Exception('User not found in local storage');
-      }
-      final booking = BookingEntity(
-        bookingDate: _selectedDate.toIso8601String().split('T').first,
-        bookingTime: formattedTime!,
-        bookingLocation: location!,
-        certificateSubTypeId: _inspectionType!.id,
-        images: uploadedUrls,
-        description: description,
-      );
+  }) => actionsService.updateBooking(context: context, bookingId: bookingId);
 
-      final updateBookingDetailUseCase = locator<UpdateBookingDetailUseCase>();
-      final state =
-          await executeParamsUseCase<BookingData, UpdateBookingDetailParams>(
-            useCase: updateBookingDetailUseCase,
-
-            query: UpdateBookingDetailParams(
-              bookingEntity: booking,
-              bookingId: bookingId,
-            ),
-            launchLoader: true,
-          );
-
-      state?.when(
-        data: (response) async {
-          clearBookingDetail();
-          updatedBookingData = response;
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Booking Updated successfully.')),
-          );
-          Navigator.pop(context, true);
-          clearFilters();
-          // clearBookingData();
-        },
-        error: (e) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(e.message ?? 'Booking creation failed')),
-          );
-        },
-      );
-    } finally {
-      setProcessing(false);
-    }
-  }
+  Future<void> deleteBookingDetail({
+    required BuildContext context,
+    required String bookingId,
+  }) => actionsService.deleteBookingDetail(
+    context: context,
+    bookingId: bookingId,
+  );
 
   Future<void> getBookingDetail({
     required BuildContext context,
     required String bookingId,
     required bool isEditable,
-  }) async {
-    try {
-      isLoadingBookingDetail = true;
-      notifyListeners();
-      final user = await locator<AuthLocalDataSource>().getUser();
-      if (user == null || user.token == null) {
-        throw Exception('User not found in local storage');
-      }
+    required bool isInspectorView,
+  }) => actionsService.getBookingDetail(
+    context: context,
+    bookingId: bookingId,
+    isEditable: isEditable,
+    isInspectorView: isInspectorView,
+  );
 
-      final getBookingDetailUseCase = locator<GetBookingDetailUseCase>();
-      final state =
-          await executeParamsUseCase<
-            BookingDetailModel,
-            GetBookingDetailParams
-          >(
-            useCase: getBookingDetailUseCase,
+  void clearBookingDetail() => actionsService.clearBookingDetail();
 
-            query: GetBookingDetailParams(bookingId: bookingId),
-            launchLoader: true,
-          );
+  void clearBookingData() => actionsService.clearBookingData();
 
-      state?.when(
-        data: (response) async {
-          clearBookingDetail();
-          bookingDetailModel = response;
+  Future<void> fetchBookingsList({bool reset = false, bool loadMore = false}) =>
+      filtersService.fetchBookingsList(reset: reset, loadMore: loadMore);
 
-          // Navigator.pop(context);
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => BookingEditScreen(
-                booking: bookingDetailModel,
-                isEdiatble: isEditable,
-                isReadOnly: !isEditable,
-              ),
-            ),
-          ).then((result) {
-            if (result == true) {
-              fetchBookingsList(reset: true);
-            }
-          });
-        },
-        error: (e) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(e.message ?? 'Fetching Booking Detail failed'),
-            ),
-          );
-        },
-      );
-    } finally {
-      isLoadingBookingDetail = false;
-      notifyListeners();
-    }
-  }
+  void resetBookings() => filtersService.resetBookings();
 
-  Future<void> deleteBookingDetail({
+  void searchBookings(String query) => filtersService.searchBookings(query);
+
+  void searchBookingsByDate(String date) =>
+      filtersService.searchBookingsByDate(date);
+
+  Future<void> filterByStatus(String status) =>
+      filtersService.filterByStatus(status);
+
+  void sortBookingsByDate({bool ascending = true}) =>
+      filtersService.sortBookingsByDate(ascending: ascending);
+
+  void clearFilters({bool triggerFetch = false}) =>
+      filtersService.clearFilters(triggerFetch: triggerFetch);
+
+  List<BookingListEntity> getFilteredBookings(List<int> filterStatuses) =>
+      filtersService.getFilteredBookings(filterStatuses);
+
+  Future<void> startInspectionTimer({
     required BuildContext context,
     required String bookingId,
-  }) async {
-    try {
-      setProcessing(true);
-      final user = await locator<AuthLocalDataSource>().getUser();
-      if (user == null || user.token == null) {
-        throw Exception('User not found in local storage');
-      }
+  }) =>
+      timerService.startInspectionTimer(context: context, bookingId: bookingId);
 
-      final deleteBookingUseCase = locator<DeleteBookingDetailUseCase>();
-      final state = await executeParamsUseCase<bool, DeleteBookingDetailParams>(
-        useCase: deleteBookingUseCase,
+  Future<void> pauseInspectionTimer({
+    required BuildContext context,
+    required String bookingId,
+  }) =>
+      timerService.pauseInspectionTimer(context: context, bookingId: bookingId);
 
-        query: DeleteBookingDetailParams(bookingId: bookingId),
-        launchLoader: true,
-      );
+  Future<void> stopInspectionTimer({
+    required BuildContext context,
+    required String bookingId,
+  }) =>
+      timerService.stopInspectionTimer(context: context, bookingId: bookingId);
 
-      state?.when(
-        data: (response) async {
-          clearBookingDetail();
-          Navigator.pop(context);
-          fetchBookingsList();
-        },
-        error: (e) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(e.message ?? 'Booking Deletion failed')),
-          );
-        },
-      );
-    } finally {
-      setProcessing(false);
-    }
-  }
+  Future<void> updateBookingTimer({
+    required BuildContext context,
+    required String bookingId,
+    required String action,
+  }) => timerService.updateBookingTimer(
+    context: context,
+    bookingId: bookingId,
+    action: action,
+  );
 
-  void clearBookingDetail() {
-    bookingDetailModel = null;
-    notifyListeners();
-  }
+  Duration calculateLiveDuration(BookingListEntity booking) =>
+      timerService.calculateLiveDuration(booking);
 
-  Future<void> fetchCertificateSubTypes() async {
-    try {
-      setProcessing(true);
-      final getSubTypesUseCase = locator<GetCertificateSubTypesUseCase>();
-      final state =
-          await executeParamsUseCase<
-            List<CertificateSubTypeEntity>,
-            GetCertificateSubTypesParams
-          >(useCase: getSubTypesUseCase, launchLoader: true);
+  String formatDuration(Duration duration) =>
+      timerService.formatDuration(duration);
 
-      state?.when(
-        data: (response) {
-          subTypes = response;
-          setInspectionType(subTypes[0]);
-          notifyListeners();
-        },
-        error: (e) {},
-      );
-    } catch (e) {
-    } finally {
-      setProcessing(false);
-    }
-  }
+  Future<void> updateBookingStatus({
+    required BuildContext context,
+    required String bookingId,
+    required String userId,
+    required int newStatus,
+  }) => actionsService.updateBookingStatus(
+    context: context,
+    bookingId: bookingId,
+    newStatus: newStatus,
+    userId: userId,
+  );
 
-  Future<void> uploadImage(BuildContext context) async {
-    try {
-      if (images.length >= 5) return;
-      setProcessing(true);
-      final XFile? picked = await _picker.pickImage(
-        source: ImageSource.gallery,
-        imageQuality: 80,
-      );
-      if (picked == null) return;
+  Future<void> updateShowUpFeeStatus({
+    required BuildContext context,
+    required String bookingId,
+    required bool showUpFeeApplied,
+  }) => actionsService.updateShowUpFeeStatus(
+    context: context,
+    bookingId: bookingId,
+    showUpFeeApplied: showUpFeeApplied,
+  );
 
-      final file = File(picked.path);
-      if (await file.length() > 1 * 1024 * 1024) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('File must be under 1 MB')),
-        );
-        return;
-      }
+  Future<void> approveAndPayBooking(
+    BuildContext context,
+    String bookingId,
+    String userId,
+  ) => actionsService.approveAndPayBooking(context, bookingId, userId);
 
-      final uploadImage = UploadImageDto(filePath: file.path);
-      final uploadImageUseCase = locator<UploadImageUseCase>();
-      final result =
-          await executeParamsUseCase<
-            UploadImageResponseModel,
-            UploadImageParams
-          >(
-            useCase: uploadImageUseCase,
-            query: UploadImageParams(filePath: uploadImage),
-            launchLoader: true,
-          );
+  Future<void> disagreeBooking(
+    BuildContext context,
+    String bookingId,
+    String userId,
+  ) => actionsService.disagreeBooking(context, bookingId, userId);
 
-      result?.when(
-        data: (response) {
-          uploadedUrls.add(response.fileUrl);
-          images.add(file);
-          notifyListeners();
-        },
-        error: (e) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(e.message ?? 'Image upload failed')),
-          );
-        },
-      );
-    } catch (e) {
-    } finally {
-      setProcessing(false);
-    }
-  }
+  Future<void> declineBooking({
+    required BuildContext context,
+    required String bookingId,
+    required String userId,
+  }) => actionsService.declineBooking(
+    context: context,
+    bookingId: bookingId,
+    userId: userId,
+  );
 
-  List<String> uploadedUrls = [];
+  TimeOfDay parseTime(String str) => filtersService.parseTime(str);
 
-  void clearBookingData() {
-    _selectedDate = DateTime.now();
-    _selectedTime = null;
-    formattedTime = null;
-    location = null;
-    _inspectionType = null;
-    description = '';
-    uploadedUrls.clear();
-    images.clear();
-    locationController.clear();
-    descriptionController.clear();
-
-    notifyListeners();
-  }
-
-  List<BookingListEntity> bookings = [];
-
-  int _currentPage = 1;
-  bool isFetchingBookings = false;
-  bool hasMoreBookings = true;
-  bool isLoadMoreRunning = false;
-
-  void resetBookings() {
-    bookings.clear();
-    _currentPage = 1;
-    hasMoreBookings = true;
-    notifyListeners();
-  }
-
-  final int _perPageLimit = 10;
-
-  String? _searchQuery;
-  String? _searchDate;
-  String? _status;
-  String _sortBy = 'createdAt';
-  String _sortOrder = 'desc';
-
-  Future<void> fetchBookingsList({
-    bool reset = false,
-    bool loadMore = false,
-  }) async {
-    try {
-      if (isFetchingBookings || isLoadMoreRunning) return;
-
-      if (reset) {
-        _currentPage = 1;
-
-        isFetchingBookings = true;
-        // _bookings = [];
-        bookings = [];
-        notifyListeners();
-      }
-
-      if (!loadMore) {
-        isFetchingBookings = true;
-      } else {
-        isLoadMoreRunning = true;
-      }
-      notifyListeners();
-
-      final fetchBookingUsecase = locator<FetchBookingsUseCase>();
-
-      final params = FetchBookingsParams(
-        page: _currentPage,
-        perPageLimit: _perPageLimit,
-        search: _searchDate ?? _searchQuery ?? '',
-        sortBy: _sortBy,
-        sortOrder: _sortOrder,
-        status: _status != null && _status!.isNotEmpty
-            ? int.tryParse(_status!)
-            : null,
-      );
-
-      final state =
-          await executeParamsUseCase<
-            List<BookingListEntity>,
-            FetchBookingsParams
-          >(useCase: fetchBookingUsecase, query: params, launchLoader: false);
-
-      state?.when(
-        data: (response) {
-          if (loadMore) {
-            bookings.addAll(response);
-          } else {
-            bookings = response;
-          }
-
-          if (response.length < _perPageLimit) {
-            hasMoreBookings = false;
-          } else {
-            _currentPage++;
-          }
-          notifyListeners();
-        },
-        error: (e) {},
-      );
-    } catch (e) {
-    } finally {
-      isFetchingBookings = false;
-      isLoadMoreRunning = false;
-      notifyListeners();
-    }
-  }
-
-  void searchBookings(String query) {
-    _searchQuery = query.trim().isEmpty ? null : query.trim();
-    _searchDate = null;
-    _currentPage = 1;
-    fetchBookingsList(reset: true);
-  }
-
-  void searchBookingsByDate(String date) {
-    _searchDate = date;
-    _searchQuery = null;
-    _currentPage = 1;
-    fetchBookingsList(reset: true);
-  }
-
-  void filterByStatus(String? status) {
-    if (_status == "status") return;
-    _status = status;
-    _currentPage = 1;
-    fetchBookingsList(reset: true);
-  }
-
-  void sortBookingsByDate({bool ascending = true}) {
-    bookings.sort((a, b) {
-      final dateA = DateTime.parse(a.bookingDate);
-      final dateB = DateTime.parse(b.bookingDate);
-      return ascending ? dateA.compareTo(dateB) : dateB.compareTo(dateA);
-    });
-    notifyListeners();
-  }
-
-  void clearFilters({bool triggerFetch = false}) {
-    _searchQuery = null;
-    _searchDate = null;
-    _status = null;
-    _currentPage = 1;
-    hasMoreBookings = true;
-    bookings.clear();
-    notifyListeners();
-
-    if (triggerFetch) {
-      fetchBookingsList(reset: true);
-    }
-  }
-
-  TimeOfDay parseTime(String str) {
-    try {
-      final normalized = str.trim().toUpperCase().replaceAll('.', '');
-
-      if (normalized.contains('AM') || normalized.contains('PM')) {
-        final dt = DateFormat('h:mm a').parse(normalized);
-        return TimeOfDay(hour: dt.hour, minute: dt.minute);
-      }
-
-      final dt = DateFormat('HH:mm').parse(normalized);
-      return TimeOfDay(hour: dt.hour, minute: dt.minute);
-    } catch (e) {
-      return const TimeOfDay(hour: 10, minute: 0);
-    }
-  }
-
-  String formatTimeForApi(TimeOfDay t) {
-    final hour = t.hourOfPeriod == 0 ? 12 : t.hourOfPeriod;
-    final minute = t.minute.toString().padLeft(2, '0');
-    final period = t.period == DayPeriod.am ? 'AM' : 'PM';
-    return '$hour:$minute $period';
-  }
-
-  void _showInsufficientFundsDialog(BuildContext context, String message) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          title: const Text(
-            'Insufficient Funds',
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          content: Text(
-            '$message\n\nYou don’t have sufficient funds in your wallet. Please recharge now to continue.',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.themeColor,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              onPressed: () {
-                Navigator.pop(context); // Close dialog
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => ChangeNotifierProvider(
-                      create: (_) => WalletProvider(),
-                      child: const WalletScreen(),
-                    ),
-                    // WalletScreen(
-                    //                     // minAmount: 50,
-                    //                     // maxAmount: 5000,
-                    //                   ),
-                  ),
-                );
-              },
-              child: const Text('Recharge Now'),
-            ),
-          ],
-        );
-      },
-    );
-  }
+  String formatTimeForApi(TimeOfDay t) => filtersService.formatTimeForApi(t);
 }

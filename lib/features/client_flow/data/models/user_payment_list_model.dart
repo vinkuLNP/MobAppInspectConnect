@@ -57,7 +57,6 @@ class PaymentModel extends PaymentEntity {
     return PaymentModel(
       id: json['_id'] ?? '',
       user: UserModel.fromJson(json['userId'] ?? {}),
-      relatedUserId: json['relatedUserId'],
       bookingId: json['bookingId'],
       stripeInvoiceId: json['stripeInvoiceId'],
       stripeSubscriptionId: json['stripeSubscriptionId'],
@@ -118,7 +117,6 @@ class UserModel extends UserEntity {
   Map<String, dynamic> toJson() => {'_id': id, 'email': email, 'name': name};
 }
 
-/// JSON Helpers
 PaymentsBodyModel paymentsResponseFromJson(String str) =>
     PaymentsBodyModel.fromJson(json.decode(str));
 

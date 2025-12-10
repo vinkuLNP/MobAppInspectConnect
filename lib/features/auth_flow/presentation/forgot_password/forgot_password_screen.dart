@@ -8,123 +8,8 @@ import 'package:inspect_connect/features/auth_flow/presentation/client/widgets/a
 import 'package:inspect_connect/features/auth_flow/presentation/client/widgets/common_auth_bar.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/client/widgets/input_fields.dart';
 import 'package:flutter/material.dart';
+import 'package:inspect_connect/features/auth_flow/utils/text_editor_controller.dart';
 import 'package:provider/provider.dart';
-
-// @RoutePage()
-// class ForgotpPasswordView extends StatelessWidget {
-//   const ForgotpPasswordView({super.key});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     final formKey = GlobalKey<FormState>();
-//     return BaseResponsiveWidget(
-//       initializeConfig: false,
-//       buildWidget: (ctx, rc, app) {
-
-//         return Scaffold(
-//           body: SingleChildScrollView(
-//             physics: const BouncingScrollPhysics(),
-//             child: Form(
-//               key: formKey,
-//               child: Padding(
-//                 padding: const EdgeInsets.symmetric(
-//                   horizontal: 20.0,
-//                   vertical: 20.0,
-//                 ),
-//                 child: Column(
-//                   crossAxisAlignment: CrossAxisAlignment.stretch,
-//                   mainAxisAlignment: MainAxisAlignment.center,
-//                   children: [
-//                     const SizedBox(height: 24),
-//                     appCommonLogoBar(height: rc.screenHeight * 0.2),
-//                     Align(
-//                       alignment: Alignment.center,
-//                       child: textWidget(
-//                         text: 'Forgot Password?',
-//                         fontSize: 30,
-//                         fontWeight: FontWeight.w700,
-//                       ),
-//                     ),
-//                     const SizedBox(height: 8),
-//                     Align(
-//                       alignment: Alignment.center,
-//                       child: textWidget(
-//                         text: 'Enter your email to receive a reset code',
-//                         fontSize: 16,
-//                         colour: Colors.black54,
-//                       ),
-//                     ),
-//                     SizedBox(
-//                       height: (rc.screenHeight * 0.05).clamp(24.0, 40.0),
-//                     ),
-
-//                     // Email
-//                     Consumer<ClientViewModelProvider>(
-//                       builder: (_, provider, _) => AppInputField(
-//                         label: 'Email ',
-//                         hint: 'Email',
-//                         controller: provider.resetEmailCtrl,
-//                         keyboardType: TextInputType.emailAddress,
-//                         validator: (_) => provider.validateEmailOrIntlPhone(),
-//                          onChanged: (_) {
-//                         if (provider.autoValidate) formKey.currentState?.validate();
-//                       },
-//                       ),
-//                     ),
-//                     SizedBox(
-//                       height: (rc.screenHeight * 0.08).clamp(40.0, 80.0),
-//                     ),
-//                     Consumer<ClientViewModelProvider>(
-//                       builder: (_, provider, _) => AppButton(
-//                         buttonBackgroundColor: AppColors.themeColor,
-//                         onTap: () async {
-//                           final isValid =
-//                               formKey.currentState?.validate() ?? false;
-//                           if (!isValid) {
-//                             provider.enableAutoValidate();
-//                             return;
-//                           }
-//                           provider.isSendingReset
-//                               ? null
-//                               : provider.requestPasswordReset(
-//                                   formKey: formKey,
-//                                   context: context,
-//                                 );
-//                         },
-//                         text: provider.isSendingReset
-//                             ? 'Sending...'
-//                             : 'Send Verification Code',
-//                       ),
-//                     ),
-
-//                     const SizedBox(height: 20),
-//                     Row(
-//                       mainAxisAlignment: MainAxisAlignment.center,
-//                       children: [
-//                         textWidget(text: "Already have an account?"),
-//                         GestureDetector(
-//                           onTap: () {
-//                             context.router.pop();
-//                           },
-//                           child: textWidget(
-//                             text: 'Sign In',
-//                             fontWeight: FontWeight.w500,
-//                             fontSize: 18,
-//                             colour: AppColors.themeColor,
-//                           ),
-//                         ),
-//                       ],
-//                     ),
-//                   ],
-//                 ),
-//               ),
-//             ),
-//           ),
-//         );
-//       },
-//     );
-//   }
-// }
 
 @RoutePage()
 class ForgotpPasswordView extends StatelessWidget {
@@ -157,7 +42,7 @@ class ForgotpPasswordView extends StatelessWidget {
                 AppInputField(
                   label: 'Email',
                   hint: 'example@gmail.com',
-                  controller: provider.resetEmailCtrl,
+                  controller: resetEmailCtrl,
                   keyboardType: TextInputType.emailAddress,
                   validator: (_) => provider.validateEmailOrIntlPhone(),
                   onChanged: (_) {

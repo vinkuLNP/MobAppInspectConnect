@@ -9,6 +9,7 @@ class CommonAuthBar extends StatelessWidget {
   final Widget form;
   final String image;
   final bool showBackButton;
+  final Function()? onBackPressed;
   final ResponsiveUiConfig rc;
   const CommonAuthBar({
     required this.title,
@@ -16,6 +17,7 @@ class CommonAuthBar extends StatelessWidget {
     required this.form,
     required this.image,
     required this.showBackButton,
+    this.onBackPressed,
     required this.rc,
     super.key,
   });
@@ -30,11 +32,15 @@ class CommonAuthBar extends StatelessWidget {
               children: [
                 SizedBox(
                   width: rc.screenWidth,
-                  height: rc.screenHeight * 0.35,
+                  height: (rc.screenHeight * 0.35).clamp(300, double.infinity),
                   child: imageAsset(
                     image: image,
                     width: rc.screenWidth,
-                    height: rc.screenHeight * 0.5,
+                    height: (rc.screenHeight * 0.35).clamp(
+                      300,
+                      double.infinity,
+                    ),
+
                     boxFit: BoxFit.cover,
                   ),
                 ),
@@ -46,7 +52,7 @@ class CommonAuthBar extends StatelessWidget {
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        Colors.black.withOpacity(0.2),
+                        Colors.black.withValues(alpha: 0.2),
                         Colors.transparent,
                       ],
                     ),
@@ -58,7 +64,6 @@ class CommonAuthBar extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // appCommonLogoBar(height: 50),
                       showBackButton
                           ? IconButton(
                               icon: Icon(Icons.arrow_back),
@@ -74,8 +79,6 @@ class CommonAuthBar extends StatelessWidget {
                         fontSize: 14,
                         color: Colors.white70,
                       ),
-
-                      // const SizedBox(height: 2),
                       textWidget(
                         text: title,
                         fontSize: 22,
@@ -88,7 +91,7 @@ class CommonAuthBar extends StatelessWidget {
               ],
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
+              padding: const EdgeInsets.only(left: 20,right: 20,bottom: 40),
               child: form,
             ),
           ],

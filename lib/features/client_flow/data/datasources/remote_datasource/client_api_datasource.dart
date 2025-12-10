@@ -13,7 +13,6 @@ import 'package:inspect_connect/core/utils/helpers/http_strategy_helper/concrete
 import 'package:inspect_connect/core/utils/helpers/http_strategy_helper/http_request_context.dart';
 import 'package:inspect_connect/features/auth_flow/data/datasources/local_datasources/auth_local_datasource.dart';
 import 'package:inspect_connect/features/client_flow/data/models/booking_detail_model.dart';
-import 'package:inspect_connect/features/client_flow/data/models/booking_list_response_model.dart';
 import 'package:inspect_connect/features/client_flow/data/models/booking_model.dart';
 import 'package:inspect_connect/features/client_flow/data/models/certificate_subtype_model.dart';
 import 'package:inspect_connect/features/client_flow/data/models/upload_image_model.dart';
@@ -31,7 +30,7 @@ abstract class BookingRemoteDataSource {
   Future<ApiResultModel<CreateBookingResponseModel>> createBooking(
     BookingEntity bookingEnity,
   );
-  Future<ApiResultModel<List<BookingListModel>>> getBookingList({
+  Future<ApiResultModel<List<BookingData>>> getBookingList({
     required int page,
     required int perPageLimit,
     String? search,
@@ -53,6 +52,19 @@ abstract class BookingRemoteDataSource {
     String bookingId,
     BookingEntity bookingEntity,
   );
+  Future<ApiResultModel<BookingData>> updateBookingStatus(
+    String bookingId,
+    int status,
+  );
+  Future<ApiResultModel<BookingData>> showUpFeeStatus(
+    String bookingId,
+    bool status,
+  );
+  
+  Future<ApiResultModel<BookingData>> updateBookingTimer(
+    String bookingId,
+    String action,
+  );
 }
 
 class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
@@ -66,8 +78,6 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
       final ApiResultModel<http.Response> res = await _ctx.makeRequest(
         uri: getCertificateSubTypesEndPoint,
         httpRequestStrategy: GetRequestStrategy(),
-        // headers: const {'Content-Type': 'application/json', 'Accept': 'application/json'},
-        // requestData: dto.toJson(),
       );
 
       return res.when(
@@ -75,8 +85,6 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
           final Map<String, dynamic> root = response.body.isEmpty
               ? {}
               : (jsonDecode(response.body) as Map<String, dynamic>);
-          // Backend shape:
-          // { "success": true, "message": "...", "body": { ... user object ... } }
           final Map<String, dynamic> body =
               (root['body'] as Map?)?.cast<String, dynamic>() ??
               <String, dynamic>{};
@@ -110,14 +118,14 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
   Future<ApiResultModel<WalletModel>> getUserWalletAmount() async {
     try {
       final user = await locator<AuthLocalDataSource>().getUser();
-      if (user == null || user.token == null) {
+      if (user == null || user.authToken == null) {
         throw Exception('User not found in local storage');
       }
       final ApiResultModel<http.Response> res = await _ctx.makeRequest(
         uri: walletEndPoint,
         httpRequestStrategy: GetRequestStrategy(),
         headers: {
-          'Authorization': 'Bearer ${user.token}',
+          'Authorization': 'Bearer ${user.authToken}',
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
@@ -128,8 +136,6 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
           final Map<String, dynamic> root = response.body.isEmpty
               ? {}
               : (jsonDecode(response.body) as Map<String, dynamic>);
-          // Backend shape:
-          // { "success": true, "message": "...", "body": { ... user object ... } }
           final Map<String, dynamic> body =
               (root['body'] as Map?)?.cast<String, dynamic>() ??
               <String, dynamic>{};
@@ -163,7 +169,7 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
   }) async {
     try {
       final user = await locator<AuthLocalDataSource>().getUser();
-      if (user == null || user.token == null) {
+      if (user == null || user.authToken == null) {
         throw Exception('User not found in local storage');
       }
       final queryParams = {
@@ -179,7 +185,7 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
         requestData: queryParams,
         httpRequestStrategy: GetRequestStrategy(),
         headers: {
-          'Authorization': 'Bearer ${user.token}',
+          'Authorization': 'Bearer ${user.authToken}',
           'Accept': 'application/json',
           'Content-Type': 'application/json',
         },
@@ -190,8 +196,6 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
           final Map<String, dynamic> root = response.body.isEmpty
               ? {}
               : (jsonDecode(response.body) as Map<String, dynamic>);
-          // Backend shape:
-          // { "success": true, "message": "...", "body": { ... user object ... } }
           final Map<String, dynamic> body =
               (root['body'] as Map?)?.cast<String, dynamic>() ??
               <String, dynamic>{};
@@ -218,15 +222,10 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
     UploadImageDto dto,
   ) async {
     try {
-      final user = await locator<AuthLocalDataSource>().getUser();
-      if (user == null || user.token == null) {
-        throw Exception('User not found in local storage');
-      }
       final ApiResultModel<http.Response> res = await _ctx.makeRequest(
         uri: uploadImageEndPoint,
         httpRequestStrategy: MultipartPostRequestStrategy(),
         headers: {
-          'Authorization': 'Bearer ${user.token}',
           "Content-Type": "multipart/form-data",
         },
         requestData: dto.toJson(),
@@ -237,8 +236,6 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
           final Map<String, dynamic> root = response.body.isEmpty
               ? {}
               : (jsonDecode(response.body) as Map<String, dynamic>);
-          // Backend shape:
-          // { "success": true, "message": "...", "body": { ... user object ... } }
           final Map<String, dynamic> body =
               (root['body'] as Map?)?.cast<String, dynamic>() ??
               <String, dynamic>{};
@@ -267,14 +264,14 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
   ) async {
     try {
       final user = await locator<AuthLocalDataSource>().getUser();
-      if (user == null || user.token == null) {
+      if (user == null || user.authToken == null) {
         throw Exception('User not found in local storage');
       }
       log(dto.certificateSubTypeId.toString());
       final ApiResultModel<http.Response> res = await _ctx.makeRequest(
         uri: createBookingEndPoint,
         headers: {
-          'Authorization': 'Bearer ${user.token}',
+          'Authorization': 'Bearer ${user.authToken}',
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
@@ -288,11 +285,7 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
               ? {}
               : (jsonDecode(response.body) as Map<String, dynamic>);
 
-          final Map<String, dynamic> body =
-              (root['body'] as Map?)?.cast<String, dynamic>() ??
-              <String, dynamic>{};
-
-          final dto = CreateBookingResponseModel.fromJson(body);
+          final dto = CreateBookingResponseModel.fromJson(root);
           return ApiResultModel<CreateBookingResponseModel>.success(data: dto);
         },
         failure: (ErrorResultModel e) =>
@@ -312,7 +305,7 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
   }
 
   @override
-  Future<ApiResultModel<List<BookingListModel>>> getBookingList({
+  Future<ApiResultModel<List<BookingData>>> getBookingList({
     required int page,
     required int perPageLimit,
     String? search,
@@ -322,7 +315,7 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
   }) async {
     try {
       final user = await locator<AuthLocalDataSource>().getUser();
-      if (user == null || user.token == null) {
+      if (user == null || user.authToken == null) {
         throw Exception('User not found in local storage');
       }
       final queryParams = {
@@ -333,16 +326,13 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
         if (sortOrder != null && sortOrder.isNotEmpty) 'sortOrder': sortOrder,
         if (status != null) 'status': status.toString(),
       };
-      final uri = Uri.parse(
-        '$createBookingEndPoint',
-      ).replace(queryParameters: queryParams);
-
+   
       final ApiResultModel<http.Response> res = await _ctx.makeRequest(
         uri: createBookingEndPoint,
         requestData: queryParams,
         httpRequestStrategy: GetRequestStrategy(),
         headers: {
-          'Authorization': 'Bearer ${user.token}',
+          'Authorization': 'Bearer ${user.authToken}',
           'Accept': 'application/json',
         },
       );
@@ -352,21 +342,18 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
           final Map<String, dynamic> root = response.body.isEmpty
               ? {}
               : (jsonDecode(response.body) as Map<String, dynamic>);
-          // Backend shape:
-          // { "success": true, "message": "...", "body": { ... user object ... } }
           final Map<String, dynamic> body =
               (root['body'] as Map?)?.cast<String, dynamic>() ??
               <String, dynamic>{};
           final List<dynamic> list = body['users'] ?? [];
-
-          final List<BookingListModel> dtoList = list
-              .map((e) => BookingListModel.fromJson(e))
+          final List<BookingData> dtoList = list
+              .map((e) => BookingData.fromJson(e))
               .toList();
 
-          return ApiResultModel<List<BookingListModel>>.success(data: dtoList);
+          return ApiResultModel<List<BookingData>>.success(data: dtoList);
         },
         failure: (ErrorResultModel e) =>
-            ApiResultModel<List<BookingListModel>>.failure(
+            ApiResultModel<List<BookingData>>.failure(
               errorResultEntity: e,
             ),
       );
@@ -387,7 +374,7 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
   ) async {
     try {
       final user = await locator<AuthLocalDataSource>().getUser();
-      if (user == null || user.token == null) {
+      if (user == null || user.authToken == null) {
         throw Exception('User not found in local storage');
       }
 
@@ -395,7 +382,7 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
         uri: "$createBookingEndPoint/$bookingId",
         httpRequestStrategy: GetRequestStrategy(),
         headers: {
-          'Authorization': 'Bearer ${user.token}',
+          'Authorization': 'Bearer ${user.authToken}',
           'Accept': 'application/json',
         },
       );
@@ -408,6 +395,7 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
           final Map<String, dynamic> body =
               (root['body'] as Map?)?.cast<String, dynamic>() ?? {};
           final model = BookingDetailModel.fromJson(body);
+          log('----------api called-----${response.body.toString()}');
           return ApiResultModel<BookingDetailModel>.success(data: model);
         },
         failure: (e) =>
@@ -428,7 +416,7 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
   Future<ApiResultModel<bool>> deleteBooking(String bookingId) async {
     try {
       final user = await locator<AuthLocalDataSource>().getUser();
-      if (user == null || user.token == null) {
+      if (user == null || user.authToken == null) {
         throw Exception('User not found in local storage');
       }
 
@@ -436,7 +424,7 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
         uri: "$createBookingEndPoint/$bookingId",
         httpRequestStrategy: DeleteRequestStrategy(),
         headers: {
-          'Authorization': 'Bearer ${user.token}',
+          'Authorization': 'Bearer ${user.authToken}',
           'Accept': 'application/json',
         },
       );
@@ -463,7 +451,7 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
   ) async {
     try {
       final user = await locator<AuthLocalDataSource>().getUser();
-      if (user == null || user.token == null) {
+      if (user == null || user.authToken == null) {
         throw Exception('User not found in local storage');
       }
 
@@ -471,7 +459,7 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
         uri: "$createBookingEndPoint/$bookingId",
         httpRequestStrategy: PutRequestStrategy(),
         headers: {
-          'Authorization': 'Bearer ${user.token}',
+          'Authorization': 'Bearer ${user.authToken}',
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
@@ -485,6 +473,147 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
               : (jsonDecode(response.body) as Map<String, dynamic>);
           final Map<String, dynamic> body =
               (root['body'] as Map?)?.cast<String, dynamic>() ?? {};
+          final dto = BookingData.fromJson(body);
+          return ApiResultModel<BookingData>.success(data: dto);
+        },
+        failure: (e) =>
+            ApiResultModel<BookingData>.failure(errorResultEntity: e),
+      );
+    } catch (e) {
+      log('updateBooking error: $e');
+      return const ApiResultModel.failure(
+        errorResultEntity: ErrorResultModel(
+          message: "Network error occurred",
+          statusCode: 500,
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<ApiResultModel<BookingData>> updateBookingStatus(
+    String bookingId,
+    int status,
+  ) async {
+    try {
+      final user = await locator<AuthLocalDataSource>().getUser();
+      if (user == null || user.authToken == null) {
+        throw Exception('User not found in local storage');
+      }
+
+      final ApiResultModel<http.Response> res = await _ctx.makeRequest(
+        uri: "$createBookingEndPoint/$bookingStatusEndPoint/$bookingId",
+        httpRequestStrategy: PutRequestStrategy(),
+        headers: {
+          'Authorization': 'Bearer ${user.authToken}',
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        requestData: {"status": status},
+      );
+
+      return res.when(
+        success: (response) {
+          final Map<String, dynamic> root = response.body.isEmpty
+              ? {}
+              : (jsonDecode(response.body) as Map<String, dynamic>);
+          final Map<String, dynamic> body =
+              (root['body'] as Map?)?.cast<String, dynamic>() ?? {};
+          final dto = BookingData.fromJson(body);
+          return ApiResultModel<BookingData>.success(data: dto);
+        },
+        failure: (e) =>
+            ApiResultModel<BookingData>.failure(errorResultEntity: e),
+      );
+    } catch (e) {
+      log('updateBooking error: $e');
+      return const ApiResultModel.failure(
+        errorResultEntity: ErrorResultModel(
+          message: "Network error occurred",
+          statusCode: 500,
+        ),
+      );
+    }
+  }
+
+
+
+  @override
+  Future<ApiResultModel<BookingData>> showUpFeeStatus(
+    String bookingId,
+    bool status,
+  ) async {
+    try {
+      final user = await locator<AuthLocalDataSource>().getUser();
+      if (user == null || user.authToken == null) {
+        throw Exception('User not found in local storage');
+      }
+
+      final ApiResultModel<http.Response> res = await _ctx.makeRequest(
+        uri: "$createBookingEndPoint/$bookingId",
+        httpRequestStrategy: PutRequestStrategy(),
+        headers: {
+          'Authorization': 'Bearer ${user.authToken}',
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        requestData: {"showUpFeeApplied": status,"_id":bookingId},
+      );
+
+      return res.when(
+        success: (response) {
+          final Map<String, dynamic> root = response.body.isEmpty
+              ? {}
+              : (jsonDecode(response.body) as Map<String, dynamic>);
+          final Map<String, dynamic> body =
+              (root['body'] as Map?)?.cast<String, dynamic>() ?? {};
+          final dto = BookingData.fromJson(body);
+          return ApiResultModel<BookingData>.success(data: dto);
+        },
+        failure: (e) =>
+            ApiResultModel<BookingData>.failure(errorResultEntity: e),
+      );
+    } catch (e) {
+      log('updateBooking error: $e');
+      return const ApiResultModel.failure(
+        errorResultEntity: ErrorResultModel(
+          message: "Network error occurred",
+          statusCode: 500,
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<ApiResultModel<BookingData>> updateBookingTimer(
+    String bookingId,
+    String action,
+  ) async {
+    try {
+      final user = await locator<AuthLocalDataSource>().getUser();
+      if (user == null || user.authToken == null) {
+        throw Exception('User not found in local storage');
+      }
+
+      final ApiResultModel<http.Response> res = await _ctx.makeRequest(
+        uri: "$createBookingEndPoint/$bookingTimerEndPoint/$bookingId",
+        httpRequestStrategy: PutRequestStrategy(),
+        headers: {
+          'Authorization': 'Bearer ${user.authToken}',
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        requestData: {"action": action},
+      );
+
+      return res.when(
+        success: (response) {
+          final Map<String, dynamic> root = response.body.isEmpty
+              ? {}
+              : (jsonDecode(response.body) as Map<String, dynamic>);
+          final Map<String, dynamic> body =
+              (root['body'] as Map?)?.cast<String, dynamic>() ?? {};
+              log(body.toString());
           final dto = BookingData.fromJson(body);
           return ApiResultModel<BookingData>.success(data: dto);
         },

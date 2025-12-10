@@ -17,11 +17,11 @@ class RecentBookingViewerCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(top: 12),
       decoration: BoxDecoration(
-        color: Colors.grey.withOpacity(0.1),
+        color: Colors.grey.withValues(alpha:0.1),
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06),
+            color: Colors.black.withValues(alpha:0.06),
             blurRadius: 12,
             offset: const Offset(0, 6),
           ),
@@ -41,7 +41,6 @@ class RecentBookingViewerCard extends StatelessWidget {
                 Expanded(
                   child: textWidget(
                     text: 'RECENT APPROVED BOOKING',
-                    // bookingListEntity.bookingLocation,
                     color: Colors.white,
                     textOverflow: TextOverflow.ellipsis,
                     fontSize: 14,
@@ -74,11 +73,6 @@ class RecentBookingViewerCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 6),
 
-                // _iconRow(
-                //   Icons.location_on_outlined,
-                //   'Booking location',
-                //   bookingListEntity.bookingLocation,
-                // ),
                 const SizedBox(height: 10),
               ],
             ),

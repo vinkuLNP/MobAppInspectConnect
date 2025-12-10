@@ -64,8 +64,9 @@ class InspectorSignInView extends StatelessWidget {
                       keyboardType: TextInputType.emailAddress,
                       hint: 'example@gmail.com',
                       validator: (v) {
-                        if (v == null || v.trim().isEmpty)
+                        if (v == null || v.trim().isEmpty) {
                           return 'Email is required';
+                        }
                         final ok = RegExp(
                           r'^[^@\s]+@[^@\s]+\.[^@\s]+$',
                         ).hasMatch(v.trim());
@@ -81,8 +82,9 @@ class InspectorSignInView extends StatelessWidget {
                       obscure: provider.obscure,
                       onToggle: provider.toggleObscure,
                       validator: (v) {
-                        if (v == null || v.isEmpty)
+                        if (v == null || v.isEmpty) {
                           return 'Password is required';
+                        }
                         if (v.length < 6) return 'At least 6 characters';
                         return null;
                       },
@@ -118,7 +120,7 @@ class InspectorSignInView extends StatelessWidget {
                         textWidget(text: "Don’t have an account? "),
                         GestureDetector(
                           onTap: () {
-                            context.pushRoute(const InspectorSignUpRoute());
+                            context.pushRoute( InspectorSignUpRoute(showBackButton: false));
                           },
                           child: textWidget(
                             text: 'Sign Up',

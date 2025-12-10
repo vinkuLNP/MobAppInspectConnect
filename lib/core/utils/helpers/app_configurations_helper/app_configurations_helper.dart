@@ -6,7 +6,6 @@ import 'package:injectable/injectable.dart';
 
 @singleton
 class AppConfigurations {
-  // String? baseUrl = locator<AppFlavorsHelper>().baseUrl;
     String? get baseUrl => locator<AppFlavorsHelper>().baseUrl;
   CustomThemeData appTheme = CustomThemeData(
     buttonEnabledColor: blue3E97C8,

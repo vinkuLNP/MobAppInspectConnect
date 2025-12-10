@@ -1,10 +1,17 @@
+import 'dart:developer';
 import 'dart:ui';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:inspect_connect/core/di/app_component/app_component.dart';
+import 'package:inspect_connect/core/di/app_sockets/socket_manager.dart';
+import 'package:inspect_connect/core/di/app_sockets/socket_service.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
+import 'package:inspect_connect/features/client_flow/presentations/providers/booking_provider.dart';
+import 'package:inspect_connect/features/client_flow/presentations/providers/user_provider.dart';
 import 'package:inspect_connect/features/client_flow/presentations/screens/booking_screen.dart';
 import 'package:inspect_connect/features/client_flow/presentations/screens/home_screen.dart';
 import 'package:inspect_connect/features/client_flow/presentations/screens/profile_screen.dart';
+import 'package:provider/provider.dart';
 
 @RoutePage()
 class ClientDashboardView extends StatefulWidget {
@@ -17,7 +24,8 @@ class ClientDashboardView extends StatefulWidget {
 class _ClientDashboardViewState extends State<ClientDashboardView> {
   int _selectedIndex = 0;
   late List<Widget> _pages;
-
+final socket = locator<SocketService>();
+  late final SocketManager socketManager;
   @override
   void initState() {
     super.initState();
@@ -30,6 +38,18 @@ class _ClientDashboardViewState extends State<ClientDashboardView> {
       ),
       ProfileScreen(),
     ];
+    final user = context.read<UserProvider>().user;
+
+    socket.initSocket(token: user!.authToken.toString());
+   
+  final bookingProvider = context.read<BookingProvider>();
+    socketManager = SocketManager(bookingProvider);
+    socketManager.registerGlobalListeners(isInspector: false);
+ socket.connectUser(user.userId.toString());
+    socket.socket?.on("test_event", (data) {
+      log("📥 Received from server: $data");
+    });
+   
   }
 
   void _onItemTapped(int index) {
@@ -45,7 +65,7 @@ class _ClientDashboardViewState extends State<ClientDashboardView> {
       backgroundColor: Colors.grey,
       extendBody: true,
       body: _pages[_selectedIndex],
-          bottomNavigationBar: SizedBox(
+      bottomNavigationBar: SizedBox(
         height: 95,
         child: Stack(
           clipBehavior: Clip.none,
@@ -68,7 +88,7 @@ class _ClientDashboardViewState extends State<ClientDashboardView> {
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
+                        color: Colors.black.withValues(alpha: 0.1),
                         blurRadius: 12,
                         offset: const Offset(0, 4),
                       ),
@@ -128,7 +148,7 @@ class _ClientDashboardViewState extends State<ClientDashboardView> {
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
+                        color: Colors.black.withValues(alpha: 0.2),
                         blurRadius: 10,
                         offset: const Offset(0, 4),
                       ),
@@ -139,7 +159,7 @@ class _ClientDashboardViewState extends State<ClientDashboardView> {
                     size: 32,
                     color: _selectedIndex == 0
                         ? Colors.white
-                        : Colors.white.withOpacity(0.9),
+                        : Colors.white.withValues(alpha: 0.9),
                   ),
                 ),
               ),
@@ -153,90 +173,12 @@ class _ClientDashboardViewState extends State<ClientDashboardView> {
                 fontWeight: FontWeight.w600,
                 color: _selectedIndex == 0
                     ? Colors.white
-                    : Colors.white.withOpacity(0.8),
+                    : Colors.white.withValues(alpha: 0.8),
               ),
             ),
           ],
         ),
       ),
-
-      // bottomNavigationBar: SizedBox(
-      //   height: 90,
-      //   child: Stack(
-      //     alignment: Alignment.bottomCenter,
-      //     children: [
-      //       ClipRRect(
-      //         child: BackdropFilter(
-      //           filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-      //           child: Container(
-      //             height: 70,
-      //             decoration: BoxDecoration(
-      //               gradient: const LinearGradient(
-      //                 colors: [
-      //                   Color(0xFF1B90FF),
-      //                   Color(0xFF0070F2),
-      //                   Color(0xFF002A86),
-      //                 ],
-      //                 begin: Alignment.topLeft,
-      //                 end: Alignment.topRight,
-      //               ),
-      //               boxShadow: [
-      //                 BoxShadow(
-      //                   color: Colors.black.withOpacity(0.05),
-      //                   blurRadius: 12,
-      //                   offset: Offset(0, 4),
-      //                 ),
-      //               ],
-      //             ),
-      //             child: Row(
-      //               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      //               children: [
-      //                 Expanded(
-      //                   child: Align(
-      //                     alignment: Alignment.center,
-      //                     child: _buildNavItem(
-      //                       icon: Icons.assignment_outlined,
-      //                       activeIcon: Icons.assignment,
-      //                       label: 'My Bookings',
-      //                       index: 1,
-      //                       primary: primary,
-      //                     ),
-      //                   ),
-      //                 ),
-
-      //                 Expanded(
-      //                   child: Align(
-      //                     alignment: Alignment.center,
-      //                     child: _buildNavItem(
-      //                       icon: Icons.add_outlined,
-      //                       activeIcon: Icons.add,
-      //                       label: 'Book Now',
-      //                       index: 0,
-      //                       primary: primary,
-      //                     ),
-      //                   ),
-      //                 ),
-
-      //                 Expanded(
-      //                   child: Align(
-      //                     alignment: Alignment.center,
-      //                     child: _buildNavItem(
-      //                       icon: Icons.person_outline,
-      //                       activeIcon: Icons.person,
-      //                       label: 'Profile',
-      //                       index: 2,
-      //                       primary: primary,
-      //                     ),
-      //                   ),
-      //                 ),
-      //               ],
-      //             ),
-      //           ),
-      //         ),
-      //       ),
-      //     ],
-      //   ),
-      // ),
     );
   }
 
@@ -252,13 +194,13 @@ class _ClientDashboardViewState extends State<ClientDashboardView> {
     final iconWidget = Icon(
       isSelected ? activeIcon : icon,
       size: 26,
-      color: isSelected ? Colors.white : Colors.white.withOpacity(0.8),
+      color: isSelected ? Colors.white : Colors.white.withValues(alpha: 0.8),
     );
 
     return InkWell(
       borderRadius: BorderRadius.circular(20),
       onTap: () => _onItemTapped(index),
-      splashColor: primary.withOpacity(0.1),
+      splashColor: primary.withValues(alpha: 0.1),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         curve: Curves.easeOut,
@@ -282,7 +224,9 @@ class _ClientDashboardViewState extends State<ClientDashboardView> {
               text: label,
               fontSize: 12,
               fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-              color: isSelected ? Colors.white : Colors.white.withOpacity(0.8),
+              color: isSelected
+                  ? Colors.white
+                  : Colors.white.withValues(alpha: 0.8),
             ),
           ],
         ),

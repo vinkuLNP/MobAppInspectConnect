@@ -1,104 +1,6 @@
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:flutter/material.dart';
 
-// class StepperHeader extends StatelessWidget {
-//   final int current;
-//   final List<String> labels;
-//   final void Function(int index)? onTap;
-
-//   const StepperHeader({
-//     super.key,
-//     required this.current,
-//     required this.labels,
-//     this.onTap,
-//   });
-
-//   @override
-//   Widget build(BuildContext context) {
-//     final theme = Theme.of(context);
-
-//     return  Row(
-//       mainAxisAlignment: MainAxisAlignment.center,
-//       crossAxisAlignment: CrossAxisAlignment.center,
-//       children: List.generate(labels.length, (i) {
-//         final bool active = i == current;
-//         final bool done = i < current;
-//         final bool upcoming = i > current;
-
-//         final Color circleColor = active || done
-//             ? theme.colorScheme.primary
-//             : Colors.grey.shade400;
-
-//         final Color textColor = active || done
-//             ? theme.colorScheme.onPrimary
-//             : theme.colorScheme.onSurfaceVariant;
-
-//         final Color connectorColor = done
-//             ? theme.colorScheme.primary
-//             : Colors.grey.shade400;
-
-//         return Expanded(
-//           child: Row(
-//             children: [
-//               InkWell(
-//                 onTap: onTap == null ? null : () => onTap!(i),
-//                 child: AnimatedContainer(
-//                   duration: const Duration(milliseconds: 300),
-//                   curve: Curves.easeInOut,
-//                   width: 30,
-//                   height: 30,
-//                   decoration: BoxDecoration(
-//                     color: circleColor,
-//                     shape: BoxShape.circle,
-//                     border: upcoming
-//                         ? Border.all(
-//                             color: theme.colorScheme.outlineVariant,
-//                             width: 1.2,
-//                           )
-//                         : null,
-//                     boxShadow: active
-//                         ? [
-//                             BoxShadow(
-//                               color: theme.colorScheme.primary
-//                                   .withOpacity(0.3),
-//                               blurRadius: 6,
-//                               spreadRadius: 2,
-//                             ),
-//                           ]
-//                         : [],
-//                   ),
-//                   alignment: Alignment.center,
-//                   child: done
-//                       ? Icon(
-//                           Icons.check_rounded,
-//                           color: white,
-//                           size: 24,
-//                         )
-//                       : textWidget(
-//                           text: '${i + 1}',
-//                           color: textColor,
-//                           fontWeight: FontWeight.w500,
-//                         ),
-//                 ),
-//               ),
-//               if (i != labels.length - 1)
-//                 Expanded(
-//                   child: AnimatedContainer(
-//                     duration: const Duration(milliseconds: 300),
-//                     curve: Curves.easeInOut,
-//                     height: 2,
-//                     color: connectorColor,
-//                   ),
-//                 ),
-//             ],
-//           ),
-//         );
-//       }),
-//     );
-
-//   }
-// }
-
 class StepperHeader extends StatelessWidget {
   final int current;
   final List<String> labels;
@@ -134,7 +36,6 @@ class StepperHeader extends StatelessWidget {
               width: 60, 
               height: 2,
               color: connectorColor,
-              // margin: const EdgeInsets.symmetric(horizontal: 4),
             );
           }
 
@@ -157,9 +58,6 @@ class StepperHeader extends StatelessWidget {
               curve: Curves.easeInOut,
               width: 30,
               height: 30,
-              // margin: const EdgeInsets.symmetric(
-              //   horizontal: 8,
-              // ), // equal spacing
               decoration: BoxDecoration(
                 color: circleColor,
                 shape: BoxShape.circle,
@@ -172,7 +70,7 @@ class StepperHeader extends StatelessWidget {
                 boxShadow: active
                     ? [
                         BoxShadow(
-                          color: theme.colorScheme.primary.withOpacity(0.3),
+                          color: theme.colorScheme.primary.withValues(alpha:0.3),
                           blurRadius: 6,
                           spreadRadius: 2,
                         ),

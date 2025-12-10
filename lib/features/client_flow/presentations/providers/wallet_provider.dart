@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/basecomponents/base_view_model.dart';
 import 'package:inspect_connect/core/commondomain/entities/based_api_result/api_result_state.dart';
 import 'package:inspect_connect/core/di/app_component/app_component.dart';
+import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/features/auth_flow/data/datasources/local_datasources/auth_local_datasource.dart';
 import 'package:inspect_connect/features/client_flow/data/models/user_payment_list_model.dart';
 import 'package:inspect_connect/features/client_flow/data/models/wallet_model.dart';
@@ -45,12 +46,12 @@ class WalletProvider extends BaseViewModel {
     _currentPage = 1;
     _totalPages = 1;
     await getUserWallet(context: context);
-    await getPaymentList(context: context, reset: true);
+  if(context.mounted)  await getPaymentList(context: context, reset: true);
   }
 
   Future<void> getUserWallet({required BuildContext context}) async {
     final user = await locator<AuthLocalDataSource>().getUser();
-    if (user?.token == null) return;
+    if (user?.authToken == null) return;
 
     final useCase = locator<GetUserWalletAmountUseCase>();
     final state = await executeParamsUseCase<WalletModel, GetUserWalletAmountParams>(
@@ -65,7 +66,7 @@ class WalletProvider extends BaseViewModel {
         notifyListeners();
       },
       error: (e) => ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.message ?? 'Failed to fetch wallet')),
+        SnackBar(content:   textWidget(text: e.message ?? 'Failed to fetch wallet',color: Colors.white)),
       ),
     );
   }
@@ -80,7 +81,7 @@ class WalletProvider extends BaseViewModel {
     notifyListeners();
 
     final user = await locator<AuthLocalDataSource>().getUser();
-    if (user?.token == null) return;
+    if (user?.authToken == null) return;
 
     final useCase = locator<GetUserPaymentsListUseCase>();
     final state = await executeParamsUseCase<PaymentsBodyModel, GetUserPaymentsListParams>(
@@ -101,7 +102,7 @@ class WalletProvider extends BaseViewModel {
         notifyListeners();
       },
       error: (e) => ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.message ?? 'Failed to fetch payments')),
+        SnackBar(content:   textWidget(text: e.message ?? 'Failed to fetch payments',color: Colors.white)),
       ),
     );
 

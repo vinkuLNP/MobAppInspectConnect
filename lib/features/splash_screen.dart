@@ -1,6 +1,9 @@
 import 'dart:developer';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
+import 'package:inspect_connect/features/inspector_flow/domain/enum/inspector_status.dart';
+import 'package:inspect_connect/features/inspector_flow/providers/inspector_main_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:inspect_connect/core/di/app_component/app_component.dart';
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
@@ -84,21 +87,53 @@ class _SplashViewState extends State<SplashView>
     _controller.forward();
 
     Future.delayed(const Duration(seconds: 3), () async {
+   
       final user = await locator<AuthLocalDataSource>().getUser();
+         if(mounted){
       final userProvider = context.read<UserProvider>();
       final bookingProvider = context.read<BookingProvider>();
+
 
       if (user != null) userProvider.setUser(user);
       await userProvider.loadUser();
 
       if (userProvider.isLoggedIn) {
-        await bookingProvider.fetchBookingsList();
-        context.router.replace(const ClientDashboardRoute());
+        if (userProvider.isUserClient) {
+          await bookingProvider.fetchBookingsList();
+        if(mounted)   context.router.replace(const ClientDashboardRoute());
+        } else if (userProvider.isUserInspector) {
+        if(mounted)   checkInspectorState(context);
+        } else {
+       if(mounted)    context.router.replace(const OnBoardingRoute());
+        }
       } else {
-        context.router.replace(const OnBoardingRoute());
+       if(mounted)  context.router.replace(const OnBoardingRoute());
       }
-    });
+   } });
   }
+Future<void> checkInspectorState(BuildContext context) async {
+  final localUser = await locator<AuthLocalDataSource>().getUser();
+  if (localUser == null) {
+    if(context.mounted) context.router.replaceAll([const OnBoardingRoute()]);
+    return;
+  }
+
+  final provider = InspectorDashboardProvider();
+    if(context.mounted) await provider.initializeUserState(context);
+
+  switch (provider.status) {
+    case InspectorStatus.needsSubscription:
+      if(context.mounted)   context.router.replaceAll([const InspectorDashboardRoute()]);
+      break;
+    case InspectorStatus.underReview:
+    case InspectorStatus.rejected:
+    case InspectorStatus.approved:
+      if(context.mounted)   context.router.replaceAll([const InspectorDashboardRoute()]);
+      break;
+    default:
+      context.router.replaceAll([const OnBoardingRoute()]);
+  }
+}
 
   @override
   void dispose() {
@@ -132,14 +167,11 @@ class _SplashViewState extends State<SplashView>
               position: _textBounceAnimation,
               child: FadeTransition(
                 opacity: _fadeAnimation,
-                child: Text(
+                child: textWidget(text: 
                   "Inspect Connect",
-                  style: TextStyle(
                     fontSize: 24,
                     color: AppColors.whiteColor,
                     fontWeight: FontWeight.bold,
-                    letterSpacing: 1.0,
-                  ),
                 ),
               ),
             ),

@@ -27,8 +27,13 @@ class _WalletScreenState extends State<WalletScreen> {
   @override
   void initState() {
     super.initState();
+    if(mounted){
+      
+    }
     Future.microtask(
-      () => context.read<WalletProvider>().init(context: context),
+      () {
+      if(mounted)  context.read<WalletProvider>().init(context: context);
+      } 
     );
   }
 
@@ -93,13 +98,11 @@ class _WalletScreenState extends State<WalletScreen> {
                 decoration: InputDecoration(
                   prefixIcon: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 12),
-                    child: Text(
+                    child: textWidget(text: 
                       "\$",
-                      style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
-                        color: Colors.grey[800],
-                      ),
+                        color: Colors.grey[800]!,
                     ),
                   ),
                   prefixIconConstraints: const BoxConstraints(
@@ -125,9 +128,9 @@ class _WalletScreenState extends State<WalletScreen> {
                       double.tryParse(amount)! < 50.0 ||
                       double.tryParse(amount)! > 100000) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                          "Please enter a valid amount - min \$50 AND max -\$100000",
+                       SnackBar(
+                        content: textWidget(text: 
+                          "Please enter a valid amount - min \$50 AND max -\$100000",color: Colors.white
                         ),
                       ),
                     );
@@ -154,13 +157,13 @@ class _WalletScreenState extends State<WalletScreen> {
         throw Exception('Missing clientSecret in payment intent response.');
       }
 
-      // ✅ Open your custom card entry modal
-      await _showCardPaymentSheet(context, clientSecret, amount);
+    if(mounted)  await _showCardPaymentSheet(context, clientSecret, amount);
     } catch (e, st) {
       log("❌ makePayment error: $e\n$st");
-      ScaffoldMessenger.of(
+      if(mounted){
+        ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('Payment failed: $e')));
+      ).showSnackBar(SnackBar(content: textWidget(text: 'Payment failed: $e',color: Colors.white)));}
     }
   }
 
@@ -210,7 +213,6 @@ class _WalletScreenState extends State<WalletScreen> {
                   ),
                   const SizedBox(height: 16),
 
-                  // Stripe card input field
                   CardField(
                     enablePostalCode: false,
                     decoration: InputDecoration(
@@ -244,19 +246,22 @@ class _WalletScreenState extends State<WalletScreen> {
                                 ),
                               );
 
-                              Navigator.pop(context);
-                              _showPaymentSuccess(parentCtx);
+                               if(context.mounted)    Navigator.pop(context);
+                                 if(context.mounted)     _showPaymentSuccess(parentCtx);
                             } on StripeException catch (e) {
                               log("⚠️ Stripe error: $e");
+                                     if(context.mounted) {
+
+                                   
                               ScaffoldMessenger.of(parentCtx).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Payment canceled'),
+                                  SnackBar(
+                                  content: textWidget(text: 'Payment canceled',color: Colors.white),
                                 ),
-                              );
-                            } catch (e) {
+                              );  }
+                            } catch (e) {  if(context.mounted) {
                               ScaffoldMessenger.of(parentCtx).showSnackBar(
-                                SnackBar(content: Text('Payment failed: $e')),
-                              );
+                                SnackBar(content: textWidget(text: 'Payment failed: $e',color: Colors.white)),
+                              );  }
                             } finally {
                               setState(() => isProcessing = false);
                             }
@@ -292,15 +297,15 @@ class _WalletScreenState extends State<WalletScreen> {
       barrierDismissible: false,
       builder: (_) => const _PaymentSuccessDialog(),
     ).then((_) {
-      walletContext.read<WalletProvider>().refreshAll(walletContext);
+   if(context.mounted)   walletContext.read<WalletProvider>().refreshAll(walletContext);
     });
   }
 
   Future<void> displayPaymentSheet() async {
     try {
       await Stripe.instance.presentPaymentSheet();
-
-      showDialog(
+   if(mounted) {
+     showDialog(
         context: context,
         builder: (_) => AlertDialog(
           shape: RoundedRectangleBorder(
@@ -308,19 +313,23 @@ class _WalletScreenState extends State<WalletScreen> {
           ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
-            children: const [
+            children:   [
               Icon(Icons.check_circle, color: Colors.green, size: 80),
               SizedBox(height: 10),
-              Text("Payment Successful!"),
+              textWidget(text: "Payment Successful!"),
             ],
           ),
         ),
       );
-    } on StripeException catch (e) {
+   
+   }
+  } on StripeException catch (e) {
       log("⚠️ StripeException: $e");
-      ScaffoldMessenger.of(
+      if(mounted){
+        ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Payment canceled')));
+      ).showSnackBar(  SnackBar(content: textWidget(text: 'Payment canceled',color: Colors.white
+      )));}
     } catch (e, stackTrace) {
       log("❌ Unexpected error: $e");
       log("🧩 Stack Trace: $stackTrace");
@@ -333,7 +342,7 @@ class _WalletScreenState extends State<WalletScreen> {
   ) async {
     try {
       final user = await locator<AuthLocalDataSource>().getUser();
-      if (user == null || user.token == null) {
+      if (user == null || user.authToken == null) {
         throw Exception('User not found in local storage');
       }
 
@@ -348,7 +357,7 @@ class _WalletScreenState extends State<WalletScreen> {
       final url = Uri.parse('$devBaseUrl/payments/paymentIntent');
       final response = await http.post(
         url,
-        headers: {'Authorization': 'Bearer ${user.token}'},
+        headers: {'Authorization': 'Bearer ${user.authToken}'},
         body: body,
       );
 
@@ -413,11 +422,11 @@ class _WalletHeaderCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: AppColors.authThemeColor.withOpacity(0.9),
+        color: AppColors.authThemeColor.withValues(alpha:0.9),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: AppColors.themeColor.withOpacity(0.2),
+            color: AppColors.themeColor.withValues(alpha:0.2),
             blurRadius: 8,
             offset: const Offset(0, 6),
           ),
@@ -445,21 +454,13 @@ class _WalletHeaderCard extends StatelessWidget {
                 child: AppButton(
                   text: "Add Money",
                   onTap: onAddMoney,
-                  buttonBackgroundColor: AppColors.backgroundColor.withOpacity(
+                  buttonBackgroundColor: AppColors.backgroundColor.withValues(alpha:
                     0.9,
                   ),
                   textColor: AppColors.authThemeColor,
                 ),
               ),
-              // const SizedBox(width: 12),
-              // Expanded(
-              //   child: AppButton(
-              //     text: "Withdraw",
-              //     buttonBackgroundColor: Colors.white.withOpacity(0.7),
-              //     textColor: AppColors.authThemeColor,
-              //     onTap: () {},
-              //   ),
-              // ),
+            
             ],
           ),
         ],
@@ -515,7 +516,7 @@ class _RecentTransactionsState extends State<_RecentTransactions> {
         borderRadius: BorderRadius.circular(22),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha:0.05),
             blurRadius: 10,
             offset: const Offset(0, 6),
           ),
@@ -531,13 +532,13 @@ class _RecentTransactionsState extends State<_RecentTransactions> {
           ),
           const SizedBox(height: 12),
           if (payments.isEmpty && !provider.isFetching)
-            const Center(
+              Center(
               child: Padding(
                 padding: EdgeInsets.symmetric(vertical: 32),
-                child: Text(
+                child: textWidget(text: 
                   "No transactions yet",
-                  style: TextStyle(color: Colors.grey),
-                ),
+              color: Colors.grey),
+            
               ),
             )
           else
@@ -584,7 +585,7 @@ class _PaymentTile extends StatelessWidget {
             width: 42,
             height: 42,
             decoration: BoxDecoration(
-              color: color.withOpacity(0.12),
+              color: color.withValues(alpha:0.12),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
@@ -604,12 +605,12 @@ class _PaymentTile extends StatelessWidget {
                   fontSize: 14,
                 ),
                 const SizedBox(height: 2),
-                Text(
+                textWidget(text: 
                   txn.createdAt != null
                       ? "${txn.createdAt!.day}/${txn.createdAt!.month}/${txn.createdAt!.year}"
                       : "N/A",
-                  style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
-                ),
+                fontSize: 12, color: Colors.grey.shade600),
+               
               ],
             ),
           ),
@@ -656,7 +657,7 @@ class _ErrorView extends StatelessWidget {
 }
 
 class _PaymentSuccessDialog extends StatefulWidget {
-  const _PaymentSuccessDialog({super.key});
+  const _PaymentSuccessDialog();
 
   @override
   State<_PaymentSuccessDialog> createState() => _PaymentSuccessDialogState();
@@ -668,7 +669,6 @@ class _PaymentSuccessDialogState extends State<_PaymentSuccessDialog> {
   @override
   void initState() {
     super.initState();
-    // Delay the checkmark animation safely
     Future.delayed(const Duration(milliseconds: 150), () {
       if (mounted) setState(() => showCheck = true);
     });
@@ -714,20 +714,20 @@ class _PaymentSuccessDialogState extends State<_PaymentSuccessDialog> {
               ),
             ),
             const SizedBox(height: 22),
-            const Text(
+              textWidget(text: 
               "Payment Successful!",
-              style: TextStyle(
+              
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
                 color: Colors.black87,
-              ),
+             
             ),
             const SizedBox(height: 8),
-            Text(
+            textWidget(text: 
               "Your wallet balance has been updated successfully.",
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.grey[700], fontSize: 14),
-            ),
+              alignment: TextAlign.center,
+             color: Colors.grey[700]!, fontSize: 14),
+           
             const SizedBox(height: 26),
             AppButton(
               text: "Continue",

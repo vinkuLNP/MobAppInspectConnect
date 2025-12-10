@@ -8,6 +8,7 @@ import 'package:inspect_connect/features/auth_flow/presentation/inspector/widget
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+
 class PersonalDetailsStep extends StatelessWidget {
   final InspectorViewModelProvider vm;
   final GlobalKey<FormState> formKey;
@@ -31,16 +32,16 @@ class PersonalDetailsStep extends StatelessWidget {
         const SizedBox(height: 10),
         textWidget(text: 'Phone Number', fontWeight: FontWeight.w400),
         const SizedBox(height: 8),
+
         Consumer<InspectorViewModelProvider>(
           builder: (_, vm, _) => FormField<String>(
             validator: (_) {
               final p = vm.phoneRaw ?? '';
-              if (!vm.autoValidate) return null;
               if ((vm.phoneE164 ?? '').isEmpty) return 'Phone is required';
               if (p.length < 10) return 'Enter a valid phone';
               return null;
             },
-            builder: (state) => Column(
+            builder: (fieldState) => Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 IntlPhoneField(
@@ -49,20 +50,19 @@ class PersonalDetailsStep extends StatelessWidget {
                   initialCountryCode: 'IN',
                   decoration: InputDecoration(
                     hintText: 'Phone Number',
+                    errorText: fieldState.errorText,
                     counterText: '',
-                    errorStyle: appTextStyle(fontSize: 12, color: Colors.red),
                     hintStyle: appTextStyle(fontSize: 12, color: Colors.grey),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
-
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(color: Colors.grey),
+                    enabledBorder: const OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                      borderSide: BorderSide(color: Colors.grey),
                     ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(
+                    focusedBorder: const OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                      borderSide: BorderSide(
                         color: AppColors.authThemeColor,
                         width: 2,
                       ),
@@ -88,9 +88,10 @@ class PersonalDetailsStep extends StatelessWidget {
                       number: phone.number,
                       e164: phone.completeNumber,
                     );
-                    if (vm.autoValidate) {
-                     formKey.currentState?.validate();
-                    }
+
+                    fieldState.didChange(phone.completeNumber);
+
+                    if (vm.autoValidate) formKey.currentState?.validate();
                   },
                   onCountryChanged: (country) {
                     vm.setPhoneParts(
@@ -101,22 +102,16 @@ class PersonalDetailsStep extends StatelessWidget {
                           ? '+${country.dialCode}${vm.phoneRaw}'
                           : '',
                     );
+
+                    fieldState.didChange(vm.phoneE164 ?? '');
                     if (vm.autoValidate) formKey.currentState?.validate();
                   },
                 ),
-                if (state.hasError)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 6),
-                    child: textWidget(
-                      text: "    ${state.errorText!}",
-                      fontSize: 12,
-                      color: Colors.red,
-                    ),
-                  ),
               ],
             ),
           ),
         ),
+
         const SizedBox(height: 10),
         AppInputField(
           label: 'Email',

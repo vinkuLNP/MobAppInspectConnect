@@ -1,3 +1,7 @@
+import 'package:inspect_connect/features/auth_flow/domain/entities/auth_user.dart';
+import 'package:inspect_connect/features/client_flow/data/models/certificate_subtype_model.dart';
+import 'package:inspect_connect/features/client_flow/domain/entities/booking_list_entity.dart';
+
 class CreateBookingResponseModel {
   final bool success;
   final String message;
@@ -18,55 +22,104 @@ class CreateBookingResponseModel {
   }
 }
 
-class BookingData {
-  final String id;
-  final String clientId;
-  final List<String> inspectorIds;
-  final List<String> certificateSubTypeId;
-  final List<String> images;
-  final String description;
-  final String bookingDate;
-  final String bookingTime;
-  final String bookingLocation;
-  final int status;
-  final bool isDeleted;
-  final String createdAt;
-  final String updatedAt;
-  final int v;
+class BookingData extends BookingListEntity {
+  final AuthUser? clientUser;
+  final AuthUser? inspector;
 
-  BookingData({
-    required this.id,
-    required this.clientId,
-    required this.inspectorIds,
-    required this.certificateSubTypeId,
-    required this.images,
-    required this.description,
-    required this.bookingDate,
-    required this.bookingTime,
-    required this.bookingLocation,
-    required this.status,
-    required this.isDeleted,
-    required this.createdAt,
-    required this.updatedAt,
-    required this.v,
+  const BookingData({
+    required super.id,
+    this.clientUser,
+    this.inspector,
+    super.inspectorIds = const [],
+    super.certificateSubTypes = const [],
+    super.images = const [],
+    required super.description,
+    required super.bookingDate,
+    required super.bookingTime,
+    required super.bookingLocation,
+    super.bookingLocationCoordinates,
+    super.bookingLocationZip,
+    super.status,
+    super.isDeleted,
+    super.createdAt,
+    super.updatedAt,
+    super.timerStartedAt,
+    super.timerEndedAt,
+    super.timerDuration,
+    super.finalBillingHours,
+    super.totalBillingAmount,
+    super.platformFee,
+    super.overRideAmount,
+    super.globalCharge,
+    super.finalRaisedAmount,
+    super.showUpFeeApplied,
+    super.showUpFee,
+    super.lateCancellation,
+    super.lateCancellationFee,
   });
 
   factory BookingData.fromJson(Map<String, dynamic> json) {
     return BookingData(
       id: json['_id'] ?? '',
-      clientId: json['clientId'] ?? '',
-      inspectorIds: List<String>.from(json['inspectorIds'] ?? []),
-      certificateSubTypeId: List<String>.from(json['certificateSubTypeId'] ?? []),
+
+      clientUser: json['clientId'] is Map
+          ? AuthUser.fromJson(json['clientId'])
+          : null,
+
+      inspector: json['inspectorId'] is Map
+          ? AuthUser.fromJson(json['inspectorId'])
+          : null,
+
+   inspectorIds: (json['inspectors'] as List<dynamic>? ?? [])
+    .map((item) {
+      if (item is Map && item['inspectorId'] is Map) {
+        return (item['inspectorId']['_id'] ?? '').toString();
+      }
+      return null;
+    })
+    .where((id) => id != null && id.isNotEmpty)
+    .cast<String>()
+    .toList(),
+
+
+      certificateSubTypes: (json['certificateSubTypeId'] as List? ?? [])
+          .map((e) => e is Map<String,dynamic> ? CertificateSubTypeModelData.fromJson(e) : null)
+          .whereType<CertificateSubTypeModelData>()
+          .toList(),
+
       images: List<String>.from(json['images'] ?? []),
+
       description: json['description'] ?? '',
       bookingDate: json['bookingDate'] ?? '',
       bookingTime: json['bookingTime'] ?? '',
       bookingLocation: json['bookingLocation'] ?? '',
-      status: json['status'] ?? 0,
-      isDeleted: json['isDeleted'] ?? false,
-      createdAt: json['createdAt'] ?? '',
-      updatedAt: json['updatedAt'] ?? '',
-      v: json['__v'] ?? 0,
+
+      bookingLocationCoordinates: (json['bookingLocationCoordinates'] as List?)
+          ?.map((e) => (e as num).toDouble())
+          .toList(),
+
+      bookingLocationZip: json['bookingLocationZip'],
+
+      status: json['status'],
+      isDeleted: json['isDeleted'],
+
+      createdAt: json['createdAt'],
+      updatedAt: json['updatedAt'],
+
+      timerStartedAt: json['timerStartedAt'],
+      timerEndedAt: json['timerEndedAt'],
+      timerDuration: json['timerDuration'],
+
+      finalBillingHours: json['finalBillingHours'],
+      totalBillingAmount: json['totalBillingAmount'],
+      platformFee: json['platformFee'],
+      overRideAmount: json['overRideAmount'],
+      globalCharge: json['globalCharge'],
+      finalRaisedAmount: json['finalRaisedAmount'],
+      showUpFeeApplied: json['showUpFeeApplied'],
+      showUpFee: json['showUpFee'],
+      lateCancellation: json['lateCancellation'],
+      lateCancellationFee: json['lateCancellationFee'],
     );
   }
 }
