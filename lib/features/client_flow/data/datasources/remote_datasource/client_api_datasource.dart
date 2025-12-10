@@ -285,11 +285,7 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
               ? {}
               : (jsonDecode(response.body) as Map<String, dynamic>);
 
-          final Map<String, dynamic> body =
-              (root['body'] as Map?)?.cast<String, dynamic>() ??
-              <String, dynamic>{};
-
-          final dto = CreateBookingResponseModel.fromJson(body);
+          final dto = CreateBookingResponseModel.fromJson(root);
           return ApiResultModel<CreateBookingResponseModel>.success(data: dto);
         },
         failure: (ErrorResultModel e) =>

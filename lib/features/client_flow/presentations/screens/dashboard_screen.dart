@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/di/app_component/app_component.dart';
+import 'package:inspect_connect/core/di/app_sockets/socket_manager.dart';
 import 'package:inspect_connect/core/di/app_sockets/socket_service.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/booking_provider.dart';
@@ -23,7 +24,8 @@ class ClientDashboardView extends StatefulWidget {
 class _ClientDashboardViewState extends State<ClientDashboardView> {
   int _selectedIndex = 0;
   late List<Widget> _pages;
-
+final socket = locator<SocketService>();
+  late final SocketManager socketManager;
   @override
   void initState() {
     super.initState();
@@ -36,24 +38,18 @@ class _ClientDashboardViewState extends State<ClientDashboardView> {
       ),
       ProfileScreen(),
     ];
-    final socket = locator<SocketService>();
-    socket.initSocket();
-       final user = context.read<UserProvider>().user;
-  socket.connectUser(user!.userId.toString());
+    final user = context.read<UserProvider>().user;
 
-  Provider.of<BookingProvider>(context, listen: false)
-      .listenSocketEvents(socket);
-
-
-
-// Listen for test responses
-socket.socket?.on("test_event", (data) {
-  log("✅ Received from server: $data");
-});
-
-// Send a test event
-socket.emitTestEvent();
-
+    socket.initSocket(token: user!.authToken.toString());
+   
+  final bookingProvider = context.read<BookingProvider>();
+    socketManager = SocketManager(bookingProvider);
+    socketManager.registerGlobalListeners(isInspector: false);
+ socket.connectUser(user.userId.toString());
+    socket.socket?.on("test_event", (data) {
+      log("📥 Received from server: $data");
+    });
+   
   }
 
   void _onItemTapped(int index) {
@@ -92,7 +88,7 @@ socket.emitTestEvent();
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha:0.1),
+                        color: Colors.black.withValues(alpha: 0.1),
                         blurRadius: 12,
                         offset: const Offset(0, 4),
                       ),
@@ -152,7 +148,7 @@ socket.emitTestEvent();
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha:0.2),
+                        color: Colors.black.withValues(alpha: 0.2),
                         blurRadius: 10,
                         offset: const Offset(0, 4),
                       ),
@@ -163,7 +159,7 @@ socket.emitTestEvent();
                     size: 32,
                     color: _selectedIndex == 0
                         ? Colors.white
-                        : Colors.white.withValues(alpha:0.9),
+                        : Colors.white.withValues(alpha: 0.9),
                   ),
                 ),
               ),
@@ -177,7 +173,7 @@ socket.emitTestEvent();
                 fontWeight: FontWeight.w600,
                 color: _selectedIndex == 0
                     ? Colors.white
-                    : Colors.white.withValues(alpha:0.8),
+                    : Colors.white.withValues(alpha: 0.8),
               ),
             ),
           ],
@@ -198,13 +194,13 @@ socket.emitTestEvent();
     final iconWidget = Icon(
       isSelected ? activeIcon : icon,
       size: 26,
-      color: isSelected ? Colors.white : Colors.white.withValues(alpha:0.8),
+      color: isSelected ? Colors.white : Colors.white.withValues(alpha: 0.8),
     );
 
     return InkWell(
       borderRadius: BorderRadius.circular(20),
       onTap: () => _onItemTapped(index),
-      splashColor: primary.withValues(alpha:0.1),
+      splashColor: primary.withValues(alpha: 0.1),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         curve: Curves.easeOut,
@@ -228,7 +224,9 @@ socket.emitTestEvent();
               text: label,
               fontSize: 12,
               fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-              color: isSelected ? Colors.white : Colors.white.withValues(alpha:0.8),
+              color: isSelected
+                  ? Colors.white
+                  : Colors.white.withValues(alpha: 0.8),
             ),
           ],
         ),

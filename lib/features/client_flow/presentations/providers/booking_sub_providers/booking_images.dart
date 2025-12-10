@@ -37,7 +37,7 @@ class BookingImagesService {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: textWidget(
-                text: 'File must be under 1 MB',
+                text: 'File must be under 2 MB',
                 color: AppColors.backgroundColor,
               ),
             ),

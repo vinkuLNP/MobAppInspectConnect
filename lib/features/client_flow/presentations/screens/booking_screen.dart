@@ -4,6 +4,7 @@ import 'package:inspect_connect/core/utils/constants/app_constants.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_button.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/features/client_flow/domain/entities/booking_list_entity.dart';
+import 'package:inspect_connect/features/client_flow/presentations/providers/user_provider.dart';
 import 'package:intl/intl.dart';
 import 'package:inspect_connect/core/basecomponents/base_responsive_widget.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/booking_provider.dart';
@@ -735,11 +736,12 @@ class _BookingsScreenState extends State<BookingsScreen> {
                             borderColor: Colors.red,
                             textColor: Colors.red,
                             onTap: () async {
+                              final user = context.read<UserProvider>().user;
                               final rootContext = Navigator.of(context).context;
                               Navigator.pop(context);
                               await context
                                   .read<BookingProvider>()
-                                  .disagreeBooking(rootContext, booking.id);
+                                  .disagreeBooking(rootContext, booking.id,user!.userId);
                             },
                           ),
                           const SizedBox(width: 10),
@@ -774,11 +776,12 @@ class _BookingsScreenState extends State<BookingsScreen> {
                         showIcon: true,
                         iconLeftMargin: 10,
                         onTap: () async {
+                          final user = context.read<UserProvider>().user;
                           final rootContext = Navigator.of(context).context;
                           Navigator.pop(context);
                           await context
                               .read<BookingProvider>()
-                              .approveAndPayBooking(rootContext, booking.id);
+                              .approveAndPayBooking(rootContext, booking.id,user!.userId);
                         },
                       ),
                     ],
@@ -865,19 +868,43 @@ class _BookingsScreenState extends State<BookingsScreen> {
               textWidget(text: "Description: ${booking.description}"),
               const SizedBox(height: 24),
 
-              AppButton(
-                text: isPending ? 'Edit Booking' : 'View Booking',
-                onTap: () async {
-                  Navigator.pop(context);
+              Row(
+                children: [
+                isPending ?   Expanded(
+                    child: AppButton(
+                      text: 'Edit Booking',
+                      onTap: () async {
+                        Navigator.pop(context);
+                    
+                        final provider = context.read<BookingProvider>();
+                        await provider.getBookingDetail(
+                          context: context,
+                          bookingId: booking.id,
+                          isEditable: true,
+                          isInspectorView: false,
+                        );
+                      },
+                    ),
+                  ) : SizedBox.shrink(),
+                  SizedBox(width: isPending ? 12 : 0),
+                    Expanded(
+                    child: AppButton(
+                      text: 'View Booking',
+                      onTap: () async {
+                        Navigator.pop(context);
+                    
+                        final provider = context.read<BookingProvider>();
+                        await provider.getBookingDetail(
+                          context: context,
+                          bookingId: booking.id,
+                          isEditable: false,
+                          isInspectorView: false,
+                        );
+                      },
+                    ),
+                  ),
 
-                  final provider = context.read<BookingProvider>();
-                  await provider.getBookingDetail(
-                    context: context,
-                    bookingId: booking.id,
-                    isEditable: isPending,
-                    isInspectorView: false,
-                  );
-                },
+                ],
               ),
               if (isPending || isApproved) ...[
                 const SizedBox(height: 12),

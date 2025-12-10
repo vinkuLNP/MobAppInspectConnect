@@ -134,20 +134,6 @@ class BookingTimerService {
   void _startLocalTimer(String bookingId) {
     ensureGlobalTimerRunning();
   }
-  // void _ensureGlobalTimerRunning() {
-  //   if (_timer != null && _timer!.isActive) return;
-
-  //   _timer = Timer.periodic(const Duration(seconds: 1), (_) {
-  //     for (final id in isTimerRunning.keys) {
-  //       if (isTimerRunning[id] == true) {
-  //         final current = activeTimers[id] ?? Duration.zero;
-  //         activeTimers[id] = current + const Duration(seconds: 1);
-  //       }
-  //     }
-  //     notifyListeners();
-  //   });
-  // }
-
   void ensureGlobalTimerRunning() {
     if (provider.timer != null && provider.timer!.isActive) return;
 

@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:inspect_connect/core/di/app_sockets/socket_manager.dart';
 import 'package:inspect_connect/core/di/app_sockets/socket_service.dart';
 import 'package:inspect_connect/core/utils/constants/app_assets_constants.dart';
 import 'package:inspect_connect/core/utils/presentation/app_assets_widget.dart';
@@ -29,7 +30,8 @@ class InspectorMainDashboard extends StatefulWidget {
 class _InspectorMainDashboardState extends State<InspectorMainDashboard> {
   int _selectedIndex = 0;
   late List<Widget> _pages;
-final socket = locator<SocketService>();
+  final socket = locator<SocketService>();
+  late final SocketManager socketManager;
   @override
   void initState() {
     super.initState();
@@ -37,22 +39,17 @@ final socket = locator<SocketService>();
       const RequestedInspectionScreen(),
       ApprovedInspectionsScreen(),
       const ProfileScreen(),
-      
     ];
-     socket.initSocket();
-       final user = context.read<UserProvider>().user;
-  socket.connectUser(user!.userId.toString());
+    final user = context.read<UserProvider>().user;
 
-  Provider.of<BookingProvider>(context, listen: false)
-      .listenSocketEvents(socket);
-       Provider.of<BookingProvider>(context, listen: false)
-      .listenRaiseInspectionInspector(socket);
-
-        final provider = context.read<BookingProvider>();
-
-  provider.listenRaiseInspectionClient(socket, context);  
-
-    
+    socket.initSocket(token: user!.authToken.toString());
+    final bookingProvider = context.read<BookingProvider>();
+    socketManager = SocketManager(bookingProvider);
+    socketManager.registerGlobalListeners(isInspector: true);
+     socket.connectUser(user.userId.toString());
+    socket.socket?.on("test_event", (data) {
+      log("📥 Received from server: $data");
+    });
   }
 
   void _onItemTapped(int index) {

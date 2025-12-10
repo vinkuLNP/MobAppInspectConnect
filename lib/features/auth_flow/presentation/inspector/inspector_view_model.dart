@@ -724,12 +724,12 @@ class InspectorViewModelProvider extends BaseViewModel {
         if (picked == null) return;
 
         final file = File(picked.path);
-        if (await file.length() > 1 * 1024 * 1024) {
+        if (await file.length() > 2 * 1024 * 1024) {
           if (context.mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: textWidget(
-                  text: 'File must be under 1 MB',
+                  text: 'File must be under 2 MB',
                   color: AppColors.backgroundColor,
                 ),
               ),

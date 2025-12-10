@@ -1,10 +1,9 @@
 import 'dart:async';
+import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:inspect_connect/core/basecomponents/base_view_model.dart';
-import 'package:inspect_connect/core/di/app_component/app_component.dart';
-import 'package:inspect_connect/core/di/app_sockets/socket_service.dart';
 import 'package:inspect_connect/features/client_flow/data/models/booking_detail_model.dart';
 import 'package:inspect_connect/features/client_flow/data/models/booking_model.dart';
 import 'package:inspect_connect/features/client_flow/domain/entities/booking_list_entity.dart';
@@ -12,7 +11,6 @@ import 'package:inspect_connect/features/client_flow/domain/entities/certificate
 import 'package:inspect_connect/features/client_flow/presentations/providers/booking_sub_providers/bookin_actions.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/booking_sub_providers/booking_filters.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/booking_sub_providers/booking_images.dart';
-import 'package:inspect_connect/features/client_flow/presentations/providers/booking_sub_providers/booking_socket.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/booking_sub_providers/booking_timers.dart';
 
 class BookingProvider extends BaseViewModel {
@@ -29,7 +27,7 @@ class BookingProvider extends BaseViewModel {
   final TextEditingController locationController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
   List<String> existingImageUrls = [];
-
+  String? currentBookingId;
   bool isProcessing = false;
   bool isLoadingBookingDetail = false;
   bool isLoading = false;
@@ -77,32 +75,47 @@ class BookingProvider extends BaseViewModel {
   late final BookingTimerService timerService;
   late final BookingActionsService actionsService;
   late final BookingFiltersService filtersService;
-  late final BookingSocketService socketService;
 
   BookingProvider() {
     imagesService = BookingImagesService(this);
     timerService = BookingTimerService(this);
     actionsService = BookingActionsService(this);
     filtersService = BookingFiltersService(this, timerService);
-    socketServiceInit();
   }
 
-  void socketServiceInit() {
-    socketService = BookingSocketService(this);
+  void onBookingAssigned({String? bookingId, dynamic inspectors}) {
+    log('Provider: booking assigned: \$bookingId');
+    //  show notification
+    notifyListeners();
+  }
+
+  void onRaiseInspectionUpdate(dynamic data) {
+    log('Provider: onRaiseInspectionUpdate: $data');
+    notifyListeners();
+  }
+
+  void onBookingStatusUpdated({
+    dynamic status,
+    String? bookingId,
+    String? message,
+  }) {
+    log(
+      'Provider: onBookingStatusUpdated status=\$status bookingId=\$bookingId',
+    );
+    // Update local booking list or UI
+    notifyListeners();
+  }
+
+  void onBookingCompleted({String? bookingId, dynamic payload}) {
+    log('Provider: onBookingCompleted bookingId=\$bookingId');
+    // Handle completion UI
+    notifyListeners();
   }
 
   Future<void> init() async {
     isLoading = true;
     notifyListeners();
     await fetchCertificateSubTypes();
-
-
-    
-  final socket = locator<SocketService>();
-  socket.initSocket();
-
-  socketService.listenSocketEvents(socket);
-  
     isLoading = false;
     notifyListeners();
   }
@@ -245,11 +258,13 @@ class BookingProvider extends BaseViewModel {
   Future<void> updateBookingStatus({
     required BuildContext context,
     required String bookingId,
+    required String userId,
     required int newStatus,
   }) => actionsService.updateBookingStatus(
     context: context,
     bookingId: bookingId,
     newStatus: newStatus,
+    userId: userId,
   );
 
   Future<void> updateShowUpFeeStatus({
@@ -262,27 +277,27 @@ class BookingProvider extends BaseViewModel {
     showUpFeeApplied: showUpFeeApplied,
   );
 
-  Future<void> approveAndPayBooking(BuildContext context, String bookingId) =>
-      actionsService.approveAndPayBooking(context, bookingId);
+  Future<void> approveAndPayBooking(
+    BuildContext context,
+    String bookingId,
+    String userId,
+  ) => actionsService.approveAndPayBooking(context, bookingId, userId);
 
-  Future<void> disagreeBooking(BuildContext context, String bookingId) =>
-      actionsService.disagreeBooking(context, bookingId);
+  Future<void> disagreeBooking(
+    BuildContext context,
+    String bookingId,
+    String userId,
+  ) => actionsService.disagreeBooking(context, bookingId, userId);
 
   Future<void> declineBooking({
     required BuildContext context,
     required String bookingId,
-  }) => actionsService.declineBooking(context: context, bookingId: bookingId);
-
-  void listenRaiseInspectionClient(
-    SocketService socket,
-    BuildContext context,
-  ) => socketService.listenRaiseInspectionClient(socket, context);
-
-  void listenRaiseInspectionInspector(SocketService socket) =>
-      socketService.listenRaiseInspectionInspector(socket);
-
-  void listenSocketEvents(SocketService socket) =>
-      socketService.listenSocketEvents(socket);
+    required String userId,
+  }) => actionsService.declineBooking(
+    context: context,
+    bookingId: bookingId,
+    userId: userId,
+  );
 
   TimeOfDay parseTime(String str) => filtersService.parseTime(str);
 
