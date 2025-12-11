@@ -64,10 +64,10 @@ class BookingActionsService {
         bookingLocationCoordinates: [
           provider.selectedLng != '' && provider.selectedLng != null
               ? provider.selectedLng.toString()
-              : '76.691',
+              : '76.6849524',
           provider.selectedLat != '' && provider.selectedLat != null
               ? provider.selectedLat.toString()
-              : '30.2672',
+              : '30.7033202',
         ],
       );
 
@@ -271,7 +271,17 @@ class BookingActionsService {
         data: (response) async {
           clearBookingDetail();
           Navigator.pop(context);
-          provider.fetchBookingsList();
+          provider.fetchBookingsList(reset: true);
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: textWidget(
+                  color: AppColors.whiteColor,
+                  text: 'Booking Deleted successfully.',
+                ),
+              ),
+            );
+          }
         },
         error: (e) {
           if (context.mounted) {

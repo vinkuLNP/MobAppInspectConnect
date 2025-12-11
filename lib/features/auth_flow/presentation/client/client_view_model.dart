@@ -222,6 +222,7 @@ class ClientViewModelProvider extends BaseViewModel {
       deviceToken = await DeviceInfoHelper.getDeviceToken();
       deviceType = await DeviceInfoHelper.getDeviceType();
 
+
       log('[RESET_PASSWORD] Device token: $deviceToken');
       log('[RESET_PASSWORD] Device type: $deviceType');
 
@@ -627,6 +628,8 @@ class ClientViewModelProvider extends BaseViewModel {
 
   String deviceToken = '';
   String deviceType = 'windows';
+  String fcmToken = '';
+
 
   Future<void> signIn({
     required GlobalKey<FormState> formKey,

@@ -823,6 +823,7 @@ class _BookingsScreenState extends State<BookingsScreen> {
   void _showBookingDetails(BuildContext context, BookingListEntity booking) {
     final isPending = booking.status == bookingStatusPending;
     final isApproved = booking.status == bookingStatusAccepted;
+    final isRejected = booking.status ==   bookingStatusRejected;
     final isAwaitingPayment = booking.status == bookingStatusAwaiting;
 
     if (isAwaitingPayment) {
@@ -906,7 +907,7 @@ class _BookingsScreenState extends State<BookingsScreen> {
 
                 ],
               ),
-              if (isPending || isApproved) ...[
+              if (isPending || isApproved || isRejected) ...[
                 const SizedBox(height: 12),
                 AppButton(
                   text: 'Delete Booking',
