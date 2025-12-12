@@ -7,7 +7,6 @@ import 'package:inspect_connect/core/utils/constants/app_assets_constants.dart';
 import 'package:inspect_connect/core/utils/presentation/app_assets_widget.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_widgets.dart';
-import 'package:inspect_connect/features/client_flow/presentations/providers/booking_provider.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/user_provider.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/wallet_provider.dart';
 import 'package:inspect_connect/features/client_flow/presentations/screens/payment_screens/wallet_screen.dart';
@@ -41,15 +40,10 @@ class _InspectorMainDashboardState extends State<InspectorMainDashboard> {
       const ProfileScreen(),
     ];
     final user = context.read<UserProvider>().user;
-
-    socket.initSocket(token: user!.authToken.toString());
-    final bookingProvider = context.read<BookingProvider>();
-    socketManager = SocketManager(bookingProvider);
-    socketManager.registerGlobalListeners(isInspector: true);
-     socket.connectUser(user.userId.toString());
-    socket.socket?.on("test_event", (data) {
-      log("📥 Received from server: $data");
-    });
+    if (user != null) {
+      final socket = locator<SocketService>();
+      socket.initSocket(token: user.authToken!);
+    }
   }
 
   void _onItemTapped(int index) {
