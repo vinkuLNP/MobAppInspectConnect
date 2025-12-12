@@ -83,13 +83,21 @@ class BookingTimerService {
           );
 
       state?.when(
-        data: (response) {
+        data: (response) async {
           provider.updatedBookingData = response;
           final index = provider.bookings.indexWhere((b) => b.id == bookingId);
           if (index != -1) {
             provider.bookings[index] = provider.updatedBookingData!;
           }
           provider.notify();
+          log(
+            "new deatils of booking timer update--------> ${response.status}",
+          );
+          await provider.actionsService.updateBoookingStatusSocket(
+            bookingId: bookingId,
+            inspectorId: response.clientUser!.userId,
+            status: response.status!,
+          );
         },
         error: (e) {
           if (context.mounted) {
@@ -134,6 +142,7 @@ class BookingTimerService {
   void _startLocalTimer(String bookingId) {
     ensureGlobalTimerRunning();
   }
+
   void ensureGlobalTimerRunning() {
     if (provider.timer != null && provider.timer!.isActive) return;
 

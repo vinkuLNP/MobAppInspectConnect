@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:flutter/material.dart';
+
 const String commonErrorUnexpectedMessage =
     'Something went wrong please try again';
 const int timeoutRequestStatusCode = 1000;
@@ -91,3 +93,123 @@ const int bookingStatusCancelledByInspector = 7;
 const int bookingStatusStarted = 8;
 const int bookingStatusPaused = 9;
 const int bookingStatusStoppped = 10;
+
+String bookingStatusToText(int status) {
+  switch (status) {
+    case bookingStatusPending:
+      return 'Pending';
+
+    case bookingStatusAccepted:
+      return 'Accepted';
+
+    case bookingStatusRejected:
+      return 'Rejected';
+
+    case bookingStatusStarted:
+      return 'Inspection Started';
+
+    case bookingStatusStoppped:
+      return 'Stopped';
+
+    case bookingStatusCompleted:
+      return 'Completed';
+
+    case bookingStatusCancelledByClient:
+      return 'Cancelled By Client';
+
+    case bookingStatusExpired:
+      return 'Expired';
+
+    case bookingStatusAwaiting:
+      return 'Waiting for Client Approval';
+
+    case bookingStatusCancelledByInspector:
+      return 'Cancelled By Inspector';
+
+    case bookingStatusPaused:
+      return 'Paused';
+
+    default:
+      return 'Other';
+  }
+}
+
+Color statusColor(int? status) {
+  switch (status) {
+    case bookingStatusPending:
+      return Colors.amber.shade700;
+
+    case bookingStatusAccepted:
+      return Colors.green.shade700;
+
+    case bookingStatusRejected:
+      return Colors.red.shade600;
+
+    case bookingStatusStarted:
+      return Colors.blue.shade600;
+
+    case bookingStatusStoppped:
+      return Colors.deepPurple.shade600;
+
+    case bookingStatusCompleted:
+      return Colors.teal.shade700;
+
+    case bookingStatusCancelledByClient:
+      return Colors.grey.shade700;
+
+    case bookingStatusCancelledByInspector:
+      return Colors.redAccent.shade200;
+
+    case bookingStatusExpired:
+      return Colors.grey.shade500;
+
+    case bookingStatusAwaiting:
+      return Colors.orange.shade600;
+
+    case bookingStatusPaused:
+      return const Color.fromARGB(255, 26, 227, 221);
+
+    default:
+      return Colors.grey;
+  }
+}
+
+IconData statusIcon(int status) {
+  switch (status) {
+    case bookingStatusPending:
+      return Icons.hourglass_empty;
+
+    case bookingStatusAccepted:
+      return Icons.check_circle;
+
+    case bookingStatusRejected:
+      return Icons.cancel;
+
+    case bookingStatusCompleted:
+      return Icons.verified;
+
+    case bookingStatusAwaiting:
+      return Icons.hourglass_bottom;
+
+    case bookingStatusCancelledByClient:
+      return Icons.person_off;
+
+    case bookingStatusCancelledByInspector:
+      return Icons.engineering;
+
+    case bookingStatusExpired:
+      return Icons.timer_off;
+
+    case bookingStatusStarted:
+      return Icons.play_arrow;
+
+    case bookingStatusPaused:
+      return Icons.pause_circle_filled;
+
+    case bookingStatusStoppped:
+      return Icons.stop_circle;
+
+    default:
+      return Icons.info_outline;
+  }
+}

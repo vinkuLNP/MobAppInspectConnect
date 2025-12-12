@@ -103,7 +103,7 @@ class BookingActionsService {
             bookingId: response.body.id,
             inspectorIds: inspectorIds,
           );
-          clearBookingData();
+          // clearBookingData();
         },
         error: (e) {
           if (context.mounted) {

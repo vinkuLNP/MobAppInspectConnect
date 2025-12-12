@@ -62,28 +62,35 @@ class BookingData extends BookingListEntity {
     return BookingData(
       id: json['_id'] ?? '',
 
-      clientUser: json['clientId'] is Map
+      clientUser: json['clientId'] is Map<String, dynamic>
           ? AuthUser.fromJson(json['clientId'])
+          : json['clientId'] is String
+          ? AuthUser(id: json['clientId'], userId: json['clientId'])
           : null,
 
-      inspector: json['inspectorId'] is Map
+      inspector: json['inspectorId'] is Map<String, dynamic>
           ? AuthUser.fromJson(json['inspectorId'])
+          : json['inspectorId'] is String
+          ? AuthUser(id: json['inspectorId'], userId: json['inspectorId'])
           : null,
 
-   inspectorIds: (json['inspectors'] as List<dynamic>? ?? [])
-    .map((item) {
-      if (item is Map && item['inspectorId'] is Map) {
-        return (item['inspectorId']['_id'] ?? '').toString();
-      }
-      return null;
-    })
-    .where((id) => id != null && id.isNotEmpty)
-    .cast<String>()
-    .toList(),
-
+      inspectorIds: (json['inspectors'] as List<dynamic>? ?? [])
+          .map((item) {
+            if (item is Map && item['inspectorId'] is Map) {
+              return (item['inspectorId']['_id'] ?? '').toString();
+            }
+            return null;
+          })
+          .where((id) => id != null && id.isNotEmpty)
+          .cast<String>()
+          .toList(),
 
       certificateSubTypes: (json['certificateSubTypeId'] as List? ?? [])
-          .map((e) => e is Map<String,dynamic> ? CertificateSubTypeModelData.fromJson(e) : null)
+          .map(
+            (e) => e is Map<String, dynamic>
+                ? CertificateSubTypeModelData.fromJson(e)
+                : null,
+          )
           .whereType<CertificateSubTypeModelData>()
           .toList(),
 

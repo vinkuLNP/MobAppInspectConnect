@@ -4,9 +4,11 @@ import 'package:inspect_connect/core/utils/constants/app_constants.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_button.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_widgets.dart';
+import 'package:inspect_connect/features/client_flow/domain/entities/booking_list_entity.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/booking_provider.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/user_provider.dart';
 import 'package:inspect_connect/features/inspector_flow/presentations/widgets/common_inspection_listing.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class ApprovedInspectionsScreen extends StatelessWidget {
@@ -39,80 +41,140 @@ class ApprovedInspectionsScreen extends StatelessWidget {
                 provider.showUpFeeStatusMap[booking.id] ??
                 booking.showUpFeeApplied ??
                 false;
-
             if (status == bookingStatusAccepted) {
-              return Column(
-                children: [
-                  AppButton(
-                    width: MediaQuery.of(context).size.width / 1.4,
-                    text: showUpFeeApplied
-                        ? "Cancel Show-Up Fee"
-                        : "Apply Show-Up Fee",
-                    buttonBackgroundColor: showUpFeeApplied
-                        ? AppColors.darkShadeAuthColor
-                        : AppColors.authThemeColor,
-                    onTap: () {
-                      showConfirmationDialog(
-                        context: context,
-                        icon: showUpFeeApplied
-                            ? Icons.undo
-                            : Icons.attach_money,
-                        confirmColor: AppColors.authThemeColor,
-                        title: showUpFeeApplied
-                            ? "Cancel Show-Up Fee"
-                            : "Apply Show-Up Fee",
-                        message: showUpFeeApplied
-                            ? "Do you want to cancel the applied Show-Up Fee?"
-                            : "Are you sure you want to apply a Show-Up Fee to this booking?",
-                        confirmText: showUpFeeApplied
-                            ? "Cancel Fee"
-                            : "Apply Fee",
-                        onConfirm: () async {
-                          Navigator.pop(context);
-                          await provider.updateShowUpFeeStatus(
-                            context: context,
-                            bookingId: booking.id,
-                            showUpFeeApplied: !showUpFeeApplied,
-                          );
-                        },
-                      );
-                    },
-                  ),
+              final now = DateTime.now();
+              final bookingTime = bookingDateTime(booking);
+              final diffHours = bookingTime.difference(now).inMinutes / 60;
+              final bool canDecline = diffHours > 8;
 
-                  const SizedBox(height: 10),
-
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      AppButton(
-                        width: MediaQuery.of(context).size.width / 2.8,
-                        isBorder: true,
-                        borderColor: Colors.red,
-                        textColor: Colors.red,
-                        buttonBackgroundColor: AppColors.backgroundColor,
-                        text: "Decline Inspection",
-                        onTap: () => showConfirmationDialog(
+              if (canDecline) {
+                return Column(
+                  children: [
+                    AppButton(
+                      width: MediaQuery.of(context).size.width / 1.4,
+                      text: showUpFeeApplied
+                          ? "Cancel Show-Up Fee"
+                          : "Apply Show-Up Fee",
+                      buttonBackgroundColor: showUpFeeApplied
+                          ? AppColors.darkShadeAuthColor
+                          : AppColors.authThemeColor,
+                      onTap: () {
+                        showConfirmationDialog(
                           context: context,
-                          confirmColor: Colors.redAccent,
-                          icon: Icons.cancel_outlined,
-                          title: "Decline Booking",
-                          message:
-                              "Are you sure you want to decline this booking request?",
-                          confirmText: "Decline",
+                          icon: showUpFeeApplied
+                              ? Icons.undo
+                              : Icons.attach_money,
+                          confirmColor: AppColors.authThemeColor,
+                          title: showUpFeeApplied
+                              ? "Cancel Show-Up Fee"
+                              : "Apply Show-Up Fee",
+                          message: showUpFeeApplied
+                              ? "Do you want to cancel the applied Show-Up Fee?"
+                              : "Are you sure you want to apply a Show-Up Fee to this booking?",
+                          confirmText: showUpFeeApplied
+                              ? "Cancel Fee"
+                              : "Apply Fee",
                           onConfirm: () async {
-                       final user = context.read<UserProvider>().user;
                             Navigator.pop(context);
-                            await provider.updateBookingStatus(
+                            await provider.updateShowUpFeeStatus(
                               context: context,
                               bookingId: booking.id,
-                              newStatus: bookingStatusCancelledByInspector,
-                              userId: user!.userId,
+                              showUpFeeApplied: !showUpFeeApplied,
+                            );
+                          },
+                        );
+                      },
+                    ),
+
+                    const SizedBox(height: 10),
+
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        AppButton(
+                          width: MediaQuery.of(context).size.width / 2.8,
+                          isBorder: true,
+                          borderColor: Colors.red,
+                          textColor: Colors.red,
+                          buttonBackgroundColor: AppColors.backgroundColor,
+                          text: "Decline Inspection",
+                          onTap: () => showConfirmationDialog(
+                            context: context,
+                            confirmColor: Colors.redAccent,
+                            icon: Icons.cancel_outlined,
+                            title: "Decline Booking",
+                            message:
+                                "Are you sure you want to decline this booking request?",
+                            confirmText: "Decline",
+                            onConfirm: () async {
+                              final user = context.read<UserProvider>().user;
+                              Navigator.pop(context);
+                              await provider.updateBookingStatus(
+                                context: context,
+                                bookingId: booking.id,
+                                newStatus: bookingStatusCancelledByInspector,
+                                userId: user!.userId,
+                              );
+                            },
+                          ),
+                        ),
+
+                        AppButton(
+                          width: MediaQuery.of(context).size.width / 2.8,
+                          text: "Start Inspection",
+                          onTap: () async {
+                            await provider.startInspectionTimer(
+                              context: context,
+                              bookingId: booking.id,
                             );
                           },
                         ),
+                      ],
+                    ),
+                  ],
+                );
+              } else {
+                return Row(
+                  children: [
+                    Expanded(
+                      child: AppButton(
+                        text: showUpFeeApplied
+                            ? "Cancel Show-Up Fee"
+                            : "Apply Show-Up Fee",
+                        buttonBackgroundColor: showUpFeeApplied
+                            ? AppColors.darkShadeAuthColor
+                            : AppColors.authThemeColor,
+                        onTap: () {
+                          showConfirmationDialog(
+                            context: context,
+                            icon: showUpFeeApplied
+                                ? Icons.undo
+                                : Icons.attach_money,
+                            confirmColor: AppColors.authThemeColor,
+                            title: showUpFeeApplied
+                                ? "Cancel Show-Up Fee"
+                                : "Apply Show-Up Fee",
+                            message: showUpFeeApplied
+                                ? "Do you want to cancel the applied Show-Up Fee?"
+                                : "Are you sure you want to apply a Show-Up Fee to this booking?",
+                            confirmText: showUpFeeApplied
+                                ? "Cancel Fee"
+                                : "Apply Fee",
+                            onConfirm: () async {
+                              Navigator.pop(context);
+                              await provider.updateShowUpFeeStatus(
+                                context: context,
+                                bookingId: booking.id,
+                                showUpFeeApplied: !showUpFeeApplied,
+                              );
+                            },
+                          );
+                        },
                       ),
-                      AppButton(
-                        width: MediaQuery.of(context).size.width / 2.8,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: AppButton(
                         text: "Start Inspection",
                         onTap: () async {
                           await provider.startInspectionTimer(
@@ -121,10 +183,10 @@ class ApprovedInspectionsScreen extends StatelessWidget {
                           );
                         },
                       ),
-                    ],
-                  ),
-                ],
-              );
+                    ),
+                  ],
+                );
+              }
             }
 
             if (isStarted || isPaused || isStopped) {
@@ -251,5 +313,21 @@ class ApprovedInspectionsScreen extends StatelessWidget {
           ),
       ],
     );
+  }
+
+  DateTime bookingDateTime(BookingListEntity booking) {
+    final date = DateTime.parse(booking.bookingDate);
+    final t = booking.bookingTime.trim().toUpperCase().replaceAll('.', '');
+    try {
+      DateTime time;
+      if (t.contains('AM') || t.contains('PM')) {
+        time = DateFormat('h:mm a').parse(t);
+      } else {
+        time = DateFormat('HH:mm').parse(t);
+      }
+      return DateTime(date.year, date.month, date.day, time.hour, time.minute);
+    } catch (_) {
+      return DateTime(date.year, date.month, date.day, 10, 0);
+    }
   }
 }
