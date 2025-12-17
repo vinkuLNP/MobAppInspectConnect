@@ -1,10 +1,9 @@
+import 'dart:developer';
 import 'dart:io';
-import 'package:device_info_plus/device_info_plus.dart';
-import 'package:uuid/uuid.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 class DeviceInfoHelper {
-  static final DeviceInfoPlugin _deviceInfoPlugin = DeviceInfoPlugin();
-  static final Uuid _uuid = const Uuid();
 
   static Future<String> getDeviceType() async {
     if (Platform.isAndroid) return 'android';
@@ -17,25 +16,39 @@ class DeviceInfoHelper {
 
   static Future<String> getDeviceToken() async {
     try {
-      if (Platform.isAndroid) {
-        final androidInfo = await _deviceInfoPlugin.androidInfo;
-        return '${androidInfo.id}_${_uuid.v4()}';
-      } else if (Platform.isIOS) {
-        final iosInfo = await _deviceInfoPlugin.iosInfo;
-        return '${iosInfo.identifierForVendor}_${_uuid.v4()}';
-      } else if (Platform.isWindows) {
-        final winInfo = await _deviceInfoPlugin.windowsInfo;
-        return '${winInfo.deviceId}_${_uuid.v4()}';
-      } else if (Platform.isMacOS) {
-        final macInfo = await _deviceInfoPlugin.macOsInfo;
-        return '${macInfo.systemGUID}_${_uuid.v4()}';
-      } else {
-        return _uuid.v4();
+      final messaging = FirebaseMessaging.instance;
+
+      if (Platform.isIOS) {
+        final settings = await messaging.requestPermission(
+          alert: true,
+          badge: true,
+          sound: true,
+          provisional: false,
+        );
+        log('[FCM] iOS authorizationStatus: ${settings.authorizationStatus}');
+        if (settings.authorizationStatus != AuthorizationStatus.authorized &&
+            settings.authorizationStatus != AuthorizationStatus.provisional) {
+          log('[FCM] Notifications not allowed — returning empty token');
+          return "";
+        }
       }
-    } catch (e) {
-      return _uuid.v4();
+
+      final token = await messaging.getToken();
+      log('[FCM] FCM token: $token');
+      return token ?? "";
+    }  on FirebaseException catch (e, s) {
+      if (e.code == 'apns-token-not-set') {
+        log('[FCM] APNS token not set yet, using placeholder.\n$e\n$s');
+
+        return 'apns-token-pending-ios';
+      }
+
+      log('[FCM] FirebaseException in getDeviceToken: ${e.code} - ${e.message}\n$s');
+      return '';
+    }  catch (e) {
+          log('[FCM] FCM ERRROR: $e');
+
+      return "";
     }
   }
-
-
 }

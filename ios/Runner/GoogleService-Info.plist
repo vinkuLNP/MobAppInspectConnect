@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>API_KEY</key>
+	<string>AIzaSyCRlmUoVsppRhgIIYg7E4thS4yvZqynVV4</string>
+	<key>GCM_SENDER_ID</key>
+	<string>382306965491</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.lnp.inspectConnect</string>
+	<key>PROJECT_ID</key>
+	<string>inspectconnect-ffea2</string>
+	<key>STORAGE_BUCKET</key>
+	<string>inspectconnect-ffea2.firebasestorage.app</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:382306965491:ios:d2290c11d1acd4d9a72486</string>
+</dict>
+</plist>

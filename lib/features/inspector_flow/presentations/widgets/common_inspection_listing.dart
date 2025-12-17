@@ -227,11 +227,11 @@ class _BaseInspectionListScreenState extends State<BaseInspectionListScreen>
               child: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha:0.9),
+                  color: Colors.white.withValues(alpha: 0.9),
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha:0.15),
+                      color: Colors.black.withValues(alpha: 0.15),
                       blurRadius: 6,
                     ),
                   ],
@@ -276,7 +276,7 @@ class _BaseInspectionListScreenState extends State<BaseInspectionListScreen>
         }
       },
       borderRadius: BorderRadius.circular(20),
-      splashColor: Colors.blueAccent.withValues(alpha:0.1),
+      splashColor: Colors.blueAccent.withValues(alpha: 0.1),
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 8),
         decoration: BoxDecoration(
@@ -288,7 +288,7 @@ class _BaseInspectionListScreenState extends State<BaseInspectionListScreen>
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha:0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -377,79 +377,31 @@ class _BaseInspectionListScreenState extends State<BaseInspectionListScreen>
   }
 
   Widget _buildStatusChip(int? status) {
-    final label = _statusLabel(status);
-    final color = _statusColor(status);
+    final label = bookingStatusToText(status ?? -1);
+    final color = statusColor(status);
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withValues(alpha:0.12),
+        color: color.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(30),
-        border: Border.all(color: color.withValues(alpha:0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
-      child: Text(
-        label,
-        style: TextStyle(
-          color: color,
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
-          letterSpacing: 0.3,
-        ),
+      child: Row(
+        children: [
+          Icon(statusIcon(status ?? 1), size: 16, color: color),
+          SizedBox(width: 3),
+          Text(
+            label,
+            style: TextStyle(
+              color: color,
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0.3,
+            ),
+          ),
+        ],
       ),
     );
-  }
-
-  String _statusLabel(int? status) {
-    switch (status) {
-      case bookingStatusPending:
-        return 'Pending';
-      case bookingStatusAccepted:
-        return 'Accepted';
-      case bookingStatusRejected:
-        return 'Rejected';
-      case bookingStatusStarted:
-        return 'Inspection Started';
-      case bookingStatusStoppped:
-        return 'Stopped';
-      case bookingStatusCompleted:
-        return 'Completed';
-      case bookingStatusCancelledByClient:
-        return 'Cancelled By Client';
-      case bookingStatusExpired:
-        return 'Expired';
-      case bookingStatusAwaiting:
-        return 'Waiting for Client Approval';
-      case bookingStatusCancelledByInspector:
-        return 'Canecelled By Inspector';
-      default:
-        return 'Other';
-    }
-  }
-
-  Color _statusColor(int? status) {
-    switch (status) {
-      case bookingStatusPending:
-        return Colors.amber.shade700;
-      case bookingStatusAccepted:
-        return Colors.green.shade700;
-      case bookingStatusRejected:
-        return Colors.red.shade600;
-      case bookingStatusStarted:
-        return Colors.blue.shade600;
-      case bookingStatusStoppped:
-        return Colors.deepPurple.shade600;
-      case bookingStatusCompleted:
-        return Colors.teal.shade700;
-      case bookingStatusCancelledByClient:
-        return Colors.grey.shade700;
-      case bookingStatusCancelledByInspector:
-        return Colors.redAccent.shade200;
-      case bookingStatusExpired:
-        return Colors.grey.shade500;
-      case bookingStatusAwaiting:
-        return Colors.orange.shade600;
-      default:
-        return Colors.grey;
-    }
   }
 }

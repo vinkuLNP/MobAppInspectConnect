@@ -8,7 +8,6 @@ import 'package:inspect_connect/features/client_flow/presentations/providers/use
 import 'package:intl/intl.dart';
 import 'package:inspect_connect/core/basecomponents/base_responsive_widget.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/booking_provider.dart';
-import 'package:inspect_connect/features/client_flow/presentations/widgets/common_app_bar.dart';
 import 'package:provider/provider.dart';
 
 class BookingsScreen extends StatefulWidget {
@@ -114,10 +113,7 @@ class _BookingsScreenState extends State<BookingsScreen> {
             final otherBookings = provider.bookings
                 .where((b) => !todaysApproved.contains(b))
                 .toList();
-            return Scaffold(
-              appBar: const CommonAppBar(showLogo: true, title: 'Bookings'),
-              backgroundColor: Colors.grey[100],
-              body: Stack(
+            return  Stack(
                 children: [
                   Padding(
                     padding: const EdgeInsets.all(16),
@@ -258,7 +254,6 @@ class _BookingsScreenState extends State<BookingsScreen> {
                       ),
                     ),
                 ],
-              ),
             );
           },
         );
@@ -420,7 +415,7 @@ class _BookingsScreenState extends State<BookingsScreen> {
   }
 
   Widget _buildBookingCard(BuildContext context, BookingListEntity booking) {
-    final color = _statusColor(booking.status);
+    final color = statusColor(booking.status);
 
     return GestureDetector(
       onTap: () => _showBookingDetails(context, booking),
@@ -457,6 +452,8 @@ class _BookingsScreenState extends State<BookingsScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
                       children: [
                         Flexible(
                           flex: 6,
@@ -488,14 +485,14 @@ class _BookingsScreenState extends State<BookingsScreen> {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Icon(
-                                  _statusIcon(booking.status!),
+                                  statusIcon(booking.status!),
                                   size: 16,
                                   color: color,
                                 ),
                                 const SizedBox(width: 4),
                                 Flexible(
                                   child: textWidget(
-                                    text: _statusLabel(booking.status),
+                                    text: bookingStatusToText(booking.status ?? -1),
                                     fontSize: 12,
                                     color: color,
                                     fontWeight: FontWeight.w600,
@@ -555,35 +552,6 @@ class _BookingsScreenState extends State<BookingsScreen> {
         ),
       ),
     );
-  }
-
-  IconData _statusIcon(int status) {
-    switch (status) {
-      case bookingStatusPending:
-        return Icons.hourglass_empty;
-      case bookingStatusAccepted:
-        return Icons.check_circle;
-      case bookingStatusRejected:
-        return Icons.cancel;
-      case bookingStatusCompleted:
-        return Icons.verified;
-      case bookingStatusAwaiting:
-        return Icons.hourglass_bottom;
-      case bookingStatusCancelledByClient:
-        return Icons.person_off;
-      case bookingStatusCancelledByInspector:
-        return Icons.engineering;
-      case bookingStatusExpired:
-        return Icons.timer_off;
-      case bookingStatusStarted:
-        return Icons.play_arrow;
-      case bookingStatusPaused:
-        return Icons.pause_circle_filled;
-      case bookingStatusStoppped:
-        return Icons.stop_circle;
-      default:
-        return Icons.info_outline;
-    }
   }
 
   void _showApprovalDialog(BuildContext context, BookingListEntity booking) {
@@ -823,6 +791,7 @@ class _BookingsScreenState extends State<BookingsScreen> {
   void _showBookingDetails(BuildContext context, BookingListEntity booking) {
     final isPending = booking.status == bookingStatusPending;
     final isApproved = booking.status == bookingStatusAccepted;
+    final isRejected = booking.status ==   bookingStatusRejected;
     final isAwaitingPayment = booking.status == bookingStatusAwaiting;
 
     if (isAwaitingPayment) {
@@ -906,15 +875,16 @@ class _BookingsScreenState extends State<BookingsScreen> {
 
                 ],
               ),
-              if (isPending || isApproved) ...[
+              if (isPending || isApproved || isRejected) ...[
                 const SizedBox(height: 12),
                 AppButton(
                   text: 'Delete Booking',
                   buttonBackgroundColor: Colors.redAccent,
-                  onTap: () {
-                    Navigator.pop(context);
-                    _confirmDelete(context, booking);
-                  },
+                  onTap: () => _showDeleteBookingModal(
+                    context,
+                    booking,
+                    cancellationFee: 60,
+                  ),
                 ),
               ],
               const SizedBox(height: 12),
@@ -926,10 +896,10 @@ class _BookingsScreenState extends State<BookingsScreen> {
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: _statusColor(booking.status).withValues(alpha: 0.1),
+                    color: statusColor(booking.status).withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
-                      color: _statusColor(
+                      color: statusColor(
                         booking.status,
                       ).withValues(alpha: 0.4),
                     ),
@@ -939,14 +909,14 @@ class _BookingsScreenState extends State<BookingsScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(
-                        _statusIcon(booking.status!),
-                        color: _statusColor(booking.status),
+                        statusIcon(booking.status!),
+                        color: statusColor(booking.status),
                         size: 18,
                       ),
                       const SizedBox(width: 6),
                       textWidget(
-                        text: _statusLabel(booking.status),
-                        color: _statusColor(booking.status),
+                        text: bookingStatusToText(booking.status ?? -1),
+                        color: statusColor(booking.status),
                         fontWeight: FontWeight.bold,
                       ),
                     ],
@@ -959,87 +929,123 @@ class _BookingsScreenState extends State<BookingsScreen> {
       },
     );
   }
+ Future<void> _showDeleteBookingModal(
+    BuildContext context,
+    BookingListEntity booking, {
+    required double cancellationFee,
+  }) async {
+    final bookingProvider = context.read<BookingProvider>();
+    bool isLoading = false;
 
-  void _confirmDelete(BuildContext context, BookingListEntity booking) {
-    showDialog(
+    // Calculate if booking is within next 8 hours
+    DateTime bookingDateTime() {
+      final date = DateTime.parse(booking.bookingDate);
+      final t = booking.bookingTime.trim().toUpperCase().replaceAll('.', '');
+      try {
+        DateTime time;
+        if (t.contains('AM') || t.contains('PM')) {
+          time = DateFormat('h:mm a').parse(t);
+        } else {
+          time = DateFormat('HH:mm').parse(t);
+        }
+        return DateTime(
+          date.year,
+          date.month,
+          date.day,
+          time.hour,
+          time.minute,
+        );
+      } catch (_) {
+        return DateTime(date.year, date.month, date.day, 10, 0);
+      }
+    }
+
+    final now = DateTime.now();
+    final bookingTime = bookingDateTime();
+    final diffHours = bookingTime.difference(now).inMinutes / 60;
+    final bool isWithin8Hours = diffHours > 0 && diffHours < 8;
+
+    await showDialog(
       context: context,
-      builder: (_) => AlertDialog(
-        title: textWidget(text: 'Delete Booking?'),
-        content: textWidget(
-          text: 'Are you sure you want to delete this booking?',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: textWidget(text: 'Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              context.read<BookingProvider>().deleteBookingDetail(
-                context: context,
-                bookingId: booking.id,
-              );
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
-            child: textWidget(text: 'Delete'),
-          ),
-        ],
-      ),
+      // barrierDismissible: false,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return Dialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              insetPadding: const EdgeInsets.symmetric(
+                horizontal: 24,
+                vertical: 20,
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    textWidget(
+                      text: "Delete Booking?",
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    const SizedBox(height: 16),
+                    textWidget(
+                      text:
+                          "Are you sure you want to delete this booking? This action cannot be undone.",
+                      fontSize: 14,
+                      color: Colors.grey[700]!,
+                    ),
+                    if (isWithin8Hours) ...[
+                      const SizedBox(height: 12),
+                      textWidget(
+                        text:
+                            "⚠ Note: Since the booking time is within the next 8 hours, a cancellation fee of \$${cancellationFee.toStringAsFixed(2)} will be applied.",
+                        fontSize: 14,
+                        color: Colors.redAccent,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ],
+                    const SizedBox(height: 24),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        TextButton(
+                          onPressed: isLoading
+                              ? null
+                              : () => Navigator.pop(context),
+                          child: textWidget(text: "Cancel"),
+                        ),
+                        const SizedBox(width: 12),
+                        AppButton(
+                          width: MediaQuery.of(context).size.width / 5,
+                          buttonBackgroundColor: Colors.redAccent,
+                          onTap: isLoading
+                              ? null
+                              : () async {
+                                  setState(() => isLoading = true);
+
+                                  await bookingProvider.deleteBookingDetail(
+                                    context: context,
+                                    bookingId: booking.id,
+                                    // applyCancellationFee: isWithin8Hours,
+                                  );
+
+                                  setState(() => isLoading = false);
+                                  if (context.mounted) Navigator.pop(context);
+                                },
+                          text: "Delete",
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
     );
-  }
-
-  String _statusLabel(int? status) {
-    switch (status) {
-      case bookingStatusPending:
-        return 'Pending';
-      case bookingStatusAccepted:
-        return 'Accepted';
-      case bookingStatusRejected:
-        return 'Rejected';
-      case bookingStatusStarted:
-        return 'Inspection Started';
-      case bookingStatusStoppped:
-        return 'Stopped';
-      case bookingStatusCompleted:
-        return 'Completed';
-      case bookingStatusCancelledByClient:
-        return 'Cancelled By You';
-      case bookingStatusExpired:
-        return 'Expired';
-      case bookingStatusAwaiting:
-        return 'Awaiting for your Approval';
-      case bookingStatusCancelledByInspector:
-        return 'Canecelled By Inspector';
-      default:
-        return 'Other';
-    }
-  }
-
-  Color _statusColor(int? status) {
-    switch (status) {
-      case bookingStatusPending:
-        return Colors.amber.shade700;
-      case bookingStatusAccepted:
-        return Colors.green.shade700;
-      case bookingStatusRejected:
-        return Colors.red.shade600;
-      case bookingStatusStarted:
-        return Colors.blue.shade600;
-      case bookingStatusStoppped:
-        return Colors.deepPurple.shade600;
-      case bookingStatusCompleted:
-        return Colors.teal.shade700;
-      case bookingStatusCancelledByClient:
-        return Colors.grey.shade700;
-      case bookingStatusCancelledByInspector:
-        return Colors.redAccent.shade200;
-      case bookingStatusExpired:
-        return Colors.grey.shade500;
-      case bookingStatusAwaiting:
-        return Colors.orange.shade600;
-      default:
-        return Colors.grey;
-    }
   }
 
   void _showSortFilterSheet(BuildContext context) {

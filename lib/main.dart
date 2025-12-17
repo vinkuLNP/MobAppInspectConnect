@@ -1,8 +1,12 @@
 import 'dart:developer';
 
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:inspect_connect/core/di/app_component/app_component.dart';
+import 'package:inspect_connect/core/di/notifcation_services/app_notification.dart';
+import 'package:inspect_connect/core/di/notifcation_services/firebase_background.dart';
 import 'package:inspect_connect/core/utils/auto_router_setup/auto_router.dart';
 import 'package:inspect_connect/core/utils/constants/app_constants.dart';
 import 'package:inspect_connect/core/utils/helpers/app_flavor_helper/app_flavors_helper.dart';
@@ -18,21 +22,71 @@ import 'package:provider/provider.dart';
 
 final rootNavigatorKey = GlobalKey<NavigatorState>();
 final appRouter = AppRouter(navigatorKey: rootNavigatorKey);
+
+Future<void> initializeFirebaseMessaging() async {
+  await Firebase.initializeApp();
+
+  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+
+  await NotificationService.init();
+
+  FirebaseMessaging messaging = FirebaseMessaging.instance;
+  NotificationSettings settings = await messaging.requestPermission(
+    alert: true,
+    badge: true,
+    sound: true,
+  );
+  print('User granted permission: ${settings.authorizationStatus}');
+
+  FirebaseMessaging.onMessage.listen((message) {
+    NotificationService.show(message);
+  });
+
+  FirebaseMessaging.onMessageOpenedApp.listen((message) {
+    final redirectUrl =
+        message.data['redirectUrl'] ?? message.data['click_action'];
+    if (redirectUrl != null) {
+      NotificationService.handleRedirect(redirectUrl);
+    }
+  });
+}
+  
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   Stripe.publishableKey = stripePublishableKey;
 
   await Stripe.instance.applySettings();
+
   await initAppComponentLocator();
+
   setupLocator();
+
   final AppFlavorsHelper configService = locator<AppFlavorsHelper>();
+
   final ProductFlavor? productFlavor = EnvironmentConfig.buildVariant
       .toProductFlavor();
+
   configService.configure(productFlavor: productFlavor);
+
   log(' buildVariant = ${EnvironmentConfig.buildVariant}');
   log(' Base URL = ${configService.baseUrl}');
+
   await dotenv.load(fileName: ".env");
+
   SessionManager().navigatorKey = rootNavigatorKey;
+
+await initializeFirebaseMessaging();
+
+
+  FirebaseMessaging messaging = FirebaseMessaging.instance;
+  await messaging.requestPermission(alert: true, badge: true, sound: true);
+
+  await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+    alert: true,
+    badge: true,
+    sound: true,
+  );
 
   runApp(MyApp(appRouter: appRouter));
 }
@@ -82,6 +136,3 @@ class _MyAppState extends State<MyApp> {
     );
   }
 }
-
-
-
