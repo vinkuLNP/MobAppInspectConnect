@@ -1,16 +1,14 @@
-import 'dart:developer';
 import 'dart:ui';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/di/app_component/app_component.dart';
-import 'package:inspect_connect/core/di/app_sockets/socket_manager.dart';
 import 'package:inspect_connect/core/di/app_sockets/socket_service.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
-import 'package:inspect_connect/features/client_flow/presentations/providers/booking_provider.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/user_provider.dart';
 import 'package:inspect_connect/features/client_flow/presentations/screens/booking_screen.dart';
 import 'package:inspect_connect/features/client_flow/presentations/screens/home_screen.dart';
 import 'package:inspect_connect/features/client_flow/presentations/screens/profile_screen.dart';
+import 'package:inspect_connect/features/client_flow/presentations/widgets/common_app_bar.dart';
 import 'package:provider/provider.dart';
 
 @RoutePage()
@@ -23,33 +21,28 @@ class ClientDashboardView extends StatefulWidget {
 
 class _ClientDashboardViewState extends State<ClientDashboardView> {
   int _selectedIndex = 0;
-  late List<Widget> _pages;
-final socket = locator<SocketService>();
-  late final SocketManager socketManager;
+  final socket = locator<SocketService>();
+  Widget _buildPage(int index) {
+    switch (index) {
+      case 0:
+        return HomeScreen();
+      case 1:
+        return BookingsScreen(onBookNowTapped: () => _onItemTapped(0));
+      case 2:
+        return ProfileScreen();
+      default:
+        return HomeScreen();
+    }
+  }
+
   @override
   void initState() {
     super.initState();
-    _pages = [
-      HomeScreen(),
-      BookingsScreen(
-        onBookNowTapped: () {
-          _onItemTapped(0);
-        },
-      ),
-      ProfileScreen(),
-    ];
     final user = context.read<UserProvider>().user;
-
-    socket.initSocket(token: user!.authToken.toString());
-   
-  final bookingProvider = context.read<BookingProvider>();
-    socketManager = SocketManager(bookingProvider);
-    socketManager.registerGlobalListeners(isInspector: false);
- socket.connectUser(user.userId.toString());
-    socket.socket?.on("test_event", (data) {
-      log("📥 Received from server: $data");
-    });
-   
+    if (user != null) {
+      final socket = locator<SocketService>();
+      socket.initSocket(token: user.authToken!);
+    }
   }
 
   void _onItemTapped(int index) {
@@ -62,9 +55,12 @@ final socket = locator<SocketService>();
     final primary = Theme.of(context).colorScheme.primary;
 
     return Scaffold(
-      backgroundColor: Colors.grey,
+      backgroundColor: Colors.grey[100],
+      appBar: _selectedIndex == 1
+          ? const CommonAppBar(showLogo: true, title: 'Bookings')
+          : null,
       extendBody: true,
-      body: _pages[_selectedIndex],
+      body: _buildPage(_selectedIndex),
       bottomNavigationBar: SizedBox(
         height: 95,
         child: Stack(

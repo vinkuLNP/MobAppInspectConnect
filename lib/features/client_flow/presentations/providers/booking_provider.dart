@@ -83,33 +83,38 @@ class BookingProvider extends BaseViewModel {
     filtersService = BookingFiltersService(this, timerService);
   }
 
-  void onBookingAssigned({String? bookingId, dynamic inspectors}) {
+  void onBookingAssigned({String? bookingId, dynamic inspectors}) async {
     log('Provider: booking assigned: \$bookingId');
-    //  show notification
-    notifyListeners();
+    await updateBookingListUI();
   }
 
-  void onRaiseInspectionUpdate(dynamic data) {
+  void onRaiseInspectionUpdate(dynamic data) async {
     log('Provider: onRaiseInspectionUpdate: $data');
-    notifyListeners();
   }
 
   void onBookingStatusUpdated({
     dynamic status,
     String? bookingId,
     String? message,
-  }) {
+  }) async {
     log(
       'Provider: onBookingStatusUpdated status=\$status bookingId=\$bookingId',
     );
-    // Update local booking list or UI
+    await updateBookingListUI();
     notifyListeners();
   }
 
-  void onBookingCompleted({String? bookingId, dynamic payload}) {
-    log('Provider: onBookingCompleted bookingId=\$bookingId');
-    // Handle completion UI
+  Future<void> updateBookingListUI() async {
+
+    resetBookings();
+    await fetchBookingsList(reset: true);
+
     notifyListeners();
+  }
+
+  void onBookingCompleted({String? bookingId, dynamic payload}) async {
+    log('Provider: onBookingCompleted bookingId=\$bookingId');
+    await updateBookingListUI();
   }
 
   Future<void> init() async {

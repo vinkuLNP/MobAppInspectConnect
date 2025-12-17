@@ -1,5 +1,13 @@
 import 'dart:developer';
 import 'dart:io';
+import 'package:flutter/material.dart';
+import 'package:inspect_connect/core/di/app_component/app_component.dart';
+import 'package:inspect_connect/core/di/app_sockets/socket_manager.dart';
+import 'package:inspect_connect/core/utils/constants/app_constants.dart';
+import 'package:inspect_connect/features/client_flow/presentations/providers/booking_provider.dart';
+import 'package:inspect_connect/features/client_flow/presentations/providers/user_provider.dart';
+import 'package:inspect_connect/main.dart';
+import 'package:provider/provider.dart';
 import 'package:socket_io_client/socket_io_client.dart' as io;
 
 class SocketService {
@@ -9,26 +17,114 @@ class SocketService {
   io.Socket? socket;
 
   bool get isConnected => socket?.connected ?? false;
-
+  late final SocketManager socketManager;
   void initSocket({required String token}) {
-    log("🔌 Initializing socket connection...");
+    log("🟦 [SOCKET INIT] Starting initialization…");
+    log(
+      "🟦 [SOCKET INIT] Token received: ${token.isNotEmpty ? 'VALID' : 'EMPTY'}",
+    );
+
+    final url = Platform.isIOS
+        ? "http://localhost:5002"
+        : "http://10.0.2.2:5002";
+    log("🟦 [SOCKET INIT] Connecting to: $url");
+
     socket = io.io(
-      Platform.isIOS ? "http://localhost:5002" : "http://10.0.2.2:5002",
+      url,
       io.OptionBuilder()
           .setTransports(['websocket'])
-          .setExtraHeaders({"authorization": "Bearer $token"})
           .enableAutoConnect()
+          .enableReconnection()
+          .setReconnectionAttempts(999999)
+          .setReconnectionDelay(1500)
+          .setExtraHeaders({'authorization': 'Bearer $token'})
           .build(),
     );
-    socket?.connect();
-    socket?.onConnect((_) {
-      log("📥  Socket connected: ${socket?.id}");
+
+    socket?.onConnect((_) async {
+      log("🟢 [SOCKET CONNECTED] ID: ${socket?.id}");
+      log(
+        "🟢 [SOCKET CONNECTED] Transport: ${socket?.io.engine?.transport?.name}",
+      );
+      final BuildContext? usercontext =
+          rootNavigatorKey.currentState?.overlay?.context;
+      if (usercontext == null) return;
+
+      final user = usercontext.read<UserProvider>().user;
+
+      if (user == null) {
+        log("⚠️ [SOCKET WARNING] No user found — cannot connect userId");
+      } else {
+        log("🟦 [SOCKET USER] Connecting user: ${user.userId}");
+        connectUser(user.userId);
+      }
+
+      final bookingProvider = locator<BookingProvider>();
+      final isInspector = user?.role == 2;
+
+      log(
+        "🟦 [SOCKET ROLE] User Role: ${isInspector ? 'INSPECTOR' : 'CLIENT'}",
+      );
+
+      log("🟦 [SOCKET LISTENERS] Registering global listeners…");
+      socketManager = SocketManager(bookingProvider);
+
+      socketManager.registerGlobalListeners(isInspector: isInspector);
+      log("🟦 [SOCKET FETCH] Fetching bookings before joining rooms…");
+      log(
+        "🟦 [SOCKET FETCH] Before booking fetchewd ${bookingProvider.bookings}…",
+      );
+
+      await bookingProvider.fetchBookingsList(reset: true);
+      log("🟦 [SOCKET FETCH] Fetching bookings before joining rooms…");
+      log(
+        "🟦 [SOCKET FETCH] after booking fetchewd ${bookingProvider.bookings}…",
+      );
+
+      log("🟦 [SOCKET ROOMS] Attempting to rejoin rooms…");
+
+      int joined = 0;
+
+      for (final booking in bookingProvider.bookings) {
+        final status = booking.status;
+
+        if (status == bookingStatusCompleted ||
+            status == bookingStatusAccepted ||
+            status == bookingStatusRejected ||
+            status == bookingStatusCancelledByClient ||
+            status == bookingStatusCancelledByInspector) {
+          log(
+            "⏭️ [ROOM SKIP] Booking ${booking.id} skipped due to status: $status",
+          );
+          continue;
+        }
+
+        log("🏠 [ROOM JOIN] Joining booking room: ${booking.id}");
+        joinBookingRoom(booking.id);
+        joined++;
+      }
+
+      log("🟢 [ROOMS JOINED] Total rooms joined: $joined");
     });
 
-    socket?.onDisconnect((_) => log("❌ Socket disconnected"));
+    socket?.onDisconnect((_) {
+      log("🔴 [SOCKET DISCONNECTED]");
+    });
 
-    socket?.onConnectError((data) => log("⚠️ Connect Error: $data"));
-    socket?.onError((data) => log("⚠️ Socket Error: $data"));
+    socket?.onReconnect((attempt) {
+      log("🔁 [SOCKET RECONNECTED] Attempt: $attempt");
+    });
+
+    socket?.onConnectError((e) {
+      log("⚠️ [CONNECT ERROR] $e");
+    });
+
+    socket?.onError((e) {
+      log("⚠️ [SOCKET ERROR] $e");
+    });
+
+    log("🟦 [SOCKET INIT] Calling socket.connect()…");
+    socket?.connect();
   }
 
   void dispose() {

@@ -30,6 +30,7 @@ import 'package:inspect_connect/features/client_flow/domain/usecases/update_book
 import 'package:inspect_connect/features/client_flow/domain/usecases/update_booking_status.dart';
 import 'package:inspect_connect/features/client_flow/domain/usecases/update_booking_timer.dart';
 import 'package:inspect_connect/features/client_flow/domain/usecases/upload_image_usecase.dart';
+import 'package:inspect_connect/features/client_flow/presentations/providers/booking_provider.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/session_manager.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/user_provider.dart';
 import 'package:inspect_connect/features/inspector_flow/data/datasources/remote_datasource/inspector_api_datasource.dart';
@@ -98,5 +99,7 @@ locator.registerLazySingleton<SocketService>(() => SocketService());
 
   locator.registerLazySingleton(() => UploadImageUseCase(locator()));
   locator.registerLazySingleton<UserProvider>(() => UserProvider());
+  locator.registerLazySingleton<BookingProvider>(() => BookingProvider());
+
   locator.registerLazySingleton<SessionManager>(() => SessionManager());
 }
