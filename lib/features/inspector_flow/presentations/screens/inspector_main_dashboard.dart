@@ -44,6 +44,9 @@ class _InspectorMainDashboardState extends State<InspectorMainDashboard> {
       final socket = locator<SocketService>();
       socket.initSocket(token: user.authToken!);
     }
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await requestNotificationPermissionIfNeeded();
+    });
   }
 
   void _onItemTapped(int index) {

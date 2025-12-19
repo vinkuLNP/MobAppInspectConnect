@@ -1,5 +1,4 @@
 import 'dart:developer';
-
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -25,20 +24,12 @@ final appRouter = AppRouter(navigatorKey: rootNavigatorKey);
 
 Future<void> initializeFirebaseMessaging() async {
   await Firebase.initializeApp();
-
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
-
-  await NotificationService.init();
-
-  FirebaseMessaging messaging = FirebaseMessaging.instance;
-  NotificationSettings settings = await messaging.requestPermission(
-    alert: true,
-    badge: true,
-    sound: true,
-  );
-  print('User granted permission: ${settings.authorizationStatus}');
-
+  await NotificationService.init(requestPermission: false);
   FirebaseMessaging.onMessage.listen((message) {
+    log('📩 [FCM] Foreground message received');
+    log('📩 [FCM] Data: ${message.data}');
+    log('📩 [FCM] Notification: ${message.notification?.title}');
     NotificationService.show(message);
   });
 
@@ -50,7 +41,7 @@ Future<void> initializeFirebaseMessaging() async {
     }
   });
 }
-  
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -69,25 +60,14 @@ Future<void> main() async {
 
   configService.configure(productFlavor: productFlavor);
 
-  log(' buildVariant = ${EnvironmentConfig.buildVariant}');
-  log(' Base URL = ${configService.baseUrl}');
+  log('buildVariant = ${EnvironmentConfig.buildVariant}');
+  log('Base URL = ${configService.baseUrl}');
 
   await dotenv.load(fileName: ".env");
 
   SessionManager().navigatorKey = rootNavigatorKey;
 
-await initializeFirebaseMessaging();
-
-
-  FirebaseMessaging messaging = FirebaseMessaging.instance;
-  await messaging.requestPermission(alert: true, badge: true, sound: true);
-
-  await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
-    alert: true,
-    badge: true,
-    sound: true,
-  );
-
+  await initializeFirebaseMessaging();
   runApp(MyApp(appRouter: appRouter));
 }
 

@@ -160,18 +160,18 @@ class ClientViewModelProvider extends BaseViewModel {
 
   @override
   void dispose() {
-    emailCtrl.dispose();
-    passwordCtrl.dispose();
-    fullNameCtrl.dispose();
-    phoneCtrl.dispose();
-    emailCtrlSignUp.dispose();
-    addressCtrl.dispose();
-    passwordCtrlSignUp.dispose();
-    confirmPasswordCtrl.dispose();
+    emailCtrl.clear();
+    passwordCtrl.clear();
+    fullNameCtrl.clear();
+    phoneCtrl.clear();
+    emailCtrlSignUp.clear();
+    addressCtrl.clear();
+    passwordCtrlSignUp.clear();
+    confirmPasswordCtrl.clear();
     _timer?.cancel();
-    pinController.dispose();
+    pinController.clear();
     focusNode.dispose();
-    resetEmailCtrl.dispose();
+    resetEmailCtrl.clear();
     _otpPurpose = null;
     super.dispose();
   }
@@ -221,7 +221,6 @@ class ClientViewModelProvider extends BaseViewModel {
 
       deviceToken = await DeviceInfoHelper.getDeviceToken();
       deviceType = await DeviceInfoHelper.getDeviceType();
-
 
       log('[RESET_PASSWORD] Device token: $deviceToken');
       log('[RESET_PASSWORD] Device type: $deviceType');
@@ -630,7 +629,6 @@ class ClientViewModelProvider extends BaseViewModel {
   String deviceType = 'windows';
   String fcmToken = '';
 
-
   Future<void> signIn({
     required GlobalKey<FormState> formKey,
     required BuildContext context,
@@ -672,7 +670,7 @@ class ClientViewModelProvider extends BaseViewModel {
           log('   Phone OTP Verified: ${user.phoneOtpVerified}');
           log('   Stripe Subscription ID: ${user.currentSubscriptionId}');
           log('   Stripe Status: ${user.stripeSubscriptionStatus}');
-          log('   Admin Approval: ${user.approvalStatusByAdmin}');
+          log('   Admin Approval: ${user.certificateApproved}');
           log('---------------------------------------------');
 
           try {
@@ -739,7 +737,7 @@ class ClientViewModelProvider extends BaseViewModel {
     log('👤 Local user found: ${localUser.name ?? 'Unknown'}');
     log('   ID: ${localUser.id}');
     log('   Email: ${localUser.email}');
-    log('   ApprovalStatus: ${localUser.approvalStatusByAdmin}');
+    log('   ApprovalStatus: ${localUser.certificateApproved}');
     log('   StripeSubscriptionStatus: ${localUser.stripeSubscriptionStatus}');
     log('   CurrentSubscriptionId: ${localUser.currentSubscriptionId}');
     log('---------------------------------------------');

@@ -174,18 +174,18 @@ class InspectorViewModelProvider extends BaseViewModel {
 
   @override
   void dispose() {
-    emailCtrl.dispose();
-    passwordCtrl.dispose();
-    fullNameCtrl.dispose();
-    phoneCtrl.dispose();
-    emailCtrlSignUp.dispose();
-    addressCtrl.dispose();
-    passwordCtrlSignUp.dispose();
+    emailCtrl.clear();
+    passwordCtrl.clear();
+    fullNameCtrl.clear();
+    phoneCtrl.clear();
+    emailCtrlSignUp.clear();
+    addressCtrl.clear();
+    passwordCtrlSignUp.clear();
     _timer?.cancel();
-    pinController.dispose();
+    pinController.clear();
     focusNode.dispose();
-    resetEmailCtrl.dispose();
-    resetPhoneCtrl.dispose();
+    resetEmailCtrl.clear();
+    resetPhoneCtrl.clear();
     _otpPurpose = null;
     super.dispose();
   }
@@ -885,7 +885,7 @@ class InspectorViewModelProvider extends BaseViewModel {
     }
 
     Position pos = await Geolocator.getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.high,
+      locationSettings: LocationSettings(accuracy: LocationAccuracy.high),
     );
 
     final lat = pos.latitude;
@@ -1040,7 +1040,7 @@ class InspectorViewModelProvider extends BaseViewModel {
     serviceAreas = saved.serviceAreas;
     if (saved.serviceAreas != [] && saved.serviceAreas.isNotEmpty) {
       final areas = saved.serviceAreas;
-loadCountries();
+      loadCountries();
 
       final savedCountryCode = areas.first.countryCode;
       final savedStateCode = areas.first.stateCode;
@@ -1069,90 +1069,84 @@ loadCountries();
     notifyListeners();
   }
 
-
-
-
-
- String? selectedCountryCode;
+  String? selectedCountryCode;
   String? selectedStateCode;
   List<String> selectedCityNames = [];
 
-List<csc.Country>? cachedCountries;
-Map<String, List<csc.State>> cachedStates = {};
-Map<String, List<csc.City>> cachedCities = {};
+  List<csc.Country>? cachedCountries;
+  Map<String, List<csc.State>> cachedStates = {};
+  Map<String, List<csc.City>> cachedCities = {};
 
-bool loadingCountries = false;
-bool loadingStates = false;
-bool loadingCities = false;
+  bool loadingCountries = false;
+  bool loadingStates = false;
+  bool loadingCities = false;
 
-Future<void> loadCountries() async {
-  if (cachedCountries != null) return;
-  loadingCountries = true;
-  notifyListeners();
+  Future<void> loadCountries() async {
+    if (cachedCountries != null) return;
+    loadingCountries = true;
+    notifyListeners();
 
-  cachedCountries = await csc.getAllCountries();
+    cachedCountries = await csc.getAllCountries();
 
-  loadingCountries = false;
-  notifyListeners();
-}
-
-Future<void> loadStates(String countryCode) async {
-  if (cachedStates.containsKey(countryCode)) return;
-  loadingStates = true;
-  notifyListeners();
-
-  cachedStates[countryCode] = await csc.getStatesOfCountry(countryCode);
-
-  loadingStates = false;
-  notifyListeners();
-}
-
-Future<void> loadCities(String countryCode) async {
-  if (cachedCities.containsKey(countryCode)) return;
-  loadingCities = true;
-  notifyListeners();
-
-  cachedCities[countryCode] = await csc.getCountryCities(countryCode);
-
-  loadingCities = false;
-  notifyListeners();
-}
-
-void selectCountry(String code) {
-  selectedCountryCode = code;
-  selectedStateCode = null;
-  selectedCityNames.clear();
-  selectedCities.clear();
-  countryError = null;
-  notifyListeners();
-}
-
-void selectState(String code) {
-  selectedStateCode = code;
-  selectedCityNames.clear();
-  selectedCities.clear();
-  stateError = null;
-  notifyListeners();
-}
-
-void selectCities(List<String> names) {
-  selectedCityNames = names;
-  selectedCities = List.from(names);
-  if (names.isNotEmpty) clearCityErrors();
-  notifyListeners();
-}
-
-void removeCity(String city) {
-  selectedCityNames.remove(city);
-  selectedCities.remove(city);
-
-  if (selectedCityNames.isEmpty) {
-    validateServiceArea();
+    loadingCountries = false;
+    notifyListeners();
   }
-  notifyListeners();
-}
 
+  Future<void> loadStates(String countryCode) async {
+    if (cachedStates.containsKey(countryCode)) return;
+    loadingStates = true;
+    notifyListeners();
 
+    cachedStates[countryCode] = await csc.getStatesOfCountry(countryCode);
+
+    loadingStates = false;
+    notifyListeners();
+  }
+
+  Future<void> loadCities(String countryCode) async {
+    if (cachedCities.containsKey(countryCode)) return;
+    loadingCities = true;
+    notifyListeners();
+
+    cachedCities[countryCode] = await csc.getCountryCities(countryCode);
+
+    loadingCities = false;
+    notifyListeners();
+  }
+
+  void selectCountry(String code) {
+    selectedCountryCode = code;
+    selectedStateCode = null;
+    selectedCityNames.clear();
+    selectedCities.clear();
+    countryError = null;
+    notifyListeners();
+  }
+
+  void selectState(String code) {
+    selectedStateCode = code;
+    selectedCityNames.clear();
+    selectedCities.clear();
+    stateError = null;
+    notifyListeners();
+  }
+
+  void selectCities(List<String> names) {
+    selectedCityNames = names;
+    selectedCities = List.from(names);
+    if (names.isNotEmpty) clearCityErrors();
+    notifyListeners();
+  }
+
+  void removeCity(String city) {
+    selectedCityNames.remove(city);
+    selectedCities.remove(city);
+
+    if (selectedCityNames.isEmpty) {
+      validateServiceArea();
+    }
+    notifyListeners();
+  }
 
   Future<void> signUp({required BuildContext context}) async {
     _isResetting = true;

@@ -105,7 +105,6 @@ class BookingProvider extends BaseViewModel {
   }
 
   Future<void> updateBookingListUI() async {
-
     resetBookings();
     await fetchBookingsList(reset: true);
 
@@ -127,8 +126,8 @@ class BookingProvider extends BaseViewModel {
 
   @override
   void dispose() {
-    locationController.dispose();
-    descriptionController.dispose();
+    locationController.clear();
+    descriptionController.clear();
     timerService.dispose();
     super.dispose();
   }

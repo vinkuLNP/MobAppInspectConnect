@@ -19,7 +19,7 @@ class AuthUserLocalEntity {
   bool? emailOtpVerified;
   bool? agreedToTerms;
   bool? isTruthfully;
-  int? approvalStatusByAdmin;
+  int? certificateApproved;
   String? rejectedReason;
   String? stripeCustomerId;
   String? stripeAccountId;
@@ -57,7 +57,7 @@ class AuthUserLocalEntity {
 
   AuthUserLocalEntity({
     this.authToken,
-   required this.userId,
+    required this.userId,
     this.name,
     this.email,
     this.phoneNumber,
@@ -69,7 +69,7 @@ class AuthUserLocalEntity {
     this.emailOtpVerified,
     this.agreedToTerms,
     this.isTruthfully,
-    this.approvalStatusByAdmin,
+    this.certificateApproved,
     this.rejectedReason,
     this.stripeCustomerId,
     this.stripeAccountId,
@@ -105,7 +105,7 @@ class AuthUserLocalEntity {
   AuthUserLocalEntity copyWith({
     String? name,
     String? email,
-   required String userId,
+    required String userId,
     String? authToken,
     int? role,
     String? phoneNumber,
@@ -124,7 +124,7 @@ class AuthUserLocalEntity {
     return AuthUserLocalEntity(
       name: name ?? this.name,
       email: email ?? this.email,
-      userId: userId ,
+      userId: userId,
       authToken: authToken ?? this.authToken,
       role: role ?? this.role,
       phoneNumber: phoneNumber ?? this.phoneNumber,
@@ -170,7 +170,7 @@ class AuthUserLocalEntity {
       emailOtpVerified: user?['emailOtpVerified'],
       agreedToTerms: user?['agreedToTerms'],
       isTruthfully: user?['isTruthfully'],
-      approvalStatusByAdmin: user?['approvalStatusByAdmin'],
+      certificateApproved: user?['certificateApproved'],
       rejectedReason: user?['rejectedReason'],
       stripeCustomerId: user?['stripeCustomerId'],
       stripeAccountId: user?['stripeAccountId'],
@@ -231,7 +231,7 @@ extension AuthUserLocalMapping on AuthUserLocalEntity {
   AuthUser toDomainEntity() {
     return AuthUser(
       id: id.toString(),
-      userId: userId ,
+      userId: userId,
       name: name ?? '',
       emailHashed: email ?? '',
       authToken: authToken ?? '',
@@ -283,7 +283,7 @@ extension AuthUserLocalEntityMergeData on AuthUserLocalEntity {
   AuthUserLocalEntity mergeWithNewData(AuthUserLocalEntity newUser) {
     final merged =
         AuthUserLocalEntity(
-          userId: newUser.userId ,
+            userId: newUser.userId,
             name: newUser.name ?? name,
             email: newUser.email ?? email,
             phoneNumber: newUser.phoneNumber ?? phoneNumber,
@@ -298,8 +298,8 @@ extension AuthUserLocalEntityMergeData on AuthUserLocalEntity {
             status: newUser.status ?? status,
             phoneOtpVerified: newUser.phoneOtpVerified ?? phoneOtpVerified,
             emailOtpVerified: newUser.emailOtpVerified ?? emailOtpVerified,
-            approvalStatusByAdmin:
-                newUser.approvalStatusByAdmin ?? approvalStatusByAdmin,
+            certificateApproved:
+                newUser.certificateApproved ?? certificateApproved,
             rejectedReason: newUser.rejectedReason ?? rejectedReason,
             stripeCustomerId: newUser.stripeCustomerId ?? stripeCustomerId,
             stripeAccountId: newUser.stripeAccountId ?? stripeAccountId,
