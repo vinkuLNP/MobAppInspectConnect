@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -6,21 +7,29 @@ class NotificationService {
   static final FlutterLocalNotificationsPlugin _fln =
       FlutterLocalNotificationsPlugin();
 
-  static Future<void> init() async {
+  static Future<void> init({bool requestPermission = false}) async {
     const AndroidInitializationSettings androidInit =
         AndroidInitializationSettings('@mipmap/ic_launcher');
-    const DarwinInitializationSettings iosInit = DarwinInitializationSettings();
+    const DarwinInitializationSettings iosInit = DarwinInitializationSettings(
+      requestAlertPermission: false,
+      requestBadgePermission: false,
+      requestSoundPermission: false,
+    );
 
-    const InitializationSettings settings =
-        InitializationSettings(android: androidInit, iOS: iosInit);
+    const InitializationSettings settings = InitializationSettings(
+      android: androidInit,
+      iOS: iosInit,
+    );
 
-    await _fln.initialize(settings,
-        onDidReceiveNotificationResponse: (response) {
-      final payload = response.payload;
-      if (payload != null) {
-        handleRedirect(payload);
-      }
-    });
+    await _fln.initialize(
+      settings,
+      onDidReceiveNotificationResponse: (response) {
+        final payload = response.payload;
+        if (payload != null) {
+          handleRedirect(payload);
+        }
+      },
+    );
 
     if (Platform.isAndroid) {
       const AndroidNotificationChannel channel = AndroidNotificationChannel(
@@ -32,15 +41,35 @@ class NotificationService {
 
       await _fln
           .resolvePlatformSpecificImplementation<
-              AndroidFlutterLocalNotificationsPlugin>()
+            AndroidFlutterLocalNotificationsPlugin
+          >()
           ?.createNotificationChannel(channel);
     }
+    if (requestPermission && Platform.isIOS) {
+      await requestIOSPermission();
+    }
+  }
+
+  static Future<void> requestIOSPermission() async {
+    final iosPlugin = _fln
+        .resolvePlatformSpecificImplementation<
+          IOSFlutterLocalNotificationsPlugin
+        >();
+
+    await iosPlugin?.requestPermissions(alert: true, badge: true, sound: true);
+
+    await FirebaseMessaging.instance.requestPermission(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
   }
 
   static Future<void> show(RemoteMessage message) async {
     final title = message.notification?.title ?? message.data['title'];
     final body = message.notification?.body ?? message.data['body'];
-    final payload = message.data['redirectUrl'] ?? message.data['click_action'] ?? 'home';
+    final payload =
+        message.data['redirectUrl'] ?? message.data['click_action'] ?? 'home';
 
     const androidDetails = AndroidNotificationDetails(
       'high_importance_channel',
@@ -51,8 +80,10 @@ class NotificationService {
 
     const iosDetails = DarwinNotificationDetails();
 
-    const notificationDetails =
-        NotificationDetails(android: androidDetails, iOS: iosDetails);
+    const notificationDetails = NotificationDetails(
+      android: androidDetails,
+      iOS: iosDetails,
+    );
 
     await _fln.show(
       DateTime.now().millisecondsSinceEpoch.remainder(100000),
@@ -64,6 +95,6 @@ class NotificationService {
   }
 
   static void handleRedirect(String redirectUrl) {
-    print("Redirect to: $redirectUrl");
+    log("Redirect to: $redirectUrl");
   }
 }

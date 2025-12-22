@@ -37,7 +37,7 @@
     },
     {
       "id": "2:7510821947055321623",
-      "lastPropertyId": "45:5289162330176025876",
+      "lastPropertyId": "46:2778237008367224666",
       "name": "AuthUserLocalEntity",
       "properties": [
         {
@@ -105,11 +105,6 @@
           "id": "13:8693323874627607521",
           "name": "isTruthfully",
           "type": 1
-        },
-        {
-          "id": "14:5058542504887666690",
-          "name": "approvalStatusByAdmin",
-          "type": 6
         },
         {
           "id": "15:815433817228123830",
@@ -265,6 +260,11 @@
           "id": "45:5289162330176025876",
           "name": "userId",
           "type": 9
+        },
+        {
+          "id": "46:2778237008367224666",
+          "name": "certificateApproved",
+          "type": 6
         }
       ],
       "relations": []
@@ -484,7 +484,9 @@
   "modelVersionParserMinimum": 5,
   "retiredEntityUids": [],
   "retiredIndexUids": [],
-  "retiredPropertyUids": [],
+  "retiredPropertyUids": [
+    5058542504887666690
+  ],
   "retiredRelationUids": [],
   "version": 1
 }

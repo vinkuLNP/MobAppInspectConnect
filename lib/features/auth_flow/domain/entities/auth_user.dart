@@ -28,7 +28,7 @@ class AuthUser {
   final bool? stripePayoutsEnabled;
   final bool? stripeTransfersActive;
 
-  final int? approvalStatusByAdmin;
+  final int? certificateApproved;
   final String? rejectedReason;
 
   final UserLocation? location;
@@ -55,10 +55,10 @@ class AuthUser {
 
   const AuthUser({
     required this.id,
-     this.name,
-   required  this.userId,
-     this.emailHashed,
-     this.authToken,
+    this.name,
+    required this.userId,
+    this.emailHashed,
+    this.authToken,
     this.role,
     this.phoneNumber,
     this.countryCode,
@@ -75,7 +75,7 @@ class AuthUser {
     this.currentSubscriptionAutoRenew,
     this.stripePayoutsEnabled,
     this.stripeTransfersActive,
-    this.approvalStatusByAdmin,
+    this.certificateApproved,
     this.rejectedReason,
     this.location,
     this.devices = const [],
@@ -125,7 +125,7 @@ class AuthUser {
       currentSubscriptionAutoRenew: json['currentSubscriptionAutoRenew'],
       stripePayoutsEnabled: json['stripePayoutsEnabled'],
       stripeTransfersActive: json['stripeTransfersActive'],
-      approvalStatusByAdmin: json['approvalStatusByAdmin'],
+      certificateApproved: json['certificateApproved'],
       rejectedReason: json['rejectedReason'],
       connectorLinkUrl: json['connectorLinkUrl'],
       bookingInProgress: json['bookingInProgress'],
@@ -201,7 +201,7 @@ class AuthUser {
       'currentSubscriptionAutoRenew': currentSubscriptionAutoRenew,
       'stripePayoutsEnabled': stripePayoutsEnabled,
       'stripeTransfersActive': stripeTransfersActive,
-      'approvalStatusByAdmin': approvalStatusByAdmin,
+      'certificateApproved': certificateApproved,
       'rejectedReason': rejectedReason,
       'bookingInProgress': bookingInProgress,
       'isDeleted': isDeleted,
@@ -232,52 +232,52 @@ class AuthUser {
           : null,
     };
   }
-  factory AuthUser.fromLocalEntity(AuthUserLocalEntity entity) {
-  return AuthUser(
-    id: entity.id.toString(),
-    name: entity.name,
-    userId: entity.userId,
-    emailHashed: entity.email,
-    authToken: entity.authToken,
-    phoneNumber: entity.phoneNumber,
-    countryCode: entity.countryCode,
-    phoneOtpVerified: entity.phoneOtpVerified ?? false,
-    emailOtpVerified: entity.emailOtpVerified?? false,
-    agreedToTerms: entity.agreedToTerms?? true,
-    isTruthfully: entity.isTruthfully?? true,
-    stripeSubscriptionStatus: entity.stripeSubscriptionStatus,
-    currentSubscriptionId: entity.currentSubscriptionId,
-    currentSubscriptionTrialDays: entity.currentSubscriptionTrialDays,
-    currentSubscriptionAutoRenew: entity.currentSubscriptionAutoRenew,
-    approvalStatusByAdmin: entity.approvalStatusByAdmin,
-    rejectedReason: entity.rejectedReason,
-    location: entity.latitude != null && entity.longitude != null
-        ? UserLocation(
-            name: entity.locationName ?? '',
-            lat: entity.latitude!,
-            lng: entity.longitude!,
-          )
-        : null,
-    devices: [], 
-    createdAt: entity.createdAt,
-    updatedAt: entity.updatedAt,
-    loginTime: entity.loginTime,
-    status: entity.status,
-    mailingAddress: entity.mailingAddress,
-    country: entity.country,
-    state: entity.state,
-    city: entity.city,
-    zip: entity.zipCode,
-    certificateTypeId: entity.certificateTypeId,
-    certificateAgencyIds: entity.certificateAgencyIds,
-    certificateDocuments: entity.certificateDocuments,
-    certificateExpiryDate: entity.certificateExpiryDate,
-    referenceDocuments: entity.referenceDocuments,
-    uploadedIdOrLicenseDocument: entity.uploadedIdOrLicenseDocument,
-    workHistoryDescription: entity.workHistoryDescription,
-  );
-}
 
+  factory AuthUser.fromLocalEntity(AuthUserLocalEntity entity) {
+    return AuthUser(
+      id: entity.id.toString(),
+      name: entity.name,
+      userId: entity.userId,
+      emailHashed: entity.email,
+      authToken: entity.authToken,
+      phoneNumber: entity.phoneNumber,
+      countryCode: entity.countryCode,
+      phoneOtpVerified: entity.phoneOtpVerified ?? false,
+      emailOtpVerified: entity.emailOtpVerified ?? false,
+      agreedToTerms: entity.agreedToTerms ?? true,
+      isTruthfully: entity.isTruthfully ?? true,
+      stripeSubscriptionStatus: entity.stripeSubscriptionStatus,
+      currentSubscriptionId: entity.currentSubscriptionId,
+      currentSubscriptionTrialDays: entity.currentSubscriptionTrialDays,
+      currentSubscriptionAutoRenew: entity.currentSubscriptionAutoRenew,
+      certificateApproved: entity.certificateApproved,
+      rejectedReason: entity.rejectedReason,
+      location: entity.latitude != null && entity.longitude != null
+          ? UserLocation(
+              name: entity.locationName ?? '',
+              lat: entity.latitude!,
+              lng: entity.longitude!,
+            )
+          : null,
+      devices: [],
+      createdAt: entity.createdAt,
+      updatedAt: entity.updatedAt,
+      loginTime: entity.loginTime,
+      status: entity.status,
+      mailingAddress: entity.mailingAddress,
+      country: entity.country,
+      state: entity.state,
+      city: entity.city,
+      zip: entity.zipCode,
+      certificateTypeId: entity.certificateTypeId,
+      certificateAgencyIds: entity.certificateAgencyIds,
+      certificateDocuments: entity.certificateDocuments,
+      certificateExpiryDate: entity.certificateExpiryDate,
+      referenceDocuments: entity.referenceDocuments,
+      uploadedIdOrLicenseDocument: entity.uploadedIdOrLicenseDocument,
+      workHistoryDescription: entity.workHistoryDescription,
+    );
+  }
 }
 
 extension AuthUserMapping on AuthUser {
@@ -303,7 +303,7 @@ extension AuthUserMapping on AuthUser {
       currentSubscriptionAutoRenew: currentSubscriptionAutoRenew,
       stripePayoutsEnabled: stripePayoutsEnabled,
       stripeTransfersActive: stripeTransfersActive,
-      approvalStatusByAdmin: approvalStatusByAdmin,
+      certificateApproved: certificateApproved,
       rejectedReason: rejectedReason,
       locationName: location?.name,
       latitude: location?.lat,
@@ -331,7 +331,6 @@ extension AuthUserMapping on AuthUser {
   }
 }
 
-
 extension AuthUserLocalEntityMerge on AuthUserLocalEntity {
   AuthUserLocalEntity mergeWithUserDetail(UserDetail detail) {
     return AuthUserLocalEntity(
@@ -350,7 +349,7 @@ extension AuthUserLocalEntityMerge on AuthUserLocalEntity {
       emailOtpVerified: detail.emailOtpVerified ?? emailOtpVerified,
       agreedToTerms: detail.agreedToTerms ?? agreedToTerms,
       isTruthfully: detail.isTruthfully ?? isTruthfully,
-      approvalStatusByAdmin: detail.approvalStatusByAdmin ?? approvalStatusByAdmin,
+      certificateApproved: detail.certificateApproved ?? certificateApproved,
       rejectedReason: detail.rejectedReason ?? rejectedReason,
       stripeCustomerId: detail.stripeCustomerId ?? stripeCustomerId,
       stripeAccountId: detail.stripeAccountId ?? stripeAccountId,
@@ -363,7 +362,8 @@ extension AuthUserLocalEntityMerge on AuthUserLocalEntity {
       currentSubscriptionAutoRenew:
           detail.currentSubscriptionAutoRenew ?? currentSubscriptionAutoRenew,
       stripePayoutsEnabled: detail.stripePayoutsEnabled ?? stripePayoutsEnabled,
-      stripeTransfersActive: detail.stripeTransfersActive ?? stripeTransfersActive,
+      stripeTransfersActive:
+          detail.stripeTransfersActive ?? stripeTransfersActive,
       walletId: detail.walletId ?? walletId,
       locationName: detail.location?.locationName ?? locationName,
       latitude: detail.location?.coordinates?[1] ?? latitude,
@@ -380,12 +380,12 @@ extension AuthUserLocalEntityMerge on AuthUserLocalEntity {
           ? DateTime.tryParse(detail.loginTime!)
           : loginTime,
       certificateTypeId: detail.certificateTypeId?.id ?? certificateTypeId,
-      certificateAgencyIds: detail.certificateAgencyIds
-              ?.map((e) => e.id ?? '')
-              .toList() ??
+      certificateAgencyIds:
+          detail.certificateAgencyIds?.map((e) => e.id ?? '').toList() ??
           certificateAgencyIds,
       certificateDocuments: detail.certificateDocuments ?? certificateDocuments,
-      certificateExpiryDate: detail.certificateExpiryDate ?? certificateExpiryDate,
+      certificateExpiryDate:
+          detail.certificateExpiryDate ?? certificateExpiryDate,
       referenceDocuments: detail.referenceDocuments ?? referenceDocuments,
       uploadedIdOrLicenseDocument:
           detail.uploadedIdOrLicenseDocument ?? uploadedIdOrLicenseDocument,

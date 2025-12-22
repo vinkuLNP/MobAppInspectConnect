@@ -35,13 +35,23 @@ class ChangePasswordViewModel extends BaseViewModel {
       state?.when(
         data: (_) {
           ScaffoldMessenger.of(context).showSnackBar(
-             SnackBar(content:   textWidget(text: 'Password updated successfully',color: Colors.white)),
+            SnackBar(
+              content: textWidget(
+                text: 'Password updated successfully',
+                color: Colors.white,
+              ),
+            ),
           );
           Navigator.pop(context);
         },
         error: (e) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content:   textWidget(text: e.message ?? 'Password update failed',color: Colors.white)),
+            SnackBar(
+              content: textWidget(
+                text: e.message ?? 'Password update failed',
+                color: Colors.white,
+              ),
+            ),
           );
         },
       );
@@ -53,9 +63,9 @@ class ChangePasswordViewModel extends BaseViewModel {
 
   @override
   void dispose() {
-    oldPasswordCtrl.dispose();
-    newPasswordCtrl.dispose();
-    confirmPasswordCtrl.dispose();
+    oldPasswordCtrl.clear();
+    newPasswordCtrl.clear();
+    confirmPasswordCtrl.clear();
     super.dispose();
   }
 

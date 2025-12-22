@@ -33,7 +33,7 @@ class UserDetail {
   final CurrentSubscription? currentSubscriptionId;
   final int? currentSubscriptionTrialDays;
   final int? currentSubscriptionAutoRenew;
-  final int? approvalStatusByAdmin;
+  final int? certificateApproved;
   final String? rejectedReason;
   final String? stripeAccountId;
   final String? connectorLinkUrl;
@@ -49,7 +49,7 @@ class UserDetail {
 
   const UserDetail({
     required this.id,
-   required this.userId,
+    required this.userId,
     this.role,
     this.email,
     this.name,
@@ -80,7 +80,7 @@ class UserDetail {
     this.currentSubscriptionId,
     this.currentSubscriptionTrialDays,
     this.currentSubscriptionAutoRenew,
-    this.approvalStatusByAdmin,
+    this.certificateApproved,
     this.rejectedReason,
     this.stripeAccountId,
     this.connectorLinkUrl,
@@ -121,11 +121,13 @@ class UserDetail {
       certificateAgencyIds: (body['certificateAgencyIds'] as List?)
           ?.map((e) => CertificateAgency.fromJson(e))
           .toList(),
-      certificateDocuments:
-          (body['certificateDocuments'] as List?)?.map((e) => e.toString()).toList(),
+      certificateDocuments: (body['certificateDocuments'] as List?)
+          ?.map((e) => e.toString())
+          .toList(),
       certificateExpiryDate: body['certificateExpiryDate'],
-      referenceDocuments: 
-       (body['referenceDocuments'] as List?)?.map((e) => e.toString()).toList(),
+      referenceDocuments: (body['referenceDocuments'] as List?)
+          ?.map((e) => e.toString())
+          .toList(),
       uploadedIdOrLicenseDocument: body['uploadedIdOrLicenseDocument'],
       workHistoryDescription: body['workHistoryDescription'],
       phoneOtpVerified: body['phoneOtpVerified'],
@@ -135,14 +137,14 @@ class UserDetail {
       loginTime: body['loginTime'],
       stripeSubscriptionStatus: body['stripeSubscriptionStatus'],
       currentSubscriptionId: body['currentSubscriptionId'] != null
-    ? (body['currentSubscriptionId'] is String
-        ? CurrentSubscription(id: body['currentSubscriptionId'])
-        : CurrentSubscription.fromJson(body['currentSubscriptionId']))
-    : null,
+          ? (body['currentSubscriptionId'] is String
+                ? CurrentSubscription(id: body['currentSubscriptionId'])
+                : CurrentSubscription.fromJson(body['currentSubscriptionId']))
+          : null,
 
       currentSubscriptionTrialDays: body['currentSubscriptionTrialDays'],
       currentSubscriptionAutoRenew: body['currentSubscriptionAutoRenew'],
-      approvalStatusByAdmin: body['approvalStatusByAdmin'],
+      certificateApproved: body['certificateApproved'],
       rejectedReason: body['rejectedReason'],
       stripeAccountId: body['stripeAccountId'],
       connectorLinkUrl: body['connectorLinkUrl'],
@@ -152,8 +154,9 @@ class UserDetail {
       devices: (body['devices'] as List?)
           ?.map((e) => Device.fromJson(e))
           .toList(),
-      location:
-          body['location'] != null ? Location.fromJson(body['location']) : null,
+      location: body['location'] != null
+          ? Location.fromJson(body['location'])
+          : null,
       createdAt: body['createdAt'],
       updatedAt: body['updatedAt'],
       phoneOtpExpiryTime: body['phoneOtpExpiryTime'],
@@ -179,8 +182,9 @@ class UserDetail {
       'zip': zip,
       'mailingAddress': mailingAddress,
       'certificateTypeId': certificateTypeId?.toJson(),
-      'certificateAgencyIds':
-          certificateAgencyIds?.map((e) => e.toJson()).toList(),
+      'certificateAgencyIds': certificateAgencyIds
+          ?.map((e) => e.toJson())
+          .toList(),
       'certificateDocuments': certificateDocuments,
       'certificateExpiryDate': certificateExpiryDate,
       'referenceDocuments': referenceDocuments,
@@ -195,7 +199,7 @@ class UserDetail {
       'currentSubscriptionId': currentSubscriptionId?.toJson(),
       'currentSubscriptionTrialDays': currentSubscriptionTrialDays,
       'currentSubscriptionAutoRenew': currentSubscriptionAutoRenew,
-      'approvalStatusByAdmin': approvalStatusByAdmin,
+      'certificateApproved': certificateApproved,
       'rejectedReason': rejectedReason,
       'stripeAccountId': stripeAccountId,
       'connectorLinkUrl': connectorLinkUrl,
@@ -212,7 +216,6 @@ class UserDetail {
   }
 }
 
-
 class Location {
   final String? type;
   final String? locationName;
@@ -221,18 +224,18 @@ class Location {
   Location({this.type, this.locationName, this.coordinates});
 
   factory Location.fromJson(Map<String, dynamic> json) => Location(
-        type: json['type'],
-        locationName: json['locationName'],
-        coordinates: (json['coordinates'] as List?)
-            ?.map((e) => (e as num).toDouble())
-            .toList(),
-      );
+    type: json['type'],
+    locationName: json['locationName'],
+    coordinates: (json['coordinates'] as List?)
+        ?.map((e) => (e as num).toDouble())
+        .toList(),
+  );
 
   Map<String, dynamic> toJson() => {
-        'type': type,
-        'locationName': locationName,
-        'coordinates': coordinates,
-      };
+    'type': type,
+    'locationName': locationName,
+    'coordinates': coordinates,
+  };
 }
 
 class CertificateType {
@@ -249,11 +252,7 @@ class CertificateType {
         status: json['status'],
       );
 
-  Map<String, dynamic> toJson() => {
-        '_id': id,
-        'name': name,
-        'status': status,
-      };
+  Map<String, dynamic> toJson() => {'_id': id, 'name': name, 'status': status};
 }
 
 class CertificateAgency {
@@ -270,11 +269,7 @@ class CertificateAgency {
         status: json['status'],
       );
 
-  Map<String, dynamic> toJson() => {
-        '_id': id,
-        'name': name,
-        'status': status,
-      };
+  Map<String, dynamic> toJson() => {'_id': id, 'name': name, 'status': status};
 }
 
 class CurrentSubscription {
@@ -308,14 +303,14 @@ class CurrentSubscription {
       );
 
   Map<String, dynamic> toJson() => {
-        '_id': id,
-        'planId': planId?.toJson(),
-        'trialStart': trialStart,
-        'trialEnd': trialEnd,
-        'amount': amount,
-        'currency': currency,
-        'interval': interval,
-      };
+    '_id': id,
+    'planId': planId?.toJson(),
+    'trialStart': trialStart,
+    'trialEnd': trialEnd,
+    'amount': amount,
+    'currency': currency,
+    'interval': interval,
+  };
 }
 
 class Plan {
@@ -325,17 +320,10 @@ class Plan {
 
   Plan({this.id, this.name, this.status});
 
-  factory Plan.fromJson(Map<String, dynamic> json) => Plan(
-        id: json['_id'],
-        name: json['name'],
-        status: json['status'],
-      );
+  factory Plan.fromJson(Map<String, dynamic> json) =>
+      Plan(id: json['_id'], name: json['name'], status: json['status']);
 
-  Map<String, dynamic> toJson() => {
-        '_id': id,
-        'name': name,
-        'status': status,
-      };
+  Map<String, dynamic> toJson() => {'_id': id, 'name': name, 'status': status};
 }
 
 class Device {
@@ -344,13 +332,11 @@ class Device {
 
   Device({this.deviceToken, this.deviceType});
 
-  factory Device.fromJson(Map<String, dynamic> json) => Device(
-        deviceToken: json['deviceToken'],
-        deviceType: json['deviceType'],
-      );
+  factory Device.fromJson(Map<String, dynamic> json) =>
+      Device(deviceToken: json['deviceToken'], deviceType: json['deviceType']);
 
   Map<String, dynamic> toJson() => {
-        'deviceToken': deviceToken,
-        'deviceType': deviceType,
-      };
+    'deviceToken': deviceToken,
+    'deviceType': deviceType,
+  };
 }

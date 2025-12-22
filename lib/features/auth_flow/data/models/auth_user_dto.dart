@@ -28,7 +28,7 @@ class AuthUserDto {
   final int? currentSubscriptionAutoRenew;
   final bool? stripePayoutsEnabled;
   final bool? stripeTransfersActive;
-  final int? approvalStatusByAdmin;
+  final int? certificateApproved;
   final String? rejectedReason;
   final bool? bookingInProgress;
   final bool? isDeleted;
@@ -74,7 +74,7 @@ class AuthUserDto {
     this.currentSubscriptionAutoRenew,
     this.stripePayoutsEnabled,
     this.stripeTransfersActive,
-    this.approvalStatusByAdmin,
+    this.certificateApproved,
     this.rejectedReason,
     this.bookingInProgress,
     this.isDeleted,
@@ -122,7 +122,7 @@ class AuthUserDto {
       currentSubscriptionAutoRenew: json['currentSubscriptionAutoRenew'],
       stripePayoutsEnabled: json['stripePayoutsEnabled'],
       stripeTransfersActive: json['stripeTransfersActive'],
-      approvalStatusByAdmin: json['approvalStatusByAdmin'],
+      certificateApproved: json['certificateApproved'],
       rejectedReason: json['rejectedReason'],
       bookingInProgress: json['bookingInProgress'],
       isDeleted: json['isDeleted'],
@@ -131,13 +131,16 @@ class AuthUserDto {
       city: json['city'],
       mailingAddress: json['mailingAddress'],
       certificateTypeId: json['certificateTypeId'],
-      certificateAgencyIds:
-          (json['certificateAgencyIds'] is List) ? List<String>.from(json['certificateAgencyIds']) : [],
-      certificateDocuments:
-          (json['certificateDocuments'] is List) ? List<String>.from(json['certificateDocuments']) : [],
+      certificateAgencyIds: (json['certificateAgencyIds'] is List)
+          ? List<String>.from(json['certificateAgencyIds'])
+          : [],
+      certificateDocuments: (json['certificateDocuments'] is List)
+          ? List<String>.from(json['certificateDocuments'])
+          : [],
       certificateExpiryDate: json['certificateExpiryDate'],
-      referenceDocuments:
-          (json['referenceDocuments'] is List) ? List<String>.from(json['referenceDocuments']) : [],
+      referenceDocuments: (json['referenceDocuments'] is List)
+          ? List<String>.from(json['referenceDocuments'])
+          : [],
       uploadedIdOrLicenseDocument: json['uploadedIdOrLicenseDocument'],
       workHistoryDescription: json['workHistoryDescription'],
       connectorLinkUrl: json['connectorLinkUrl'],
@@ -146,9 +149,9 @@ class AuthUserDto {
           : null,
       devices: (json['devices'] is List)
           ? (json['devices'] as List)
-              .whereType<Map<String, dynamic>>()
-              .map(DeviceDto.fromJson)
-              .toList()
+                .whereType<Map<String, dynamic>>()
+                .map(DeviceDto.fromJson)
+                .toList()
           : const [],
       loginTime: json['loginTime'],
       createdAt: json['createdAt'],
@@ -157,37 +160,36 @@ class AuthUserDto {
   }
 
   AuthUser toEntity() => AuthUser(
-        id: id,
-        name: name,
-        userId: userId,
-        emailHashed: email,
-        authToken: authToken ?? '',
-        role: role,
-        phoneNumber: phoneNumber,
-        countryCode: countryCode,
-        phoneOtpVerified: phoneOtpVerified ?? false,
-        emailOtpVerified: emailOtpVerified ?? false,
-        agreedToTerms: agreedToTerms ?? false,
-        isTruthfully: isTruthfully ?? false,
-        walletId: walletId,
-        stripeAccountId: stripeAccountId,
-        stripeCustomerId: stripeCustomerId,
-        stripeSubscriptionStatus: stripeSubscriptionStatus,
-        currentSubscriptionId: currentSubscriptionId,
-        approvalStatusByAdmin: approvalStatusByAdmin,
-        rejectedReason: rejectedReason,
-        location: (location?.coordinates?.length == 2)
-            ? UserLocation(
-                name: location?.locationName,
-                lat: location!.coordinates![0],
-                lng: location!.coordinates![1],
-              )
-            : null,
-        devices: devices
-                ?.map(
-                  (d) => UserDevice(token: d.deviceToken, type: d.deviceType),
-                )
-                .toList() ??
-            const [],
-      );
+    id: id,
+    name: name,
+    userId: userId,
+    emailHashed: email,
+    authToken: authToken ?? '',
+    role: role,
+    phoneNumber: phoneNumber,
+    countryCode: countryCode,
+    phoneOtpVerified: phoneOtpVerified ?? false,
+    emailOtpVerified: emailOtpVerified ?? false,
+    agreedToTerms: agreedToTerms ?? false,
+    isTruthfully: isTruthfully ?? false,
+    walletId: walletId,
+    stripeAccountId: stripeAccountId,
+    stripeCustomerId: stripeCustomerId,
+    stripeSubscriptionStatus: stripeSubscriptionStatus,
+    currentSubscriptionId: currentSubscriptionId,
+    certificateApproved: certificateApproved,
+    rejectedReason: rejectedReason,
+    location: (location?.coordinates?.length == 2)
+        ? UserLocation(
+            name: location?.locationName,
+            lat: location!.coordinates![0],
+            lng: location!.coordinates![1],
+          )
+        : null,
+    devices:
+        devices
+            ?.map((d) => UserDevice(token: d.deviceToken, type: d.deviceType))
+            .toList() ??
+        const [],
+  );
 }

@@ -75,9 +75,9 @@ class _AccountSettingsViewState extends State<AccountSettingsView> {
 
   @override
   void dispose() {
-    nameCtrl.dispose();
-    emailCtrl.dispose();
-    phoneCtrl.dispose();
+    nameCtrl.clear();
+    emailCtrl.clear();
+    phoneCtrl.clear();
     super.dispose();
   }
 

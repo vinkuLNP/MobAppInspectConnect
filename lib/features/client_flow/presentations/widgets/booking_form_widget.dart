@@ -265,6 +265,7 @@ class _BookingFormWidgetState extends State<BookingFormWidget> {
   Widget _inspectionTypeDropdown(BookingProvider prov) {
     return DropdownButtonFormField<CertificateSubTypeEntity>(
       isDense: true,
+      isExpanded: true,
       decoration: _inputDecoration('Select inspection type').copyWith(
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 10,
