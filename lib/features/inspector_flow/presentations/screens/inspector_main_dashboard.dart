@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/di/app_sockets/socket_manager.dart';
 import 'package:inspect_connect/core/di/app_sockets/socket_service.dart';
+import 'package:inspect_connect/core/di/notifcation_services/notification_permission_manager.dart';
 import 'package:inspect_connect/core/utils/constants/app_assets_constants.dart';
 import 'package:inspect_connect/core/utils/presentation/app_assets_widget.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
@@ -45,7 +46,7 @@ class _InspectorMainDashboardState extends State<InspectorMainDashboard> {
       socket.initSocket(token: user.authToken!);
     }
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await requestNotificationPermissionIfNeeded();
+      await NotificationPermissionManager.request();
     });
   }
 
@@ -75,80 +76,83 @@ class _InspectorMainDashboardState extends State<InspectorMainDashboard> {
             ),
 
       body: _pages[_selectedIndex],
-      bottomNavigationBar: SizedBox(
-        height: 95,
-        child: Stack(
-          clipBehavior: Clip.none,
-          alignment: Alignment.bottomCenter,
-          children: [
-            ClipRRect(
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-                child: Container(
-                  height: 70,
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [
-                        Color(0xFF1B90FF),
-                        Color(0xFF0070F2),
-                        Color(0xFF002A86),
+      bottomNavigationBar: SafeArea(
+        top: false,
+        child: SizedBox(
+          height: 95,
+          child: Stack(
+            clipBehavior: Clip.none,
+            alignment: Alignment.bottomCenter,
+            children: [
+              ClipRRect(
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+                  child: Container(
+                    height: 70,
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [
+                          Color(0xFF1B90FF),
+                          Color(0xFF0070F2),
+                          Color(0xFF002A86),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.topRight,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.1),
+                          blurRadius: 12,
+                          offset: const Offset(0, 4),
+                        ),
                       ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.topRight,
                     ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.1),
-                        blurRadius: 12,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Align(
-                          alignment: Alignment.center,
-                          child: _buildNavItem(
-                            icon: Icons.assignment_outlined,
-                            activeIcon: Icons.assignment,
-                            label: 'My Inspections',
-                            index: 1,
-                            primary: primary,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Align(
+                            alignment: Alignment.center,
+                            child: _buildNavItem(
+                              icon: Icons.assignment_outlined,
+                              activeIcon: Icons.assignment,
+                              label: 'My Inspections',
+                              index: 1,
+                              primary: primary,
+                            ),
                           ),
                         ),
-                      ),
-                      Expanded(
-                        child: Align(
-                          alignment: Alignment.center,
-                          child: _buildNavItem(
-                            icon: Icons.verified_outlined,
-                            activeIcon: Icons.verified_rounded,
-                            label: 'Requested',
-                            index: 0,
-                            primary: primary,
+                        Expanded(
+                          child: Align(
+                            alignment: Alignment.center,
+                            child: _buildNavItem(
+                              icon: Icons.verified_outlined,
+                              activeIcon: Icons.verified_rounded,
+                              label: 'Requested',
+                              index: 0,
+                              primary: primary,
+                            ),
                           ),
                         ),
-                      ),
-                      Expanded(
-                        child: Align(
-                          alignment: Alignment.center,
-                          child: _buildNavItem(
-                            icon: Icons.person_outline,
-                            activeIcon: Icons.person,
-                            label: 'Profile',
-                            index: 2,
-                            primary: primary,
+                        Expanded(
+                          child: Align(
+                            alignment: Alignment.center,
+                            child: _buildNavItem(
+                              icon: Icons.person_outline,
+                              activeIcon: Icons.person,
+                              label: 'Profile',
+                              index: 2,
+                              primary: primary,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

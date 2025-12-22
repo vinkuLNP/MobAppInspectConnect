@@ -5,7 +5,7 @@ class UserDetail {
   final String? email;
   final String? name;
   final int? status;
-  final String? statusUpdatedByAdmin;
+  final bool? statusUpdatedByAdmin;
   final String? phoneNumber;
   final String? countryCode;
   final bool? bookingInProgress;

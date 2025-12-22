@@ -31,19 +31,13 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
       decoration: const BoxDecoration(
         color: AppColors.authThemeColor,
         gradient: LinearGradient(
-          colors: [
-            Color(0xFF1B90FF), 
-            Color(0xFF0070F2), 
-
-            Color(0xFF002A86), 
-          ],
+          colors: [Color(0xFF1B90FF), Color(0xFF0070F2), Color(0xFF002A86)],
           begin: Alignment.topLeft,
           end: Alignment.topRight,
         ),
         boxShadow: [
           BoxShadow(color: Colors.black26, offset: Offset(0, 2), blurRadius: 6),
         ],
-       
       ),
       child: AppBar(
         backgroundColor: Colors.transparent,
@@ -110,7 +104,12 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
               onPressed:
                   onNotificationTap ??
                   () => ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: textWidget(text: 'Notifications tapped',color: Colors.white)),
+                    SnackBar(
+                      content: textWidget(
+                        text: 'Notifications tapped',
+                        color: Colors.white,
+                      ),
+                    ),
                   ),
             ),
           if (showBookButton)
@@ -122,7 +121,12 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
               onPressed:
                   onNotificationTap ??
                   () => ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: textWidget(text: 'Notifications tapped',color: Colors.white)),
+                    SnackBar(
+                      content: textWidget(
+                        text: 'Notifications tapped',
+                        color: Colors.white,
+                      ),
+                    ),
                   ),
             ),
         ],

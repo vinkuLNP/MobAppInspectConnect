@@ -1,7 +1,4 @@
-import 'dart:developer';
-
 import 'package:auto_route/auto_route.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/utils/auto_router_setup/auto_router.dart';
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
@@ -77,8 +74,8 @@ void logOutUser(BuildContext context) {
   showDialog(
     context: context,
     builder: (_) => AlertDialog(
-      title: textWidget(text: 'log OUT?'),
-      content: textWidget(text: 'Are you sure you want to logout?'),
+      title: textWidget(text: 'Log Out?'),
+      content: textWidget(text: 'Are you sure you want to Log Out?'),
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
@@ -99,7 +96,7 @@ void logOutUser(BuildContext context) {
           },
           buttonBackgroundColor: Colors.redAccent,
           textColor: AppColors.backgroundColor,
-          text: 'log Out',
+          text: 'Log Out',
         ),
       ],
     ),
@@ -219,61 +216,4 @@ void showRaiseAmountSheet({
       );
     },
   );
-}
-
-Future<void> requestNotificationPermissionIfNeeded() async {
-  final messaging = FirebaseMessaging.instance;
-
-  log('🔔 [FCM] Checking notification permission...');
-
-  final settings = await messaging.getNotificationSettings();
-  log(
-    '🔔 [FCM] Current authorizationStatus: '
-    '${settings.authorizationStatus}',
-  );
-
-  if (settings.authorizationStatus == AuthorizationStatus.notDetermined) {
-    log('🔔 [FCM] Requesting notification permission...');
-
-    final result = await messaging.requestPermission(
-      alert: true,
-      badge: true,
-      sound: true,
-    );
-
-    log(
-      '🔔 [FCM] Permission request result: '
-      '${result.authorizationStatus}',
-    );
-
-    if (result.authorizationStatus != AuthorizationStatus.authorized) {
-      log('❌ [FCM] User denied notification permission');
-      return;
-    }
-  } else if (settings.authorizationStatus ==
-      AuthorizationStatus.denied) {
-    log('⚠️ [FCM] Notification permission previously denied');
-    return;
-  } else if (settings.authorizationStatus ==
-      AuthorizationStatus.authorized) {
-    log('✅ [FCM] Notification permission already granted');
-  } else if (settings.authorizationStatus ==
-      AuthorizationStatus.provisional) {
-    log('🟡 [FCM] Provisional permission granted (iOS)');
-  }
-
-  log('🔔 [FCM] Setting foreground notification presentation options...');
-
-  await FirebaseMessaging.instance
-      .setForegroundNotificationPresentationOptions(
-    alert: true,
-    badge: true,
-    sound: true,
-  );
-
-  log('✅ [FCM] Foreground presentation options set');
-
-  // 🔥 Token check (VERY IMPORTANT FOR DEBUGGING)
-  final token = await messaging.getToken();
-  log('🔑 [FCM] FCM token: $token');
 }
