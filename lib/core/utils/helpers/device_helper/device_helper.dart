@@ -4,7 +4,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
 class DeviceInfoHelper {
-
   static Future<String> getDeviceType() async {
     if (Platform.isAndroid) return 'android';
     if (Platform.isIOS) return 'ios';
@@ -18,35 +17,37 @@ class DeviceInfoHelper {
     try {
       final messaging = FirebaseMessaging.instance;
 
-      if (Platform.isIOS) {
-        final settings = await messaging.requestPermission(
-          alert: true,
-          badge: true,
-          sound: true,
-          provisional: false,
-        );
-        log('[FCM] iOS authorizationStatus: ${settings.authorizationStatus}');
-        if (settings.authorizationStatus != AuthorizationStatus.authorized &&
-            settings.authorizationStatus != AuthorizationStatus.provisional) {
-          log('[FCM] Notifications not allowed — returning empty token');
-          return "";
-        }
-      }
+      // if (Platform.isIOS) {
+      //   final settings = await messaging.requestPermission(
+      //     alert: true,
+      //     badge: true,
+      //     sound: true,
+      //     provisional: false,
+      //   );
+      //   log('[FCM] iOS authorizationStatus: ${settings.authorizationStatus}');
+      //   if (settings.authorizationStatus != AuthorizationStatus.authorized &&
+      //       settings.authorizationStatus != AuthorizationStatus.provisional) {
+      //     log('[FCM] Notifications not allowed — returning empty token');
+      //     return "";
+      //   }
+      // }
 
       final token = await messaging.getToken();
       log('[FCM] FCM token: $token');
       return token ?? "";
-    }  on FirebaseException catch (e, s) {
+    } on FirebaseException catch (e, s) {
       if (e.code == 'apns-token-not-set') {
         log('[FCM] APNS token not set yet, using placeholder.\n$e\n$s');
 
         return 'apns-token-pending-ios';
       }
 
-      log('[FCM] FirebaseException in getDeviceToken: ${e.code} - ${e.message}\n$s');
+      log(
+        '[FCM] FirebaseException in getDeviceToken: ${e.code} - ${e.message}\n$s',
+      );
       return '';
-    }  catch (e) {
-          log('[FCM] FCM ERRROR: $e');
+    } catch (e) {
+      log('[FCM] FCM ERRROR: $e');
 
       return "";
     }

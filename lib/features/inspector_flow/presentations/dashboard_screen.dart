@@ -20,13 +20,18 @@ class InspectorDashboardView extends StatelessWidget {
       create: (_) => InspectorDashboardProvider()..initializeUserState(context),
       child: Consumer<InspectorDashboardProvider>(
         builder: (context, provider, _) {
-          Widget content;
+          Widget content = const InspectorMainDashboard();
 
           switch (provider.status) {
+            case InspectorStatus.initial:
+              content = Scaffold();
+              break;
             case InspectorStatus.unverified:
-              content =   Scaffold(
+              content = Scaffold(
                 body: Center(
-                  child: textWidget(text:  'Please verify your phone number to continue.'),
+                  child: textWidget(
+                    text: 'Please verify your phone number to continue.',
+                  ),
                 ),
               );
               break;
@@ -39,8 +44,10 @@ class InspectorDashboardView extends StatelessWidget {
             case InspectorStatus.rejected:
               final user = context.read<UserProvider>().user;
               if (user == null) {
-                content =  Scaffold(
-                  body: Center(child: textWidget(text: 'User data unavailable')),
+                content = Scaffold(
+                  body: Center(
+                    child: textWidget(text: 'User data unavailable'),
+                  ),
                 );
               } else {
                 content = ApprovalStatusScreen(user: user.toDomainEntity());
@@ -56,10 +63,24 @@ class InspectorDashboardView extends StatelessWidget {
             children: [
               content,
               if (provider.isLoading)
-                Container(
-                  color: Colors.black.withValues(alpha:0.3),
-                  child: const Center(
-                    child: CircularProgressIndicator(color: Colors.white),
+                Center(
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.9),
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.15),
+                          blurRadius: 6,
+                        ),
+                      ],
+                    ),
+                    child: const SizedBox(
+                      width: 30,
+                      height: 30,
+                      child: CircularProgressIndicator(),
+                    ),
                   ),
                 ),
             ],

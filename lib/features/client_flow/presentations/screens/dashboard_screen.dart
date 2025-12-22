@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/di/app_component/app_component.dart';
 import 'package:inspect_connect/core/di/app_sockets/socket_service.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
+import 'package:inspect_connect/core/utils/presentation/app_common_widgets.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/user_provider.dart';
 import 'package:inspect_connect/features/client_flow/presentations/screens/booking_screen.dart';
 import 'package:inspect_connect/features/client_flow/presentations/screens/home_screen.dart';
@@ -43,6 +44,9 @@ class _ClientDashboardViewState extends State<ClientDashboardView> {
       final socket = locator<SocketService>();
       socket.initSocket(token: user.authToken!);
     }
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await requestNotificationPermissionIfNeeded();
+    });
   }
 
   void _onItemTapped(int index) {

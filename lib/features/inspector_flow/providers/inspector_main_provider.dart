@@ -221,7 +221,7 @@ class InspectorDashboardProvider extends BaseViewModel {
           await locator<AuthLocalDataSource>().saveUser(mergedUser);
           if (context.mounted) context.read<UserProvider>().setUser(mergedUser);
 
-          status = userDetail.approvalStatusByAdmin;
+          status = userDetail.certificateApproved;
         },
         error: (e) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -313,14 +313,14 @@ class InspectorDashboardProvider extends BaseViewModel {
     }
   }
 
-  InspectorStatus status = InspectorStatus.unverified;
+  InspectorStatus status = InspectorStatus.initial;
   AuthUser? user;
   UserSubscriptionModel? subscription;
 
   Future<void> initializeUserState(BuildContext context) async {
     isLoading = true;
     notifyListeners();
-
+    status = InspectorStatus.initial;
     try {
       final localUser = await locator<AuthLocalDataSource>().getUser();
 
@@ -329,35 +329,37 @@ class InspectorDashboardProvider extends BaseViewModel {
         return;
       }
 
-      final userDetail = await fetchAndUpdateUserDetail(localUser, context);
+      if (context.mounted) {
+        final userDetail = await fetchAndUpdateUserDetail(localUser, context);
 
-      final mergedUser = localUser.mergeWithUserDetail(userDetail);
+        final mergedUser = localUser.mergeWithUserDetail(userDetail);
 
-      user = AuthUser.fromLocalEntity(mergedUser);
+        user = AuthUser.fromLocalEntity(mergedUser);
 
-      if (mergedUser.phoneOtpVerified != true) {
-        status = InspectorStatus.unverified;
-        return;
-      }
+        if (mergedUser.phoneOtpVerified != true) {
+          status = InspectorStatus.unverified;
+          return;
+        }
 
-      if (mergedUser.stripeSubscriptionStatus != 'active' ||
-          mergedUser.currentSubscriptionId == null) {
-        status = InspectorStatus.needsSubscription;
-        await fetchSubscriptionPlans();
-        return;
-      }
+        if (mergedUser.stripeSubscriptionStatus != 'active' ||
+            mergedUser.currentSubscriptionId == null) {
+          status = InspectorStatus.needsSubscription;
+          await fetchSubscriptionPlans();
+          return;
+        }
 
-      switch (mergedUser.approvalStatusByAdmin) {
-        case 0:
-          status = InspectorStatus.underReview;
-          break;
-        case 1:
-          status = InspectorStatus.approved;
-          break;
-        case 2:
-          status = InspectorStatus.rejected;
-          break;
-        default:
+        switch (mergedUser.certificateApproved) {
+          case 0:
+            status = InspectorStatus.underReview;
+            break;
+          case 1:
+            status = InspectorStatus.approved;
+            break;
+          case 2:
+            status = InspectorStatus.rejected;
+            break;
+          default:
+        }
       }
     } catch (e) {
       log('[initializeUserState] Error occurred: $e');
@@ -407,7 +409,7 @@ class InspectorDashboardProvider extends BaseViewModel {
           currentSubscriptionId: localUser.currentSubscriptionId != null
               ? CurrentSubscription(id: localUser.currentSubscriptionId)
               : null,
-          approvalStatusByAdmin: localUser.approvalStatusByAdmin,
+          certificateApproved: localUser.certificateApproved,
           location: localUser.latitude != null && localUser.longitude != null
               ? Location(
                   type: 'Point',

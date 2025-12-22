@@ -110,7 +110,7 @@ class _PerDigitOtpState extends State<PerDigitOtp> {
   @override
   void dispose() {
     for (final c in _digits) {
-      c.dispose();
+      c.clear();
     }
     for (final n in _nodes) {
       n.dispose();
