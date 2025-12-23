@@ -51,9 +51,21 @@ class _BookingFormWidgetState extends State<BookingFormWidget> {
         provider.descriptionController.text = b.description;
         provider.setDate(DateTime.parse(b.bookingDate));
         provider.setTime(provider.parseTime(b.bookingTime));
-        provider.setInspectionType(
-          (b.certificateSubTypes != [] ? b.certificateSubTypes[0] : null),
+        log(
+          '----SOCKET----->provider.certificateSubTypes ${b.certificateSubTypes[0].name.toString()}',
         );
+        final savedTypeId = b.certificateSubTypes[0].id;
+
+        final matched = provider.subTypes.firstWhere(
+          (e) => e.id == savedTypeId,
+          orElse: () => provider.subTypes.first,
+        );
+
+        provider.setInspectionType(matched);
+
+        // provider.setInspectionType(
+        //   (b.certificateSubTypes != [] ? b.certificateSubTypes[0] : null),
+        // );
 
         if (b.images != [] && b.images.isNotEmpty) {
           provider.uploadedUrls = List<String>.from(b.images);
@@ -264,6 +276,7 @@ class _BookingFormWidgetState extends State<BookingFormWidget> {
   }
 
   Widget _inspectionTypeDropdown(BookingProvider prov) {
+    final items = prov.subTypes;
     return DropdownButtonFormField<CertificateSubTypeEntity>(
       isDense: true,
       isExpanded: true,
@@ -274,9 +287,12 @@ class _BookingFormWidgetState extends State<BookingFormWidget> {
         ),
       ),
       style: appTextStyle(fontSize: 12),
-      initialValue: prov.provInspectionType,
+      initialValue: items.contains(prov.provInspectionType)
+          ? prov.provInspectionType
+          : null,
 
-      items: prov.subTypes.map((subType) {
+      // prov.provInspectionType,
+      items: items.map((subType) {
         return DropdownMenuItem<CertificateSubTypeEntity>(
           value: subType,
           child: ConstrainedBox(
@@ -326,6 +342,7 @@ class _BookingFormWidgetState extends State<BookingFormWidget> {
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
+      padding: EdgeInsets.zero,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 4,
         mainAxisSpacing: 8,

@@ -64,10 +64,11 @@ class BookingActionsService {
         bookingLocationCoordinates: [
           provider.selectedLng != '' && provider.selectedLng != null
               ? provider.selectedLng.toString()
-              : '33.6103',
+              : '-114.59635',
+
           provider.selectedLat != '' && provider.selectedLat != null
               ? provider.selectedLat.toString()
-              : '114.59635',
+              : '33.6103',
         ],
       );
 

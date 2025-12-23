@@ -23,7 +23,9 @@ class SocketService {
       "🟦 [SOCKET INIT] Token received: ${token.isNotEmpty ? 'VALID' : 'EMPTY'}",
     );
 
-    final url = devBaseUrl;
+    final url =
+        "https://inspect-connect-api-auakczg0ave2bqex.westus2-01.azurewebsites.net/";
+    //  devBaseUrl;
     //  Platform.isIOS
     //     ? "http://localhost:5002"
     //     : "http://10.0.2.2:5002";
@@ -94,17 +96,17 @@ class SocketService {
             status == bookingStatusCancelledByClient ||
             status == bookingStatusCancelledByInspector) {
           log(
-            "⏭️ [ROOM SKIP] Booking ${booking.id} skipped due to status: $status",
+            "⏭️ SOCKET[ROOM SKIP] Booking ${booking.id} skipped due to status: $status",
           );
           continue;
         }
 
-        log("🏠 [ROOM JOIN] Joining booking room: ${booking.id}");
+        log("🏠SOCKET [ROOM JOIN] Joining booking room: ${booking.id}");
         joinBookingRoom(booking.id);
         joined++;
       }
 
-      log("🟢 [ROOMS JOINED] Total rooms joined: $joined");
+      log("🟢SOCKET [ROOMS JOINED] Total rooms joined: $joined");
     });
 
     socket?.onDisconnect((_) {
@@ -116,7 +118,7 @@ class SocketService {
     });
 
     socket?.onConnectError((e) {
-      log("⚠️ [CONNECT ERROR] $e");
+      log("⚠️ [SOCKET CONNECT ERROR] $e");
     });
 
     socket?.onError((e) {
@@ -132,7 +134,7 @@ class SocketService {
       socket?.disconnect();
       socket?.destroy();
     } catch (e) {
-      log('SocketService dispose error: $e');
+      log(' SOCKET SocketService dispose error: $e');
     } finally {
       socket = null;
     }
@@ -140,42 +142,42 @@ class SocketService {
 
   void emit(String event, Map<String, dynamic> payload) {
     socket?.emit(event, payload);
-    log("📥  emit $event with payload: $payload");
+    log("📥SOCKET  emit $event with payload: $payload");
   }
 
   void connectUser(String userId) {
     socket?.emit('connect_user', {'userId': userId});
-    log("📥     connect_user $userId   ");
+    log("📥SOCKET     connect_user $userId   ");
   }
 
   void disconnectUser(String userId) {
     socket?.emit('disconnect_user', {'userId': userId});
-    log("📥   disconnect_user $userId      ");
+    log("📥 SOCKET  disconnect_user $userId      ");
   }
 
   void joinBookingRoom(String bookingId) {
     socket?.emit('booking_join_room', {'bookingId': bookingId});
-    log("📥   booking_join_room $bookingId      ");
+    log("📥 SOCKET  booking_join_room $bookingId      ");
   }
 
   void leaveBookingRoom(String bookingId) {
-    socket?.emit('booking_leave_room', {'bookingId': bookingId});
-    log("📥   booking_leave_room $bookingId      ");
+    // socket?.emit('booking_leave_room', {'bookingId': bookingId});
+    log("📥SOCKET   booking_leave_room $bookingId      ");
   }
 
   void raiseInspectionRequest(Map<String, dynamic> payload) {
     socket?.emit('raised_inspection_request', payload);
-    log("📥   raise_inspection_request_listener. $payload      ");
+    log("📥 SOCKET  raise_inspection_request_listener. $payload      ");
   }
 
   void updateBookingStatus(Map<String, dynamic> payload) {
     socket?.emit('booking_status_update', payload);
-    log("📥   booking_status_update . $payload      ");
+    log("📥 SOCKET  booking_status_update . $payload      ");
   }
 
   void bookingCreationNotification(Map<String, dynamic> payload) {
     socket?.emit('booking_creation_notification', payload);
-    log("📥   booking_creation_notification . $payload      ");
+    log("📥 SOCKET  booking_creation_notification . $payload      ");
   }
 
   void on(String event, Function(dynamic) callback) =>

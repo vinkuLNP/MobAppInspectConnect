@@ -24,7 +24,7 @@ class SocketManager {
   SocketManager(this.bookingProvider);
 
   void registerGlobalListeners({required bool isInspector}) {
-    log("🔌 Registering Socket Listeners | Inspector: $isInspector");
+    log("🔌SOCKET Registering Socket Listeners | Inspector: $isInspector");
 
     registerRaiseInspectionListener(isInspector);
     registerBookingStatusUpdateListener();
@@ -36,7 +36,7 @@ class SocketManager {
   }
 
   void unregisterAllListeners() {
-    log("🔌 Removing all socket listeners");
+    log("🔌SOCKET Removing all socket listeners");
 
     _socket.off('raise_inspection_request_listener');
     _socket.off('booking_status_update_listener');
@@ -49,7 +49,7 @@ class SocketManager {
       final data = payload?['data'];
       if (data == null) return;
       log(
-        "🔔 Client Raise Inspection Request OPutdisdedddddd| Payload: $payload",
+        "🔔SOCKET Client Raise Inspection Request OPutdisdedddddd| Payload: $payload",
       );
       final String? bookingId = data['bookingId']?.toString();
       if (bookingId == null) return;
@@ -59,18 +59,18 @@ class SocketManager {
       final inspectorId = data['inspectorId']?.toString();
 
       if (agreedToRaise == 1) {
-        log(  
-          "🔔 Client Raise Inspection Request | Booking ID: $bookingId | Raised Amount: $raisedAmount | AGREED",
+        log(
+          "🔔SOCKET Client Raise Inspection Request | Booking ID: $bookingId | Raised Amount: $raisedAmount | AGREED",
         );
         bookingProvider.onRaiseInspectionUpdate(data);
       }
       log(
-        "🔔 Client Raise Inspection Request OPutdisdedddddd| Booking ID: $bookingId | Raised Amount: $raisedAmount",
+        "🔔 SOCKET Client Raise Inspection Request OPutdisdedddddd| Booking ID: $bookingId | Raised Amount: $raisedAmount",
       );
 
       if (!isInspector) {
         log(
-          "🔔 Client Raise Inspection Request | Booking ID: $bookingId | Raised Amount: $raisedAmount",
+          "🔔SOCKET Client Raise Inspection Request | Booking ID: $bookingId | Raised Amount: $raisedAmount",
         );
         handleClientRaiseRequest(
           bookingId: bookingId,
@@ -154,7 +154,7 @@ class SocketManager {
     required int? agreedToRaise,
   }) {
     if (handledRaiseRequests.contains(bookingId) && agreedToRaise != 0) {
-      log("⚠️ Client dialog already shown for booking $bookingId");
+      log("⚠️SOCKET Client dialog already shown for booking $bookingId");
       return;
     }
 
