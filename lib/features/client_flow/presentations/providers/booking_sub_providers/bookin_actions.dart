@@ -64,10 +64,10 @@ class BookingActionsService {
         bookingLocationCoordinates: [
           provider.selectedLng != '' && provider.selectedLng != null
               ? provider.selectedLng.toString()
-              : '76.6849524',
+              : '33.6103',
           provider.selectedLat != '' && provider.selectedLat != null
               ? provider.selectedLat.toString()
-              : '30.7033202',
+              : '114.59635',
         ],
       );
 
@@ -103,7 +103,7 @@ class BookingActionsService {
             bookingId: response.body.id,
             inspectorIds: inspectorIds,
           );
-          // clearBookingData();
+          clearBookingData();
         },
         error: (e) {
           if (context.mounted) {

@@ -22,97 +22,99 @@ class ProfileScreen extends StatelessWidget {
         return Consumer<UserProvider>(
           builder: (context, userProv, _) {
             final user = userProv.user;
-            return Scaffold(
-              backgroundColor: Colors.grey[200],
-              body: Column(
-                children: [
-                  Stack(
-                    children: [
-                      SizedBox(
-                        width: rc.screenWidth,
-                        height: rc.screenHeight * 0.35,
-                        child: imageAsset(
-                          image: finalImage,
+            return SafeArea(
+              top: false,
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    Stack(
+                      children: [
+                        SizedBox(
                           width: rc.screenWidth,
-                          height: rc.screenHeight * 0.5,
-                          boxFit: BoxFit.cover,
+                          height: rc.screenHeight * 0.35,
+                          child: imageAsset(
+                            image: finalImage,
+                            width: rc.screenWidth,
+                            height: rc.screenHeight * 0.5,
+                            boxFit: BoxFit.cover,
+                          ),
                         ),
-                      ),
-                      Container(
-                        width: rc.screenWidth,
-                        height: rc.screenHeight * 0.4,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              Colors.black.withValues(alpha: 0.2),
-                              Colors.transparent,
+                        Container(
+                          width: rc.screenWidth,
+                          height: rc.screenHeight * 0.4,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                Colors.black.withValues(alpha: 0.2),
+                                Colors.transparent,
+                              ],
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          left: 24,
+                          top: 80,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              textWidget(
+                                text: user?.name.toString() ?? '',
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.white,
+                              ),
+                              SizedBox(height: 4),
+                              textWidget(
+                                text: user?.email.toString() ?? '',
+                                fontSize: 22,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.white,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Card(
+                        elevation: 3,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 20,
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  const Icon(Icons.phone, color: Colors.grey),
+                                  const SizedBox(width: 8),
+                                  textWidget(
+                                    text:
+                                        '${user?.countryCode ?? ''} ${user?.phoneNumber ?? 'N/A'}',
+                                    fontSize: 16,
+                                  ),
+                                ],
+                              ),
                             ],
                           ),
                         ),
                       ),
-                      Positioned(
-                        left: 24,
-                        top: 80,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            textWidget(
-                              text: user?.name.toString() ?? '',
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.white,
-                            ),
-                            SizedBox(height: 4),
-                            textWidget(
-                              text: user?.email.toString() ?? '',
-                              fontSize: 22,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.white,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Card(
-                      elevation: 3,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 20,
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                const Icon(Icons.phone, color: Colors.grey),
-                                const SizedBox(width: 8),
-                                textWidget(
-                                  text:
-                                      '${user?.countryCode ?? ''} ${user?.phoneNumber ?? 'N/A'}',
-                                  fontSize: 16,
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
                     ),
-                  ),
 
-                  const SizedBox(height: 24),
+                    const SizedBox(height: 24),
 
-                  Expanded(
-                    child: ListView(
+                    ListView(
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       children: [
                         _buildOptionTile(
@@ -157,8 +159,8 @@ class ProfileScreen extends StatelessWidget {
                         ),
                       ],
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             );
           },
@@ -166,7 +168,6 @@ class ProfileScreen extends StatelessWidget {
       },
     );
   }
-
 
   Widget _buildOptionTile(
     BuildContext context, {

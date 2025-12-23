@@ -113,147 +113,139 @@ class _BookingsScreenState extends State<BookingsScreen> {
             final otherBookings = provider.bookings
                 .where((b) => !todaysApproved.contains(b))
                 .toList();
-            return  Stack(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      children: [
-                        _buildFilterChips(context),
-                        const SizedBox(height: 16),
-                        _buildBookNowButton(context),
-                        const SizedBox(height: 16),
-                        Expanded(
-                          child: RefreshIndicator(
-                            onRefresh: () async =>
-                                provider.fetchBookingsList(reset: true),
-                            child: ListView.builder(
-                              controller: _scrollController,
-                              padding: const EdgeInsets.only(bottom: 24),
-                              itemCount:
-                                  todaysApproved.length +
-                                  otherBookings.length +
-                                  (provider.isLoadMoreRunning ? 1 : 0),
-                              itemBuilder: (context, index) {
-                                if (index < todaysApproved.length) {
-                                  final booking = todaysApproved[index];
-                                  return Padding(
-                                    padding: const EdgeInsets.only(bottom: 8.0),
-                                    child: GestureDetector(
-                                      onTap: () =>
-                                          _showBookingDetails(context, booking),
-                                      child: _buildBookingCard(
-                                        context,
-                                        booking,
-                                      ),
-                                    ),
-                                  );
-                                }
-
-                                final adjustedIndex =
-                                    index - todaysApproved.length;
-                                if (adjustedIndex < otherBookings.length) {
-                                  final booking = otherBookings[adjustedIndex];
-                                  return Column(
-                                    children: [
-                                      _buildBookingCard(context, booking),
-                                      index == provider.bookings.length - 1
-                                          ? SizedBox(height: 80)
-                                          : SizedBox.shrink(),
-                                    ],
-                                  );
-                                }
-                                if (provider.isFetchingBookings &&
-                                    provider.bookings.isEmpty) {
-                                  return const Center(
-                                    child: CircularProgressIndicator(),
-                                  );
-                                }
-                                if (!provider.isFetchingBookings &&
-                                    provider.bookings.isEmpty) {
-                                  return Center(
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Image.asset(
-                                          'assets/images/no_booking.webp',
-                                          width: 150,
-                                          height: 150,
-                                        ),
-                                        const SizedBox(height: 16),
-                                        textWidget(
-                                          text: "No bookings found.",
-                                          fontSize: 16,
-                                          color: Colors.grey,
-                                        ),
-                                        const SizedBox(height: 16),
-                                      ],
-                                    ),
-                                  );
-                                }
-
-                                return const Padding(
-                                  padding: EdgeInsets.all(16),
-                                  child: Center(
-                                    child: CircularProgressIndicator(),
+            return Stack(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    children: [
+                      _buildFilterChips(context),
+                      const SizedBox(height: 16),
+                      _buildBookNowButton(context),
+                      const SizedBox(height: 16),
+                      Expanded(
+                        child: RefreshIndicator(
+                          onRefresh: () async =>
+                              provider.fetchBookingsList(reset: true),
+                          child: ListView.builder(
+                            controller: _scrollController,
+                            padding: const EdgeInsets.only(bottom: 24),
+                            itemCount:
+                                todaysApproved.length +
+                                otherBookings.length +
+                                (provider.isLoadMoreRunning ? 1 : 0),
+                            itemBuilder: (context, index) {
+                              if (index < todaysApproved.length) {
+                                final booking = todaysApproved[index];
+                                return Padding(
+                                  padding: const EdgeInsets.only(bottom: 8.0),
+                                  child: GestureDetector(
+                                    onTap: () =>
+                                        _showBookingDetails(context, booking),
+                                    child: _buildBookingCard(context, booking),
                                   ),
                                 );
-                              },
-                            ),
+                              }
+
+                              final adjustedIndex =
+                                  index - todaysApproved.length;
+                              if (adjustedIndex < otherBookings.length) {
+                                final booking = otherBookings[adjustedIndex];
+                                return Column(
+                                  children: [
+                                    _buildBookingCard(context, booking),
+                                    index == provider.bookings.length - 1
+                                        ? SizedBox(height: 80)
+                                        : SizedBox.shrink(),
+                                  ],
+                                );
+                              }
+                              if (provider.isFetchingBookings &&
+                                  provider.bookings.isEmpty) {
+                                return const Center(
+                                  child: CircularProgressIndicator(),
+                                );
+                              }
+                              if (!provider.isFetchingBookings &&
+                                  provider.bookings.isEmpty) {
+                                return Center(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Image.asset(
+                                        'assets/images/no_booking.webp',
+                                        width: 150,
+                                        height: 150,
+                                      ),
+                                      const SizedBox(height: 16),
+                                      textWidget(
+                                        text: "No bookings found.",
+                                        fontSize: 16,
+                                        color: Colors.grey,
+                                      ),
+                                      const SizedBox(height: 16),
+                                    ],
+                                  ),
+                                );
+                              }
+
+                              return const Padding(
+                                padding: EdgeInsets.all(16),
+                                child: Center(
+                                  child: CircularProgressIndicator(),
+                                ),
+                              );
+                            },
                           ),
                         ),
+                      ),
+                    ],
+                  ),
+                ),
+                if (provider.isFetchingBookings && provider.bookings.isEmpty)
+                  const Center(child: CircularProgressIndicator()),
+                if (!provider.isFetchingBookings && provider.bookings.isEmpty)
+                  Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.asset(
+                          'assets/images/no_booking.webp',
+                          width: 150,
+                          height: 150,
+                        ),
+                        const SizedBox(height: 16),
+                        textWidget(
+                          text: "No bookings found.",
+                          fontSize: 16,
+                          color: Colors.grey,
+                        ),
+                        const SizedBox(height: 16),
                       ],
                     ),
                   ),
-                  if (provider.isFetchingBookings && provider.bookings.isEmpty)
-                    const Center(child: CircularProgressIndicator()),
-                  if (!provider.isFetchingBookings && provider.bookings.isEmpty)
-                    Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Image.asset(
-                            'assets/images/no_booking.webp',
-                            width: 150,
-                            height: 150,
-                          ),
-                          const SizedBox(height: 16),
-                          textWidget(
-                            text: "No bookings found.",
-                            fontSize: 16,
-                            color: Colors.grey,
-                          ),
-                          const SizedBox(height: 16),
-                        ],
+                if (provider.isFilterLoading)
+                  const Center(child: CircularProgressIndicator()),
+                if (provider.isActionProcessing)
+                  Container(
+                    color: Colors.black54,
+                    child: const Center(
+                      child: CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                       ),
                     ),
-                  if (provider.isFilterLoading)
-                    const Center(child: CircularProgressIndicator()),
-                  if (provider.isActionProcessing)
-                    Container(
-                      color: Colors.black54,
-                      child: const Center(
-                        child: CircularProgressIndicator(
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            Colors.white,
-                          ),
-                        ),
-                      ),
-                    ),
+                  ),
 
-                  if (provider.isLoadingBookingDetail)
-                    Container(
-                      color: Colors.black54,
-                      child: const Center(
-                        child: CircularProgressIndicator(
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            Colors.white,
-                          ),
-                        ),
+                if (provider.isLoadingBookingDetail)
+                  Container(
+                    color: Colors.black54,
+                    child: const Center(
+                      child: CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                       ),
                     ),
-                ],
+                  ),
+              ],
             );
           },
         );
@@ -452,7 +444,7 @@ class _BookingsScreenState extends State<BookingsScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
                       children: [
                         Flexible(
@@ -492,7 +484,9 @@ class _BookingsScreenState extends State<BookingsScreen> {
                                 const SizedBox(width: 4),
                                 Flexible(
                                   child: textWidget(
-                                    text: bookingStatusToText(booking.status ?? -1),
+                                    text: bookingStatusToText(
+                                      booking.status ?? -1,
+                                    ),
                                     fontSize: 12,
                                     color: color,
                                     fontWeight: FontWeight.w600,
@@ -709,7 +703,11 @@ class _BookingsScreenState extends State<BookingsScreen> {
                               Navigator.pop(context);
                               await context
                                   .read<BookingProvider>()
-                                  .disagreeBooking(rootContext, booking.id,user!.userId);
+                                  .disagreeBooking(
+                                    rootContext,
+                                    booking.id,
+                                    user!.userId,
+                                  );
                             },
                           ),
                           const SizedBox(width: 10),
@@ -749,7 +747,11 @@ class _BookingsScreenState extends State<BookingsScreen> {
                           Navigator.pop(context);
                           await context
                               .read<BookingProvider>()
-                              .approveAndPayBooking(rootContext, booking.id,user!.userId);
+                              .approveAndPayBooking(
+                                rootContext,
+                                booking.id,
+                                user!.userId,
+                              );
                         },
                       ),
                     ],
@@ -791,7 +793,7 @@ class _BookingsScreenState extends State<BookingsScreen> {
   void _showBookingDetails(BuildContext context, BookingListEntity booking) {
     final isPending = booking.status == bookingStatusPending;
     final isApproved = booking.status == bookingStatusAccepted;
-    final isRejected = booking.status ==   bookingStatusRejected;
+    final isRejected = booking.status == bookingStatusRejected;
     final isAwaitingPayment = booking.status == bookingStatusAwaiting;
 
     if (isAwaitingPayment) {
@@ -839,29 +841,31 @@ class _BookingsScreenState extends State<BookingsScreen> {
 
               Row(
                 children: [
-                isPending ?   Expanded(
-                    child: AppButton(
-                      text: 'Edit Booking',
-                      onTap: () async {
-                        Navigator.pop(context);
-                    
-                        final provider = context.read<BookingProvider>();
-                        await provider.getBookingDetail(
-                          context: context,
-                          bookingId: booking.id,
-                          isEditable: true,
-                          isInspectorView: false,
-                        );
-                      },
-                    ),
-                  ) : SizedBox.shrink(),
+                  isPending
+                      ? Expanded(
+                          child: AppButton(
+                            text: 'Edit Booking',
+                            onTap: () async {
+                              Navigator.pop(context);
+
+                              final provider = context.read<BookingProvider>();
+                              await provider.getBookingDetail(
+                                context: context,
+                                bookingId: booking.id,
+                                isEditable: true,
+                                isInspectorView: false,
+                              );
+                            },
+                          ),
+                        )
+                      : SizedBox.shrink(),
                   SizedBox(width: isPending ? 12 : 0),
-                    Expanded(
+                  Expanded(
                     child: AppButton(
                       text: 'View Booking',
                       onTap: () async {
                         Navigator.pop(context);
-                    
+
                         final provider = context.read<BookingProvider>();
                         await provider.getBookingDetail(
                           context: context,
@@ -872,7 +876,6 @@ class _BookingsScreenState extends State<BookingsScreen> {
                       },
                     ),
                   ),
-
                 ],
               ),
               if (isPending || isApproved || isRejected) ...[
@@ -899,9 +902,7 @@ class _BookingsScreenState extends State<BookingsScreen> {
                     color: statusColor(booking.status).withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
-                      color: statusColor(
-                        booking.status,
-                      ).withValues(alpha: 0.4),
+                      color: statusColor(booking.status).withValues(alpha: 0.4),
                     ),
                   ),
                   child: Row(
@@ -929,7 +930,8 @@ class _BookingsScreenState extends State<BookingsScreen> {
       },
     );
   }
- Future<void> _showDeleteBookingModal(
+
+  Future<void> _showDeleteBookingModal(
     BuildContext context,
     BookingListEntity booking, {
     required double cancellationFee,
@@ -937,7 +939,6 @@ class _BookingsScreenState extends State<BookingsScreen> {
     final bookingProvider = context.read<BookingProvider>();
     bool isLoading = false;
 
-    // Calculate if booking is within next 8 hours
     DateTime bookingDateTime() {
       final date = DateTime.parse(booking.bookingDate);
       final t = booking.bookingTime.trim().toUpperCase().replaceAll('.', '');

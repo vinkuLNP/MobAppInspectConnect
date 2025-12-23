@@ -1,13 +1,11 @@
 import 'dart:convert';
 import 'dart:developer';
-import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:http/http.dart' as http;
 import 'package:inspect_connect/core/basecomponents/base_view_model.dart';
 import 'package:inspect_connect/core/commondomain/entities/based_api_result/api_result_state.dart';
 import 'package:inspect_connect/core/di/app_component/app_component.dart';
-import 'package:inspect_connect/core/utils/auto_router_setup/auto_router.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/features/auth_flow/data/datasources/local_datasources/auth_local_datasource.dart';
 import 'package:inspect_connect/features/auth_flow/data/datasources/local_datasources/auth_user_local_entity.dart';
@@ -273,46 +271,6 @@ class InspectorDashboardProvider extends BaseViewModel {
     );
   }
 
-  Future<void> fetchUserDetail({
-    required AuthUser user,
-    required BuildContext context,
-  }) async {
-    final existingUser = await locator<AuthLocalDataSource>().getUser();
-
-    final localUser = user.toLocalEntity();
-
-    if (localUser.authToken == null || localUser.authToken!.isEmpty) {
-      localUser.authToken = existingUser?.authToken;
-    }
-
-    await locator<AuthLocalDataSource>().saveUser(localUser);
-    if (context.mounted) {
-      final userProvider = context.read<UserProvider>();
-      await userProvider.setUser(localUser);
-      await userProvider.loadUser();
-
-      final fetchUserUseCase = locator<GetUserUseCase>();
-      final userState = await executeParamsUseCase<UserDetail, GetUserParams>(
-        useCase: fetchUserUseCase,
-        query: GetUserParams(userId: user.id),
-        launchLoader: true,
-      );
-
-      userState?.when(
-        data: (userData) async {
-          final mergedUser = localUser.mergeWithUserDetail(userData);
-
-          await locator<AuthLocalDataSource>().saveUser(mergedUser);
-
-          await userProvider.setUser(mergedUser);
-        },
-        error: (e) {
-          context.router.replaceAll([const OnBoardingRoute()]);
-        },
-      );
-    }
-  }
-
   InspectorStatus status = InspectorStatus.initial;
   AuthUser? user;
   UserSubscriptionModel? subscription;
@@ -368,32 +326,60 @@ class InspectorDashboardProvider extends BaseViewModel {
       notifyListeners();
     }
   }
-
+]
   Future<UserDetail> fetchAndUpdateUserDetail(
     AuthUserLocalEntity localUser,
     BuildContext context,
   ) async {
+    log('👤 [FETCH_USER_DETAIL] Started → localUserId=${localUser.id}');
+
     final getUserUseCase = locator<GetUserUseCase>();
+    log('📡 [FETCH_USER_DETAIL] Calling GetUserUseCase');
+
     final result = await executeParamsUseCase<UserDetail, GetUserParams>(
       useCase: getUserUseCase,
       query: GetUserParams(userId: localUser.id.toString()),
       launchLoader: false,
     );
 
+    log(
+      '📥 [FETCH_USER_DETAIL] API response received → '
+      'isNull=${result == null}',
+    );
+
     late UserDetail detail;
 
     await result?.when(
       data: (userDetail) async {
+        log(
+          '✅ [FETCH_USER_DETAIL] Success → '
+          'userId=${userDetail.id}',
+        );
+
         detail = userDetail;
+
+        log('🔀 [FETCH_USER_DETAIL] Merging local user with server data');
         final mergedUser = localUser.mergeWithUserDetail(userDetail);
 
+        log('💾 [FETCH_USER_DETAIL] Saving merged user locally');
         await locator<AuthLocalDataSource>().saveUser(mergedUser);
 
         if (context.mounted) {
+          log('🔄 [FETCH_USER_DETAIL] Updating UserProvider');
           context.read<UserProvider>().setUser(mergedUser);
+        } else {
+          log(
+            '⚠️ [FETCH_USER_DETAIL] Context not mounted, '
+            'skipping provider update',
+          );
         }
       },
       error: (e) {
+        log(
+          '❌ [FETCH_USER_DETAIL] API failed → '
+          'using local fallback. Error: $e',
+        );
+
         detail = UserDetail(
           id: localUser.id.toString(),
           userId: localUser.userId.toString(),
@@ -418,7 +404,16 @@ class InspectorDashboardProvider extends BaseViewModel {
                 )
               : null,
         );
+
+        log(
+          '🧩 [FETCH_USER_DETAIL] Fallback UserDetail created from local data',
+        );
       },
+    );
+
+    log(
+      '🏁 [FETCH_USER_DETAIL] Completed → returning UserDetail '
+      '(userId=${detail.id})',
     );
 
     return detail;

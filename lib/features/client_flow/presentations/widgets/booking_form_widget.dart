@@ -108,6 +108,7 @@ class _BookingFormWidgetState extends State<BookingFormWidget> {
                   child: SingleChildScrollView(
                     padding: const EdgeInsets.all(16),
                     child: Container(
+                      margin: EdgeInsets.only(bottom: 150),
                       padding: EdgeInsets.symmetric(vertical: 14),
                       decoration: BoxDecoration(
                         color: Colors.white,

@@ -28,10 +28,14 @@ class BookingEditScreen extends StatelessWidget {
         showLogo: false,
       ),
       body: SafeArea(
+        bottom: false,
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: isReadOnly
-              ? ViewBookingDetailsScreen(booking: booking,isInspectorView: isInspectorView,)
+              ? ViewBookingDetailsScreen(
+                  booking: booking,
+                  isInspectorView: isInspectorView,
+                )
               : BookingFormWidget(
                   isEditing: true,
                   isReadOnly: isReadOnly,

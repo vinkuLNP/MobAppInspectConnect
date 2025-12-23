@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
@@ -16,17 +17,30 @@ class InspectorDashboardView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    log('📍 [InspectorDashboard] build() called');
+
     return ChangeNotifierProvider(
-      create: (_) => InspectorDashboardProvider()..initializeUserState(context),
+      create: (_) {
+        log('🟦 [InspectorDashboard] Provider created');
+        return InspectorDashboardProvider()..initializeUserState(context);
+      },
       child: Consumer<InspectorDashboardProvider>(
         builder: (context, provider, _) {
+          log(
+            '🔁 [InspectorDashboard] status=${provider.status}, '
+            'isLoading=${provider.isLoading}',
+          );
+
           Widget content = const InspectorMainDashboard();
 
           switch (provider.status) {
             case InspectorStatus.initial:
-              content = Scaffold();
+              log('🟡 [InspectorDashboard] Status: INITIAL');
+              content = const Scaffold();
               break;
+
             case InspectorStatus.unverified:
+              log('🔴 [InspectorDashboard] Status: UNVERIFIED');
               content = Scaffold(
                 body: Center(
                   child: textWidget(
@@ -37,32 +51,61 @@ class InspectorDashboardView extends StatelessWidget {
               break;
 
             case InspectorStatus.needsSubscription:
+              log('💳 [InspectorDashboard] Status: NEEDS_SUBSCRIPTION');
               content = SubscriptionScreen(provider: provider);
               break;
 
             case InspectorStatus.underReview:
-            case InspectorStatus.rejected:
+              log('🟠 [InspectorDashboard] Status: UNDER_REVIEW');
               final user = context.read<UserProvider>().user;
+
               if (user == null) {
+                log('❌ [InspectorDashboard] UserProvider returned null user');
                 content = Scaffold(
                   body: Center(
                     child: textWidget(text: 'User data unavailable'),
                   ),
                 );
               } else {
+                log(
+                  '👤 [InspectorDashboard] User loaded → '
+                  'ID=${user.id}, Status=UNDER_REVIEW',
+                );
+                content = ApprovalStatusScreen(user: user.toDomainEntity());
+              }
+              break;
+
+            case InspectorStatus.rejected:
+              log('❌ [InspectorDashboard] Status: REJECTED');
+              final user = context.read<UserProvider>().user;
+
+              if (user == null) {
+                log('❌ [InspectorDashboard] UserProvider returned null user');
+                content = Scaffold(
+                  body: Center(
+                    child: textWidget(text: 'User data unavailable'),
+                  ),
+                );
+              } else {
+                log(
+                  '👤 [InspectorDashboard] User loaded → '
+                  'ID=${user.id}, Status=REJECTED',
+                );
                 content = ApprovalStatusScreen(user: user.toDomainEntity());
               }
               break;
 
             case InspectorStatus.approved:
+              log('✅ [InspectorDashboard] Status: APPROVED');
               content = const InspectorMainDashboard();
               break;
           }
+          log('⏳ [InspectorDashboard] Showing loader');
 
           return Stack(
             children: [
               content,
-              if (provider.isLoading)
+              if (provider.isLoading) ...[
                 Center(
                   child: Container(
                     padding: const EdgeInsets.all(8),
@@ -83,6 +126,7 @@ class InspectorDashboardView extends StatelessWidget {
                     ),
                   ),
                 ),
+              ],
             ],
           );
         },
