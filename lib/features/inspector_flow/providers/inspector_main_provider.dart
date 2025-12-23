@@ -326,7 +326,7 @@ class InspectorDashboardProvider extends BaseViewModel {
       notifyListeners();
     }
   }
-]
+
   Future<UserDetail> fetchAndUpdateUserDetail(
     AuthUserLocalEntity localUser,
     BuildContext context,
