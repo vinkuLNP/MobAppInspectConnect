@@ -137,7 +137,9 @@ class SocketManager {
         bookingId: data['bookingId']?.toString(),
         inspectors: data['inspectors'],
       );
-
+      // bookingProvider.resetBookings();
+      // bookingProvider.clearFilters(triggerFetch: false);
+      bookingProvider.fetchBookingsList(reset: false);
       _showNotification(
         title: "New Booking Assigned",
         body: "Booking #${data['bookingId']} assigned to you",

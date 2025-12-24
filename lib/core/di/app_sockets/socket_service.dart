@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/di/app_component/app_component.dart';
 import 'package:inspect_connect/core/di/app_sockets/socket_manager.dart';
@@ -24,11 +25,9 @@ class SocketService {
     );
 
     final url =
-        "https://inspect-connect-api-auakczg0ave2bqex.westus2-01.azurewebsites.net/";
-    //  devBaseUrl;
-    //  Platform.isIOS
-    //     ? "http://localhost:5002"
-    //     : "http://10.0.2.2:5002";
+        //     "https://inspect-connect-api-auakczg0ave2bqex.westus2-01.azurewebsites.net/";
+        //  devBaseUrl;
+        Platform.isIOS ? "http://localhost:5002" : "http://10.0.2.2:5002";
     log("🟦 [SOCKET INIT] Connecting to: $url");
 
     socket = io.io(
@@ -91,10 +90,11 @@ class SocketService {
         final status = booking.status;
 
         if (status == bookingStatusCompleted ||
-            status == bookingStatusAccepted ||
+            // status == bookingStatusAccepted ||
             status == bookingStatusRejected ||
             status == bookingStatusCancelledByClient ||
-            status == bookingStatusCancelledByInspector) {
+            status == bookingStatusCancelledByInspector ||
+            status == bookingStatusExpired) {
           log(
             "⏭️ SOCKET[ROOM SKIP] Booking ${booking.id} skipped due to status: $status",
           );

@@ -41,7 +41,7 @@ class InspectorViewModelProvider extends BaseViewModel {
     isLoading = true;
     notifyListeners();
     fetchCertificateTypes();
-
+    loadCountries();
     isLoading = false;
     notifyListeners();
   }
@@ -99,9 +99,17 @@ class InspectorViewModelProvider extends BaseViewModel {
   final zipController = TextEditingController();
   final mailingAddressController = TextEditingController();
   void saveDataToProvider() {
-    country = countryController.text;
-    state = stateController.text;
-    city = cityController.text;
+    country = selectedCountryCode == null
+        ? "Select Country"
+        : cachedCountries!
+              .firstWhere((c) => c.isoCode == selectedCountryCode!)
+              .name;
+    state = selectedStateCode == null
+        ? "Select State"
+        : cachedStates[selectedCountryCode]!
+              .firstWhere((s) => s.isoCode == selectedStateCode!)
+              .name;
+    city = selectedCityNames[0];
     zipCode = zipController.text;
     mailingAddress = mailingAddressController.text;
   }

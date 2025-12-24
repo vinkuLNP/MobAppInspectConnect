@@ -77,6 +77,7 @@ class BookingProvider extends BaseViewModel {
   late final BookingFiltersService filtersService;
 
   BookingProvider() {
+    log("🔥 BookingProvider instance hash: $hashCode");
     imagesService = BookingImagesService(this);
     timerService = BookingTimerService(this);
     actionsService = BookingActionsService(this);

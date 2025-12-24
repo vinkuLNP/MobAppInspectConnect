@@ -292,12 +292,12 @@ class _OnBoardingPageState extends State<OnBoardingPage>
 
                                 if (_isClient == true) {
                                   authFlow.setUserType(AuthUserType.client);
-                                  context.pushRoute(
+                                  context.replaceRoute(
                                     ClientSignUpRoute(showBackButton: false),
                                   );
                                 } else {
                                   authFlow.setUserType(AuthUserType.inspector);
-                                  context.pushRoute(
+                                  context.replaceRoute(
                                     InspectorSignUpRoute(showBackButton: false),
                                   );
                                 }
@@ -324,7 +324,7 @@ class _OnBoardingPageState extends State<OnBoardingPage>
 
                                     if (_isClient == true) {
                                       authFlow.setUserType(AuthUserType.client);
-                                      context.pushRoute(
+                                      context.replaceRoute(
                                         ClientSignInRoute(
                                           showBackButton: false,
                                         ),
@@ -333,7 +333,7 @@ class _OnBoardingPageState extends State<OnBoardingPage>
                                       authFlow.setUserType(
                                         AuthUserType.inspector,
                                       );
-                                      context.pushRoute(
+                                      context.replaceRoute(
                                         ClientSignInRoute(
                                           showBackButton: false,
                                         ),
