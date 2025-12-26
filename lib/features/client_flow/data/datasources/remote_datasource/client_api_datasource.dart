@@ -60,7 +60,7 @@ abstract class BookingRemoteDataSource {
     String bookingId,
     bool status,
   );
-  
+
   Future<ApiResultModel<BookingData>> updateBookingTimer(
     String bookingId,
     String action,
@@ -141,6 +141,7 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
               <String, dynamic>{};
 
           final WalletModel data = WalletModel.fromJson(body);
+          log('-1111111111111111111-------get user wallet data--------->$body');
 
           return ApiResultModel<WalletModel>.success(data: data);
         },
@@ -200,7 +201,9 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
               (root['body'] as Map?)?.cast<String, dynamic>() ??
               <String, dynamic>{};
           final dto = PaymentsBodyModel.fromJson(body);
-
+          log(
+            '--2222222222222222222------get user payment list--------->$body',
+          );
           return ApiResultModel<PaymentsBodyModel>.success(data: dto);
         },
         failure: (ErrorResultModel e) =>
@@ -225,9 +228,7 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
       final ApiResultModel<http.Response> res = await _ctx.makeRequest(
         uri: uploadImageEndPoint,
         httpRequestStrategy: MultipartPostRequestStrategy(),
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
+        headers: {"Content-Type": "multipart/form-data"},
         requestData: dto.toJson(),
       );
 
@@ -326,7 +327,7 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
         if (sortOrder != null && sortOrder.isNotEmpty) 'sortOrder': sortOrder,
         if (status != null) 'status': status.toString(),
       };
-   
+
       final ApiResultModel<http.Response> res = await _ctx.makeRequest(
         uri: createBookingEndPoint,
         requestData: queryParams,
@@ -353,9 +354,7 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
           return ApiResultModel<List<BookingData>>.success(data: dtoList);
         },
         failure: (ErrorResultModel e) =>
-            ApiResultModel<List<BookingData>>.failure(
-              errorResultEntity: e,
-            ),
+            ApiResultModel<List<BookingData>>.failure(errorResultEntity: e),
       );
     } catch (e) {
       log('autoremoteresopoonse------> $e');
@@ -536,8 +535,6 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
     }
   }
 
-
-
   @override
   Future<ApiResultModel<BookingData>> showUpFeeStatus(
     String bookingId,
@@ -557,7 +554,7 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
-        requestData: {"showUpFeeApplied": status,"_id":bookingId},
+        requestData: {"showUpFeeApplied": status, "_id": bookingId},
       );
 
       return res.when(
@@ -613,7 +610,7 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
               : (jsonDecode(response.body) as Map<String, dynamic>);
           final Map<String, dynamic> body =
               (root['body'] as Map?)?.cast<String, dynamic>() ?? {};
-              log(body.toString());
+          log(body.toString());
           final dto = BookingData.fromJson(body);
           return ApiResultModel<BookingData>.success(data: dto);
         },

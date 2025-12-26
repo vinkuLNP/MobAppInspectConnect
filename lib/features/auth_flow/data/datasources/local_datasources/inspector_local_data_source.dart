@@ -22,134 +22,138 @@ class InspectorSignUpLocalDataSource {
       return entity;
     }
   }
+
   Future<void> updateFields(Map<String, dynamic> fields) async {
-  final entity = await _getOrCreate();
+    final entity = await _getOrCreate();
 
-  entity.serviceAreas.length; 
-  log('Before update:  ${entity.name.toString()} ----- zipCode: ${entity.zipCode.toString()} ----- serviceAreas: ${entity.serviceAreas.length}');
+    entity.serviceAreas.length;
+    log(
+      'Before update:  ${entity.name.toString()} ----- zipCode: ${entity.zipCode.toString()} ----- serviceAreas: ${entity.serviceAreas.length}',
+    );
 
-  fields.forEach((k, v) {
-    switch (k) {
-      case 'name':
-        entity.name = v as String?;
-        break;
-      case 'phoneNumber':
-        entity.phoneNumber = v as String?;
-        break;
-      case 'countryCode':
-        entity.countryCode = v as String?;
-        break;
-      case 'email':
-        entity.email = v as String?;
-        break;
-      case 'password':
-        entity.password = v as String?;
-        break;
-      case 'mailingAddress':
-        entity.mailingAddress = v as String?;
-        break;
-      case 'certificateTypeId':
-        entity.certificateTypeId = v as String?;
-        break;
-      case 'certificateExpiryDate':
-        entity.certificateExpiryDate = v as String?;
-        break;
-      case 'certificateDocuments':
-        entity.certificateDocuments = List<String>.from(v as Iterable);
-        break;
-      case 'certificateAgencyIds':
-        entity.certificateAgencyIds = List<String>.from(v as Iterable);
-        break;
-      case 'country':
-        entity.country = v as String?;
-        break;
-      case 'zip':
-      case 'zipCode':
-        entity.zipCode = v as String?;
-        break;
-      case 'workHistoryDescription':
-        entity.workHistoryDescription = v as String?;
-        break;
-      case 'state':
-        entity.state = v as String?;
-        break;
-      case 'city':
-        entity.city = v as String?;
-        break;
-      case 'profileImage':
-        if (v != null) entity.profileImage = v as String?;
-        break;
-      case 'uploadedIdOrLicenseDocument':
-        if (v != null) entity.uploadedIdOrLicenseDocument = v as String?;
-        break;
-      case 'referenceDocuments':
-        entity.referenceDocuments = List<String>.from(v as Iterable);
-        break;
-      case 'agreedToTerms':
-        entity.agreedToTerms = v as bool?;
-        break;
-      case 'isTruthfully':
-        entity.isTruthfully = v as bool?;
-        break;
-      case 'locationType':
-        entity.locationType = v as String?;
-        break;
-      case 'locationName':
-        entity.locationName = v as String?;
-        break;
-      case 'latitude':
-        entity.latitude = (v is double) ? v : double.tryParse(v.toString());
-        break;
-      case 'longitude':
-        entity.longitude = (v is double) ? v : double.tryParse(v.toString());
-        break;
-      case 'role':
-        entity.role = v as int?;
-        break;
-      case 'deviceType':
-        entity.deviceType = v as String?;
-        break;
-      case 'deviceToken':
-        entity.deviceToken = v as String?;
-        break;
+    fields.forEach((k, v) {
+      switch (k) {
+        case 'name':
+          entity.name = v as String?;
+          break;
+        case 'phoneNumber':
+          entity.phoneNumber = v as String?;
+          break;
+        case 'countryCode':
+          entity.countryCode = v as String?;
+          break;
+        case 'email':
+          entity.email = v as String?;
+          break;
+        case 'password':
+          entity.password = v as String?;
+          break;
+        case 'mailingAddress':
+          entity.mailingAddress = v as String?;
+          break;
+        case 'certificateTypeId':
+          entity.certificateTypeId = v as String?;
+          break;
+        case 'certificateExpiryDate':
+          entity.certificateExpiryDate = v as String?;
+          break;
+        case 'certificateDocuments':
+          entity.certificateDocuments = List<String>.from(v as Iterable);
+          break;
+        case 'certificateAgencyIds':
+          entity.certificateAgencyIds = List<String>.from(v as Iterable);
+          break;
+        case 'country':
+          entity.country = v as String?;
+          break;
+        case 'zip':
+        case 'zipCode':
+          entity.zipCode = v as String?;
+          break;
+        case 'workHistoryDescription':
+          entity.workHistoryDescription = v as String?;
+          break;
+        case 'state':
+          entity.state = v as String?;
+          break;
+        case 'city':
+          entity.city = v as String?;
+          break;
+        case 'profileImage':
+          if (v != null) entity.profileImage = v as String?;
+          break;
+        case 'uploadedIdOrLicenseDocument':
+          if (v != null) entity.uploadedIdOrLicenseDocument = v as String?;
+          break;
+        case 'referenceDocuments':
+          entity.referenceDocuments = List<String>.from(v as Iterable);
+          break;
+        case 'agreedToTerms':
+          entity.agreedToTerms = v as bool?;
+          break;
+        case 'isTruthfully':
+          entity.isTruthfully = v as bool?;
+          break;
+        case 'locationType':
+          entity.locationType = v as String?;
+          break;
+        case 'locationName':
+          entity.locationName = v as String?;
+          break;
+        case 'latitude':
+          entity.latitude = (v is double) ? v : double.tryParse(v.toString());
+          break;
+        case 'longitude':
+          entity.longitude = (v is double) ? v : double.tryParse(v.toString());
+          break;
+        case 'role':
+          entity.role = v as int?;
+          break;
+        case 'deviceType':
+          entity.deviceType = v as String?;
+          break;
+        case 'deviceToken':
+          entity.deviceToken = v as String?;
+          break;
 
-      case 'serviceAreas':
-        if (v is Iterable) {
-           for (var old in entity.serviceAreas) {
-      _database.removeServiceArea(old.id);
-    }
+        case 'serviceAreas':
+          if (v is Iterable) {
+            for (var old in entity.serviceAreas) {
+              _database.removeServiceArea(old.id);
+            }
 
-          entity.serviceAreas.clear();
-          for (var s in v) {
-            final loc = s['location'] as Map<String, dynamic>?;
+            entity.serviceAreas.clear();
+            for (var s in v) {
+              final loc = s['location'] as Map<String, dynamic>?;
 
-            final sa = ServiceAreaLocalEntity(
-              countryCode: s['countryCode'] as String?,
-              stateCode: s['stateCode'] as String?,
-              cityName: s['cityName'] as String?,
-              locationType: loc?['type'] as String?,
-              latitude: (loc != null)
-                  ? double.tryParse(loc['coordinates'][1].toString())
-                  : null,
-              longitude: (loc != null)
-                  ? double.tryParse(loc['coordinates'][0].toString())
-                  : null,
-            );
+              final sa = ServiceAreaLocalEntity(
+                countryCode: s['countryCode'] as String?,
+                stateCode: s['stateCode'] as String?,
+                cityName: s['cityName'] as String?,
+                locationType: loc?['type'] as String?,
+                latitude: (loc != null)
+                    ? double.tryParse(loc['coordinates'][1].toString())
+                    : null,
+                longitude: (loc != null)
+                    ? double.tryParse(loc['coordinates'][0].toString())
+                    : null,
+              );
 
-            sa.inspector.target = entity;
+              sa.inspector.target = entity;
               _database.saveServiceArea(sa);
-            entity.serviceAreas.add(sa);
+              entity.serviceAreas.add(sa);
+            }
           }
-        }
-        break;
-    }
-  });
+          break;
+      }
+    });
 
-  _database.saveInspector(entity);
+    _database.saveInspector(entity);
 
-  log(
-    'After update: ${entity.name.toString()} ----- zipCode: ${entity.zipCode.toString()} ----- serviceAreas: ${entity.serviceAreas.iterator}',);
-}
+    log(
+      'After update: ${entity.name.toString()} ----- zipCode: ${entity.zipCode.toString()} ----- serviceAreas: ${entity.serviceAreas.iterator}',
+    );
+  }
 
   Future<InspectorSignUpLocalEntity?> getFullData() async {
     final list = await _database.getAll<InspectorSignUpLocalEntity>();

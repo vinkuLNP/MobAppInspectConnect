@@ -85,11 +85,13 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => UserProvider()),
-        ChangeNotifierProvider(create: (_) => BookingProvider()),
-        ChangeNotifierProvider(create: (_) => AuthFlowProvider()),
-        ChangeNotifierProvider(create: (_) => ClientViewModelProvider()),
-        ChangeNotifierProvider(create: (_) => InspectorDashboardProvider()),
+        ChangeNotifierProvider.value(value: locator<UserProvider>()),
+        ChangeNotifierProvider.value(value: locator<BookingProvider>()),
+        ChangeNotifierProvider.value(value: locator<AuthFlowProvider>()),
+        ChangeNotifierProvider.value(value: locator<ClientViewModelProvider>()),
+        ChangeNotifierProvider.value(
+          value: locator<InspectorDashboardProvider>(),
+        ),
       ],
       child: MaterialApp.router(
         routerConfig: appRouter.config(),
@@ -97,6 +99,13 @@ class _MyAppState extends State<MyApp> {
         theme: ThemeData(
           primaryColor: themeColor,
           scaffoldBackgroundColor: Colors.white,
+          textButtonTheme: TextButtonThemeData(
+            style: TextButton.styleFrom(
+              padding: EdgeInsets.zero,
+              minimumSize: Size.zero,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+          ),
           colorScheme: ColorScheme.fromSwatch().copyWith(
             primary: themeColor,
             secondary: themeColor,

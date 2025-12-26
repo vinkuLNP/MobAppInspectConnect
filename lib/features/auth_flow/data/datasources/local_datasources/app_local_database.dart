@@ -9,30 +9,28 @@ import 'package:path_provider/path_provider.dart';
 class AppLocalDatabase {
   static Store? store;
 
-void saveInspector(InspectorSignUpLocalEntity entity) {
-  store!.box<InspectorSignUpLocalEntity>().put(entity);
-}
-void saveServiceArea(ServiceAreaLocalEntity entity) {
-  store!.box<ServiceAreaLocalEntity>().put(entity);
-}
-
-
-void removeServiceArea(int id) {
-  store!.box<ServiceAreaLocalEntity>().remove(id);
-}
-
-
-static Future<AppLocalDatabase> create() async {
-
-  final Directory docsDir = await getApplicationDocumentsDirectory();
-final dbDir = Directory(p.join(docsDir.path, 'objectbox'));
-  if (!dbDir.existsSync()) {
-    dbDir.createSync(recursive: true);
+  void saveInspector(InspectorSignUpLocalEntity entity) {
+    store!.box<InspectorSignUpLocalEntity>().put(entity);
   }
-store = await openStore(directory: p.join(docsDir.path, 'objectbox'));
 
-  return AppLocalDatabase();
-}
+  void saveServiceArea(ServiceAreaLocalEntity entity) {
+    store!.box<ServiceAreaLocalEntity>().put(entity);
+  }
+
+  void removeServiceArea(int id) {
+    store!.box<ServiceAreaLocalEntity>().remove(id);
+  }
+
+  static Future<AppLocalDatabase> create() async {
+    final Directory docsDir = await getApplicationDocumentsDirectory();
+    final dbDir = Directory(p.join(docsDir.path, 'objectbox'));
+    if (!dbDir.existsSync()) {
+      dbDir.createSync(recursive: true);
+    }
+    store = await openStore(directory: p.join(docsDir.path, 'objectbox'));
+
+    return AppLocalDatabase();
+  }
 
   int? insert<T>(T object) {
     final Box<T>? box = store?.box<T>();
@@ -43,16 +41,14 @@ store = await openStore(directory: p.join(docsDir.path, 'objectbox'));
     final Box<T>? box = store?.box<T>();
     return box?.getAll();
   }
-    void clear<T>() {
+
+  void clear<T>() {
     final Box<T>? box = store?.box<T>();
     box?.removeAll();
   }
-
 
   void clearAll<T>() {
     final box = store!.box<T>();
     box.removeAll();
   }
 }
-
-

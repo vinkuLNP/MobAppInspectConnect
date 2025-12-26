@@ -20,6 +20,14 @@ class ServiceAreaStep extends StatefulWidget {
 }
 
 class _ServiceAreaStepState extends State<ServiceAreaStep> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      widget.vm.loadCountries();
+    });
+  }
+
   void openCitySelectionDialog() async {
     final vm = widget.vm;
 

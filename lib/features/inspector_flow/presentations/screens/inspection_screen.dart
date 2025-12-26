@@ -50,15 +50,8 @@ class ApprovedInspectionsScreen extends StatelessWidget {
               if (canDecline) {
                 return Column(
                   children: [
-                    AppButton(
-                      width: MediaQuery.of(context).size.width / 1.4,
-                      text: showUpFeeApplied
-                          ? "Cancel Show-Up Fee"
-                          : "Apply Show-Up Fee",
-                      buttonBackgroundColor: showUpFeeApplied
-                          ? AppColors.darkShadeAuthColor
-                          : AppColors.authThemeColor,
-                      onTap: () {
+                    TextButton(
+                      onPressed: () {
                         showConfirmationDialog(
                           context: context,
                           icon: showUpFeeApplied
@@ -66,7 +59,7 @@ class ApprovedInspectionsScreen extends StatelessWidget {
                               : Icons.attach_money,
                           confirmColor: AppColors.authThemeColor,
                           title: showUpFeeApplied
-                              ? "Cancel Show-Up Fee"
+                              ? "Cancel Fee"
                               : "Apply Show-Up Fee",
                           message: showUpFeeApplied
                               ? "Do you want to cancel the applied Show-Up Fee?"
@@ -84,6 +77,14 @@ class ApprovedInspectionsScreen extends StatelessWidget {
                           },
                         );
                       },
+                      child: textWidget(
+                        text: showUpFeeApplied
+                            ? "Cancel Fee"
+                            : "Apply Show-Up Fee",
+                        color: showUpFeeApplied
+                            ? AppColors.darkShadeAuthColor
+                            : AppColors.authThemeColor,
+                      ),
                     ),
 
                     const SizedBox(height: 10),
@@ -97,7 +98,7 @@ class ApprovedInspectionsScreen extends StatelessWidget {
                           borderColor: Colors.red,
                           textColor: Colors.red,
                           buttonBackgroundColor: AppColors.backgroundColor,
-                          text: "Decline Inspection",
+                          text: "Decline",
                           onTap: () => showConfirmationDialog(
                             context: context,
                             confirmColor: Colors.redAccent,
@@ -121,7 +122,7 @@ class ApprovedInspectionsScreen extends StatelessWidget {
 
                         AppButton(
                           width: MediaQuery.of(context).size.width / 2.8,
-                          text: "Start Inspection",
+                          text: "Start",
                           onTap: () async {
                             await provider.startInspectionTimer(
                               context: context,
@@ -134,55 +135,59 @@ class ApprovedInspectionsScreen extends StatelessWidget {
                   ],
                 );
               } else {
-                return Row(
+                return Column(
                   children: [
-                    Expanded(
-                      child: AppButton(
+                    TextButton(
+                      style: TextButton.styleFrom(
+                        padding: EdgeInsets.zero,
+                        minimumSize: Size.zero,
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        visualDensity: VisualDensity.compact,
+                      ),
+                      onPressed: () {
+                        showConfirmationDialog(
+                          context: context,
+                          icon: showUpFeeApplied
+                              ? Icons.undo
+                              : Icons.attach_money,
+                          confirmColor: AppColors.authThemeColor,
+                          title: showUpFeeApplied
+                              ? "Cancel Fee"
+                              : "Apply Show-Up Fee",
+                          message: showUpFeeApplied
+                              ? "Do you want to cancel the applied Show-Up Fee?"
+                              : "Are you sure you want to apply a Show-Up Fee to this booking?",
+                          confirmText: showUpFeeApplied
+                              ? "Cancel Fee"
+                              : "Apply Fee",
+                          onConfirm: () async {
+                            Navigator.pop(context);
+                            await provider.updateShowUpFeeStatus(
+                              context: context,
+                              bookingId: booking.id,
+                              showUpFeeApplied: !showUpFeeApplied,
+                            );
+                          },
+                        );
+                      },
+                      child: textWidget(
                         text: showUpFeeApplied
-                            ? "Cancel Show-Up Fee"
+                            ? "Cancel Fee"
                             : "Apply Show-Up Fee",
-                        buttonBackgroundColor: showUpFeeApplied
+                        color: showUpFeeApplied
                             ? AppColors.darkShadeAuthColor
                             : AppColors.authThemeColor,
-                        onTap: () {
-                          showConfirmationDialog(
-                            context: context,
-                            icon: showUpFeeApplied
-                                ? Icons.undo
-                                : Icons.attach_money,
-                            confirmColor: AppColors.authThemeColor,
-                            title: showUpFeeApplied
-                                ? "Cancel Show-Up Fee"
-                                : "Apply Show-Up Fee",
-                            message: showUpFeeApplied
-                                ? "Do you want to cancel the applied Show-Up Fee?"
-                                : "Are you sure you want to apply a Show-Up Fee to this booking?",
-                            confirmText: showUpFeeApplied
-                                ? "Cancel Fee"
-                                : "Apply Fee",
-                            onConfirm: () async {
-                              Navigator.pop(context);
-                              await provider.updateShowUpFeeStatus(
-                                context: context,
-                                bookingId: booking.id,
-                                showUpFeeApplied: !showUpFeeApplied,
-                              );
-                            },
-                          );
-                        },
                       ),
                     ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: AppButton(
-                        text: "Start Inspection",
-                        onTap: () async {
-                          await provider.startInspectionTimer(
-                            context: context,
-                            bookingId: booking.id,
-                          );
-                        },
-                      ),
+
+                    AppButton(
+                      text: "Start",
+                      onTap: () async {
+                        await provider.startInspectionTimer(
+                          context: context,
+                          bookingId: booking.id,
+                        );
+                      },
                     ),
                   ],
                 );
@@ -194,11 +199,53 @@ class ApprovedInspectionsScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   if (timerDuration != null)
-                    textWidget(
-                      text: "Timer: ${provider.formatDuration(timerDuration)}",
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        textWidget(
+                          text:
+                              "Timer: ${provider.formatDuration(timerDuration)}",
 
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            showConfirmationDialog(
+                              context: context,
+                              icon: showUpFeeApplied
+                                  ? Icons.undo
+                                  : Icons.attach_money,
+                              confirmColor: AppColors.authThemeColor,
+                              title: showUpFeeApplied
+                                  ? "Cancel Fee"
+                                  : "Apply Show-Up Fee",
+                              message: showUpFeeApplied
+                                  ? "Do you want to cancel the applied Show-Up Fee?"
+                                  : "Are you sure you want to apply a Show-Up Fee to this booking?",
+                              confirmText: showUpFeeApplied
+                                  ? "Cancel Fee"
+                                  : "Apply Fee",
+                              onConfirm: () async {
+                                Navigator.pop(context);
+                                await provider.updateShowUpFeeStatus(
+                                  context: context,
+                                  bookingId: booking.id,
+                                  showUpFeeApplied: !showUpFeeApplied,
+                                );
+                              },
+                            );
+                          },
+                          child: textWidget(
+                            text: showUpFeeApplied
+                                ? "Cancel Fee"
+                                : "Apply Show-Up Fee",
+                            color: showUpFeeApplied
+                                ? AppColors.darkShadeAuthColor
+                                : AppColors.authThemeColor,
+                          ),
+                        ),
+                      ],
                     ),
                   const SizedBox(height: 10),
                   if (!isStopped)
@@ -240,61 +287,18 @@ class ApprovedInspectionsScreen extends StatelessWidget {
                     ),
                   const SizedBox(height: 8),
                   if (isStopped)
-                    Row(
-                      children: [
-                        Expanded(
-                          child: AppButton(
-                            text: showUpFeeApplied
-                                ? "Cancel Show-Up Fee"
-                                : "Apply Show-Up Fee",
-                            buttonBackgroundColor: showUpFeeApplied
-                                ? AppColors.darkShadeAuthColor
-                                : AppColors.authThemeColor,
-                            onTap: () {
-                              showConfirmationDialog(
-                                context: context,
-                                icon: showUpFeeApplied
-                                    ? Icons.undo
-                                    : Icons.attach_money,
-                                confirmColor: AppColors.authThemeColor,
-                                title: showUpFeeApplied
-                                    ? "Cancel Show-Up Fee"
-                                    : "Apply Show-Up Fee",
-                                message: showUpFeeApplied
-                                    ? "Do you want to cancel the applied Show-Up Fee?"
-                                    : "Are you sure you want to apply a Show-Up Fee to this booking?",
-                                confirmText: showUpFeeApplied
-                                    ? "Cancel Fee"
-                                    : "Apply Fee",
-                                onConfirm: () async {
-                                  Navigator.pop(context);
-                                  await provider.updateShowUpFeeStatus(
-                                    context: context,
-                                    bookingId: booking.id,
-                                    showUpFeeApplied: !showUpFeeApplied,
-                                  );
-                                },
-                              );
-                            },
-                          ),
-                        ),
-                        SizedBox(width: 8),
-                        Expanded(
-                          child: AppButton(
-                            text: "Complete Inspection",
-                            buttonBackgroundColor: AppColors.authThemeColor,
-                            onTap: () async {
-                              final user = context.read<UserProvider>().user;
-                              await provider.updateBookingStatus(
-                                context: context,
-                                bookingId: booking.id,
-                                newStatus: bookingStatusAwaiting,
-                                userId: user!.userId,
-                              );
-                            },
-                          ),
-                        ),
-                      ],
+                    AppButton(
+                      text: "Complete",
+                      buttonBackgroundColor: AppColors.authThemeColor,
+                      onTap: () async {
+                        final user = context.read<UserProvider>().user;
+                        await provider.updateBookingStatus(
+                          context: context,
+                          bookingId: booking.id,
+                          newStatus: bookingStatusAwaiting,
+                          userId: user!.userId,
+                        );
+                      },
                     ),
                 ],
               );

@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:inspect_connect/core/di/app_component/app_component.dart';
 import 'package:inspect_connect/core/utils/app_widgets/common_address_auto_complete_field.dart';
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_button.dart';
@@ -38,7 +39,7 @@ class _BookingFormWidgetState extends State<BookingFormWidget> {
   @override
   void initState() {
     super.initState();
-    provider = BookingProvider();
+    provider = locator<BookingProvider>();
 
     provider.init().then((_) {
       if (widget.isEditing && widget.initialBooking != null) {
