@@ -1,5 +1,4 @@
 import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_button.dart';
@@ -34,10 +33,6 @@ class _BaseInspectionListScreenState extends State<BaseInspectionListScreen>
   final ScrollController _scrollController = ScrollController();
   late AnimationController _animController;
   bool _isCardLoading = false;
-
-  Future<void> _refreshBookings() async {
-    await context.read<BookingProvider>().fetchBookingsList(reset: true);
-  }
 
   @override
   void initState() {
@@ -114,118 +109,57 @@ class _BaseInspectionListScreenState extends State<BaseInspectionListScreen>
               if (provider.isFetchingBookings && filteredBookings.isEmpty) {
                 return const Center(child: CircularProgressIndicator());
               }
-
-              // if (filteredBookings.isEmpty) {
-              //   return Center(
-              //     child: Column(
-              //       mainAxisAlignment: MainAxisAlignment.center,
-              //       children: [
-              //         AnimatedScale(
-              //           scale: 1.05,
-              //           duration: const Duration(seconds: 2),
-              //           curve: Curves.easeInOut,
-              //           child: Image.asset(
-              //             'assets/images/no_booking.webp',
-              //             width: 160,
-              //           ),
-              //         ),
-
-              //         const SizedBox(height: 20),
-              //         Text(
-              //           "No bookings found",
-              //           style: theme.textTheme.titleMedium?.copyWith(
-              //             color: Colors.grey[800],
-              //             fontWeight: FontWeight.w600,
-              //           ),
-              //         ),
-              //         const SizedBox(height: 8),
-              // Text(
-              //   "Pull down to refresh or tap below",
-              //   style: theme.textTheme.bodySmall?.copyWith(
-              //     color: Colors.grey[500],
-              //   ),
-              // ),
-              // const SizedBox(height: 20),
-              // AppButton(
-              //   text: "Refresh",
-              //   width: MediaQuery.of(context).size.width / 3,
-              //   iconLeftMargin: 10,
-              //   icon: const Icon(
-              //     Icons.refresh,
-              //     size: 20,
-              //     color: AppColors.backgroundColor,
-              //   ),
-
-              //   showIcon: true,
-              //   onTap: () {
-              // final provider = context.read<BookingProvider>();
-              // provider.fetchBookingsList(reset: true);
-              //   },
-              // ),
-              //       ],
-              //     ),
-              //   );
-              // }
               if (filteredBookings.isEmpty) {
-                return RefreshIndicator(
-                  onRefresh: _refreshBookings,
-                  color: AppColors.authThemeColor,
-                  child: ListView(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    children: [
-                      SizedBox(
-                        height: MediaQuery.of(context).size.height * 0.75,
-                        child: Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              AnimatedScale(
-                                scale: 1.05,
-                                duration: const Duration(seconds: 2),
-                                curve: Curves.easeInOut,
-                                child: Image.asset(
-                                  'assets/images/no_booking.webp',
-                                  width: 160,
-                                ),
-                              ),
-                              const SizedBox(height: 20),
-                              Text(
-                                "No bookings found",
-                                style: theme.textTheme.titleMedium?.copyWith(
-                                  color: Colors.grey[800],
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                "Pull down to refresh or tap below",
-                                style: theme.textTheme.bodySmall?.copyWith(
-                                  color: Colors.grey[500],
-                                ),
-                              ),
-                              const SizedBox(height: 20),
-                              AppButton(
-                                text: "Refresh",
-                                width: MediaQuery.of(context).size.width / 3,
-                                iconLeftMargin: 10,
-                                icon: const Icon(
-                                  Icons.refresh,
-                                  size: 20,
-                                  color: AppColors.backgroundColor,
-                                ),
-
-                                showIcon: true,
-                                onTap: () {
-                                  final provider = context
-                                      .read<BookingProvider>();
-                                  provider.fetchBookingsList(reset: true);
-                                },
-                              ),
-                            ],
+                return SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.75,
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        AnimatedScale(
+                          scale: 1.05,
+                          duration: const Duration(seconds: 2),
+                          curve: Curves.easeInOut,
+                          child: Image.asset(
+                            'assets/images/no_booking.webp',
+                            width: 160,
                           ),
                         ),
-                      ),
-                    ],
+
+                        const SizedBox(height: 20),
+                        Text(
+                          "No bookings found",
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            color: Colors.grey[800],
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          "Pull down to refresh or tap below",
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: Colors.grey[500],
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        AppButton(
+                          text: "Refresh",
+                          width: MediaQuery.of(context).size.width / 3,
+                          iconLeftMargin: 10,
+                          icon: const Icon(
+                            Icons.refresh,
+                            size: 20,
+                            color: AppColors.backgroundColor,
+                          ),
+
+                          showIcon: true,
+                          onTap: () {
+                            final provider = context.read<BookingProvider>();
+                            provider.fetchBookingsList(reset: true);
+                          },
+                        ),
+                      ],
+                    ),
                   ),
                 );
               }
@@ -249,9 +183,7 @@ class _BaseInspectionListScreenState extends State<BaseInspectionListScreen>
                         child: Center(child: CircularProgressIndicator()),
                       );
                     }
-
                     final booking = filteredBookings[index];
-
                     final animation = CurvedAnimation(
                       parent: _animController,
                       curve: Interval(
@@ -260,7 +192,6 @@ class _BaseInspectionListScreenState extends State<BaseInspectionListScreen>
                         curve: Curves.easeOutCubic,
                       ),
                     );
-
                     return AnimatedBuilder(
                       animation: animation,
                       builder: (context, child) {
