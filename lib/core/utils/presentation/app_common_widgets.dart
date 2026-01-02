@@ -278,3 +278,13 @@ DateTime bookingDateTime(BookingListEntity booking) {
     return DateTime(date.year, date.month, date.day, 10, 0);
   }
 }
+
+void showSnackBar(BuildContext context, {required String message}) {
+  if (!context.mounted) return;
+
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: textWidget(text: message, color: AppColors.backgroundColor),
+    ),
+  );
+}

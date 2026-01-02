@@ -4,7 +4,7 @@ import 'package:inspect_connect/core/utils/auto_router_setup/auto_router.dart';
 import 'package:inspect_connect/features/auth_flow/enum/auth_user_enum.dart';
 
 class AuthFlowProvider extends ChangeNotifier {
-   AuthUserType? _currentFlow;
+  AuthUserType? _currentFlow;
 
   AuthUserType? get currentFlow => _currentFlow;
 
@@ -22,27 +22,30 @@ class AuthFlowProvider extends ChangeNotifier {
     } else if (isInspector) {
       context.router.replaceAll([ClientSignInRoute(showBackButton: false)]);
     } else {
-      context.router.pop(); 
+      context.router.pop();
     }
   }
-    void handleBackNavigation(BuildContext context) {
+
+  void handleBackNavigation(BuildContext context) {
     if (isClient) {
       context.replaceRoute(ClientSignInRoute(showBackButton: false));
     } else if (isInspector) {
-      context.replaceRoute(InspectorSignInRoute());
+      context.replaceRoute(ClientSignInRoute(showBackButton: false));
     } else {
       context.pop();
     }
   }
- void goBackToSignUp(BuildContext context) {
+
+  void goBackToSignUp(BuildContext context) {
     if (isClient) {
       context.router.replaceAll([ClientSignUpRoute(showBackButton: false)]);
     } else if (isInspector) {
       context.router.replaceAll([InspectorSignUpRoute(showBackButton: false)]);
     } else {
-      context.router.pop(); 
+      context.router.pop();
     }
   }
+
   void goToOtp(BuildContext context) {
     context.pushRoute(OtpVerificationRoute(addShowButton: true));
   }

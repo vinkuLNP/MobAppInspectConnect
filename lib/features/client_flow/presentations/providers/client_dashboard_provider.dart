@@ -5,12 +5,9 @@ import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.d
 import 'package:inspect_connect/features/auth_flow/domain/entities/auth_user.dart';
 import 'package:inspect_connect/core/commondomain/entities/based_api_result/api_result_state.dart';
 import 'package:inspect_connect/features/auth_flow/domain/usecases/change_password_usecases.dart';
+import 'package:inspect_connect/features/auth_flow/utils/text_editor_controller.dart';
 
 class ChangePasswordViewModel extends BaseViewModel {
-  final oldPasswordCtrl = TextEditingController();
-  final newPasswordCtrl = TextEditingController();
-  final confirmPasswordCtrl = TextEditingController();
-
   final formKey = GlobalKey<FormState>();
   bool isLoading = false;
 

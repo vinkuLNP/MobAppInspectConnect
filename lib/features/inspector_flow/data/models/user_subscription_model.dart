@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import '../../domain/entities/user_subscription_entity.dart';
 
 class UserSubscriptionModel extends UserSubscriptionEntity {
@@ -30,6 +32,10 @@ class UserSubscriptionModel extends UserSubscriptionEntity {
   });
 
   factory UserSubscriptionModel.fromJson(Map<String, dynamic> json) {
+    log(
+      'UserSubscriptionModel.fromJson response:\n$json',
+      name: 'UserSubscriptionModel',
+    );
     return UserSubscriptionModel(
       id: json['_id'] ?? '',
       userId: json['userId'] ?? '',
@@ -60,30 +66,30 @@ class UserSubscriptionModel extends UserSubscriptionEntity {
   }
 
   Map<String, dynamic> toJson() => {
-        '_id': id,
-        'userId': userId,
-        'planId': planId,
-        'stripeSubscriptionId': stripeSubscriptionId,
-        'customerId': customerId,
-        'productId': productId,
-        'priceId': priceId,
-        'stripeSubscriptionStatus': stripeSubscriptionStatus,
-        'collectionMethod': collectionMethod,
-        'startDate': startDate,
-        'currentPeriodStart': currentPeriodStart,
-        'currentPeriodEnd': currentPeriodEnd,
-        'trialStart': trialStart,
-        'trialEnd': trialEnd,
-        'amount': amount,
-        'currency': currency,
-        'interval': interval,
-        'intervalCount': intervalCount,
-        'latestInvoiceUrl': latestInvoiceUrl,
-        'latestInvoicePdf': latestInvoicePdf,
-        'latestInvoiceId': latestInvoiceId,
-        'livemode': livemode,
-        'isDeleted': isDeleted,
-        'createdAt': createdAt.toIso8601String(),
-        'updatedAt': updatedAt.toIso8601String(),
-      };
+    '_id': id,
+    'userId': userId,
+    'planId': planId,
+    'stripeSubscriptionId': stripeSubscriptionId,
+    'customerId': customerId,
+    'productId': productId,
+    'priceId': priceId,
+    'stripeSubscriptionStatus': stripeSubscriptionStatus,
+    'collectionMethod': collectionMethod,
+    'startDate': startDate,
+    'currentPeriodStart': currentPeriodStart,
+    'currentPeriodEnd': currentPeriodEnd,
+    'trialStart': trialStart,
+    'trialEnd': trialEnd,
+    'amount': amount,
+    'currency': currency,
+    'interval': interval,
+    'intervalCount': intervalCount,
+    'latestInvoiceUrl': latestInvoiceUrl,
+    'latestInvoicePdf': latestInvoicePdf,
+    'latestInvoiceId': latestInvoiceId,
+    'livemode': livemode,
+    'isDeleted': isDeleted,
+    'createdAt': createdAt.toIso8601String(),
+    'updatedAt': updatedAt.toIso8601String(),
+  };
 }

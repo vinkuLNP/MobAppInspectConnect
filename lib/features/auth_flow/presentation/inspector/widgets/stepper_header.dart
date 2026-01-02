@@ -19,7 +19,7 @@ class StepperHeader extends StatelessWidget {
 
     return Center(
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: List.generate(labels.length * 2 - 1, (index) {
           final i = index ~/ 2;
           final bool isConnector = index.isOdd;
@@ -33,7 +33,7 @@ class StepperHeader extends StatelessWidget {
             return AnimatedContainer(
               duration: const Duration(milliseconds: 300),
               curve: Curves.easeInOut,
-              width: 60, 
+              width: 50,
               height: 2,
               color: connectorColor,
             );
@@ -70,7 +70,9 @@ class StepperHeader extends StatelessWidget {
                 boxShadow: active
                     ? [
                         BoxShadow(
-                          color: theme.colorScheme.primary.withValues(alpha:0.3),
+                          color: theme.colorScheme.primary.withValues(
+                            alpha: 0.3,
+                          ),
                           blurRadius: 6,
                           spreadRadius: 2,
                         ),

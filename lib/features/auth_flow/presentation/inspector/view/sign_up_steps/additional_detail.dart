@@ -1,6 +1,9 @@
+import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:inspect_connect/features/auth_flow/domain/entities/inspector_documents_type.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/inspector/widgets/stepper_header.dart';
+import 'package:inspect_connect/features/auth_flow/utils/text_editor_controller.dart';
 import 'package:provider/provider.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/client/widgets/input_fields.dart';
@@ -50,7 +53,7 @@ class _AdditionalDetailsStepState extends State<AdditionalDetailsStep> {
                           child: _imageUploader(
                             context: context,
                             files: prov.profileImageUrl != null
-                                ? [prov.profileImageUrl!]
+                                ? [prov.profileImage!]
                                 : [],
                             maxFiles: 1,
                             allowOnlyImages: true,
@@ -62,17 +65,66 @@ class _AdditionalDetailsStepState extends State<AdditionalDetailsStep> {
                             onRemove: (index) => prov.removeProfileImage(),
                           ),
                         ),
-
                         _section(
-                          title: 'Upload ID / License(Optional)',
-                          child: _imageUploader(
-                            context: context,
-                            files: prov.idLicenseUrl != null
-                                ? [prov.idLicenseUrl!]
-                                : [],
-                            maxFiles: 1,
-                            onAdd: () => prov.pickFile(context, 'id'),
-                            onRemove: (index) => prov.removeIdImage(index),
+                          title: 'Upload ID / License',
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              documentTypeDropdown(prov),
+
+                              const SizedBox(height: 8),
+
+                              _imageUploader(
+                                context: context,
+                                files: prov.idDocumentFile != null
+                                    ? [prov.idDocumentFile!]
+                                    : [],
+                                maxFiles: 1,
+                                onAdd: () => prov.pickFile(context, 'id'),
+                                onRemove: (_) => prov.removeIdImage(0),
+                              ),
+
+                              const SizedBox(height: 6),
+
+                              expiryPicker(
+                                context,
+                                label: 'ID / License Expiry Date',
+                                date: prov.selectedIdDocExpiry,
+                                onPick: (date) {
+                                  prov.selectedIdDocExpiry = date;
+                                  prov.notify();
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                        _section(
+                          title: 'Upload COI Document',
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _imageUploader(
+                                context: context,
+                                files: prov.coiUploadedUrl != null
+                                    ? [File(prov.coiUploadedUrl!)]
+                                    : [],
+                                maxFiles: 1,
+                                onAdd: () => prov.pickFile(context, 'coi'),
+                                onRemove: (_) => prov.removeCoi(),
+                              ),
+
+                              const SizedBox(height: 6),
+
+                              expiryPicker(
+                                context,
+                                label: 'COI Document Expiry Date',
+                                date: prov.coiExpiry,
+                                onPick: (date) {
+                                  prov.coiExpiry = date;
+                                  prov.notify();
+                                },
+                              ),
+                            ],
                           ),
                         ),
 
@@ -80,7 +132,7 @@ class _AdditionalDetailsStepState extends State<AdditionalDetailsStep> {
                           title: 'Upload Reference Letters(Optional)',
                           child: _imageUploader(
                             context: context,
-                            files: prov.referenceLettersUrls,
+                            files: prov.referenceLetters,
                             maxFiles: 5,
                             onAdd: () => prov.pickFile(context, 'ref'),
                             onRemove: (index) =>
@@ -91,7 +143,7 @@ class _AdditionalDetailsStepState extends State<AdditionalDetailsStep> {
                         const SizedBox(height: 12),
 
                         AppInputField(
-                          controller: prov.workHistoryController,
+                          controller: inspWorkHistoryController,
                           label: 'Work History Description',
                           maxLines: 4,
                           hint: 'Enter work experience details...',
@@ -149,6 +201,71 @@ class _AdditionalDetailsStepState extends State<AdditionalDetailsStep> {
     );
   }
 
+  Widget expiryPicker(
+    BuildContext context, {
+    required String label,
+    required DateTime? date,
+    required Function(DateTime) onPick,
+  }) {
+    final isSelected = date != null;
+
+    return GestureDetector(
+      onTap: () async {
+        final picked = await showDatePicker(
+          context: context,
+          initialDate: date ?? DateTime.now(),
+          firstDate: DateTime.now(),
+          lastDate: DateTime(2100),
+        );
+
+        if (picked != null) {
+          onPick(picked);
+          // onPick(DateTime(picked.year, picked.month, 1));
+        }
+      },
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color: isSelected ? Colors.black : Colors.grey.shade400,
+            width: 1.2,
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 11,
+                color: isSelected ? Colors.black : Colors.grey,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              isSelected ? _numericDate(date) : 'Select expiry date',
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+                color: isSelected ? Colors.black : Colors.grey,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _numericDate(DateTime date) {
+    log(date.toString());
+    final day = date.day.toString().padLeft(2, '0');
+    final month = date.month.toString().padLeft(2, '0');
+    final year = date.year.toString();
+    return '$day-$month-$year';
+  }
+
   Widget _section({required String title, required Widget child}) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
@@ -188,6 +305,40 @@ class _AdditionalDetailsStepState extends State<AdditionalDetailsStep> {
       height: double.infinity,
       errorBuilder: (_, _, _) =>
           const Center(child: Icon(Icons.broken_image, color: Colors.grey)),
+    );
+  }
+
+  Widget documentTypeDropdown(InspectorViewModelProvider prov) {
+    return DropdownButtonFormField<InspectorDocumentsTypeEntity>(
+      initialValue: prov.selectedIdDocType,
+      isExpanded: true,
+      decoration: InputDecoration(
+        labelText: 'Document Type',
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 12,
+          vertical: 14,
+        ),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(color: Colors.grey.shade400),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(
+            color: Theme.of(context).primaryColor,
+            width: 1.5,
+          ),
+        ),
+      ),
+      items: prov.inspectorDocumentsType.map((doc) {
+        return DropdownMenuItem(value: doc, child: Text(doc.name));
+      }).toList(),
+      onChanged: (val) {
+        prov.selectedIdDocType = val;
+        prov.notify();
+      },
+      validator: (val) => val == null ? 'Please select document type' : null,
     );
   }
 

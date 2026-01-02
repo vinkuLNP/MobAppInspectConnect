@@ -42,7 +42,7 @@ class ForgotpPasswordView extends StatelessWidget {
                 AppInputField(
                   label: 'Email',
                   hint: 'example@gmail.com',
-                  controller: resetEmailCtrl,
+                  controller: cltResetEmailCtrl,
                   keyboardType: TextInputType.emailAddress,
                   validator: (_) => provider.validateEmailOrIntlPhone(),
                   onChanged: (_) {

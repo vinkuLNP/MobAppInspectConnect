@@ -49,7 +49,7 @@ class ClientSignUpView extends StatelessWidget {
                 AppInputField(
                   label: 'Full Name',
                   hint: 'Full Name',
-                  controller: fullNameCtrl,
+                  controller: cltFullNameCtrl,
                   validator: vm.validateRequired,
                   onChanged: (_) {
                     if (vm.autoValidate) formKey.currentState?.validate();
@@ -75,7 +75,7 @@ class ClientSignUpView extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           IntlPhoneField(
-                            controller: phoneCtrl,
+                            controller: cltPhoneCtrl,
 
                             style: appTextStyle(fontSize: 12),
                             initialCountryCode: 'IN',
@@ -145,7 +145,7 @@ class ClientSignUpView extends StatelessWidget {
                                     ? '+${country.dialCode}${vm.phoneRaw}'
                                     : '',
                               );
-                              countryCodeCtrl.text = '+${country.dialCode}';
+                              cltCountryCodeCtrl.text = '+${country.dialCode}';
                               if (vm.autoValidate) state.validate();
                             },
                           ),
@@ -167,7 +167,7 @@ class ClientSignUpView extends StatelessWidget {
                 AppInputField(
                   label: 'Email',
                   hint: 'Email',
-                  controller: emailCtrlSignUp,
+                  controller: cltEmailCtrlSignUp,
                   keyboardType: TextInputType.emailAddress,
                   validator: vm.validateEmail,
                   onChanged: (_) {
@@ -184,11 +184,10 @@ class ClientSignUpView extends StatelessWidget {
                       vm.enableAutoValidate();
                       return;
                     }
-                    log('------>${fullNameCtrl.text}');
-                    log('------>${emailCtrlSignUp.text}');
-                    log('------>${phoneCtrl.text}');
-                    log('------>${countryCodeCtrl.text}');
-
+                    log('------>${cltFullNameCtrl.text}');
+                    log('------>${cltEmailCtrlSignUp.text}');
+                    log('------>${cltPhoneCtrl.text}');
+                    log('------>${cltCountryCodeCtrl.text}');
 
                     await vm.submitSignUp(formKey: formKey, context: context);
                   },
@@ -199,9 +198,9 @@ class ClientSignUpView extends StatelessWidget {
                   question: "Already have an account?",
                   actionText: "Sign In",
                   onTap: () {
-                    emailCtrlSignUp.clear();
-                    phoneCtrl.clear();
-                    fullNameCtrl.clear();
+                    cltEmailCtrlSignUp.clear();
+                    cltPhoneCtrl.clear();
+                    cltFullNameCtrl.clear();
 
                     final stackString = context.router.stack.toString();
                     log('stack raw: $stackString');

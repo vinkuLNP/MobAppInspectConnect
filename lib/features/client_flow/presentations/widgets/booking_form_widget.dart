@@ -4,6 +4,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:inspect_connect/core/di/app_component/app_component.dart';
 import 'package:inspect_connect/core/utils/app_widgets/common_address_auto_complete_field.dart';
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
+import 'package:inspect_connect/core/utils/constants/app_common_card_container.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_button.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/core/utils/presentation/app_text_style.dart';
@@ -40,45 +41,42 @@ class _BookingFormWidgetState extends State<BookingFormWidget> {
   void initState() {
     super.initState();
     provider = locator<BookingProvider>();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      provider.init().then((_) {
+        if (widget.isEditing && widget.initialBooking != null) {
+          final BookingDetailModel b = widget.initialBooking;
+          log(b.images.toString());
 
-    provider.init().then((_) {
-      if (widget.isEditing && widget.initialBooking != null) {
-        final BookingDetailModel b = widget.initialBooking;
-        log(b.images.toString());
-
-        provider.locationController.text = b.bookingLocation;
-        provider.location = b.bookingLocation;
-        provider.description = b.description;
-        provider.descriptionController.text = b.description;
-        provider.setDate(DateTime.parse(b.bookingDate));
-        provider.setTime(provider.parseTime(b.bookingTime));
-        log(
-          '----SOCKET----->provider.certificateSubTypes ${b.certificateSubTypes[0].name.toString()}',
-        );
-        final savedTypeId = b.certificateSubTypes[0].id;
-
-        final matched = provider.subTypes.firstWhere(
-          (e) => e.id == savedTypeId,
-          orElse: () => provider.subTypes.first,
-        );
-
-        provider.setInspectionType(matched);
-
-        // provider.setInspectionType(
-        //   (b.certificateSubTypes != [] ? b.certificateSubTypes[0] : null),
-        // );
-
-        if (b.images != [] && b.images.isNotEmpty) {
-          provider.uploadedUrls = List<String>.from(b.images);
-          provider.existingImageUrls = List<String>.from(b.images);
+          provider.locationController.text = b.bookingLocation;
+          provider.location = b.bookingLocation;
+          provider.description = b.description;
+          provider.descriptionController.text = b.description;
+          provider.setDate(DateTime.parse(b.bookingDate));
+          provider.setTime(provider.parseTime(b.bookingTime));
           log(
-            '--------->provider.uploadedUrls ${provider.uploadedUrls.toString()}',
+            '----SOCKET----->provider.certificateSubTypes ${b.certificateSubTypes[0].name.toString()}',
           );
-          log(
-            '--------->provider.existingImageUrls ${provider.existingImageUrls.toString()}',
+          final savedTypeId = b.certificateSubTypes[0].id;
+
+          final matched = provider.subTypes.firstWhere(
+            (e) => e.id == savedTypeId,
+            orElse: () => provider.subTypes.first,
           );
+
+          provider.setInspectionType(matched);
+
+          if (b.images != [] && b.images.isNotEmpty) {
+            provider.uploadedUrls = List<String>.from(b.images);
+            provider.existingImageUrls = List<String>.from(b.images);
+            log(
+              '--------->provider.uploadedUrls ${provider.uploadedUrls.toString()}',
+            );
+            log(
+              '--------->provider.existingImageUrls ${provider.existingImageUrls.toString()}',
+            );
+          }
         }
-      }
+      });
     });
   }
 
@@ -120,20 +118,9 @@ class _BookingFormWidgetState extends State<BookingFormWidget> {
                   opacity: prov.isProcessing ? 0.6 : 1.0,
                   child: SingleChildScrollView(
                     padding: const EdgeInsets.all(16),
-                    child: Container(
+                    child: AppCardContainer(
                       margin: EdgeInsets.only(bottom: 150),
                       padding: EdgeInsets.symmetric(vertical: 14),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.shade200,
-                            blurRadius: 12,
-                            offset: const Offset(0, 6),
-                          ),
-                        ],
-                      ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
@@ -292,7 +279,6 @@ class _BookingFormWidgetState extends State<BookingFormWidget> {
           ? prov.provInspectionType
           : null,
 
-      // prov.provInspectionType,
       items: items.map((subType) {
         return DropdownMenuItem<CertificateSubTypeEntity>(
           value: subType,

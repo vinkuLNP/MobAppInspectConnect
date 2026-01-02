@@ -1,10 +1,13 @@
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:country_state_city/country_state_city.dart' as csc;
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/client/widgets/input_fields.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/inspector/inspector_view_model.dart';
+import 'package:inspect_connect/features/auth_flow/presentation/inspector/widgets/app_file_picker.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/inspector/widgets/stepper_header.dart';
+import 'package:inspect_connect/features/auth_flow/utils/text_editor_controller.dart';
 import 'package:provider/provider.dart';
 import '../../widgets/app_selector_field.dart';
 import '../../widgets/country_state_cities_dialog.dart';
@@ -237,25 +240,69 @@ class _ServiceAreaStepState extends State<ServiceAreaStep> {
                       fontSize: 12,
                     ),
                   ),
+                Column(
+                  children: vm.selectedCityNames.map((city) {
+                    final requiresIcc = vm.cityRequiresIcc[city] == true;
+
+                    log(
+                      'UI check → city: "$city", '
+                      'cityRequiresIcc: ${vm.cityRequiresIcc[city]}',
+                    );
+
+                    if (!requiresIcc) return const SizedBox.shrink();
+
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 12),
+                        textWidget(
+                          text: "Upload ICC Document for $city",
+                          fontWeight: FontWeight.w500,
+                        ),
+                        const SizedBox(height: 6),
+                        AppFilePickerGrid(
+                          documents: vm.iccDocsByCity[city] ?? [],
+                          onPick: (file) => vm.addIccFile(
+                            context: context,
+                            city: city,
+                            file: file,
+                          ),
+                          onRemove: (index) =>
+                              vm.iccDocsByCity[city]!.removeAt(index),
+                          onPickExpiry: (index, date) {
+                            vm.iccDocsByCity[city]![index].expiryDate = date;
+                            vm.notify();
+                          },
+                        ),
+                      ],
+                    );
+                  }).toList(),
+                ),
               ],
             ),
 
             const SizedBox(height: 18),
 
-            AppInputField(
-              label: "Zip Code",
-              hint: "123232",
-              controller: vm.zipController,
-              keyboardType: TextInputType.number,
-              validator: (_) => vm.zipError,
-              onChanged: (_) => vm.validateServiceArea(),
+            Column(
+              children: vm.selectedCityNames.map((city) {
+                final controller = vm.getCityZipController(city);
+
+                return AppInputField(
+                  label: "Zip Code for $city",
+                  controller: controller,
+                  keyboardType: TextInputType.number,
+                  onChanged: (value) {
+                    vm.cityZipCodes[city] = value ?? '';
+                  },
+                );
+              }).toList(),
             ),
             const SizedBox(height: 12),
 
             AppInputField(
               label: "Enter your Mailing Address",
               hint: "Mailing address",
-              controller: vm.mailingAddressController,
+              controller: inspMailingAddressController,
               validator: (_) => vm.mailingAddressError,
               onChanged: (_) => vm.validateServiceArea(),
             ),

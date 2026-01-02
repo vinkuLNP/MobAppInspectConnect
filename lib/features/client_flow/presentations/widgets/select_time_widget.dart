@@ -78,8 +78,9 @@ class _DateTimePickerWidgetState extends State<DateTimePickerWidget> {
                                           context: context,
                                           initialTime: provider.tempTime,
                                         );
-                                        if (picked != null)
+                                        if (picked != null) {
                                           provider.setTime(picked);
+                                        }
                                       },
                                       icon: const Icon(Icons.access_time),
                                       label: textWidget(

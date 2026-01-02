@@ -271,7 +271,7 @@
     },
     {
       "id": "3:9109420249064471506",
-      "lastPropertyId": "29:5971348717096684686",
+      "lastPropertyId": "34:340893041376304159",
       "name": "InspectorSignUpLocalEntity",
       "properties": [
         {
@@ -419,13 +419,38 @@
           "id": "29:5971348717096684686",
           "name": "longitude",
           "type": 8
+        },
+        {
+          "id": "30:2827095630864152251",
+          "name": "uploadedCoiDocument",
+          "type": 9
+        },
+        {
+          "id": "31:879714024604332109",
+          "name": "coiExpiryDate",
+          "type": 9
+        },
+        {
+          "id": "32:281102519960584207",
+          "name": "documentExpiryDate",
+          "type": 9
+        },
+        {
+          "id": "33:281380528162074395",
+          "name": "documentTypeId",
+          "type": 9
+        },
+        {
+          "id": "34:340893041376304159",
+          "name": "privateTempId",
+          "type": 9
         }
       ],
       "relations": []
     },
     {
       "id": "4:9029954651202435050",
-      "lastPropertyId": "8:2799346839572520102",
+      "lastPropertyId": "9:1586819708624274860",
       "name": "ServiceAreaLocalEntity",
       "properties": [
         {
@@ -471,13 +496,55 @@
           "type": 11,
           "flags": 520,
           "relationTarget": "InspectorSignUpLocalEntity"
+        },
+        {
+          "id": "9:1586819708624274860",
+          "name": "zipCode",
+          "type": 9
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "5:1092552167430950126",
+      "lastPropertyId": "5:2791628972036703477",
+      "name": "IccDocumentLocalEntity",
+      "properties": [
+        {
+          "id": "1:8348989484481952739",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:6667415046504984302",
+          "name": "serviceCity",
+          "type": 9
+        },
+        {
+          "id": "3:1311932127798013556",
+          "name": "documentUrl",
+          "type": 9
+        },
+        {
+          "id": "4:3418233597536894974",
+          "name": "expiryDate",
+          "type": 9
+        },
+        {
+          "id": "5:2791628972036703477",
+          "name": "inspectorId",
+          "indexId": "3:3003052939359749212",
+          "type": 11,
+          "flags": 520,
+          "relationTarget": "InspectorSignUpLocalEntity"
         }
       ],
       "relations": []
     }
   ],
-  "lastEntityId": "4:9029954651202435050",
-  "lastIndexId": "2:7437307085727159997",
+  "lastEntityId": "5:1092552167430950126",
+  "lastIndexId": "3:3003052939359749212",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",
   "modelVersion": 5,

@@ -5,6 +5,7 @@ import 'package:inspect_connect/features/auth_flow/presentation/client/widgets/i
 import 'package:inspect_connect/features/auth_flow/presentation/inspector/inspector_view_model.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/inspector/widgets/stepper_header.dart';
+import 'package:inspect_connect/features/auth_flow/utils/text_editor_controller.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -23,7 +24,7 @@ class PersonalDetailsStep extends StatelessWidget {
         AppInputField(
           label: 'Full Name',
           hint: 'Full Name',
-          controller: vm.fullNameCtrl,
+          controller: inspFullNameCtrl,
           validator: vm.validateRequired,
           onChanged: (_) {
             if (vm.autoValidate) formKey.currentState?.validate();
@@ -46,7 +47,7 @@ class PersonalDetailsStep extends StatelessWidget {
               children: [
                 IntlPhoneField(
                   style: appTextStyle(fontSize: 12),
-                  controller: vm.phoneCtrl,
+                  controller: inspPhoneCtrl,
                   initialCountryCode: 'IN',
                   decoration: InputDecoration(
                     hintText: 'Phone Number',
@@ -116,7 +117,7 @@ class PersonalDetailsStep extends StatelessWidget {
         AppInputField(
           label: 'Email',
           hint: 'Email',
-          controller: vm.emailCtrlSignUp,
+          controller: inspEmailCtrlSignUp,
           keyboardType: TextInputType.emailAddress,
           validator: vm.validateEmail,
           onChanged: (_) {
@@ -126,7 +127,7 @@ class PersonalDetailsStep extends StatelessWidget {
         const SizedBox(height: 10),
         AppPasswordField(
           label: 'Password',
-          controller: vm.passwordCtrlSignUp,
+          controller: inspPasswordCtrlSignUp,
           obscure: vm.obscurePassword,
           onToggle: vm.toggleObscurePassword,
           validator: vm.validatePassword,

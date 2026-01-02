@@ -29,8 +29,6 @@ import 'package:inspect_connect/features/inspector_flow/providers/inspector_main
 import 'package:provider/provider.dart';
 
 class ClientViewModelProvider extends BaseViewModel {
-  void init() {}
-
   bool _obscure = true;
   bool get obscure => _obscure;
   bool _autoValidate = false;
@@ -122,7 +120,7 @@ class ClientViewModelProvider extends BaseViewModel {
 
   String? validateConfirmPassword(String? v) {
     if (v == null || v.isEmpty) return 'Confirm your password';
-    if (v != passwordCtrlSignUp.text) return 'Passwords do not match';
+    if (v != cltPasswordCtrlSignUp.text) return 'Passwords do not match';
     return null;
   }
 
@@ -147,7 +145,7 @@ class ClientViewModelProvider extends BaseViewModel {
     placeType = value["place_type"].toString();
 
     log("FULL ADDRESS → $value");
-    log(addressCtrl.text.toString());
+    log(cltAddressCtrl.text.toString());
     notifyListeners();
   }
 
@@ -160,18 +158,16 @@ class ClientViewModelProvider extends BaseViewModel {
 
   @override
   void dispose() {
-    emailCtrl.clear();
-    passwordCtrl.clear();
-    fullNameCtrl.clear();
-    phoneCtrl.clear();
-    emailCtrlSignUp.clear();
-    addressCtrl.clear();
-    passwordCtrlSignUp.clear();
-    confirmPasswordCtrl.clear();
+    cltEmailCtrlSignUp.clear();
+    cltFullNameCtrl.clear();
+    cltPhoneCtrl.clear();
+    cltCountryCodeCtrl.clear();
+    cltConfirmPasswordCtrl.clear();
+    cltAddressCtrl.clear();
+    cltResetEmailCtrl.clear();
     _timer?.cancel();
     pinController.clear();
     focusNode.dispose();
-    resetEmailCtrl.clear();
     _otpPurpose = null;
     super.dispose();
   }
@@ -229,16 +225,16 @@ class ClientViewModelProvider extends BaseViewModel {
 
       final params = SignUpParams(
         role: 1,
-        email: emailCtrlSignUp.text.trim(),
-        name: fullNameCtrl.text.trim(),
-        phoneNumber: phoneCtrl.text.trim().toString(),
-        countryCode: countryCodeCtrl.text.trim().toString() != ""
-            ? countryCodeCtrl.text.trim().toString()
+        email: cltEmailCtrlSignUp.text.trim(),
+        name: cltFullNameCtrl.text.trim(),
+        phoneNumber: cltPhoneCtrl.text.trim().toString(),
+        countryCode: cltCountryCodeCtrl.text.trim().toString() != ""
+            ? cltCountryCodeCtrl.text.trim().toString()
             : "+91",
-        password: passwordCtrlSignUp.text.trim(),
+        password: cltPasswordCtrlSignUp.text.trim(),
         deviceToken: deviceToken,
         deviceType: deviceType,
-        mailingAddress: addressCtrl.text.toString(),
+        mailingAddress: cltAddressCtrl.text.toString(),
         zip: pincode.toString(),
         agreedToTerms: true,
         isTruthfully: true,
@@ -347,8 +343,8 @@ class ClientViewModelProvider extends BaseViewModel {
       final state = await executeParamsUseCase<AuthUser, OtpVerificationParams>(
         useCase: verifyOtpUseCase,
         query: OtpVerificationParams(
-          phoneNumber: user.phoneNumber ?? emailCtrl.text.trim(),
-          countryCode: user.countryCode ?? passwordCtrl.text.trim(),
+          phoneNumber: user.phoneNumber ?? cltEmailCtrl.text.trim(),
+          countryCode: user.countryCode ?? cltPasswordCtrl.text.trim(),
           phoneOtp: pinController.text.trim(),
         ),
         launchLoader: true,
@@ -430,8 +426,8 @@ class ClientViewModelProvider extends BaseViewModel {
       log('[VERIFY] Exception: $e');
       log('[VERIFY] Stacktrace: $s');
     } finally {
-      emailCtrl.clear();
-      passwordCtrl.clear();
+      cltEmailCtrl.clear();
+      cltPasswordCtrl.clear();
       log('[VERIFY] Cleanup complete.');
     }
   }
@@ -508,8 +504,8 @@ class ClientViewModelProvider extends BaseViewModel {
       final state = await executeParamsUseCase<AuthUser, ResendOtpParams>(
         useCase: resendOtpUseCase,
         query: ResendOtpParams(
-          phoneNumber: user.phoneNumber ?? emailCtrl.text.trim(),
-          countryCode: user.countryCode ?? passwordCtrl.text.trim(),
+          phoneNumber: user.phoneNumber ?? cltEmailCtrl.text.trim(),
+          countryCode: user.countryCode ?? cltPasswordCtrl.text.trim(),
         ),
         launchLoader: true,
       );
@@ -540,8 +536,8 @@ class ClientViewModelProvider extends BaseViewModel {
         },
       );
     } finally {
-      emailCtrl.clear();
-      passwordCtrl.clear();
+      cltEmailCtrl.clear();
+      cltPasswordCtrl.clear();
     }
   }
 
@@ -586,7 +582,7 @@ class ClientViewModelProvider extends BaseViewModel {
   String? get resetTargetLabel => _resetTargetLabel;
 
   String? validateEmailOrIntlPhone() {
-    final email = resetEmailCtrl.text.trim();
+    final email = cltResetEmailCtrl.text.trim();
     final eOk =
         email.isNotEmpty &&
         RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(email);
@@ -605,10 +601,10 @@ class ClientViewModelProvider extends BaseViewModel {
     notifyListeners();
 
     try {
-      final email = resetEmailCtrl.text.trim();
+      final email = cltResetEmailCtrl.text.trim();
       _resetTargetLabel = email;
       startOtpFlow(OtpPurpose.forgotPassword);
-      resetEmailCtrl.clear();
+      cltResetEmailCtrl.clear();
       context.pushRoute(OtpVerificationRoute(addShowButton: true));
     } finally {
       _isSendingReset = false;
@@ -651,8 +647,8 @@ class ClientViewModelProvider extends BaseViewModel {
       final state = await executeParamsUseCase<AuthUser, SignInParams>(
         useCase: signInUseCase,
         query: SignInParams(
-          email: emailCtrl.text.trim(),
-          password: passwordCtrl.text.trim(),
+          email: cltEmailCtrl.text.trim(),
+          password: cltPasswordCtrl.text.trim(),
           deviceToken: deviceToken,
           deviceType: deviceType,
         ),
@@ -692,8 +688,8 @@ class ClientViewModelProvider extends BaseViewModel {
               ),
             ),
           );
-          emailCtrl.clear();
-          passwordCtrl.clear();
+          cltEmailCtrl.clear();
+          cltPasswordCtrl.clear();
 
           if (user.role == 1) {
             log('➡️ Navigating to ClientDashboardRoute');
@@ -808,8 +804,8 @@ class ClientViewModelProvider extends BaseViewModel {
       final state = await executeParamsUseCase<AuthUser, SignInParams>(
         useCase: signInUseCase,
         query: SignInParams(
-          email: emailCtrl.text.trim(),
-          password: passwordCtrl.text.trim(),
+          email: cltEmailCtrl.text.trim(),
+          password: cltPasswordCtrl.text.trim(),
           deviceToken: deviceToken,
           deviceType: deviceType,
         ),
@@ -839,8 +835,8 @@ class ClientViewModelProvider extends BaseViewModel {
         },
       );
     } finally {
-      emailCtrl.clear();
-      passwordCtrl.clear();
+      cltEmailCtrl.clear();
+      cltPasswordCtrl.clear();
       setSigningIn(false);
     }
   }

@@ -228,22 +228,6 @@ class ForgotpPasswordRouteArgs {
 }
 
 /// generated route for
-/// [InspectorAuthAutoWrapperView]
-class InspectorAuthAutoWrapperRoute extends PageRouteInfo<void> {
-  const InspectorAuthAutoWrapperRoute({List<PageRouteInfo>? children})
-    : super(InspectorAuthAutoWrapperRoute.name, initialChildren: children);
-
-  static const String name = 'InspectorAuthAutoWrapperRoute';
-
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      return WrappedRoute(child: const InspectorAuthAutoWrapperView());
-    },
-  );
-}
-
-/// generated route for
 /// [InspectorDashboardView]
 class InspectorDashboardRoute extends PageRouteInfo<void> {
   const InspectorDashboardRoute({List<PageRouteInfo>? children})
@@ -255,22 +239,6 @@ class InspectorDashboardRoute extends PageRouteInfo<void> {
     name,
     builder: (data) {
       return const InspectorDashboardView();
-    },
-  );
-}
-
-/// generated route for
-/// [InspectorSignInView]
-class InspectorSignInRoute extends PageRouteInfo<void> {
-  const InspectorSignInRoute({List<PageRouteInfo>? children})
-    : super(InspectorSignInRoute.name, initialChildren: children);
-
-  static const String name = 'InspectorSignInRoute';
-
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      return const InspectorSignInView();
     },
   );
 }

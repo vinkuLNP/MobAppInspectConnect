@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/core/utils/presentation/app_text_style.dart';
-import 'package:inspect_connect/features/auth_flow/domain/entities/certificate_agency_entity.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/certificate_type_entity.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/inspector/inspector_view_model.dart';
 import 'package:inspect_connect/features/client_flow/presentations/widgets/select_time_widget.dart';
@@ -39,12 +38,7 @@ class ProfessionalDetailsStep extends StatelessWidget {
                         title: 'Certificate Type',
                         child: _inspectionTypeDropdown(prov),
                       ),
-                      const SizedBox(height: 6),
 
-                      _section(
-                        title: 'Certifying Agencies ',
-                        child: _agencyTypeDropdown(prov),
-                      ),
                       const SizedBox(height: 6),
 
                       _section(
@@ -62,7 +56,7 @@ class ProfessionalDetailsStep extends StatelessWidget {
                       ),
                       const SizedBox(height: 6),
                       _section(
-                        title: 'Upload Certification Documents (max 5)',
+                        title: 'Upload Certification Documents (max 4)',
                         child: _documentGrid(prov, context),
                       ),
                     ],
@@ -90,24 +84,6 @@ class ProfessionalDetailsStep extends StatelessWidget {
           child,
         ],
       ),
-    );
-  }
-
-  Widget _agencyTypeDropdown(InspectorViewModelProvider prov) {
-    return DropdownButtonFormField<AgencyEntity>(
-      decoration: _inputDecoration('Select Certifying Agencies'),
-      initialValue: prov.agencyTypeData,
-
-      style: appTextStyle(fontSize: 12),
-      items: prov.agencyType
-          .map(
-            (subType) => DropdownMenuItem<AgencyEntity>(
-              value: subType,
-              child: textWidget(text: subType.name, fontSize: 12),
-            ),
-          )
-          .toList(),
-      onChanged: null,
     );
   }
 
@@ -152,7 +128,7 @@ class ProfessionalDetailsStep extends StatelessWidget {
 
   Widget _documentGrid(InspectorViewModelProvider prov, BuildContext context) {
     final totalDocs = prov.documents.length + prov.existingDocumentUrls.length;
-    final canAddMore = totalDocs < 5;
+    final canAddMore = totalDocs < 4;
 
     if (totalDocs == 0) {
       return GestureDetector(
@@ -214,7 +190,7 @@ class ProfessionalDetailsStep extends StatelessWidget {
           return _documentTile(
             name: name,
             onDelete: () => prov.removeExistingDocumentAt(i),
-            onTap: () => prov.openDocument(url),
+            // onTap: () => prov.openDocument(url),
           );
         }
 
@@ -226,7 +202,7 @@ class ProfessionalDetailsStep extends StatelessWidget {
           return _documentTile(
             name: name,
             onDelete: () => prov.removeDocumentAt(docIndex),
-            onTap: () => prov.openLocalDocument(file),
+            // onTap: () => prov.openLocalDocument(file),
           );
         }
 

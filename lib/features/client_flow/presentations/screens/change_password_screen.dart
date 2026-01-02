@@ -2,6 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_button.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/client/widgets/input_fields.dart';
+import 'package:inspect_connect/features/auth_flow/utils/text_editor_controller.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/client_dashboard_provider.dart';
 import 'package:inspect_connect/features/client_flow/presentations/widgets/common_app_bar.dart';
 import 'package:provider/provider.dart';
@@ -33,7 +34,7 @@ class ChangePasswordView extends StatelessWidget {
 
                 AppPasswordField(
                   label: 'Old Password',
-                  controller: vm.oldPasswordCtrl,
+                  controller: oldPasswordCtrl,
                   obscure: !vm.showOldPassword,
                   onToggle: vm.toggleOldPasswordVisibility,
                   validator: vm.validatePassword,
@@ -42,7 +43,7 @@ class ChangePasswordView extends StatelessWidget {
 
                 AppPasswordField(
                   label: 'New Password',
-                  controller: vm.newPasswordCtrl,
+                  controller: newPasswordCtrl,
                   obscure: !vm.showNewPassword,
                   onToggle: vm.toggleNewPasswordVisibility,
                   validator: vm.validatePassword,
@@ -51,7 +52,7 @@ class ChangePasswordView extends StatelessWidget {
 
                 AppPasswordField(
                   label: 'Confirm Password',
-                  controller: vm.confirmPasswordCtrl,
+                  controller: confirmPasswordCtrl,
                   obscure: !vm.showConfirmPassword,
                   onToggle: vm.toggleConfirmPasswordVisibility,
                   validator: vm.validateConfirmPassword,

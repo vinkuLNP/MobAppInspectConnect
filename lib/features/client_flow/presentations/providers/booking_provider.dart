@@ -118,10 +118,7 @@ class BookingProvider extends BaseViewModel {
   }
 
   Future<void> init() async {
-    isLoading = true;
-    notifyListeners();
     await fetchCertificateSubTypes();
-    isLoading = false;
     notifyListeners();
   }
 

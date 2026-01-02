@@ -2,15 +2,18 @@ import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/utils/constants/app_assets_constants.dart';
-import 'package:inspect_connect/core/utils/constants/app_colors.dart';
+import 'package:inspect_connect/core/utils/constants/app_common_card_container.dart';
+import 'package:inspect_connect/core/utils/constants/app_strings.dart';
+import 'package:inspect_connect/features/auth_flow/data/models/step_meta_model.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/inspector/view/sign_up_steps/additional_detail.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/inspector/view/sign_up_steps/personal_details_step.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/inspector/view/sign_up_steps/professional_details.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/inspector/view/sign_up_steps/service_area.dart';
+import 'package:inspect_connect/features/auth_flow/presentation/inspector/widgets/sign_up_bottom_button_bar.dart';
+import 'package:inspect_connect/features/auth_flow/utils/text_editor_controller.dart';
 import 'package:provider/provider.dart';
 import '../inspector_view_model.dart';
 import 'package:inspect_connect/core/basecomponents/base_responsive_widget.dart';
-import 'package:inspect_connect/core/utils/presentation/app_common_button.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/inspector/widgets/inspector_common_auth_bar.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/inspector/widgets/stepper_header.dart';
 
@@ -43,23 +46,23 @@ class _InspectorSignUpContentState extends State<InspectorSignUpContent> {
   Widget build(BuildContext context) {
     final vm = context.watch<InspectorViewModelProvider>();
     final steps = [
-      _StepMeta(
-        'Personal Details',
+      StepMeta(
+        personalDetails,
         PersonalDetailsStep(vm, _personalKey),
         _personalKey,
       ),
-      _StepMeta(
-        'Professional Details',
+      StepMeta(
+        professionalDetails,
         ProfessionalDetailsStep(vm, _professionalKey),
         _professionalKey,
       ),
-      _StepMeta(
-        'Service Area',
+      StepMeta(
+        serviceArea,
         ServiceAreaStep(vm, _serviceAreaKey),
         _serviceAreaKey,
       ),
-      _StepMeta(
-        'Additional Details',
+      StepMeta(
+        additionalDetails,
         AdditionalDetailsStep(vm, _additionalKey),
         _additionalKey,
       ),
@@ -68,181 +71,135 @@ class _InspectorSignUpContentState extends State<InspectorSignUpContent> {
     return BaseResponsiveWidget(
       initializeConfig: true,
       buildWidget: (ctx, rc, app) => InspectorCommonAuthBar(
-        title: 'Sign Up',
+        title: signUpTitle,
         showBackButton: false,
-        subtitle: 'Create Your Account!',
+        subtitle: signUpSubtitle,
         image: finalImage,
         rc: rc,
         headerWidget: StepperHeader(
           current: vm.currentStep,
           labels: const [
-            'Personal\nDetails',
-            'Professional\nDetails',
-            'Service\nArea',
-            'Additional\nDetails',
+            personalDetailsLabel,
+            professionalDetailsLabel,
+            serviceAreaLabel,
+            additionalDetailsLabel,
           ],
           onTap: (i) {
             if (i <= vm.currentStep) vm.goTo(i);
           },
         ),
-        bottomSection: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Row(
-            children: [
-              Expanded(
-                child: AppButton(
-                  isBorder: true,
-                  buttonBackgroundColor: Colors.white,
-                  borderColor: Colors.grey,
-                  textColor: AppColors.authThemeColor,
-                  onTap: () => vm.currentStep == 0 ? null : vm.goPrevious(),
-                  text: 'Previous',
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: AppButton(
-                  buttonBackgroundColor:
-                      (vm.currentStep == 3 &&
-                          (!vm.agreedToTerms || !vm.confirmTruth))
-                      ? Colors.grey
-                      : AppColors.authThemeColor,
-                  onTap:
-                      (vm.currentStep == 3 &&
-                          (!vm.agreedToTerms || !vm.confirmTruth))
-                      ? null
-                      : () async {
-                          final key = steps[vm.currentStep].formKey;
-                          final isValid = key.currentState?.validate() ?? false;
-                          if (!isValid) {
-                            vm.enableAutoValidate();
-                            return;
-                          }
-                          key.currentState?.save();
-                          switch (vm.currentStep) {
-                            case 0:
-                              await vm.savePersonalStep();
-                              log('💾 Personal details saved');
-                              break;
-                            case 1:
-                              if (!vm.validateProfessionalDetails()) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      vm.errorMessage ?? "Invalid input",
-                                    ),
-                                  ),
-                                );
-                                return;
-                              }
+        bottomSection: SignupActionBar(
+          vm: vm,
+          onNext: () async {
+            final key = steps[vm.currentStep].formKey;
+            final isValid = key.currentState?.validate() ?? false;
+            if (!isValid) {
+              vm.enableAutoValidate();
+              return;
+            }
+            key.currentState?.save();
+            switch (vm.currentStep) {
+              case 0:
+                await vm.savePersonalStep();
+                log('💾 Personal details saved');
+                break;
+              case 1:
+                if (!vm.validateProfessionalDetails()) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(vm.errorMessage ?? invalidInput)),
+                  );
+                  return;
+                }
 
-                              await vm.saveProfessionalStep(
-                                certificateTypeId:
-                                    vm.selectedCertificateTypeId ?? '',
-                                certificateExpiryDate:
-                                    vm.certificateExpiryDate != ''
-                                    ? vm.certificateExpiryDate.toString()
-                                    : '',
-                                uploadedCertificateUrls:
-                                    vm.uploadedCertificateUrls,
-                                agencyIds: vm.selectedAgencyIds,
-                              );
-                              break;
-                            case 2:
-                              final isValid = vm.validateServiceArea();
-                              if (!isValid) return;
-                              vm.saveDataToProvider();
+                await vm.saveProfessionalStep(
+                  certificateTypeId: vm.selectedCertificateTypeId ?? '',
+                  certificateExpiryDate: vm.certificateExpiryDate != ''
+                      ? vm.certificateExpiryDate.toString()
+                      : '',
+                  uploadedCertificateUrls: vm.uploadedCertificateUrls,
+                  agencyIds: vm.selectedAgencyIds,
+                );
+                break;
+              case 2:
+                log('ICC Local Files: ${vm.iccLocalFiles}');
+                log('ICC Uploaded URLs: ${vm.iccUploadedUrls}');
+                log('Selected Cities: ${vm.selectedCityNames}');
+                // final isValid = vm.validateServiceArea();
+                if (!isValid) return;
+                vm.saveSelectedServiceDataToProvider();
 
-                              await vm.generateServiceAreas(
-                                countryCode: vm.countryCode.toString(),
-                                stateCode: vm.stateCode.toString(),
-                                selectedCities: vm.selectedCities,
-                              );
+                await vm.generateServiceAreas(
+                  countryCode: vm.countryCode.toString(),
+                  stateCode: vm.stateCode.toString(),
+                  selectedCities: vm.selectedCities,
+                );
 
-                              await vm.saveServiceAreaStep(
-                                country: vm.country,
-                                state: vm.state,
-                                city: vm.city ?? '',
-                                mailingAddress: vm.mailingAddress,
-                                zipCode: vm.zipCode,
-                                serviceAreas: vm.serviceAreas,
-                              );
+                await vm.saveServiceAreaStep(
+                  country: vm.country,
+                  state: vm.state,
+                  city: vm.city ?? '',
+                  mailingAddress: vm.mailingAddress,
+                  zipCode: vm.zipCode,
+                  serviceAreas: vm.serviceAreas,
+                );
 
-                              break;
-                            case 3:
-                              vm.validateBeforeSubmit(context: ctx);
-                              if (!vm.agreedToTerms || !vm.confirmTruth ) {
-                                return;
-                              }
-                              String? getSafePath(dynamic fileOrUrl) {
-                                if (fileOrUrl == null) return null;
-                                final path = fileOrUrl is File
-                                    ? fileOrUrl.path
-                                    : fileOrUrl.toString();
+                break;
+              case 3:
+                // vm.validateBeforeSubmit(context: ctx);
+                // if (!vm.agreedToTerms || !vm.confirmTruth) {
+                //   return;
+                // }
+                log("called");
+                String? getSafePath(dynamic fileOrUrl) {
+                  if (fileOrUrl == null) return null;
+                  final path = fileOrUrl is File
+                      ? fileOrUrl.path
+                      : fileOrUrl.toString();
 
-                                if (path.startsWith('http://') ||
-                                    path.startsWith('https://')) {
-                                  return path;
-                                }
-                                return path;
-                              }
+                  if (path.startsWith('http://') ||
+                      path.startsWith('https://')) {
+                    return path;
+                  }
+                  return path;
+                }
 
-                              final profilePath = getSafePath(
-                                vm.profileImageUrl,
-                              );
-                              final idPath = getSafePath(vm.idLicenseUrl);
-                              final refs = vm.referenceLettersUrls.map((f) {
-                                final path = f.path;
-                                return (path.startsWith('http://') ||
-                                        path.startsWith('https://'))
-                                    ? path
-                                    : path;
-                              }).toList();
+                final profilePath = getSafePath(vm.profileImageUrl);
+                final idPath = getSafePath(vm.idDocumentUploadedUrl);
+                final refs = vm.referenceLetters.map((f) {
+                  final path = f.path;
+                  return (path.startsWith('http://') ||
+                          path.startsWith('https://'))
+                      ? path
+                      : path;
+                }).toList();
 
-                              await vm.saveAdditionalStep(
-                                profileImageUrlOrPath: profilePath.toString(),
-                                idLicenseUrlOrPath: idPath.toString(),
-                                referenceDocs: refs,
-                                agreed: vm.agreedToTerms,
-                                truthful: vm.confirmTruth,
-                                workHistoryDescription:
-                                    vm.workHistoryController.text,
-                              );
-                              break;
-                          }
+                await vm.saveAdditionalStep(
+                  profileImageUrlOrPath: profilePath.toString(),
+                  idLicenseUrlOrPath: idPath.toString(),
+                  referenceDocs: refs,
+                  agreed: vm.agreedToTerms,
+                  truthful: vm.confirmTruth,
+                  workHistoryDescription: inspWorkHistoryController.text,
+                );
+                break;
+            }
 
-                          if (vm.currentStep < steps.length - 1) {
-                            vm.goNext();
-                          } else {
-                            await vm.submit();
-                            final saved = await vm.getSavedData();
-                            log('final data: ${saved?.toString()}');
-                            if (context.mounted) {
-                              vm.signUp(context: context);
-                            }
-                          }
-                        },
-                  text: vm.currentStep < 3 ? 'Next' : 'Submit',
-                ),
-              ),
-            ],
-          ),
+            if (vm.currentStep < steps.length - 1) {
+              vm.goNext();
+            } else {
+              await vm.submit();
+              final saved = await vm.getSavedData();
+              log('final data: ${saved?.toString()}');
+              if (context.mounted) {
+                vm.signUp(context: context);
+              }
+            }
+          },
         ),
         form: Column(
           children: [
-            Container(
+            AppCardContainer(
               padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.shade200,
-                    blurRadius: 12,
-                    offset: const Offset(0, 6),
-                  ),
-                ],
-              ),
               child: Form(
                 key: steps[vm.currentStep].formKey,
                 autovalidateMode: vm.autoValidate
@@ -259,11 +216,4 @@ class _InspectorSignUpContentState extends State<InspectorSignUpContent> {
       ),
     );
   }
-}
-
-class _StepMeta {
-  final String title;
-  final Widget content;
-  final GlobalKey<FormState> formKey;
-  _StepMeta(this.title, this.content, this.formKey);
 }
