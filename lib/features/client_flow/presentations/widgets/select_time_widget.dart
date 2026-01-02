@@ -49,44 +49,58 @@ class _DateTimePickerWidgetState extends State<DateTimePickerWidget> {
                 title: textWidget(text: "Select Date & Time"),
                 content: SizedBox(
                   width: 300,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      SizedBox(
-                        height: 300,
-                        child: CalendarDatePicker(
-                          initialDate: provider.tempDate,
-                          firstDate: now,
-                          lastDate: now.add(const Duration(days: 265)),
-                          onDateChanged: provider.setDate,
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      return ConstrainedBox(
+                        constraints: BoxConstraints(
+                          maxWidth: constraints.maxWidth > 360
+                              ? 360
+                              : constraints.maxWidth,
                         ),
-                      ),
-                      const SizedBox(height: 16),
-                      widget.showTimePicker
-                          ? ElevatedButton.icon(
-                              onPressed: () async {
-                                final picked = await showTimePicker(
-                                  context: context,
-                                  initialTime: provider.tempTime,
-                                );
-                                if (picked != null) provider.setTime(picked);
-                              },
-                              icon: const Icon(Icons.access_time),
-                              label: textWidget(
-                                text: "Pick Time",
-                                color: AppColors.whiteColor,
+                        child: SingleChildScrollView(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              SizedBox(
+                                height: 300,
+                                child: CalendarDatePicker(
+                                  initialDate: provider.tempDate,
+                                  firstDate: now,
+                                  lastDate: now.add(const Duration(days: 265)),
+                                  onDateChanged: provider.setDate,
+                                ),
                               ),
-                            )
-                          : SizedBox.shrink(),
-                      if (provider.errorMessage != null)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 12),
-                          child: textWidget(
-                            text: provider.errorMessage!,
-                            color: Colors.red,
+                              const SizedBox(height: 16),
+                              widget.showTimePicker
+                                  ? ElevatedButton.icon(
+                                      onPressed: () async {
+                                        final picked = await showTimePicker(
+                                          context: context,
+                                          initialTime: provider.tempTime,
+                                        );
+                                        if (picked != null)
+                                          provider.setTime(picked);
+                                      },
+                                      icon: const Icon(Icons.access_time),
+                                      label: textWidget(
+                                        text: "Pick Time",
+                                        color: AppColors.whiteColor,
+                                      ),
+                                    )
+                                  : SizedBox.shrink(),
+                              if (provider.errorMessage != null)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 12),
+                                  child: textWidget(
+                                    text: provider.errorMessage!,
+                                    color: Colors.red,
+                                  ),
+                                ),
+                            ],
                           ),
                         ),
-                    ],
+                      );
+                    },
                   ),
                 ),
                 actions: [

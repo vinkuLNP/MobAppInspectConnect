@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 
 const String commonErrorUnexpectedMessage =
@@ -31,21 +29,26 @@ const String contentMultipartTypeValue = 'multipart/form-data';
 const Duration timeOutDuration = Duration(seconds: 20);
 
 ///The app base Url should be provided in this value
-///
-///
-///
-String devBaseUrl = Platform.isIOS
-    ? 'http://localhost:5002/api/v1/'
-    : 'http://10.0.2.2:5002/api/v1/';
-// const String devBaseUrl =
-//     'https://inspect-connect-api-auakczg0ave2bqex.westus2-01.azurewebsites.net/api/v1/';
+
+String socketUrl =
+    "https://inspect-connect-api-auakczg0ave2bqex.westus2-01.azurewebsites.net/";
+// Platform.isIOS ? "http://localhost:5002" : "http://10.0.2.2:5002";
+
+String devBaseUrl =
+    // Platform.isIOS
+    //     ? 'http://localhost:5002/api/v1/'
+    //     : 'http://10.0.2.2:5002/api/v1/';
+    'https://inspect-connect-api-auakczg0ave2bqex.westus2-01.azurewebsites.net/api/v1/';
 
 const String stripePublishableKey =
     "pk_test_51RuoE4A1eZHeCW31LaeAmCLpWw0Zmyme5RfE3HG8Svoum8yGvBmYhm2gatOR6zWhyn0PmQGcJQqE5GtzvEIuAVKN00W26f1it7";
 
-const String prodBaseUrl = '';
-const String qaBaseUrl = '';
-const String uatBaseUrl = '';
+const String prodBaseUrl =
+    'https://inspect-connect-api-auakczg0ave2bqex.westus2-01.azurewebsites.net/api/v1/';
+const String qaBaseUrl =
+    'https://inspect-connect-api-auakczg0ave2bqex.westus2-01.azurewebsites.net/api/v1/';
+const String uatBaseUrl =
+    'https://inspect-connect-api-auakczg0ave2bqex.westus2-01.azurewebsites.net/api/v1/';
 
 /// api keys endpoints
 const String signInEndPoint = 'signIn';
