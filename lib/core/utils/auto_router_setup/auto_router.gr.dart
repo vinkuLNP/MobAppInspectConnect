@@ -260,22 +260,6 @@ class InspectorDashboardRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
-/// [InspectorSignInView]
-class InspectorSignInRoute extends PageRouteInfo<void> {
-  const InspectorSignInRoute({List<PageRouteInfo>? children})
-    : super(InspectorSignInRoute.name, initialChildren: children);
-
-  static const String name = 'InspectorSignInRoute';
-
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      return const InspectorSignInView();
-    },
-  );
-}
-
-/// generated route for
 /// [InspectorSignUpView]
 class InspectorSignUpRoute extends PageRouteInfo<InspectorSignUpRouteArgs> {
   InspectorSignUpRoute({

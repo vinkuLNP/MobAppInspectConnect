@@ -6,7 +6,6 @@ import 'package:inspect_connect/features/auth_flow/presentation/reset_password/r
 import 'package:inspect_connect/features/auth_flow/presentation/client/view/sign_in_screen.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/client/view/sign_up_screen.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/client/widgets/client_auth_wrapper.dart';
-import 'package:inspect_connect/features/auth_flow/presentation/inspector/view/sign_in_screen.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/inspector/view/sign_up_screen.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/inspector/widgets/inspector_auth_wrapper.dart';
 import 'package:inspect_connect/features/client_flow/presentations/screens/dashboard_screen.dart';

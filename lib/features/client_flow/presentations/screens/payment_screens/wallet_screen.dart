@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:http/http.dart' as http;
+import 'package:inspect_connect/core/utils/constants/app_common_card_container.dart';
 import 'package:inspect_connect/core/utils/constants/app_constants.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_button.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
@@ -27,14 +28,10 @@ class _WalletScreenState extends State<WalletScreen> {
   @override
   void initState() {
     super.initState();
-    if(mounted){
-      
-    }
-    Future.microtask(
-      () {
-      if(mounted)  context.read<WalletProvider>().init(context: context);
-      } 
-    );
+    if (mounted) {}
+    Future.microtask(() {
+      if (mounted) context.read<WalletProvider>().init(context: context);
+    });
   }
 
   @override
@@ -98,11 +95,11 @@ class _WalletScreenState extends State<WalletScreen> {
                 decoration: InputDecoration(
                   prefixIcon: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 12),
-                    child: textWidget(text: 
-                      "\$",
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.grey[800]!,
+                    child: textWidget(
+                      text: "\$",
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.grey[800]!,
                     ),
                   ),
                   prefixIconConstraints: const BoxConstraints(
@@ -128,9 +125,11 @@ class _WalletScreenState extends State<WalletScreen> {
                       double.tryParse(amount)! < 50.0 ||
                       double.tryParse(amount)! > 100000) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                       SnackBar(
-                        content: textWidget(text: 
-                          "Please enter a valid amount - min \$50 AND max -\$100000",color: Colors.white
+                      SnackBar(
+                        content: textWidget(
+                          text:
+                              "Please enter a valid amount - min \$50 AND max -\$100000",
+                          color: Colors.white,
                         ),
                       ),
                     );
@@ -157,13 +156,19 @@ class _WalletScreenState extends State<WalletScreen> {
         throw Exception('Missing clientSecret in payment intent response.');
       }
 
-    if(mounted)  await _showCardPaymentSheet(context, clientSecret, amount);
+      if (mounted) await _showCardPaymentSheet(context, clientSecret, amount);
     } catch (e, st) {
       log("❌ makePayment error: $e\n$st");
-      if(mounted){
-        ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: textWidget(text: 'Payment failed: $e',color: Colors.white)));}
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: textWidget(
+              text: 'Payment failed: $e',
+              color: Colors.white,
+            ),
+          ),
+        );
+      }
     }
   }
 
@@ -246,22 +251,33 @@ class _WalletScreenState extends State<WalletScreen> {
                                 ),
                               );
 
-                               if(context.mounted)    Navigator.pop(context);
-                                 if(context.mounted)     _showPaymentSuccess(parentCtx);
+                              if (context.mounted) Navigator.pop(context);
+                              if (context.mounted) {
+                                _showPaymentSuccess(parentCtx);
+                              }
                             } on StripeException catch (e) {
                               log("⚠️ Stripe error: $e");
-                                     if(context.mounted) {
-
-                                   
-                              ScaffoldMessenger.of(parentCtx).showSnackBar(
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(parentCtx).showSnackBar(
                                   SnackBar(
-                                  content: textWidget(text: 'Payment canceled',color: Colors.white),
-                                ),
-                              );  }
-                            } catch (e) {  if(context.mounted) {
-                              ScaffoldMessenger.of(parentCtx).showSnackBar(
-                                SnackBar(content: textWidget(text: 'Payment failed: $e',color: Colors.white)),
-                              );  }
+                                    content: textWidget(
+                                      text: 'Payment canceled',
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                );
+                              }
+                            } catch (e) {
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(parentCtx).showSnackBar(
+                                  SnackBar(
+                                    content: textWidget(
+                                      text: 'Payment failed: $e',
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                );
+                              }
                             } finally {
                               setState(() => isProcessing = false);
                             }
@@ -297,39 +313,42 @@ class _WalletScreenState extends State<WalletScreen> {
       barrierDismissible: false,
       builder: (_) => const _PaymentSuccessDialog(),
     ).then((_) {
-   if(context.mounted)   walletContext.read<WalletProvider>().refreshAll(walletContext);
+      if (context.mounted) {
+        walletContext.read<WalletProvider>().refreshAll(walletContext);
+      }
     });
   }
 
   Future<void> displayPaymentSheet() async {
     try {
       await Stripe.instance.presentPaymentSheet();
-   if(mounted) {
-     showDialog(
-        context: context,
-        builder: (_) => AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.check_circle, color: Colors.green, size: 80),
+                SizedBox(height: 10),
+                textWidget(text: "Payment Successful!"),
+              ],
+            ),
           ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children:   [
-              Icon(Icons.check_circle, color: Colors.green, size: 80),
-              SizedBox(height: 10),
-              textWidget(text: "Payment Successful!"),
-            ],
-          ),
-        ),
-      );
-   
-   }
-  } on StripeException catch (e) {
+        );
+      }
+    } on StripeException catch (e) {
       log("⚠️ StripeException: $e");
-      if(mounted){
-        ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(  SnackBar(content: textWidget(text: 'Payment canceled',color: Colors.white
-      )));}
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: textWidget(text: 'Payment canceled', color: Colors.white),
+          ),
+        );
+      }
     } catch (e, stackTrace) {
       log("❌ Unexpected error: $e");
       log("🧩 Stack Trace: $stackTrace");
@@ -419,19 +438,11 @@ class _WalletHeaderCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return AppCardContainer(
       padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: AppColors.authThemeColor.withValues(alpha:0.9),
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.themeColor.withValues(alpha:0.2),
-            blurRadius: 8,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
+      backgroundColor: AppColors.authThemeColor.withValues(alpha: 0.9),
+      shadowColor: AppColors.themeColor.withValues(alpha: 0.2),
+      blurRadius: 8,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -454,13 +465,12 @@ class _WalletHeaderCard extends StatelessWidget {
                 child: AppButton(
                   text: "Add Money",
                   onTap: onAddMoney,
-                  buttonBackgroundColor: AppColors.backgroundColor.withValues(alpha:
-                    0.9,
+                  buttonBackgroundColor: AppColors.backgroundColor.withValues(
+                    alpha: 0.9,
                   ),
                   textColor: AppColors.authThemeColor,
                 ),
               ),
-            
             ],
           ),
         ],
@@ -509,19 +519,11 @@ class _RecentTransactionsState extends State<_RecentTransactions> {
     final provider = context.watch<WalletProvider>();
     final payments = provider.payments;
 
-    return Container(
+    return AppCardContainer(
       padding: const EdgeInsets.fromLTRB(18, 16, 18, 8),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(22),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha:0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
+      borderRadius: 22,
+      shadowColor: Colors.black.withValues(alpha: 0.05),
+      blurRadius: 10,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -532,13 +534,13 @@ class _RecentTransactionsState extends State<_RecentTransactions> {
           ),
           const SizedBox(height: 12),
           if (payments.isEmpty && !provider.isFetching)
-              Center(
+            Center(
               child: Padding(
                 padding: EdgeInsets.symmetric(vertical: 32),
-                child: textWidget(text: 
-                  "No transactions yet",
-              color: Colors.grey),
-            
+                child: textWidget(
+                  text: "No transactions yet",
+                  color: Colors.grey,
+                ),
               ),
             )
           else
@@ -585,7 +587,7 @@ class _PaymentTile extends StatelessWidget {
             width: 42,
             height: 42,
             decoration: BoxDecoration(
-              color: color.withValues(alpha:0.12),
+              color: color.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
@@ -605,12 +607,13 @@ class _PaymentTile extends StatelessWidget {
                   fontSize: 14,
                 ),
                 const SizedBox(height: 2),
-                textWidget(text: 
-                  txn.createdAt != null
+                textWidget(
+                  text: txn.createdAt != null
                       ? "${txn.createdAt!.day}/${txn.createdAt!.month}/${txn.createdAt!.year}"
                       : "N/A",
-                fontSize: 12, color: Colors.grey.shade600),
-               
+                  fontSize: 12,
+                  color: Colors.grey.shade600,
+                ),
               ],
             ),
           ),
@@ -714,20 +717,21 @@ class _PaymentSuccessDialogState extends State<_PaymentSuccessDialog> {
               ),
             ),
             const SizedBox(height: 22),
-              textWidget(text: 
-              "Payment Successful!",
-              
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
-             
+            textWidget(
+              text: "Payment Successful!",
+
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
             ),
             const SizedBox(height: 8),
-            textWidget(text: 
-              "Your wallet balance has been updated successfully.",
+            textWidget(
+              text: "Your wallet balance has been updated successfully.",
               alignment: TextAlign.center,
-             color: Colors.grey[700]!, fontSize: 14),
-           
+              color: Colors.grey[700]!,
+              fontSize: 14,
+            ),
+
             const SizedBox(height: 26),
             AppButton(
               text: "Continue",

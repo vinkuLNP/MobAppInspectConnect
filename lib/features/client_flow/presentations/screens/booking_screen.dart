@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
+import 'package:inspect_connect/core/utils/constants/app_common_card_container.dart';
 import 'package:inspect_connect/core/utils/constants/app_constants.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_button.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
@@ -411,19 +412,12 @@ class _BookingsScreenState extends State<BookingsScreen> {
 
     return GestureDetector(
       onTap: () => _showBookingDetails(context, booking),
-      child: Container(
+      child: AppCardContainer(
         margin: const EdgeInsets.symmetric(vertical: 8),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(18),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withValues(alpha: 0.15),
-              blurRadius: 8,
-              offset: const Offset(0, 3),
-            ),
-          ],
-        ),
+        borderRadius: 18,
+        shadowColor: Colors.grey.withValues(alpha: 0.15),
+        blurRadius: 8,
+        shadowOffset: const Offset(0, 3),
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Row(

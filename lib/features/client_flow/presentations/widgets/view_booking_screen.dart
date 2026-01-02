@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:inspect_connect/core/utils/constants/app_common_card_container.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:intl/intl.dart';
@@ -191,20 +192,10 @@ class ViewBookingDetailsScreen extends StatelessWidget {
   }
 
   Widget _section({required String title, required Widget child}) {
-    return Container(
+    return AppCardContainer(
+      borderRadius: 14,
       margin: const EdgeInsets.only(bottom: 18),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.shade200,
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
+      shadowOffset: const Offset(0, 4),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
