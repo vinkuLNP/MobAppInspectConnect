@@ -108,8 +108,12 @@ class InspectorProfessionalStepService {
   }
 
   void removeDocumentAt(int index) {
-    provider.documents.removeAt(index);
-    provider.uploadedCertificateUrls.removeAt(index);
+    if (index < provider.uploadedCertificateUrls.length) {
+      provider.uploadedCertificateUrls.removeAt(index);
+    }
+    if (index < provider.documents.length) {
+      provider.documents.removeAt(index);
+    }
     provider.notify();
   }
 

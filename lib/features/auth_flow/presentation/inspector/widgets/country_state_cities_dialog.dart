@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import '../../../utils/text_editor_controller.dart';
 import '../../client/widgets/input_fields.dart';
@@ -28,7 +27,7 @@ Future<List<T>> showMultiSelectSearchDialog<T>({
                   AppInputField(
                     label: "Search Cities",
                     hint: "Search Cities",
-                    controller: countrySearchCtrl,
+                    controller: inspCountrySearchCtrl,
                     onChanged: (value) {
                       setState(() {
                         filtered = items
@@ -75,14 +74,14 @@ Future<List<T>> showMultiSelectSearchDialog<T>({
               TextButton(
                 onPressed: () {
                   Navigator.pop(context);
-                  countrySearchCtrl.clear();
+                  inspCountrySearchCtrl.clear();
                 },
                 child: const Text("Cancel"),
               ),
               TextButton(
                 onPressed: () {
                   Navigator.pop(context, selectedItems);
-                  countrySearchCtrl.clear();
+                  inspCountrySearchCtrl.clear();
                 },
                 child: const Text("Done"),
               ),
@@ -95,7 +94,6 @@ Future<List<T>> showMultiSelectSearchDialog<T>({
 
   return selectedItems;
 }
-
 
 Future<T?> showSearchableListDialog<T>({
   required BuildContext context,
@@ -120,7 +118,7 @@ Future<T?> showSearchableListDialog<T>({
                   AppInputField(
                     label: "Search $title",
                     hint: "Search $title",
-                    controller: countrySearchCtrl,
+                    controller: inspCountrySearchCtrl,
                     onChanged: (value) {
                       setState(() {
                         filtered = items
@@ -143,7 +141,7 @@ Future<T?> showSearchableListDialog<T>({
                           title: Text(itemAsString(item)),
                           onTap: () {
                             Navigator.pop(context, item);
-                            countrySearchCtrl.clear();
+                            inspCountrySearchCtrl.clear();
                           },
                         );
                       },

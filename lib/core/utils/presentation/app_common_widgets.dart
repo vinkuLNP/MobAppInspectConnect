@@ -1,17 +1,12 @@
 import 'dart:io';
 import 'package:auto_route/auto_route.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:inspect_connect/core/di/app_component/app_component.dart';
 import 'package:inspect_connect/core/utils/auto_router_setup/auto_router.dart';
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
 import 'package:inspect_connect/core/utils/constants/app_strings.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_button.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/features/client_flow/domain/entities/booking_list_entity.dart';
-import 'package:inspect_connect/features/client_flow/domain/entities/upload_image_dto.dart';
-import 'package:inspect_connect/features/client_flow/domain/usecases/upload_image_usecase.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/user_provider.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';

@@ -1,3 +1,4 @@
+import 'package:inspect_connect/features/auth_flow/domain/entities/icc_area_entity.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/service_area_entity.dart';
 import 'package:objectbox/objectbox.dart';
 
@@ -11,22 +12,29 @@ class InspectorSignUpLocalEntity {
   String? phoneNumber;
   String? countryCode;
   String? isoCode;
+
   String? certificateTypeId;
   String? certificateExpiryDate;
   List<String>? certificateDocuments;
   List<String>? certificateAgencyIds;
+
   String? country;
   String? state;
   String? city;
   String? zipCode;
   String? mailingAddress;
+
   String? uploadedIdOrLicenseDocument;
+  String? uploadedCoiDocument;
+
   String? workHistoryDescription;
   List<String>? referenceDocuments;
   String? profileImage;
+
   bool? agreedToTerms;
   bool? isTruthfully;
   int? role;
+
   String? deviceType;
   String? deviceToken;
 
@@ -37,6 +45,9 @@ class InspectorSignUpLocalEntity {
 
   @Backlink('inspector')
   final serviceAreas = ToMany<ServiceAreaLocalEntity>();
+
+  @Backlink('inspector')
+  final iccDocuments = ToMany<IccDocumentLocalEntity>();
 
   InspectorSignUpLocalEntity({
     this.id = 0,
@@ -56,6 +67,7 @@ class InspectorSignUpLocalEntity {
     this.zipCode,
     this.mailingAddress,
     this.uploadedIdOrLicenseDocument,
+    this.uploadedCoiDocument,
     this.workHistoryDescription,
     this.referenceDocuments,
     this.profileImage,
@@ -70,6 +82,7 @@ class InspectorSignUpLocalEntity {
     this.longitude,
   });
 }
+
 extension InspectorSignUpEntityMapper on InspectorSignUpLocalEntity {
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{
@@ -77,21 +90,22 @@ extension InspectorSignUpEntityMapper on InspectorSignUpLocalEntity {
       "email": email,
       "password": password,
       "phoneNumber": phoneNumber,
-      "countryCode": countryCode,
-      "isoCode": isoCode,
-      "certificateTypeId": certificateTypeId,
-      "certificateExpiryDate": certificateExpiryDate,
-      "certificateDocuments": certificateDocuments,
-      "certificateAgencyIds": certificateAgencyIds,
+
       "country": country,
       "state": state,
       "city": city,
       "zip": zipCode,
-      "mailingAddress": mailingAddress,
+
+      "certificateTypeId": certificateTypeId,
+      "certificateExpiryDate": certificateExpiryDate,
+      "certificateDocuments": certificateDocuments,
+
       "uploadedIdOrLicenseDocument": uploadedIdOrLicenseDocument,
+      "uploadedCoiDocument": uploadedCoiDocument,
+
       "workHistoryDescription": workHistoryDescription,
-      "referenceDocuments": referenceDocuments,
       "profileImage": profileImage,
+
       "agreedToTerms": agreedToTerms,
       "isTruthfully": isTruthfully,
       "role": role,
@@ -109,10 +123,19 @@ extension InspectorSignUpEntityMapper on InspectorSignUpLocalEntity {
           "countryCode": s.countryCode,
           "stateCode": s.stateCode,
           "cityName": s.cityName,
+          "zipCode": s.zipCode,
           "location": {
             "type": s.locationType,
             "coordinates": [s.longitude, s.latitude],
-          }
+          },
+        };
+      }).toList(),
+
+      "iccDocument": iccDocuments.map((d) {
+        return {
+          "serviceCity": d.serviceCity,
+          "documentUrl": d.documentUrl,
+          "expiryDate": d.expiryDate,
         };
       }).toList(),
     };

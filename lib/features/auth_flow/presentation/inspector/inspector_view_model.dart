@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 import 'dart:io';
 import 'package:inspect_connect/core/basecomponents/base_view_model.dart';
 import 'package:inspect_connect/core/di/app_component/app_component.dart';
@@ -7,20 +8,26 @@ import 'package:inspect_connect/core/utils/constants/app_strings.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/features/auth_flow/data/datasources/local_datasources/inspector_local_data_source.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/certificate_type_entity.dart';
+import 'package:inspect_connect/features/auth_flow/domain/entities/inspector_documents_type.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/inspector_sign_up_entity.dart';
+import 'package:inspect_connect/features/auth_flow/domain/entities/jurisdiction_entity.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/service_area_entity.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/inspector/providers/insepctor_additional_step_service.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/inspector/providers/inspector_personal_step_service.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/inspector/providers/inspector_professional_service.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/inspector/providers/inspector_service_area_service.dart';
-import 'package:inspect_connect/features/auth_flow/presentation/inspector/providers/inspector_stepper_service.dart';
+import 'package:inspect_connect/features/auth_flow/presentation/inspector/providers/inspector_persistent_data_service.dart';
 import 'package:flutter/material.dart';
 import 'package:country_state_city/country_state_city.dart' as csc;
+import 'package:inspect_connect/features/auth_flow/utils/text_editor_controller.dart';
 
 class InspectorViewModelProvider extends BaseViewModel {
   Future<void> init() async {
+    log('init being called');
     fetchCertificateTypes();
     loadCountries();
+    fetchJurisdictions();
+    fetchInspectorDocumentsType();
     notifyListeners();
   }
 
@@ -36,14 +43,13 @@ class InspectorViewModelProvider extends BaseViewModel {
     persistentDataService = InsepctorPersistentDataService(this);
     professionalStepService = InspectorProfessionalStepService(this);
     additionalStepService = InsepctorAdditionalStepService(this);
-
     inspectorServiceAreaService = InspectorServiceAreaService(this);
+    init();
   }
 
   final InspectorSignUpLocalDataSource localDs =
       locator<InspectorSignUpLocalDataSource>();
 
-  // Service Area Variables
   String? selectedCountryCode;
   String? selectedStateCode;
   List<String> selectedCityNames = [];
@@ -61,6 +67,27 @@ class InspectorViewModelProvider extends BaseViewModel {
   String? cityError;
   String? zipError;
   String? mailingAddressError;
+  final Map<String, List<File>> iccLocalFiles = {};
+  final Map<String, List<String>> iccUploadedUrls = {};
+
+  void addIccFile(String city, File file) {
+    iccLocalFiles.putIfAbsent(city, () => []);
+    if (iccLocalFiles[city]!.length + (iccUploadedUrls[city]?.length ?? 0) <
+        4) {
+      iccLocalFiles[city]!.add(file);
+      notifyListeners();
+    }
+  }
+
+  void removeIccLocalFile(String city, int index) {
+    iccLocalFiles[city]?.removeAt(index);
+    notifyListeners();
+  }
+
+  void removeIccUploadedUrl(String city, int index) {
+    iccUploadedUrls[city]?.removeAt(index);
+    notifyListeners();
+  }
 
   bool _autoValidate = false;
   bool get autoValidate => _autoValidate;
@@ -69,7 +96,10 @@ class InspectorViewModelProvider extends BaseViewModel {
   DateTime certificateExpiryDateShow = DateTime.now();
 
   String get selectedcertificateExpiryDate => certificateExpiryDate;
-
+  List<JurisdictionEntity> jurisdictions = [];
+  List<InspectorDocumentsTypeEntity> inspectorDocumentsType = [];
+  Map<String, bool> cityRequiresIcc = {};
+  Map<String, File?> iccDocuments = {};
   String? selectedCertificateTypeId;
   List<String> uploadedCertificateUrls = [];
   List<String>? selectedAgencyIds;
@@ -83,20 +113,7 @@ class InspectorViewModelProvider extends BaseViewModel {
 
   bool agreeTnC = false;
   bool isTruthful = false;
-  final TextEditingController workHistoryController = TextEditingController();
-  final emailCtrl = TextEditingController();
-  final passwordCtrl = TextEditingController();
-  final fullNameCtrl = TextEditingController();
-  final phoneCtrl = TextEditingController();
-  final emailCtrlSignUp = TextEditingController();
-  final addressCtrl = TextEditingController();
-  final passwordCtrlSignUp = TextEditingController();
-  final countryController = TextEditingController();
-  final stateController = TextEditingController();
-  final cityController = TextEditingController();
-  final zipController = TextEditingController();
-  final mailingAddressController = TextEditingController();
-  final pinController = TextEditingController();
+
   final focusNode = FocusNode();
 
   Timer? _timer;
@@ -164,13 +181,13 @@ class InspectorViewModelProvider extends BaseViewModel {
 
   @override
   void dispose() {
-    emailCtrl.clear();
-    passwordCtrl.clear();
-    fullNameCtrl.clear();
-    phoneCtrl.clear();
-    emailCtrlSignUp.clear();
-    addressCtrl.clear();
-    passwordCtrlSignUp.clear();
+    inspEmailCtrl.clear();
+    inspPasswordCtrl.clear();
+    inspFullNameCtrl.clear();
+    inspPhoneCtrl.clear();
+    inspEmailCtrlSignUp.clear();
+    inspAddressCtrl.clear();
+    inspPasswordCtrlSignUp.clear();
     _timer?.cancel();
     pinController.clear();
     focusNode.dispose();
@@ -334,10 +351,17 @@ class InspectorViewModelProvider extends BaseViewModel {
   }) => professionalStepService.saveProfessionalStep(
     certificateTypeId: certificateTypeId,
     certificateExpiryDate: certificateExpiryDate,
+    uploadedCertificateUrls: uploadedCertificateUrls,
   );
 
   Future<void> setUserCurrentLocation() =>
       inspectorServiceAreaService.setUserCurrentLocation();
+
+  Future<void> fetchJurisdictions() =>
+      inspectorServiceAreaService.fetchJurisdictions();
+
+  Future<void> fetchInspectorDocumentsType() =>
+      additionalStepService.fetchDocumentTypes();
 
   Future<void> saveServiceAreaStep({
     required String country,
@@ -407,4 +431,30 @@ class InspectorViewModelProvider extends BaseViewModel {
     stateCode: stateCode,
     selectedCities: selectedCities,
   );
+
+  final Map<String, TextEditingController> cityZipControllers = {};
+
+  final Map<String, String> cityZipCodes = {};
+
+  TextEditingController getCityZipController(String city) {
+    return cityZipControllers.putIfAbsent(
+      city,
+      () => TextEditingController(text: cityZipCodes[city] ?? ''),
+    );
+  }
+
+  void removeCityZip(String city) {
+    cityZipControllers[city]?.dispose();
+    cityZipControllers.remove(city);
+    cityZipCodes.remove(city);
+  }
+
+  bool validateIccDocuments() {
+    for (final entry in cityRequiresIcc.entries) {
+      if (entry.value == true && iccDocuments[entry.key] == null) {
+        return false;
+      }
+    }
+    return true;
+  }
 }

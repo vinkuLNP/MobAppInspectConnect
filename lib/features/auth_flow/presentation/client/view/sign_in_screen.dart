@@ -42,7 +42,7 @@ class ClientSignInView extends StatelessWidget {
               children: [
                 AppInputField(
                   label: 'Email',
-                  controller: emailCtrl,
+                  controller: cltEmailCtrl,
                   keyboardType: TextInputType.emailAddress,
                   hint: 'example@gmail.com',
                   validator: provider.validateEmail,
@@ -53,7 +53,7 @@ class ClientSignInView extends StatelessWidget {
                 const SizedBox(height: 14),
                 AppPasswordField(
                   label: 'Password',
-                  controller: passwordCtrl,
+                  controller: cltPasswordCtrl,
                   obscure: provider.obscure,
                   onToggle: provider.toggleObscure,
                   validator: provider.validatePassword,
@@ -100,8 +100,8 @@ class ClientSignInView extends StatelessWidget {
                   question: "Don’t have an account? ",
                   actionText: "Sign Up",
                   onTap: () {
-                    passwordCtrl.clear();
-                    emailCtrl.clear();
+                    cltPasswordCtrl.clear();
+                    cltEmailCtrl.clear();
                     final stackString = context.router.stack.toString();
                     log('stack raw: $stackString');
 

@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/inspector/widgets/stepper_header.dart';
+import 'package:inspect_connect/features/auth_flow/utils/text_editor_controller.dart';
 import 'package:provider/provider.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/client/widgets/input_fields.dart';
@@ -91,7 +92,7 @@ class _AdditionalDetailsStepState extends State<AdditionalDetailsStep> {
                         const SizedBox(height: 12),
 
                         AppInputField(
-                          controller: prov.workHistoryController,
+                          controller: inspWorkHistoryController,
                           label: 'Work History Description',
                           maxLines: 4,
                           hint: 'Enter work experience details...',

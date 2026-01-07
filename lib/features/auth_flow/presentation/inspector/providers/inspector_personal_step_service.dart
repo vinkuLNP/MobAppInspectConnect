@@ -63,19 +63,19 @@ class InspectorPersonalStepService {
       'deviceType': deviceType,
 
       'deviceToken': deviceToken,
-      'name': provider.fullNameCtrl.text.trim(),
-      'phoneNumber': phoneCtrl.text.trim(),
+      'name': inspFullNameCtrl.text.trim(),
+      'phoneNumber': inspPhoneCtrl.text.trim(),
       'countryCode':
           provider.phoneE164 != null && provider.phoneE164!.startsWith('+')
           ? provider.phoneE164!.substring(
               0,
-              provider.phoneE164!.length - (phoneCtrl.text.length),
+              provider.phoneE164!.length - (inspPhoneCtrl.text.length),
             )
           : provider.phoneDial ??
                 (await provider.localDs.getFullData())?.countryCode ??
                 '+91',
-      'email': emailCtrlSignUp.text.trim(),
-      'password': passwordCtrlSignUp.text,
+      'email': inspEmailCtrlSignUp.text.trim(),
+      'password': inspPasswordCtrlSignUp.text,
       'isoCode':
           provider.phoneIso != "" ||
               provider.phoneIso != null ||

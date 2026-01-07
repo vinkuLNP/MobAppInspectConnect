@@ -15,6 +15,8 @@ import 'package:inspect_connect/features/auth_flow/data/models/agency_certificat
 import 'package:inspect_connect/features/auth_flow/data/models/auth_user_dto.dart';
 import 'package:inspect_connect/features/auth_flow/data/models/certificate_inspector_type_datamodel.dart';
 import 'package:inspect_connect/features/auth_flow/data/models/change_password_dto.dart';
+import 'package:inspect_connect/features/auth_flow/data/models/inspector_document_types_model.dart';
+import 'package:inspect_connect/features/auth_flow/data/models/jurisdiction_data_model.dart';
 import 'package:inspect_connect/features/auth_flow/data/models/profile_update_dto.dart';
 import 'package:inspect_connect/features/auth_flow/data/models/resend_otp_request_model.dart';
 import 'package:inspect_connect/features/auth_flow/data/models/signin_request_model.dart';
@@ -42,6 +44,9 @@ abstract class AuthRemoteDataSource {
 
   Future<ApiResultModel<List<CertificateInspectorTypeModelData>>>
   getCertificateType();
+  Future<ApiResultModel<List<JurisdictionDataModel>>> getJurisdictionCities();
+  Future<ApiResultModel<List<InspectorDocumentTypesDataModel>>>
+  getIsnpectorDocumentsType();
   Future<ApiResultModel<List<AgencyModel>>> getCertificateAgency();
 }
 
@@ -241,9 +246,11 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           final Map<String, dynamic> body =
               (root['body'] as Map?)?.cast<String, dynamic>() ??
               <String, dynamic>{};
-              log('----------datat calling----->${body.toString()}');
+          log('----------datat calling----->${body.toString()}');
 
-              log('----------datat calling----->${jsonDecode(response.body).toString()}');
+          log(
+            '----------datat calling----->${jsonDecode(response.body).toString()}',
+          );
 
           final dto = UserDetail.fromJson(body);
           return ApiResultModel<UserDetail>.success(data: dto);
@@ -392,6 +399,86 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         },
         failure: (ErrorResultModel e) =>
             ApiResultModel<AuthUserDto>.failure(errorResultEntity: e),
+      );
+    } catch (e) {
+      log('autoremoteresopoonse------> $e');
+      return const ApiResultModel.failure(
+        errorResultEntity: ErrorResultModel(
+          message: "Network error occurred",
+          statusCode: 500,
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<ApiResultModel<List<JurisdictionDataModel>>>
+  getJurisdictionCities() async {
+    try {
+      final ApiResultModel<http.Response> res = await _ctx.makeRequest(
+        uri: getJurisdictionCitiesEndPoint,
+        httpRequestStrategy: GetRequestStrategy(),
+      );
+      return res.when(
+        success: (http.Response response) {
+          final Map<String, dynamic> root = response.body.isEmpty
+              ? {}
+              : (jsonDecode(response.body) as Map<String, dynamic>);
+          final List<dynamic> list =
+              (root['body']['jurisdictions'] as List?) ?? [];
+
+          final List<JurisdictionDataModel> dtoList = list
+              .map((e) => JurisdictionDataModel.fromJson(e))
+              .toList();
+
+          return ApiResultModel<List<JurisdictionDataModel>>.success(
+            data: dtoList,
+          );
+        },
+        failure: (ErrorResultModel e) =>
+            ApiResultModel<List<JurisdictionDataModel>>.failure(
+              errorResultEntity: e,
+            ),
+      );
+    } catch (e) {
+      log('autoremoteresopoonse------> $e');
+      return const ApiResultModel.failure(
+        errorResultEntity: ErrorResultModel(
+          message: "Network error occurred",
+          statusCode: 500,
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<ApiResultModel<List<InspectorDocumentTypesDataModel>>>
+  getIsnpectorDocumentsType() async {
+    try {
+      final ApiResultModel<http.Response> res = await _ctx.makeRequest(
+        uri: getInspectorDocumentTypeEndPoint,
+        httpRequestStrategy: GetRequestStrategy(),
+      );
+
+      return res.when(
+        success: (http.Response response) {
+          final Map<String, dynamic> root = response.body.isEmpty
+              ? {}
+              : (jsonDecode(response.body) as Map<String, dynamic>);
+          final List<dynamic> list = (root['body'] as List?) ?? [];
+
+          final List<InspectorDocumentTypesDataModel> dtoList = list
+              .map((e) => InspectorDocumentTypesDataModel.fromJson(e))
+              .toList();
+
+          return ApiResultModel<List<InspectorDocumentTypesDataModel>>.success(
+            data: dtoList,
+          );
+        },
+        failure: (ErrorResultModel e) =>
+            ApiResultModel<List<InspectorDocumentTypesDataModel>>.failure(
+              errorResultEntity: e,
+            ),
       );
     } catch (e) {
       log('autoremoteresopoonse------> $e');

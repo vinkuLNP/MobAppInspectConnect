@@ -30,11 +30,11 @@ class InsepctorPersistentDataService {
     log('📦 Loaded saved data: ${saved?.toString()}');
     if (saved == null) return;
 
-    fullNameCtrl.text = saved.name ?? '';
-    phoneCtrl.text = saved.phoneNumber ?? '';
+    inspFullNameCtrl.text = saved.name ?? '';
+    inspPhoneCtrl.text = saved.phoneNumber ?? '';
     provider.phoneE164 = saved.phoneNumber;
-    emailCtrlSignUp.text = saved.email ?? '';
-    passwordCtrlSignUp.text = saved.password ?? '';
+    inspEmailCtrlSignUp.text = saved.email ?? '';
+    inspPasswordCtrlSignUp.text = saved.password ?? '';
     if (saved.phoneNumber != null && saved.phoneNumber!.isNotEmpty) {
       final phone = saved.phoneNumber!;
       String dial = saved.countryCode ?? '';
@@ -57,18 +57,23 @@ class InsepctorPersistentDataService {
     }
 
     provider.selectedCertificateTypeId = saved.certificateTypeId;
-    provider.setDate(DateTime.parse(saved.certificateExpiryDate.toString()));
+    final expiry = saved.certificateExpiryDate;
+
+    if (expiry != null && expiry.isNotEmpty) {
+      provider.setDate(DateTime.parse(expiry));
+    }
+
     provider.uploadedCertificateUrls = saved.certificateDocuments ?? [];
     provider.existingDocumentUrls = List.from(provider.uploadedCertificateUrls);
     provider.selectedAgencyIds = saved.certificateAgencyIds ?? [];
     await provider.fetchCertificateTypes(
       savedId: provider.selectedCertificateTypeId,
     );
-    countryController.text = saved.country.toString();
-    stateController.text = saved.state.toString();
-    cityController.text = saved.city.toString();
-    mailingAddressController.text = saved.mailingAddress.toString();
-    zipController.text = saved.zipCode.toString();
+    inspCountryController.text = saved.country.toString();
+    inspStateController.text = saved.state.toString();
+    inspCityController.text = saved.city.toString();
+    inspMailingAddressController.text = saved.mailingAddress.toString();
+    inspZipController.text = saved.zipCode.toString();
     if (saved.profileImage != null &&
         saved.profileImage!.isNotEmpty &&
         saved.profileImage != 'null') {
@@ -85,7 +90,7 @@ class InsepctorPersistentDataService {
         .where((e) => e != 'null' && e.isNotEmpty)
         .map((e) => File(e))
         .toList();
-    workHistoryController.text = saved.workHistoryDescription ?? '';
+    inspWorkHistoryController.text = saved.workHistoryDescription ?? '';
     provider.agreedToTerms = saved.agreedToTerms ?? false;
     provider.confirmTruth = saved.isTruthfully ?? false;
     provider.serviceAreas = saved.serviceAreas;
@@ -154,15 +159,15 @@ class InsepctorPersistentDataService {
 
           final localUser = user.toLocalEntity();
           await locator<AuthLocalDataSource>().saveUser(localUser);
-
           if (context.mounted) {
             final userProvider = context.read<UserProvider>();
             await userProvider.setUser(localUser);
             await userProvider.loadUser();
+            if (context.mounted) {
+              showSnackBar(context, message: verifyOtp);
 
-            showSnackBar(context, message: verifyOtp);
-
-            context.pushRoute(OtpVerificationRoute(addShowButton: true));
+              context.pushRoute(OtpVerificationRoute(addShowButton: true));
+            }
           }
         },
         error: (e) {
@@ -177,7 +182,7 @@ class InsepctorPersistentDataService {
     } finally {
       provider.setProcessing(false);
       provider.notify();
-      AppLogger.info('SignUp', '🧹 Cleanup complete');
+      AppLogger.info('SignUp', 'Cleanup complete');
     }
   }
 }

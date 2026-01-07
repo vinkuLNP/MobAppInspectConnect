@@ -65,10 +65,6 @@ class _BookingFormWidgetState extends State<BookingFormWidget> {
 
         provider.setInspectionType(matched);
 
-        // provider.setInspectionType(
-        //   (b.certificateSubTypes != [] ? b.certificateSubTypes[0] : null),
-        // );
-
         if (b.images != [] && b.images.isNotEmpty) {
           provider.uploadedUrls = List<String>.from(b.images);
           provider.existingImageUrls = List<String>.from(b.images);

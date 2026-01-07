@@ -7,6 +7,9 @@ import 'package:inspect_connect/core/commondomain/entities/based_api_result/api_
 import 'package:inspect_connect/core/di/app_component/app_component.dart';
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
+import 'package:inspect_connect/features/auth_flow/data/models/inspector_document_types_model.dart';
+import 'package:inspect_connect/features/auth_flow/domain/entities/inspector_documents_type.dart';
+import 'package:inspect_connect/features/auth_flow/domain/usecases/document_type_usecase.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/inspector/inspector_view_model.dart';
 import 'package:inspect_connect/features/client_flow/data/models/upload_image_model.dart';
 import 'package:inspect_connect/features/client_flow/domain/entities/upload_image_dto.dart';
@@ -152,5 +155,48 @@ class InsepctorAdditionalStepService {
       if (agreed != null) 'agreedToTerms': agreed,
       if (truthful != null) 'isTruthfully': truthful,
     });
+  }
+
+  Future<void> fetchDocumentTypes() async {
+    try {
+      provider.setProcessing(true);
+
+      final getSubTypesUseCase = locator<GetInspectorDocumentsTypeUseCase>();
+
+      final state = await provider
+          .executeParamsUseCase<
+            List<InspectorDocumentsTypeEntity>,
+            GetInspectorDocumentsTypeParams
+          >(useCase: getSubTypesUseCase, launchLoader: true);
+
+      state?.when(
+        data: (response) {
+          final modelList = response
+              .map(
+                (e) => InspectorDocumentTypesDataModel(
+                  id: e.id,
+                  name: e.name,
+                  isDeleted: e.isDeleted,
+                  status: e.status,
+                  createdAt: e.createdAt,
+                  updatedAt: e.updatedAt,
+                  v: e.v,
+                ),
+              )
+              .toList();
+
+          provider.inspectorDocumentsType = modelList;
+
+          provider.notify();
+        },
+        error: (e) {
+          log("Error fetching certificate types: $e");
+        },
+      );
+    } catch (e) {
+      log("Exception in fetchCertificateTypes: $e");
+    } finally {
+      provider.setProcessing(false);
+    }
   }
 }

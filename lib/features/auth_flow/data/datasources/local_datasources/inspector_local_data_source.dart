@@ -28,7 +28,7 @@ class InspectorSignUpLocalDataSource {
 
     entity.serviceAreas.length;
     log(
-      'Before update:  ${entity.name.toString()} ----- zipCode: ${entity.zipCode.toString()} ----- serviceAreas: ${entity.serviceAreas.length}',
+      'Before update:  ${entity.name.toString()} ----- icc doc: ${entity.iccDocuments[0].documentUrl.toString()}    ${entity.iccDocuments[0].serviceCity.toString()} ----- zipcode : ${entity.serviceAreas[0].cityName.toString()} zipcode : ${entity.serviceAreas[0].zipCode.toString()}  certificate dfocuments ${entity.certificateDocuments}',
     );
 
     fields.forEach((k, v) {
@@ -151,7 +151,7 @@ class InspectorSignUpLocalDataSource {
     _database.saveInspector(entity);
 
     log(
-      'After update: ${entity.name.toString()} ----- zipCode: ${entity.zipCode.toString()} ----- serviceAreas: ${entity.serviceAreas.iterator}',
+      'After update:   ${entity.name.toString()} ----- icc doc: ${entity.iccDocuments[0].documentUrl.toString()}    ${entity.iccDocuments[0].serviceCity.toString()} ----- zipcode : ${entity.serviceAreas[0].cityName.toString()} zipcode : ${entity.serviceAreas[0].zipCode.toString()}  certificate dfocuments ${entity.certificateDocuments}',
     );
   }
 

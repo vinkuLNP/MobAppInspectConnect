@@ -56,7 +56,7 @@ class ProfessionalDetailsStep extends StatelessWidget {
                       ),
                       const SizedBox(height: 6),
                       _section(
-                        title: 'Upload Certification Documents (max 5)',
+                        title: 'Upload Certification Documents (max 4)',
                         child: _documentGrid(prov, context),
                       ),
                     ],
@@ -128,7 +128,7 @@ class ProfessionalDetailsStep extends StatelessWidget {
 
   Widget _documentGrid(InspectorViewModelProvider prov, BuildContext context) {
     final totalDocs = prov.documents.length + prov.existingDocumentUrls.length;
-    final canAddMore = totalDocs < 5;
+    final canAddMore = totalDocs < 4;
 
     if (totalDocs == 0) {
       return GestureDetector(

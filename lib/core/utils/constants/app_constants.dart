@@ -61,17 +61,15 @@ const String updateUser = 'user';
 const String getCertificateSubTypesEndPoint = 'certificate/subTypes';
 const String getInspectorCertificateTypesEndPoint = 'certificate/types';
 const String getInspectorCertificateTAgenciesEndPoint = 'certificate/agencies';
+const String getJurisdictionCitiesEndPoint = 'cities/jurisdictions';
+const String getInspectorDocumentTypeEndPoint = 'document/types';
 
 const String createBookingEndPoint = 'bookings';
-
 const String bookingStatusEndPoint = 'status';
 const String bookingTimerEndPoint = 'timer';
-
 const String uploadImageEndPoint = 'uploads';
-
 const String walletEndPoint = 'wallet';
 const String paymentEndPOint = 'payments';
-
 const String subscriptionEndPoint = 'subscriptionPlans';
 const String userSubscriptionByIdEndPoint = 'subscriptions';
 

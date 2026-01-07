@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:inspect_connect/core/utils/constants/app_common_card_container.dart';
 import 'package:inspect_connect/core/utils/helpers/responsive_ui_helper/responsive_config.dart';
 import 'package:inspect_connect/core/utils/presentation/app_assets_widget.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
-import 'package:inspect_connect/features/auth_flow/presentation/inspector/widgets/header_card.dart';
+import 'package:inspect_connect/features/auth_flow/presentation/inspector/widgets/cusotm_painter.dart';
 
 class InspectorCommonAuthBar extends StatelessWidget {
   final String title;
@@ -40,7 +41,8 @@ class InspectorCommonAuthBar extends StatelessWidget {
                 return Stack(
                   children: [
                     AspectRatio(
-                      aspectRatio: 375 / 280,
+                      aspectRatio: 335 / 230,
+                      // 375/280
                       child: imageAsset(
                         image: image,
                         width: rc.screenWidth,
@@ -60,19 +62,11 @@ class InspectorCommonAuthBar extends StatelessWidget {
                         ),
                       ),
                     ),
-                    // Positioned(
-                    //   left: 24,
-                    //   right: 24,
-                    //   top: showBackButton
-                    //       ? 40
-                    //       : showSubscriptionBanner!
-                    //       ? 40
-                    //       : 80,
                     SafeArea(
                       child: Padding(
                         padding: EdgeInsets.symmetric(
                           horizontal: rc.setWidth(20),
-                          vertical: rc.setHeight(16),
+                          vertical: rc.setHeight(40),
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -97,7 +91,8 @@ class InspectorCommonAuthBar extends StatelessWidget {
                             ),
                             if (!showSubscriptionBanner!) ...[
                               SizedBox(height: rc.setHeight(20)),
-                              HeaderCard(headerWidget),
+                              AppCardContainer(child: headerWidget),
+                              CustomPaint(painter: TrianglePainter()),
                             ],
                           ],
                         ),

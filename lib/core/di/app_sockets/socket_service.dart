@@ -1,5 +1,4 @@
 import 'dart:developer';
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/di/app_component/app_component.dart';
 import 'package:inspect_connect/core/di/app_sockets/socket_manager.dart';
@@ -24,10 +23,7 @@ class SocketService {
       "🟦 [SOCKET INIT] Token received: ${token.isNotEmpty ? 'VALID' : 'EMPTY'}",
     );
 
-    final url =
-        // "https://inspect-connect-api-auakczg0ave2bqex.westus2-01.azurewebsites.net/";
-        //  devBaseUrl;
-        Platform.isIOS ? "http://localhost:5002" : "http://10.0.2.2:5002";
+    final url = socketUrl;
     log("🟦 [SOCKET INIT] Connecting to: $url");
 
     socket = io.io(

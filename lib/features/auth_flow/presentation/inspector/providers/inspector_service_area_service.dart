@@ -1,9 +1,14 @@
 import 'dart:developer';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:inspect_connect/core/commondomain/entities/based_api_result/api_result_state.dart';
+import 'package:inspect_connect/core/di/app_component/app_component.dart';
 import 'package:inspect_connect/core/utils/constants/app_keywords.dart';
 import 'package:inspect_connect/core/utils/constants/app_strings.dart';
+import 'package:inspect_connect/features/auth_flow/data/models/jurisdiction_data_model.dart';
+import 'package:inspect_connect/features/auth_flow/domain/entities/jurisdiction_entity.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/service_area_entity.dart';
+import 'package:inspect_connect/features/auth_flow/domain/usecases/jurisdiction_usecase.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/inspector/inspector_view_model.dart';
 import 'package:country_state_city/country_state_city.dart' as csc;
 import 'package:inspect_connect/features/auth_flow/utils/text_editor_controller.dart';
@@ -53,19 +58,61 @@ class InspectorServiceAreaService {
   }
 
   void selectCities(List<String> names) {
+    log('--- Cities selected from UI ---');
+    log('Selected cities: $names');
     provider.selectedCityNames = names;
     provider.selectedCities = List.from(names);
+    provider.cityRequiresIcc.clear();
+    for (final city in names) {
+      final requiresIcc = isJurisdictionCity(city);
+
+      log('Checking ICC requirement for city: "$city"');
+      log('→ Requires ICC: $requiresIcc');
+
+      provider.cityRequiresIcc[city] = requiresIcc;
+    }
+    log('Final cityRequiresIcc map: ${provider.cityRequiresIcc}');
+
     if (names.isNotEmpty) clearCityErrors();
     provider.notify();
+  }
+
+  bool isJurisdictionCity(String cityName) {
+    log('--- Jurisdiction comparison start ---');
+    log('Incoming city: "$cityName"');
+
+    for (final j in provider.jurisdictions) {
+      log(
+        'Comparing with jurisdiction: '
+        '"${j.name}" → '
+        '("${j.name.toLowerCase().trim()}")',
+      );
+    }
+
+    final result = provider.jurisdictions.any(
+      (j) => j.name.toLowerCase().trim() == cityName.toLowerCase().trim(),
+    );
+
+    log('Comparison result for "$cityName": $result');
+    log('--- Jurisdiction comparison end ---');
+
+    return result;
   }
 
   void removeCity(String city) {
     provider.selectedCityNames.remove(city);
     provider.selectedCities.remove(city);
 
+    provider.iccDocuments.remove(city);
+
+    provider.removeCityZip(city);
+
+    provider.cityRequiresIcc.remove(city);
+
     if (provider.selectedCityNames.isEmpty) {
       validateServiceArea();
     }
+
     provider.notify();
   }
 
@@ -82,9 +129,9 @@ class InspectorServiceAreaService {
         ? selectCityError
         : null;
 
-    provider.zipError = validateZip(zipController.text);
+    provider.zipError = validateZip(inspZipController.text);
     provider.mailingAddressError = validateAddress(
-      mailingAddressController.text,
+      inspMailingAddressController.text,
     );
 
     provider.notify();
@@ -130,6 +177,7 @@ class InspectorServiceAreaService {
           countryCode: countryCode,
           stateCode: stateCode,
           cityName: cityName,
+          zipCode: provider.cityZipCodes[cityName],
           locationType: ServiceAreaKeywords.locationTypePoint,
           latitude: double.tryParse(city.latitude.toString()),
           longitude: double.tryParse(city.longitude.toString()),
@@ -150,8 +198,8 @@ class InspectorServiceAreaService {
               .firstWhere((s) => s.isoCode == provider.selectedStateCode!)
               .name;
     provider.city = provider.selectedCityNames[0];
-    provider.zipCode = zipController.text;
-    provider.mailingAddress = mailingAddressController.text;
+    provider.zipCode = inspZipController.text;
+    provider.mailingAddress = inspMailingAddressController.text;
   }
 
   Future<void> setUserCurrentLocation() async {
@@ -231,5 +279,48 @@ class InspectorServiceAreaService {
     }
 
     await provider.localDs.updateFields(fieldsToUpdate);
+  }
+
+  Future<void> fetchJurisdictions() async {
+    try {
+      provider.setProcessing(true);
+
+      final getSubTypesUseCase = locator<GetJurisdictionCitiesUseCase>();
+
+      final state = await provider
+          .executeParamsUseCase<
+            List<JurisdictionEntity>,
+            GetJurisdictionParams
+          >(useCase: getSubTypesUseCase, launchLoader: true);
+
+      state?.when(
+        data: (response) {
+          final modelList = response
+              .map(
+                (e) => JurisdictionDataModel(
+                  id: e.id,
+                  name: e.name,
+                  type: e.type,
+                  status: e.status,
+                  createdAt: e.createdAt,
+                  updatedAt: e.updatedAt,
+                  v: e.v,
+                ),
+              )
+              .toList();
+
+          provider.jurisdictions = modelList;
+          log(provider.jurisdictions.length.toString());
+          provider.notify();
+        },
+        error: (e) {
+          log("Error fetching certificate types: $e");
+        },
+      );
+    } catch (e) {
+      log("Exception in fetchCertificateTypes: $e");
+    } finally {
+      provider.setProcessing(false);
+    }
   }
 }

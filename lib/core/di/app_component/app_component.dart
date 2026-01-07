@@ -6,8 +6,10 @@ import 'package:inspect_connect/features/auth_flow/domain/repositories/auth_repo
 import 'package:inspect_connect/features/auth_flow/domain/usecases/agency_type_usecase.dart';
 import 'package:inspect_connect/features/auth_flow/domain/usecases/certificate_type_usecase.dart';
 import 'package:inspect_connect/features/auth_flow/domain/usecases/change_password_usecases.dart';
+import 'package:inspect_connect/features/auth_flow/domain/usecases/document_type_usecase.dart';
 import 'package:inspect_connect/features/auth_flow/domain/usecases/get_user__usercase.dart';
 import 'package:inspect_connect/features/auth_flow/domain/usecases/inspector_signup_case.dart';
+import 'package:inspect_connect/features/auth_flow/domain/usecases/jurisdiction_usecase.dart';
 import 'package:inspect_connect/features/auth_flow/domain/usecases/otp_verification_usecases.dart';
 import 'package:inspect_connect/features/auth_flow/domain/usecases/resend_otp_usecases.dart';
 import 'package:inspect_connect/features/auth_flow/domain/usecases/sign_in_usecase.dart';
@@ -95,6 +97,11 @@ void setupLocator() {
   locator.registerLazySingleton(() => GetAgencyUseCase(locator()));
   locator.registerLazySingleton(() => GetCertificateTypeUseCase(locator()));
   locator.registerLazySingleton(() => InspectorSignUpUseCase(locator()));
+
+  locator.registerLazySingleton(() => GetJurisdictionCitiesUseCase(locator()));
+  locator.registerLazySingleton(
+    () => GetInspectorDocumentsTypeUseCase(locator()),
+  );
 
   locator.registerLazySingleton(() => FetchBookingsUseCase(locator()));
   locator.registerLazySingleton<SocketService>(() => SocketService());
