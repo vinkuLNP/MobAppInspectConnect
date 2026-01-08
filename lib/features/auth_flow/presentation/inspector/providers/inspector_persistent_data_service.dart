@@ -69,24 +69,46 @@ class InsepctorPersistentDataService {
     await provider.fetchCertificateTypes(
       savedId: provider.selectedCertificateTypeId,
     );
+    await provider.fetchInspectorDocumentsType();
     inspCountryController.text = saved.country.toString();
     inspStateController.text = saved.state.toString();
     inspCityController.text = saved.city.toString();
     inspMailingAddressController.text = saved.mailingAddress.toString();
+    provider.mailingAddress = saved.mailingAddress.toString();
     inspZipController.text = saved.zipCode.toString();
+
+    if (saved.uploadedIdOrLicenseDocument != null) {
+      provider.idDocumentUploadedUrl = saved.uploadedIdOrLicenseDocument;
+      provider.idDocumentFile = File(
+        saved.uploadedIdOrLicenseDocument.toString(),
+      );
+    }
+
+    if (saved.uploadedCoiDocument != null) {
+      provider.coiUploadedUrl = saved.uploadedCoiDocument;
+      provider.coiFile = File(saved.uploadedCoiDocument.toString());
+    }
+
+    if (saved.coiExpiryDate != null) {
+      provider.coiExpiry = DateTime.parse(saved.coiExpiryDate.toString());
+    }
+    if (saved.documentExpiryDate != null) {
+      provider.selectedIdDocExpiry = DateTime.parse(
+        saved.documentExpiryDate.toString(),
+      );
+    }
     if (saved.profileImage != null &&
         saved.profileImage!.isNotEmpty &&
         saved.profileImage != 'null') {
-      provider.profileImageUrl = File(saved.profileImage!);
+      provider.profileImageUrl = saved.profileImage;
+      provider.profileImage = File(saved.profileImage.toString());
     }
-
-    if (saved.uploadedIdOrLicenseDocument != null &&
-        saved.uploadedIdOrLicenseDocument!.isNotEmpty &&
-        saved.uploadedIdOrLicenseDocument != 'null') {
-      provider.idLicenseUrl = File(saved.uploadedIdOrLicenseDocument!);
+    if (saved.documentTypeId != "") {
+      provider.selectedIdDocType = provider.inspectorDocumentsType.firstWhere(
+        (e) => e.id == saved.documentTypeId,
+      );
     }
-
-    provider.referenceLettersUrls = (saved.referenceDocuments ?? [])
+    provider.referenceLetters = (saved.referenceDocuments ?? [])
         .where((e) => e != 'null' && e.isNotEmpty)
         .map((e) => File(e))
         .toList();
@@ -119,7 +141,13 @@ class InsepctorPersistentDataService {
       await provider.loadCities(savedCountryCode.toString());
       provider.setUserCurrentLocation();
     }
-
+    provider.recalculateCityIccRequirement();
+    for (final area in saved.serviceAreas) {
+      if (area.cityName != null && area.zipCode != null) {
+        provider.cityZipCodes[area.cityName!] = area.zipCode!;
+      }
+    }
+    provider.hydrateIccFromLocalDb(saved.iccDocuments);
     provider.notify();
   }
 
@@ -136,7 +164,7 @@ class InsepctorPersistentDataService {
         AppLogger.error('SignUp', 'Saved data is null');
         return;
       }
-
+      saved.privateTempId = 'privatetempid';
       final useCase = locator<InspectorSignUpUseCase>();
       final params = InspectorSignUpParams(inspectorSignUpLocalEntity: saved);
 

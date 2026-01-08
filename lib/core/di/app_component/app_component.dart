@@ -42,6 +42,7 @@ import 'package:inspect_connect/features/inspector_flow/data/repositories/inspec
 import 'package:inspect_connect/features/inspector_flow/domain/repositories/inspector_repository.dart';
 import 'package:inspect_connect/features/inspector_flow/domain/usecases/get_subscription_plans_usecase.dart';
 import 'package:inspect_connect/features/inspector_flow/domain/usecases/get_user_subscription_detail_usecase.dart';
+import 'package:inspect_connect/features/inspector_flow/domain/usecases/payment_intent_usecase.dart';
 import 'package:inspect_connect/features/inspector_flow/providers/inspector_main_provider.dart';
 
 final GetIt locator = GetIt.I;
@@ -87,9 +88,12 @@ void setupLocator() {
   locator.registerLazySingleton(() => GetUserUseCase(locator()));
   locator.registerLazySingleton(() => UpdateProfileUseCase(locator()));
   locator.registerLazySingleton(() => GetSubscriptionPlansUseCase(locator()));
+  locator.registerLazySingleton(() => GetPaymentIntentUseCase(locator()));
+
   locator.registerLazySingleton(
     () => GetUserSubscriptionDetailUseCase(locator()),
   );
+
   locator.registerLazySingleton(() => UpdateBookingStatusUseCase(locator()));
   locator.registerLazySingleton(() => UpdateBookingTimerUseCase(locator()));
   locator.registerLazySingleton(() => ShowUpFeeStatusUseCase(locator()));

@@ -70,6 +70,8 @@ const String bookingTimerEndPoint = 'timer';
 const String uploadImageEndPoint = 'uploads';
 const String walletEndPoint = 'wallet';
 const String paymentEndPOint = 'payments';
+const String paymentIntentEndPOint = 'payments/paymentIntent';
+
 const String subscriptionEndPoint = 'subscriptionPlans';
 const String userSubscriptionByIdEndPoint = 'subscriptions';
 

@@ -26,14 +26,15 @@ class InsepctorAdditionalStepService {
   }) async {
     try {
       provider.setProcessing(true);
-
+      log("1---profileImage------>${provider.profileImage.toString()}");
       if (allowOnlyImages) {
+        log("--2-profileImage------>${provider.profileImage.toString()}");
         final picked = await ImagePicker().pickImage(
           source: ImageSource.gallery,
         );
 
         if (picked == null) return;
-
+        log("-3--profileImage------>${provider.profileImage.toString()}");
         final file = File(picked.path);
         if (await file.length() > 2 * 1024 * 1024) {
           if (context.mounted) {
@@ -48,7 +49,7 @@ class InsepctorAdditionalStepService {
           }
           return;
         }
-
+        log("-4--profileImage------>${provider.profileImage.toString()}");
         final uploadImage = UploadImageDto(filePath: file.path);
         final uploadImageUseCase = locator<UploadImageUseCase>();
         final result = await provider
@@ -57,12 +58,16 @@ class InsepctorAdditionalStepService {
               query: UploadImageParams(filePath: uploadImage),
               launchLoader: true,
             );
-
+        log("--5-profileImage------>${provider.profileImage.toString()}");
         result?.when(
           data: (response) {
-            provider.profileImageUrl = File(response.fileUrl);
-            provider.profileImage = File(file.path);
+            provider.profileImageUrl = response.fileUrl;
+            provider.profileImage = file;
             provider.notify();
+            log("--6-profileImage------>${provider.profileImage.toString()}");
+            log(
+              "-7--profileImageUrl------>${provider.profileImageUrl.toString()}",
+            );
           },
           error: (e) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -108,11 +113,16 @@ class InsepctorAdditionalStepService {
         responseResult?.when(
           data: (response) {
             if (type == 'id') {
-              provider.idLicense = file;
-              provider.idLicenseUrl = File(response.fileUrl);
+              // provider.idLicense = file;
+              // provider.idLicenseUrl = File(response.fileUrl);
+              provider.idDocumentFile = file;
+              provider.idDocumentUploadedUrl = response.fileUrl;
             } else if (type == 'ref') {
               provider.referenceLetters.add(file);
-              provider.referenceLettersUrls.add(File(response.fileUrl));
+              provider.referenceLettersUrls.add(response.fileUrl);
+            } else if (type == 'coi') {
+              provider.coiFile = file;
+              provider.coiUploadedUrl = response.fileUrl;
             }
             provider.notify();
           },
@@ -120,7 +130,7 @@ class InsepctorAdditionalStepService {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: textWidget(
-                  text: e.message ?? 'Image upload failed',
+                  text: e.message ?? 'File upload failed',
                   color: AppColors.backgroundColor,
                 ),
               ),
@@ -144,11 +154,16 @@ class InsepctorAdditionalStepService {
     bool? agreed,
     bool? truthful,
   }) async {
+    log(provider.idDocumentUploadedUrl.toString());
     await provider.localDs.updateFields({
       if (profileImageUrlOrPath != null) 'profileImage': profileImageUrlOrPath,
       if (idLicenseUrlOrPath != null)
         'uploadedIdOrLicenseDocument': idLicenseUrlOrPath,
+      "documentTypeId": provider.selectedIdDocType?.id,
+      "documentExpiryDate": provider.selectedIdDocExpiry?.toIso8601String(),
       if (referenceDocs != null) 'referenceDocuments': referenceDocs,
+      'uploadedCoiDocument': provider.coiUploadedUrl,
+      'coiExpiryDate': provider.coiExpiry?.toIso8601String(),
       if (workHistoryDescription != null)
         'workHistoryDescription': workHistoryDescription,
 
@@ -185,7 +200,9 @@ class InsepctorAdditionalStepService {
               )
               .toList();
 
-          provider.inspectorDocumentsType = modelList;
+          provider.inspectorDocumentsType = modelList
+              .where((e) => e.name.toLowerCase() != 'icc')
+              .toList();
 
           provider.notify();
         },

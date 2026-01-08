@@ -121,7 +121,10 @@ class _InspectorSignUpContentState extends State<InspectorSignUpContent> {
                 );
                 break;
               case 2:
-                final isValid = vm.validateServiceArea();
+                log('ICC Local Files: ${vm.iccLocalFiles}');
+                log('ICC Uploaded URLs: ${vm.iccUploadedUrls}');
+                log('Selected Cities: ${vm.selectedCityNames}');
+                // final isValid = vm.validateServiceArea();
                 if (!isValid) return;
                 vm.saveSelectedServiceDataToProvider();
 
@@ -142,10 +145,11 @@ class _InspectorSignUpContentState extends State<InspectorSignUpContent> {
 
                 break;
               case 3:
-                vm.validateBeforeSubmit(context: ctx);
-                if (!vm.agreedToTerms || !vm.confirmTruth) {
-                  return;
-                }
+                // vm.validateBeforeSubmit(context: ctx);
+                // if (!vm.agreedToTerms || !vm.confirmTruth) {
+                //   return;
+                // }
+                log("called");
                 String? getSafePath(dynamic fileOrUrl) {
                   if (fileOrUrl == null) return null;
                   final path = fileOrUrl is File
@@ -160,8 +164,8 @@ class _InspectorSignUpContentState extends State<InspectorSignUpContent> {
                 }
 
                 final profilePath = getSafePath(vm.profileImageUrl);
-                final idPath = getSafePath(vm.idLicenseUrl);
-                final refs = vm.referenceLettersUrls.map((f) {
+                final idPath = getSafePath(vm.idDocumentUploadedUrl);
+                final refs = vm.referenceLetters.map((f) {
                   final path = f.path;
                   return (path.startsWith('http://') ||
                           path.startsWith('https://'))

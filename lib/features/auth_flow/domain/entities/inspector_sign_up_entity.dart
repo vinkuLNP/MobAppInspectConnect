@@ -1,47 +1,43 @@
-import 'package:inspect_connect/features/auth_flow/domain/entities/icc_area_entity.dart';
+import 'package:inspect_connect/features/auth_flow/domain/entities/icc_document_entity.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/service_area_entity.dart';
 import 'package:objectbox/objectbox.dart';
 
 @Entity()
 class InspectorSignUpLocalEntity {
   int id;
-
   String? name;
   String? email;
   String? password;
   String? phoneNumber;
   String? countryCode;
   String? isoCode;
-
   String? certificateTypeId;
   String? certificateExpiryDate;
   List<String>? certificateDocuments;
   List<String>? certificateAgencyIds;
-
   String? country;
   String? state;
   String? city;
   String? zipCode;
   String? mailingAddress;
-
   String? uploadedIdOrLicenseDocument;
   String? uploadedCoiDocument;
-
   String? workHistoryDescription;
   List<String>? referenceDocuments;
   String? profileImage;
-
   bool? agreedToTerms;
   bool? isTruthfully;
   int? role;
-
   String? deviceType;
   String? deviceToken;
-
   String? locationType;
   String? locationName;
   double? latitude;
   double? longitude;
+  String? coiExpiryDate;
+  String? documentExpiryDate;
+  String? documentTypeId;
+  String? privateTempId;
 
   @Backlink('inspector')
   final serviceAreas = ToMany<ServiceAreaLocalEntity>();
@@ -80,6 +76,10 @@ class InspectorSignUpLocalEntity {
     this.locationName,
     this.latitude,
     this.longitude,
+    this.coiExpiryDate,
+    this.documentExpiryDate,
+    this.documentTypeId,
+    this.privateTempId,
   });
 }
 
@@ -90,34 +90,34 @@ extension InspectorSignUpEntityMapper on InspectorSignUpLocalEntity {
       "email": email,
       "password": password,
       "phoneNumber": phoneNumber,
-
+      "countryCode": countryCode,
       "country": country,
       "state": state,
       "city": city,
       "zip": zipCode,
-
+      "mailingAddress": mailingAddress,
       "certificateTypeId": certificateTypeId,
       "certificateExpiryDate": certificateExpiryDate,
       "certificateDocuments": certificateDocuments,
-
       "uploadedIdOrLicenseDocument": uploadedIdOrLicenseDocument,
       "uploadedCoiDocument": uploadedCoiDocument,
-
+      "coiExpiryDate": coiExpiryDate,
+      "documentExpiryDate": documentExpiryDate,
+      "documentTypeId": documentTypeId,
+      "privateTempId": privateTempId,
       "workHistoryDescription": workHistoryDescription,
       "profileImage": profileImage,
-
+      "referenceDocuments": referenceDocuments,
       "agreedToTerms": agreedToTerms,
       "isTruthfully": isTruthfully,
       "role": role,
       "deviceType": deviceType,
       "deviceToken": deviceToken,
-
       "location": {
         "type": locationType,
         "locationName": locationName,
         "coordinates": [longitude, latitude],
       },
-
       "serviceAreas": serviceAreas.map((s) {
         return {
           "countryCode": s.countryCode,

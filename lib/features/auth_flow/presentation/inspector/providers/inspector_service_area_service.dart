@@ -243,6 +243,10 @@ class InspectorServiceAreaService {
     String? zipCode,
     required List<ServiceAreaLocalEntity>? serviceAreas,
   }) async {
+    log('Saving Service Area Step');
+    log('ICC Local Files at save: ${provider.iccLocalFiles}');
+    log('ICC Uploaded URLs at save: ${provider.iccUploadedUrls}');
+
     final fieldsToUpdate = {
       ServiceAreaKeywords.keyCountry: provider.userCurrentCountry,
       ServiceAreaKeywords.keyState: provider.userCurrentState,
@@ -269,6 +273,7 @@ class InspectorServiceAreaService {
           ServiceAreaKeywords.keyCountryCode: s.countryCode,
           ServiceAreaKeywords.keyStateCode: s.stateCode,
           ServiceAreaKeywords.keyCityName: s.cityName,
+          ServiceAreaKeywords.keyZipCode: provider.cityZipCodes[s.cityName],
           ServiceAreaKeywords.keyLocation: {
             ServiceAreaKeywords.keyType:
                 s.locationType ?? ServiceAreaKeywords.locationTypePoint,
@@ -278,6 +283,18 @@ class InspectorServiceAreaService {
       }).toList();
     }
 
+    fieldsToUpdate['iccDocuments'] = provider.iccDocsByCity.entries.expand((
+      entry,
+    ) {
+      final city = entry.key;
+      return entry.value.map((doc) {
+        return {
+          'serviceCity': city,
+          'documentUrl': doc.uploadedUrl,
+          'expiryDate': doc.expiryDate!.toIso8601String(),
+        };
+      });
+    }).toList();
     await provider.localDs.updateFields(fieldsToUpdate);
   }
 

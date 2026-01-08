@@ -3,22 +3,21 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
+import 'package:inspect_connect/features/auth_flow/data/models/ui_icc_document.dart';
 
 class AppFilePickerGrid extends StatelessWidget {
-  final List<File> files;
-  final List<String> existingUrls;
+  final List<IccUiDocument> documents;
   final int maxFiles;
-  final Function(File file) onPick;
-  final Function(int index) onRemoveFile;
-  final Function(int index) onRemoveUrl;
+  final Function(File) onPick;
+  final Function(int) onRemove;
+  final Function(int, DateTime) onPickExpiry;
 
   const AppFilePickerGrid({
     super.key,
-    required this.files,
-    required this.existingUrls,
+    required this.documents,
     required this.onPick,
-    required this.onRemoveFile,
-    required this.onRemoveUrl,
+    required this.onRemove,
+    required this.onPickExpiry,
     this.maxFiles = 4,
   });
 
@@ -35,10 +34,9 @@ class AppFilePickerGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final totalCount = files.length + existingUrls.length;
-    final canAddMore = totalCount < maxFiles;
+    final canAddMore = documents.length < maxFiles;
 
-    if (totalCount == 0) {
+    if (documents.isEmpty) {
       return _emptyUploadTile();
     }
 
@@ -50,29 +48,16 @@ class AppFilePickerGrid extends StatelessWidget {
         crossAxisCount: 2,
         mainAxisSpacing: 8,
         crossAxisSpacing: 8,
-        childAspectRatio: 3,
+        childAspectRatio: 1.6,
       ),
-      itemCount: canAddMore ? totalCount + 1 : totalCount,
+      itemCount: canAddMore ? documents.length + 1 : documents.length,
       itemBuilder: (context, index) {
-        if (index < existingUrls.length) {
-          final url = existingUrls[index];
-          final name = url.split('/').last;
-
-          return _documentTile(name: name, onDelete: () => onRemoveUrl(index));
+        if (index == documents.length && canAddMore) {
+          return GestureDetector(onTap: _pickFile, child: _addMoreTile());
         }
 
-        final localIndex = index - existingUrls.length;
-        if (localIndex < files.length) {
-          final file = files[localIndex];
-          final name = file.path.split('/').last;
-
-          return _documentTile(
-            name: name,
-            onDelete: () => onRemoveFile(localIndex),
-          );
-        }
-
-        return GestureDetector(onTap: _pickFile, child: _addMoreTile());
+        final doc = documents[index];
+        return _docCard(context, doc, index);
       },
     );
   }
@@ -106,7 +91,7 @@ class AppFilePickerGrid extends StatelessWidget {
   Widget _addMoreTile() {
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(14),
         border: Border.all(color: Colors.grey.shade300),
         color: Colors.grey.shade50,
       ),
@@ -116,28 +101,62 @@ class AppFilePickerGrid extends StatelessWidget {
     );
   }
 
-  Widget _documentTile({required String name, required VoidCallback onDelete}) {
+  Widget _docCard(BuildContext context, IccUiDocument doc, int index) {
+    final hasExpiry = doc.expiryDate != null;
+
     return Container(
-      padding: const EdgeInsets.all(8),
+      padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade300),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: hasExpiry ? Colors.green : Colors.red),
         color: Colors.white,
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.insert_drive_file, color: AppColors.authThemeColor),
-          const SizedBox(width: 8),
-          Expanded(
-            child: textWidget(
-              text: name,
-              fontSize: 13,
-              textOverflow: TextOverflow.ellipsis,
-            ),
+          Row(
+            children: [
+              const Icon(
+                Icons.insert_drive_file,
+                color: AppColors.authThemeColor,
+                size: 18,
+              ),
+              const SizedBox(width: 6),
+              Expanded(
+                child: textWidget(
+                  text: doc.fileName,
+                  fontSize: 12,
+                  textOverflow: TextOverflow.ellipsis,
+                ),
+              ),
+              GestureDetector(
+                onTap: () => onRemove(index),
+                child: const Icon(Icons.close, size: 16, color: Colors.red),
+              ),
+            ],
           ),
+
+          const Spacer(),
+
           GestureDetector(
-            onTap: onDelete,
-            child: const Icon(Icons.close, size: 18, color: Colors.red),
+            onTap: () async {
+              final date = await showDatePicker(
+                context: context,
+                firstDate: DateTime.now(),
+                lastDate: DateTime(2100),
+                initialDate: doc.expiryDate ?? DateTime.now(),
+              );
+              if (date != null) {
+                onPickExpiry(index, date);
+              }
+            },
+            child: textWidget(
+              text: hasExpiry
+                  ? 'Expiry: ${doc.expiryDate!.toIso8601String().split("T").first}'
+                  : 'Select Expiry Date *',
+              fontSize: 11,
+              color: hasExpiry ? Colors.green : Colors.red,
+            ),
           ),
         ],
       ),

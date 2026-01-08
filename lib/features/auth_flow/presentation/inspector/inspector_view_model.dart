@@ -2,12 +2,15 @@ import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 import 'package:inspect_connect/core/basecomponents/base_view_model.dart';
+import 'package:inspect_connect/core/commondomain/entities/based_api_result/api_result_state.dart';
 import 'package:inspect_connect/core/di/app_component/app_component.dart';
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
 import 'package:inspect_connect/core/utils/constants/app_strings.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/features/auth_flow/data/datasources/local_datasources/inspector_local_data_source.dart';
+import 'package:inspect_connect/features/auth_flow/data/models/ui_icc_document.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/certificate_type_entity.dart';
+import 'package:inspect_connect/features/auth_flow/domain/entities/icc_document_entity.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/inspector_documents_type.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/inspector_sign_up_entity.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/jurisdiction_entity.dart';
@@ -20,6 +23,9 @@ import 'package:inspect_connect/features/auth_flow/presentation/inspector/provid
 import 'package:flutter/material.dart';
 import 'package:country_state_city/country_state_city.dart' as csc;
 import 'package:inspect_connect/features/auth_flow/utils/text_editor_controller.dart';
+import 'package:inspect_connect/features/client_flow/data/models/upload_image_model.dart';
+import 'package:inspect_connect/features/client_flow/domain/entities/upload_image_dto.dart';
+import 'package:inspect_connect/features/client_flow/domain/usecases/upload_image_usecase.dart';
 
 class InspectorViewModelProvider extends BaseViewModel {
   Future<void> init() async {
@@ -67,15 +73,80 @@ class InspectorViewModelProvider extends BaseViewModel {
   String? cityError;
   String? zipError;
   String? mailingAddressError;
-  final Map<String, List<File>> iccLocalFiles = {};
+  final Map<String, List<IccDocumentLocalEntity>> iccLocalFiles = {};
   final Map<String, List<String>> iccUploadedUrls = {};
+  Map<String, String> iccExpiryDates = {};
+  Map<String, List<IccUiDocument>> iccDocsByCity = {};
+  void preloadIccDocuments(String city, List<IccDocumentLocalEntity> docs) {
+    iccDocsByCity[city] = docs.map((d) {
+      return IccUiDocument(
+        uploadedUrl: d.documentUrl,
+        expiryDate: DateTime.parse(d.expiryDate),
+      );
+    }).toList();
 
-  void addIccFile(String city, File file) {
-    iccLocalFiles.putIfAbsent(city, () => []);
-    if (iccLocalFiles[city]!.length + (iccUploadedUrls[city]?.length ?? 0) <
-        4) {
-      iccLocalFiles[city]!.add(file);
-      notifyListeners();
+    notifyListeners();
+  }
+
+  File? profileImage;
+  String? profileImageUrl;
+  File? idDocumentFile;
+  String? idDocumentUploadedUrl;
+
+  File? coiFile;
+  String? coiUploadedUrl;
+
+  List<File> referenceLetters = [];
+  List<String> referenceLettersUrls = [];
+  Future<void> addIccFile({
+    required BuildContext context,
+    required String city,
+    required File file,
+  }) async {
+    try {
+      setProcessing(true);
+
+      if (await file.length() > 2 * 1024 * 1024) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('File must be under 2 MB')),
+          );
+        }
+        return;
+      }
+
+      final uploadUseCase = locator<UploadImageUseCase>();
+
+      final result =
+          await executeParamsUseCase<
+            UploadImageResponseModel,
+            UploadImageParams
+          >(
+            useCase: uploadUseCase,
+            query: UploadImageParams(
+              filePath: UploadImageDto(filePath: file.path),
+            ),
+            launchLoader: true,
+          );
+
+      result?.when(
+        data: (response) {
+          iccDocsByCity.putIfAbsent(city, () => []);
+          iccDocsByCity[city]!.add(
+            IccUiDocument(localFile: file, uploadedUrl: response.fileUrl),
+          );
+          notifyListeners();
+        },
+        error: (e) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(e.message ?? 'Upload failed')));
+        },
+      );
+    } catch (e) {
+      log('ICC upload error: $e');
+    } finally {
+      setProcessing(false);
     }
   }
 
@@ -89,6 +160,10 @@ class InspectorViewModelProvider extends BaseViewModel {
     notifyListeners();
   }
 
+  InspectorDocumentsTypeEntity? selectedIdDocType;
+  DateTime? selectedIdDocExpiry;
+
+  DateTime? coiExpiry;
   bool _autoValidate = false;
   bool get autoValidate => _autoValidate;
 
@@ -99,7 +174,7 @@ class InspectorViewModelProvider extends BaseViewModel {
   List<JurisdictionEntity> jurisdictions = [];
   List<InspectorDocumentsTypeEntity> inspectorDocumentsType = [];
   Map<String, bool> cityRequiresIcc = {};
-  Map<String, File?> iccDocuments = {};
+  List<IccDocumentLocalEntity> iccDocuments = [];
   String? selectedCertificateTypeId;
   List<String> uploadedCertificateUrls = [];
   List<String>? selectedAgencyIds;
@@ -129,14 +204,8 @@ class InspectorViewModelProvider extends BaseViewModel {
   List<File> documents = [];
   List<String> existingDocumentUrls = [];
 
-  File? profileImage;
-  File? profileImageUrl;
-
   File? idLicense;
   File? idLicenseUrl;
-
-  List<File> referenceLetters = [];
-  List<File> referenceLettersUrls = [];
 
   bool agreedToTerms = false;
   bool confirmTruth = false;
@@ -256,6 +325,11 @@ class InspectorViewModelProvider extends BaseViewModel {
     notifyListeners();
   }
 
+  void removeCoi() {
+    coiUploadedUrl = null;
+    notifyListeners();
+  }
+
   void removeReferenceLetterImage(int i) {
     referenceLetters.removeAt(i);
     notifyListeners();
@@ -339,7 +413,11 @@ class InspectorViewModelProvider extends BaseViewModel {
     BuildContext context,
     String type, {
     bool allowOnlyImages = false,
-  }) => additionalStepService.pickFile(context, type);
+  }) => additionalStepService.pickFile(
+    context,
+    type,
+    allowOnlyImages: allowOnlyImages,
+  );
 
   Future<void> savePersonalStep() => personalStepService.savePersonalStep();
 
@@ -375,6 +453,8 @@ class InspectorViewModelProvider extends BaseViewModel {
     state: state,
     city: city,
     serviceAreas: serviceAreas,
+    zipCode: zipCode,
+    mailingAddress: mailingAddress,
   );
 
   Future<void> saveAdditionalStep({
@@ -387,6 +467,7 @@ class InspectorViewModelProvider extends BaseViewModel {
   }) => additionalStepService.saveAdditionalStep(
     profileImageUrlOrPath: profileImageUrlOrPath,
     idLicenseUrlOrPath: idLicenseUrlOrPath,
+
     workHistoryDescription: workHistoryDescription,
     referenceDocs: referenceDocs,
     agreed: agreed,
@@ -449,12 +530,93 @@ class InspectorViewModelProvider extends BaseViewModel {
     cityZipCodes.remove(city);
   }
 
+  void hydrateIccFromLocalDb(List<dynamic>? storedDocs) {
+    if (storedDocs == null || storedDocs.isEmpty) return;
+
+    iccDocsByCity.clear();
+
+    for (final e in storedDocs) {
+      late final String city;
+      late final String url;
+      late final DateTime expiry;
+
+      if (e is Map<String, dynamic>) {
+        city = e['serviceCity'];
+        url = e['documentUrl'];
+        expiry = DateTime.parse(e['expiryDate']);
+      } else if (e is IccDocumentLocalEntity) {
+        city = e.serviceCity;
+        url = e.documentUrl;
+        expiry = DateTime.parse(e.expiryDate);
+      } else {
+        continue;
+      }
+
+      iccDocsByCity.putIfAbsent(city, () => []);
+      iccDocsByCity[city]!.add(
+        IccUiDocument(
+          // : url.split('/').last,
+          uploadedUrl: url,
+          expiryDate: expiry,
+          // isUploaded: true,
+        ),
+      );
+    }
+
+    notify();
+  }
+
+  void recalculateCityIccRequirement() {
+    cityRequiresIcc.clear();
+
+    for (final city in selectedCityNames) {
+      cityRequiresIcc[city] = inspectorServiceAreaService.isJurisdictionCity(
+        city,
+      );
+    }
+  }
+
+  List<IccDocumentLocalEntity> iccDocsForCity(String city) {
+    return iccDocuments.where((d) => d.serviceCity == city).toList();
+  }
+
   bool validateIccDocuments() {
-    for (final entry in cityRequiresIcc.entries) {
-      if (entry.value == true && iccDocuments[entry.key] == null) {
-        return false;
+    for (final city in selectedCityNames) {
+      if (cityRequiresIcc[city] == true) {
+        final docs = iccDocuments.where((d) => d.serviceCity == city).toList();
+
+        if (docs.isEmpty) {
+          cityError = 'ICC document required for $city';
+          notify();
+          return false;
+        }
+
+        for (final d in docs) {
+          if (d.expiryDate == '') {
+            cityError = 'Expiry date required for ICC in $city';
+            notify();
+            return false;
+          }
+        }
       }
     }
     return true;
+  }
+
+  Future<void> pickIccExpiryDate(
+    BuildContext context,
+    IccDocumentLocalEntity doc,
+  ) async {
+    final picked = await showDatePicker(
+      context: context,
+      firstDate: DateTime.now(),
+      lastDate: DateTime.now().add(const Duration(days: 3650)),
+      initialDate: DateTime.now(),
+    );
+
+    if (picked != null) {
+      doc.expiryDate = picked.toIso8601String().split('T').first;
+      notify();
+    }
   }
 }

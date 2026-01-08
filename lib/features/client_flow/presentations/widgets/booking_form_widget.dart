@@ -278,7 +278,6 @@ class _BookingFormWidgetState extends State<BookingFormWidget> {
           ? prov.provInspectionType
           : null,
 
-      // prov.provInspectionType,
       items: items.map((subType) {
         return DropdownMenuItem<CertificateSubTypeEntity>(
           value: subType,

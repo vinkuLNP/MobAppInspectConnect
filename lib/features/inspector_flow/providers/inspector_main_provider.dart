@@ -13,13 +13,16 @@ import 'package:inspect_connect/features/auth_flow/domain/entities/auth_user.dar
 import 'package:inspect_connect/features/auth_flow/domain/entities/user_detail.dart';
 import 'package:inspect_connect/features/auth_flow/domain/usecases/get_user__usercase.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/user_provider.dart';
+import 'package:inspect_connect/features/inspector_flow/data/models/payment_intent_response_model.dart';
 import 'package:inspect_connect/features/inspector_flow/data/models/subscription_model.dart';
 import 'package:inspect_connect/core/utils/constants/app_constants.dart';
 import 'package:inspect_connect/features/inspector_flow/data/models/user_subscription_model.dart';
+import 'package:inspect_connect/features/inspector_flow/domain/entities/payment_intent_dto.dart';
 import 'package:inspect_connect/features/inspector_flow/domain/entities/user_subscription_by_id.dart';
 import 'package:inspect_connect/features/inspector_flow/domain/enum/inspector_status.dart';
 import 'package:inspect_connect/features/inspector_flow/domain/usecases/get_subscription_plans_usecase.dart';
 import 'package:inspect_connect/features/inspector_flow/domain/usecases/get_user_subscription_detail_usecase.dart';
+import 'package:inspect_connect/features/inspector_flow/domain/usecases/payment_intent_usecase.dart';
 import 'package:provider/provider.dart';
 
 class InspectorDashboardProvider extends BaseViewModel {
@@ -84,7 +87,6 @@ class InspectorDashboardProvider extends BaseViewModel {
             GetUserSubscriptionDetailParams
           >(
             useCase: getSubscriptionPlansUseCase,
-
             query: GetUserSubscriptionDetailParams(
               userSubscriptionByIdDto: UserSubscriptionByIdDto(
                 planId: plan.id,
@@ -97,7 +99,7 @@ class InspectorDashboardProvider extends BaseViewModel {
       state?.when(
         data: (response) async {
           userSubscriptionModel = response;
-
+          log("resposne of subscriptionas plan----------$response");
           startPayment(context: context, plan: userSubscriptionModel!);
         },
         error: (e) {},
@@ -120,29 +122,47 @@ class InspectorDashboardProvider extends BaseViewModel {
       if (user == null || user.authToken == null) {
         throw Exception('User not found');
       }
+      log("resposne of subscriptionas plan-----createPaymentIntent called----");
 
-      /*    final intentResponse = await createPaymentIntent(
-       user.authToken!,
-       plan.amount!.toDouble(),
-       plan.id!,
-       plan.stripeSubscriptionId,
-     );
+      final intentdto = CreatePaymentIntentDto(
+        paymentType: 'subscription',
+        priceId: plan.id,
+        subscriptionId: plan.stripeSubscriptionId,
+        totalAmount: plan.amount.toDouble().toString(),
+        type: 0,
+        device: '1',
+      );
+      final getPaymentIntentUseCase = locator<GetPaymentIntentUseCase>();
+      final state =
+          await executeParamsUseCase<
+            PaymentIntentModel,
+            GetPaymentIntnetParams
+          >(
+            useCase: getPaymentIntentUseCase,
+            query: GetPaymentIntnetParams(createPaymentIntentDto: intentdto),
+            launchLoader: true,
+          );
 
+      state?.when(
+        data: (response) async {
+          final intentResponse = response;
+          log("resposne of subscriptionas plan----------$response");
+          final clientSecret = intentResponse.clientSecret;
+          if (clientSecret == "" || clientSecret.isEmpty) {
+            throw Exception('Missing client secret from API');
+          }
 
-     final clientSecret = intentResponse['body']?['clientSecret'];
-     if (clientSecret == null) {
-       throw Exception('Missing client secret from API');
-     }
+          await Stripe.instance.confirmPayment(
+            paymentIntentClientSecret: clientSecret,
+            data: const PaymentMethodParams.card(
+              paymentMethodData: PaymentMethodData(),
+            ),
+          );
 
-
-     await Stripe.instance.confirmPayment(
-       paymentIntentClientSecret: clientSecret,
-       data: const PaymentMethodParams.card(
-         paymentMethodData: PaymentMethodData(),
-       ),
-     );
-*/
-      if (context.mounted) showPaymentSuccessDialog(context);
+          if (context.mounted) showPaymentSuccessDialog(context);
+        },
+        error: (e) {},
+      );
     } on StripeException catch (e) {
       log('⚠️ StripeException: $e');
       if (context.mounted) {
@@ -176,23 +196,37 @@ class InspectorDashboardProvider extends BaseViewModel {
     String subscriptionId,
   ) async {
     try {
-      final url = Uri.parse('$devBaseUrl/payments/paymentIntent');
+      final url = Uri.parse('${devBaseUrl}payments/paymentIntent');
+      final requestBody = {
+        'totalAmount': amount.toString(),
+        'priceId': priceId,
+        'paymentType': 'subscription',
+        'device': '1',
+        'subscriptionId': subscriptionId,
+        'type': '0',
+      };
+
+      log('🟦 PaymentIntent $url REQUEST BODY => ${jsonEncode(requestBody)}');
       final response = await http.post(
         url,
-        headers: {'Authorization': 'Bearer $token'},
-        body: {
-          'totalAmount': amount.toString(),
-          'priceId': priceId,
-          'paymentType': 'subscription',
-          'device': '1',
-          'subscriptionId': subscriptionId,
-          'type': '0',
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
         },
+        body: jsonEncode(requestBody),
       );
 
-      final decoded = json.decode(response.body);
+      log('🔹 PaymentIntent statusCode: ${response.statusCode}');
+      log('🔹 PaymentIntent raw body: ${response.body}');
+
+      final decoded = jsonDecode(response.body);
+
+      log('🔹 PaymentIntent decoded response: $decoded');
+
       return decoded;
-    } catch (e) {
+    } catch (e, stack) {
+      log('❌ PaymentIntent error: $e');
+      log('❌ StackTrace: $stack');
       rethrow;
     }
   }

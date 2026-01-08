@@ -271,7 +271,7 @@
     },
     {
       "id": "3:9109420249064471506",
-      "lastPropertyId": "30:2827095630864152251",
+      "lastPropertyId": "34:340893041376304159",
       "name": "InspectorSignUpLocalEntity",
       "properties": [
         {
@@ -423,6 +423,26 @@
         {
           "id": "30:2827095630864152251",
           "name": "uploadedCoiDocument",
+          "type": 9
+        },
+        {
+          "id": "31:879714024604332109",
+          "name": "coiExpiryDate",
+          "type": 9
+        },
+        {
+          "id": "32:281102519960584207",
+          "name": "documentExpiryDate",
+          "type": 9
+        },
+        {
+          "id": "33:281380528162074395",
+          "name": "documentTypeId",
+          "type": 9
+        },
+        {
+          "id": "34:340893041376304159",
+          "name": "privateTempId",
           "type": 9
         }
       ],

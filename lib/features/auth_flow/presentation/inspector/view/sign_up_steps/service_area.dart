@@ -1,5 +1,4 @@
 import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:country_state_city/country_state_city.dart' as csc;
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
@@ -262,17 +261,17 @@ class _ServiceAreaStepState extends State<ServiceAreaStep> {
                         ),
                         const SizedBox(height: 6),
                         AppFilePickerGrid(
-                          files: vm.iccLocalFiles[city] ?? [],
-                          existingUrls: vm.iccUploadedUrls[city] ?? [],
-                          maxFiles: 4,
-                          onPick: (file) {
-                            vm.addIccFile(city, file);
-                          },
-                          onRemoveFile: (index) {
-                            vm.removeIccLocalFile(city, index);
-                          },
-                          onRemoveUrl: (index) {
-                            vm.removeIccUploadedUrl(city, index);
+                          documents: vm.iccDocsByCity[city] ?? [],
+                          onPick: (file) => vm.addIccFile(
+                            context: context,
+                            city: city,
+                            file: file,
+                          ),
+                          onRemove: (index) =>
+                              vm.iccDocsByCity[city]!.removeAt(index),
+                          onPickExpiry: (index, date) {
+                            vm.iccDocsByCity[city]![index].expiryDate = date;
+                            vm.notify();
                           },
                         ),
                       ],
