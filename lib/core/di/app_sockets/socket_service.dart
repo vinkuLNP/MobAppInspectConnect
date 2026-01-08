@@ -25,7 +25,7 @@ class SocketService {
     );
 
     final url =
-        //     "https://inspect-connect-api-auakczg0ave2bqex.westus2-01.azurewebsites.net/";
+        // "https://inspect-connect-api-auakczg0ave2bqex.westus2-01.azurewebsites.net/";
         //  devBaseUrl;
         Platform.isIOS ? "http://localhost:5002" : "http://10.0.2.2:5002";
     log("🟦 [SOCKET INIT] Connecting to: $url");

@@ -1,10 +1,14 @@
+import 'dart:io';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/utils/auto_router_setup/auto_router.dart';
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
+import 'package:inspect_connect/core/utils/constants/app_strings.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_button.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
+import 'package:inspect_connect/features/client_flow/domain/entities/booking_list_entity.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/user_provider.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 void showConfirmationDialog({
@@ -48,7 +52,7 @@ void showConfirmationDialog({
                     isBorder: true,
                     borderColor: AppColors.authThemeColor,
                     textColor: AppColors.authThemeColor,
-                    text: "Cancel",
+                    text: cancelTxt,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -74,12 +78,12 @@ void logOutUser(BuildContext context) {
   showDialog(
     context: context,
     builder: (_) => AlertDialog(
-      title: textWidget(text: 'Log Out?'),
-      content: textWidget(text: 'Are you sure you want to Log Out?'),
+      title: textWidget(text: logOutTxt),
+      content: textWidget(text: logOutMsgTxt),
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: textWidget(text: 'Cancel'),
+          child: textWidget(text: cancelTxt),
         ),
         AppButton(
           width: 120,
@@ -88,7 +92,7 @@ void logOutUser(BuildContext context) {
             if (context.mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: textWidget(text: 'Logged out', color: Colors.white),
+                  content: textWidget(text: loggedOutTxt, color: Colors.white),
                 ),
               );
               context.router.replaceAll([const OnBoardingRoute()]);
@@ -96,7 +100,7 @@ void logOutUser(BuildContext context) {
           },
           buttonBackgroundColor: Colors.redAccent,
           textColor: AppColors.backgroundColor,
-          text: 'Log Out',
+          text: logOutTxt,
         ),
       ],
     ),
@@ -124,9 +128,10 @@ void showRaiseAmountSheet({
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text(
-                  "Select Raise Amount",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                textWidget(
+                  text: slctRaiseAmtTxt,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
                 ),
 
                 const SizedBox(height: 20),
@@ -161,13 +166,11 @@ void showRaiseAmountSheet({
                                 : Colors.grey.shade400,
                           ),
                         ),
-                        child: Text(
-                          "\$${amounts[index]}",
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: isSelected ? Colors.white : Colors.black,
-                          ),
+                        child: textWidget(
+                          text: "\$${amounts[index]}",
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: isSelected ? Colors.white : Colors.black,
                         ),
                       ),
                     );
@@ -176,10 +179,11 @@ void showRaiseAmountSheet({
 
                 const SizedBox(height: 15),
 
-                const Text(
-                  "This amount will be added to the booking charge and requires client approval.",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 13, color: Colors.grey),
+                textWidget(
+                  text: slctRaiseAmtMsgTxt,
+                  alignment: TextAlign.center,
+                  fontSize: 13,
+                  color: Colors.grey,
                 ),
 
                 const SizedBox(height: 20),
@@ -187,22 +191,22 @@ void showRaiseAmountSheet({
                 Row(
                   children: [
                     Expanded(
-                      child: OutlinedButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: const Text("Cancel"),
+                      child: AppButton(
+                        onTap: () => Navigator.pop(context),
+                        text: cancelTxt,
+                        buttonBackgroundColor: AppColors.backgroundColor,
+                        borderColor: Colors.red,
+                        isBorder: true,
                       ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.authThemeColor,
-                        ),
-                        onPressed: () {
+                      child: AppButton(
+                        onTap: () {
                           Navigator.pop(context);
                           onConfirm(selectedAmount);
                         },
-                        child: const Text("Confirm & Raise"),
+                        text: cnfrmRaiseTxt,
                       ),
                     ),
                   ],
@@ -216,4 +220,61 @@ void showRaiseAmountSheet({
       );
     },
   );
+}
+
+Future<bool> validateFileSize(File file, BuildContext context) async {
+  if (await file.length() <= 2 * 1024 * 1024) return true;
+
+  if (context.mounted) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: textWidget(
+          text: fileMstBeUnder2Txt,
+          color: AppColors.backgroundColor,
+        ),
+      ),
+    );
+  }
+  return false;
+}
+
+void showError(BuildContext context, String message) {
+  if (!context.mounted) return;
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: textWidget(text: message, color: AppColors.backgroundColor),
+    ),
+  );
+}
+
+void showShowUpFeeDialog({
+  required BuildContext context,
+  required bool isApplied,
+  required VoidCallback onConfirm,
+}) {
+  showConfirmationDialog(
+    context: context,
+    icon: isApplied ? Icons.undo : Icons.attach_money,
+    confirmColor: AppColors.authThemeColor,
+    title: isApplied ? cancelFeeTxt : applyShowUpFeeTxt,
+    message: isApplied ? cnclShowUpFeeMsgTxt : applyShowUpFeeMsgTxt,
+    confirmText: isApplied ? cancelFeeTxt : applyShowUpFeeTxt,
+    onConfirm: onConfirm,
+  );
+}
+
+DateTime bookingDateTime(BookingListEntity booking) {
+  final date = DateTime.parse(booking.bookingDate);
+  final t = booking.bookingTime.trim().toUpperCase().replaceAll('.', '');
+  try {
+    DateTime time;
+    if (t.contains('AM') || t.contains('PM')) {
+      time = DateFormat('h:mm a').parse(t);
+    } else {
+      time = DateFormat('HH:mm').parse(t);
+    }
+    return DateTime(date.year, date.month, date.day, time.hour, time.minute);
+  } catch (_) {
+    return DateTime(date.year, date.month, date.day, 10, 0);
+  }
 }
