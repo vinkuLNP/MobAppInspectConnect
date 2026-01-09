@@ -41,41 +41,42 @@ class _BookingFormWidgetState extends State<BookingFormWidget> {
   void initState() {
     super.initState();
     provider = locator<BookingProvider>();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      provider.init().then((_) {
+        if (widget.isEditing && widget.initialBooking != null) {
+          final BookingDetailModel b = widget.initialBooking;
+          log(b.images.toString());
 
-    provider.init().then((_) {
-      if (widget.isEditing && widget.initialBooking != null) {
-        final BookingDetailModel b = widget.initialBooking;
-        log(b.images.toString());
-
-        provider.locationController.text = b.bookingLocation;
-        provider.location = b.bookingLocation;
-        provider.description = b.description;
-        provider.descriptionController.text = b.description;
-        provider.setDate(DateTime.parse(b.bookingDate));
-        provider.setTime(provider.parseTime(b.bookingTime));
-        log(
-          '----SOCKET----->provider.certificateSubTypes ${b.certificateSubTypes[0].name.toString()}',
-        );
-        final savedTypeId = b.certificateSubTypes[0].id;
-
-        final matched = provider.subTypes.firstWhere(
-          (e) => e.id == savedTypeId,
-          orElse: () => provider.subTypes.first,
-        );
-
-        provider.setInspectionType(matched);
-
-        if (b.images != [] && b.images.isNotEmpty) {
-          provider.uploadedUrls = List<String>.from(b.images);
-          provider.existingImageUrls = List<String>.from(b.images);
+          provider.locationController.text = b.bookingLocation;
+          provider.location = b.bookingLocation;
+          provider.description = b.description;
+          provider.descriptionController.text = b.description;
+          provider.setDate(DateTime.parse(b.bookingDate));
+          provider.setTime(provider.parseTime(b.bookingTime));
           log(
-            '--------->provider.uploadedUrls ${provider.uploadedUrls.toString()}',
+            '----SOCKET----->provider.certificateSubTypes ${b.certificateSubTypes[0].name.toString()}',
           );
-          log(
-            '--------->provider.existingImageUrls ${provider.existingImageUrls.toString()}',
+          final savedTypeId = b.certificateSubTypes[0].id;
+
+          final matched = provider.subTypes.firstWhere(
+            (e) => e.id == savedTypeId,
+            orElse: () => provider.subTypes.first,
           );
+
+          provider.setInspectionType(matched);
+
+          if (b.images != [] && b.images.isNotEmpty) {
+            provider.uploadedUrls = List<String>.from(b.images);
+            provider.existingImageUrls = List<String>.from(b.images);
+            log(
+              '--------->provider.uploadedUrls ${provider.uploadedUrls.toString()}',
+            );
+            log(
+              '--------->provider.existingImageUrls ${provider.existingImageUrls.toString()}',
+            );
+          }
         }
-      }
+      });
     });
   }
 

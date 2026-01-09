@@ -165,6 +165,14 @@ class InsepctorPersistentDataService {
         return;
       }
       saved.privateTempId = 'privatetempid';
+      saved.country = "US";
+      saved.state = "US";
+      saved.city = "US";
+      saved.zipCode = "00000";
+      saved.locationName = "Default Location";
+      saved.longitude = 0.0;
+      saved.latitude = 0.0;
+
       final useCase = locator<InspectorSignUpUseCase>();
       final params = InspectorSignUpParams(inspectorSignUpLocalEntity: saved);
 

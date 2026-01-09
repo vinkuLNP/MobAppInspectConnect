@@ -1,8 +1,6 @@
-import 'dart:convert';
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
-import 'package:http/http.dart' as http;
 import 'package:inspect_connect/core/basecomponents/base_view_model.dart';
 import 'package:inspect_connect/core/commondomain/entities/based_api_result/api_result_state.dart';
 import 'package:inspect_connect/core/di/app_component/app_component.dart';
@@ -15,7 +13,6 @@ import 'package:inspect_connect/features/auth_flow/domain/usecases/get_user__use
 import 'package:inspect_connect/features/client_flow/presentations/providers/user_provider.dart';
 import 'package:inspect_connect/features/inspector_flow/data/models/payment_intent_response_model.dart';
 import 'package:inspect_connect/features/inspector_flow/data/models/subscription_model.dart';
-import 'package:inspect_connect/core/utils/constants/app_constants.dart';
 import 'package:inspect_connect/features/inspector_flow/data/models/user_subscription_model.dart';
 import 'package:inspect_connect/features/inspector_flow/domain/entities/payment_intent_dto.dart';
 import 'package:inspect_connect/features/inspector_flow/domain/entities/user_subscription_by_id.dart';
@@ -126,7 +123,7 @@ class InspectorDashboardProvider extends BaseViewModel {
 
       final intentdto = CreatePaymentIntentDto(
         paymentType: 'subscription',
-        priceId: plan.id,
+        priceId: plan.priceId,
         subscriptionId: plan.stripeSubscriptionId,
         totalAmount: plan.amount.toDouble().toString(),
         type: 0,
@@ -186,48 +183,6 @@ class InspectorDashboardProvider extends BaseViewModel {
     } finally {
       isProcessingPayment = false;
       notifyListeners();
-    }
-  }
-
-  Future<Map<String, dynamic>> createPaymentIntent(
-    String token,
-    double amount,
-    String priceId,
-    String subscriptionId,
-  ) async {
-    try {
-      final url = Uri.parse('${devBaseUrl}payments/paymentIntent');
-      final requestBody = {
-        'totalAmount': amount.toString(),
-        'priceId': priceId,
-        'paymentType': 'subscription',
-        'device': '1',
-        'subscriptionId': subscriptionId,
-        'type': '0',
-      };
-
-      log('🟦 PaymentIntent $url REQUEST BODY => ${jsonEncode(requestBody)}');
-      final response = await http.post(
-        url,
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode(requestBody),
-      );
-
-      log('🔹 PaymentIntent statusCode: ${response.statusCode}');
-      log('🔹 PaymentIntent raw body: ${response.body}');
-
-      final decoded = jsonDecode(response.body);
-
-      log('🔹 PaymentIntent decoded response: $decoded');
-
-      return decoded;
-    } catch (e, stack) {
-      log('❌ PaymentIntent error: $e');
-      log('❌ StackTrace: $stack');
-      rethrow;
     }
   }
 

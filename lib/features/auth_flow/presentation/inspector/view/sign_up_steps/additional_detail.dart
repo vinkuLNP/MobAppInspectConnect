@@ -245,7 +245,7 @@ class _AdditionalDetailsStepState extends State<AdditionalDetailsStep> {
             ),
             const SizedBox(height: 4),
             Text(
-              isSelected ? _numericDate(date!) : 'Select expiry date',
+              isSelected ? _numericDate(date) : 'Select expiry date',
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w500,

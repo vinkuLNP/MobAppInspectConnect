@@ -1,7 +1,7 @@
 class CreatePaymentIntentDto {
   final String paymentType;
-  final String priceId;
-  final String subscriptionId;
+  final String? priceId;
+  final String? subscriptionId;
   final String totalAmount;
   final int type;
   final String device;
@@ -11,8 +11,8 @@ class CreatePaymentIntentDto {
 
   CreatePaymentIntentDto({
     required this.paymentType,
-    required this.priceId,
-    required this.subscriptionId,
+    this.priceId,
+    this.subscriptionId,
     required this.totalAmount,
     required this.type,
     required this.device,
@@ -22,8 +22,8 @@ class CreatePaymentIntentDto {
 
   Map<String, dynamic> toJson() => {
     "paymentType": paymentType,
-    "priceId": priceId,
-    "subscriptionId": subscriptionId,
+    if (priceId != null) "priceId": priceId,
+    if (subscriptionId != null) "subscriptionId": subscriptionId,
     "totalAmount": totalAmount,
     "type": type,
     "device": device,

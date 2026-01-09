@@ -2,7 +2,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/commondomain/entities/based_api_result/api_result_state.dart';
 import 'package:inspect_connect/core/di/app_component/app_component.dart';
-import 'package:inspect_connect/core/di/app_sockets/socket_service.dart';
+import 'package:inspect_connect/core/di/services/app_sockets/socket_service.dart';
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
 import 'package:inspect_connect/core/utils/constants/app_constants.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
@@ -104,7 +104,7 @@ class BookingActionsService {
             bookingId: response.body.id,
             inspectorIds: inspectorIds,
           );
-          // clearBookingData();
+          clearBookingData();
         },
         error: (e) {
           if (context.mounted) {
@@ -500,6 +500,7 @@ class BookingActionsService {
     try {
       provider.isActionProcessing = true;
       provider.notify();
+
       await updateBookingStatus(
         context: context,
         bookingId: bookingId,

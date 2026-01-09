@@ -29,8 +29,6 @@ import 'package:inspect_connect/features/inspector_flow/providers/inspector_main
 import 'package:provider/provider.dart';
 
 class ClientViewModelProvider extends BaseViewModel {
-  void init() {}
-
   bool _obscure = true;
   bool get obscure => _obscure;
   bool _autoValidate = false;

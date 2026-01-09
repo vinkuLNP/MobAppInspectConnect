@@ -103,7 +103,7 @@ class InspectorServiceAreaService {
     provider.selectedCityNames.remove(city);
     provider.selectedCities.remove(city);
 
-    provider.iccDocuments.remove(city);
+    provider.iccDocuments.removeWhere((doc) => doc.serviceCity == city);
 
     provider.removeCityZip(city);
 

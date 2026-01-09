@@ -4,13 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 @RoutePage()
-class ClientAuthAutoWrapperView extends StatelessWidget implements AutoRouteWrapper {
+class ClientAuthAutoWrapperView extends StatelessWidget
+    implements AutoRouteWrapper {
   const ClientAuthAutoWrapperView({super.key});
 
   @override
   Widget wrappedRoute(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => ClientViewModelProvider()..init(),
+      create: (_) => ClientViewModelProvider(),
       child: this,
     );
   }
