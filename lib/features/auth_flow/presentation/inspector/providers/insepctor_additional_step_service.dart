@@ -6,8 +6,10 @@ import 'package:image_picker/image_picker.dart';
 import 'package:inspect_connect/core/commondomain/entities/based_api_result/api_result_state.dart';
 import 'package:inspect_connect/core/di/app_component/app_component.dart';
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
+import 'package:inspect_connect/core/utils/constants/app_strings.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/features/auth_flow/data/models/inspector_document_types_model.dart';
+import 'package:inspect_connect/features/auth_flow/data/models/user_document_data_model.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/inspector_documents_type.dart';
 import 'package:inspect_connect/features/auth_flow/domain/usecases/document_type_usecase.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/inspector/inspector_view_model.dart';
@@ -36,12 +38,12 @@ class InsepctorAdditionalStepService {
         if (picked == null) return;
         log("-3--profileImage------>${provider.profileImage.toString()}");
         final file = File(picked.path);
-        if (await file.length() > 2 * 1024 * 1024) {
+        if (await file.length() > maxFileSizeInBytes) {
           if (context.mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: textWidget(
-                  text: 'File must be under 2 MB',
+                  text: fileMstBeUnder2Txt,
                   color: AppColors.backgroundColor,
                 ),
               ),
@@ -55,7 +57,7 @@ class InsepctorAdditionalStepService {
         final result = await provider
             .executeParamsUseCase<UploadImageResponseModel, UploadImageParams>(
               useCase: uploadImageUseCase,
-              query: UploadImageParams(filePath: uploadImage),
+              query: UploadImageParams(uploadImageDto: uploadImage),
               launchLoader: true,
             );
         log("--5-profileImage------>${provider.profileImage.toString()}");
@@ -88,12 +90,12 @@ class InsepctorAdditionalStepService {
         );
         if (result == null && result!.files.single.path == null) return;
         final file = File(result.files.single.path.toString());
-        if (await file.length() > 2 * 1024 * 1024) {
+        if (await file.length() > maxFileSizeInBytes) {
           if (context.mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: textWidget(
-                  text: 'File must be under 2 MB',
+                  text: fileMstBeUnder2Txt,
                   color: AppColors.backgroundColor,
                 ),
               ),
@@ -101,28 +103,44 @@ class InsepctorAdditionalStepService {
           }
           return;
         }
-        final uploadImage = UploadImageDto(filePath: file.path);
+        late final UploadImageDto uploadImage;
+        if (type == 'ref') {
+          uploadImage = UploadImageDto(filePath: file.path);
+        } else {
+          uploadImage = UploadImageDto(
+            filePath: file.path,
+            fileType: 'sensitive',
+            privateTempId: await provider.localDs.getPrivateTempId(),
+          );
+        }
         final uploadImageUseCase = locator<UploadImageUseCase>();
         final responseResult = await provider
             .executeParamsUseCase<UploadImageResponseModel, UploadImageParams>(
               useCase: uploadImageUseCase,
-              query: UploadImageParams(filePath: uploadImage),
+              query: UploadImageParams(uploadImageDto: uploadImage),
               launchLoader: true,
             );
 
         responseResult?.when(
           data: (response) {
+            final fileName = file.path.split('/').last;
             if (type == 'id') {
-              // provider.idLicense = file;
-              // provider.idLicenseUrl = File(response.fileUrl);
               provider.idDocumentFile = file;
-              provider.idDocumentUploadedUrl = response.fileUrl;
+              provider.idDocumentUploadedUrl = UserDocumentDataModel(
+                documentUrl: response.fileUrl,
+                fileName: fileName,
+              );
+
+              //  response.fileUrl;
             } else if (type == 'ref') {
               provider.referenceLetters.add(file);
               provider.referenceLettersUrls.add(response.fileUrl);
             } else if (type == 'coi') {
               provider.coiFile = file;
-              provider.coiUploadedUrl = response.fileUrl;
+              provider.coiUploadedUrl = UserDocumentDataModel(
+                documentUrl: response.fileUrl,
+                fileName: fileName,
+              );
             }
             provider.notify();
           },
@@ -157,8 +175,9 @@ class InsepctorAdditionalStepService {
     log(provider.idDocumentUploadedUrl.toString());
     await provider.localDs.updateFields({
       if (profileImageUrlOrPath != null) 'profileImage': profileImageUrlOrPath,
-      if (idLicenseUrlOrPath != null)
-        'uploadedIdOrLicenseDocument': idLicenseUrlOrPath,
+
+      // if (idLicenseUrlOrPath != null)
+      //   'uploadedIdOrLicenseDocument': idLicenseUrlOrPath,
       "documentTypeId": provider.selectedIdDocType?.id,
       "documentExpiryDate": provider.selectedIdDocExpiry?.toIso8601String(),
       if (referenceDocs != null) 'referenceDocuments': referenceDocs,

@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/commondomain/entities/based_api_result/api_result_state.dart';
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
 import 'package:inspect_connect/core/utils/constants/app_constants.dart';
+import 'package:inspect_connect/core/utils/constants/app_strings.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
+import 'package:inspect_connect/features/client_flow/data/models/booking_model.dart';
 import 'package:inspect_connect/features/client_flow/domain/entities/booking_list_entity.dart';
 import 'package:inspect_connect/features/client_flow/domain/entities/certificate_sub_type_entity.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/booking_provider.dart';
@@ -95,31 +97,56 @@ class BookingFiltersService {
   bool validate({required BuildContext cntx}) {
     if (provider.provSelectedTime == null) {
       ScaffoldMessenger.of(cntx).showSnackBar(
-        SnackBar(content: textWidget(text: 'Please select a time', color: AppColors.backgroundColor,)),
+        SnackBar(
+          content: textWidget(
+            text: pleaseSelectATime,
+            color: AppColors.backgroundColor,
+          ),
+        ),
       );
       return false;
     }
     if (provider.provInspectionType == null) {
       ScaffoldMessenger.of(cntx).showSnackBar(
-        SnackBar(content: textWidget(text: 'Please select an inspection type', color: AppColors.backgroundColor,)),
+        SnackBar(
+          content: textWidget(
+            text: pleaseSelectAnInspectionType,
+            color: AppColors.backgroundColor,
+          ),
+        ),
       );
       return false;
     }
     if (provider.location == null) {
       ScaffoldMessenger.of(cntx).showSnackBar(
-        SnackBar(content: textWidget(text: 'Please select a location', color: AppColors.backgroundColor,)),
+        SnackBar(
+          content: textWidget(
+            text: pleaseSelectALocation,
+            color: AppColors.backgroundColor,
+          ),
+        ),
       );
       return false;
     }
     if (provider.description == null) {
       ScaffoldMessenger.of(cntx).showSnackBar(
-        SnackBar(content: textWidget(text: 'Please enter a description', color: AppColors.backgroundColor,)),
+        SnackBar(
+          content: textWidget(
+            text: pleaseEnterADescription,
+            color: AppColors.backgroundColor,
+          ),
+        ),
       );
       return false;
     }
     if (provider.uploadedUrls.isEmpty) {
       ScaffoldMessenger.of(cntx).showSnackBar(
-        SnackBar(content: textWidget(text: 'Please add at least one image', color: AppColors.backgroundColor,)),
+        SnackBar(
+          content: textWidget(
+            text: pleaseAddAtLeastOneImage,
+            color: AppColors.backgroundColor,
+          ),
+        ),
       );
       return false;
     }
@@ -127,7 +154,8 @@ class BookingFiltersService {
       ScaffoldMessenger.of(cntx).showSnackBar(
         SnackBar(
           content: textWidget(
-            text: 'You must agree to the policies before continuing.', color: AppColors.backgroundColor,
+            text: pleaseAgreeToPolicies,
+            color: AppColors.backgroundColor,
           ),
         ),
       );
@@ -172,7 +200,7 @@ class BookingFiltersService {
       );
 
       final state = await provider
-          .executeParamsUseCase<List<BookingListEntity>, FetchBookingsParams>(
+          .executeParamsUseCase<List<BookingData>, FetchBookingsParams>(
             useCase: fetchBookingUsecase,
             query: params,
             launchLoader: false,
@@ -193,8 +221,7 @@ class BookingFiltersService {
                 booking.status == bookingStatusStarted;
           }
 
-          provider.timerService.ensureGlobalTimerRunning
-              .call(); 
+          provider.timerService.ensureGlobalTimerRunning.call();
           if (response.length < provider.perPageLimit) {
             provider.hasMoreBookings = false;
           } else {
@@ -256,7 +283,7 @@ class BookingFiltersService {
   }
 
   Future<void> filterByStatus(String status) async {
-    if (provider.status == "status") return;
+    if (provider.status == status) return;
     provider.status = status;
     provider.currentPage = 1;
     try {

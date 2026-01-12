@@ -6,8 +6,11 @@ import 'package:inspect_connect/core/di/app_component/app_component.dart';
 import 'package:inspect_connect/core/utils/constants/app_keywords.dart';
 import 'package:inspect_connect/core/utils/constants/app_strings.dart';
 import 'package:inspect_connect/features/auth_flow/data/models/jurisdiction_data_model.dart';
+import 'package:inspect_connect/features/auth_flow/data/models/settings_model.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/jurisdiction_entity.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/service_area_entity.dart';
+import 'package:inspect_connect/features/auth_flow/domain/entities/settings_entity.dart';
+import 'package:inspect_connect/features/auth_flow/domain/usecases/get_max_number_of_cities_usecase.dart';
 import 'package:inspect_connect/features/auth_flow/domain/usecases/jurisdiction_usecase.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/inspector/inspector_view_model.dart';
 import 'package:country_state_city/country_state_city.dart' as csc;
@@ -128,8 +131,15 @@ class InspectorServiceAreaService {
     provider.cityError = provider.selectedCities.isEmpty
         ? selectCityError
         : null;
+    provider.iccError = null;
+    for (final city in provider.selectedCities) {
+      final error = validateIccForCity(city);
+      if (error != null) {
+        provider.iccError = error;
+        break;
+      }
+    }
 
-    provider.zipError = validateZip(inspZipController.text);
     provider.mailingAddressError = validateAddress(
       inspMailingAddressController.text,
     );
@@ -139,8 +149,27 @@ class InspectorServiceAreaService {
     return provider.countryError == null &&
         provider.stateError == null &&
         provider.cityError == null &&
-        provider.zipError == null &&
+        provider.iccError == null &&
         provider.mailingAddressError == null;
+  }
+
+  String? validateIccForCity(String city) {
+    final requiresIcc = provider.cityRequiresIcc[city] == true;
+    if (!requiresIcc) return null;
+
+    final docs = provider.iccDocsByCity[city];
+
+    if (docs == null || docs.isEmpty) {
+      return "ICC document required for $city";
+    }
+
+    for (final doc in docs) {
+      if (doc.expiryDate == null) {
+        return "Expiry date required for ICC document ($city)";
+      }
+    }
+
+    return null;
   }
 
   String? validateAddress(String? value) {
@@ -283,13 +312,15 @@ class InspectorServiceAreaService {
       }).toList();
     }
 
-    fieldsToUpdate['iccDocuments'] = provider.iccDocsByCity.entries.expand((
+    fieldsToUpdate['iccDocument'] = provider.iccDocsByCity.entries.expand((
       entry,
     ) {
       final city = entry.key;
       return entry.value.map((doc) {
         return {
           'serviceCity': city,
+          'id': doc.documentId,
+          'fileName': doc.fileName,
           'documentUrl': doc.uploadedUrl,
           'expiryDate': doc.expiryDate!.toIso8601String(),
         };
@@ -328,6 +359,39 @@ class InspectorServiceAreaService {
 
           provider.jurisdictions = modelList;
           log(provider.jurisdictions.length.toString());
+          provider.notify();
+        },
+        error: (e) {
+          log("Error fetching certificate types: $e");
+        },
+      );
+    } catch (e) {
+      log("Exception in fetchCertificateTypes: $e");
+    } finally {
+      provider.setProcessing(false);
+    }
+  }
+
+  Future<void> fetchMaxNumberOfCities() async {
+    try {
+      provider.setProcessing(true);
+
+      final getSubTypesUseCase = locator<GetSettingsUseCase>();
+
+      final state = await provider
+          .executeParamsUseCase<SettingEntity, SettingsParams>(
+            useCase: getSubTypesUseCase,
+            launchLoader: true,
+            query: SettingsParams(type: 5.toString()),
+          );
+
+      state?.when(
+        data: (response) {
+          final modelList = SettingsDataModel.fromEntity(response);
+          provider.setting = modelList;
+          log(provider.setting!.toString());
+          provider.maxCitiesAllowed = modelList.maxCities;
+
           provider.notify();
         },
         error: (e) {

@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:inspect_connect/core/utils/constants/app_strings.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/inspector_documents_type.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/inspector/widgets/stepper_header.dart';
 import 'package:inspect_connect/features/auth_flow/utils/text_editor_controller.dart';
@@ -45,11 +46,11 @@ class _AdditionalDetailsStepState extends State<AdditionalDetailsStep> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        const SectionTitle('Additional Details'),
+                        const SectionTitle(additionalDetails),
                         const SizedBox(height: 8),
 
                         _section(
-                          title: 'Profile Image(Optional)',
+                          title: profileImageOptional,
                           child: _imageUploader(
                             context: context,
                             files: prov.profileImageUrl != null
@@ -66,7 +67,7 @@ class _AdditionalDetailsStepState extends State<AdditionalDetailsStep> {
                           ),
                         ),
                         _section(
-                          title: 'Upload ID / License',
+                          title: uploadIdLicense,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -88,7 +89,7 @@ class _AdditionalDetailsStepState extends State<AdditionalDetailsStep> {
 
                               expiryPicker(
                                 context,
-                                label: 'ID / License Expiry Date',
+                                label: idLicenseExpiryDate,
                                 date: prov.selectedIdDocExpiry,
                                 onPick: (date) {
                                   prov.selectedIdDocExpiry = date;
@@ -99,14 +100,19 @@ class _AdditionalDetailsStepState extends State<AdditionalDetailsStep> {
                           ),
                         ),
                         _section(
-                          title: 'Upload COI Document',
+                          title: uploadCoiDocument,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               _imageUploader(
                                 context: context,
                                 files: prov.coiUploadedUrl != null
-                                    ? [File(prov.coiUploadedUrl!)]
+                                    ? [
+                                        File(
+                                          prov.coiUploadedUrl!.documentUrl
+                                              .toString(),
+                                        ),
+                                      ]
                                     : [],
                                 maxFiles: 1,
                                 onAdd: () => prov.pickFile(context, 'coi'),
@@ -117,7 +123,7 @@ class _AdditionalDetailsStepState extends State<AdditionalDetailsStep> {
 
                               expiryPicker(
                                 context,
-                                label: 'COI Document Expiry Date',
+                                label: coiDocumentExpiryDate,
                                 date: prov.coiExpiry,
                                 onPick: (date) {
                                   prov.coiExpiry = date;
@@ -129,7 +135,7 @@ class _AdditionalDetailsStepState extends State<AdditionalDetailsStep> {
                         ),
 
                         _section(
-                          title: 'Upload Reference Letters(Optional)',
+                          title: uploadReferenceLetters,
                           child: _imageUploader(
                             context: context,
                             files: prov.referenceLetters,
@@ -144,9 +150,9 @@ class _AdditionalDetailsStepState extends State<AdditionalDetailsStep> {
 
                         AppInputField(
                           controller: inspWorkHistoryController,
-                          label: 'Work History Description',
+                          label: workHistoryDescription,
                           maxLines: 4,
-                          hint: 'Enter work experience details...',
+                          hint: workHistoryHint,
                         ),
 
                         CheckboxListTile(
@@ -160,7 +166,7 @@ class _AdditionalDetailsStepState extends State<AdditionalDetailsStep> {
                           dense: true,
                           controlAffinity: ListTileControlAffinity.leading,
                           title: textWidget(
-                            text: 'I agree to the Terms and Conditions.',
+                            text: agreeToTerms,
                             fontSize: 12,
                             color:
                                 prov.showValidationError && !prov.agreedToTerms
@@ -179,7 +185,7 @@ class _AdditionalDetailsStepState extends State<AdditionalDetailsStep> {
                           contentPadding: EdgeInsets.zero,
                           controlAffinity: ListTileControlAffinity.leading,
                           title: textWidget(
-                            text: 'I confirm all information is truthful.',
+                            text: informationTruthful,
                             fontSize: 12,
                             color:
                                 prov.showValidationError && !prov.confirmTruth
@@ -213,14 +219,13 @@ class _AdditionalDetailsStepState extends State<AdditionalDetailsStep> {
       onTap: () async {
         final picked = await showDatePicker(
           context: context,
-          initialDate: date ?? DateTime.now(),
-          firstDate: DateTime.now(),
+          initialDate: date ?? DateTime.now().add(Duration(days: 30)),
+          firstDate: DateTime.now().add(Duration(days: 30)),
           lastDate: DateTime(2100),
         );
 
         if (picked != null) {
           onPick(picked);
-          // onPick(DateTime(picked.year, picked.month, 1));
         }
       },
       child: Container(
@@ -245,7 +250,7 @@ class _AdditionalDetailsStepState extends State<AdditionalDetailsStep> {
             ),
             const SizedBox(height: 4),
             Text(
-              isSelected ? _numericDate(date) : 'Select expiry date',
+              isSelected ? _numericDate(date) : selectExpiryDate,
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w500,
@@ -283,7 +288,7 @@ class _AdditionalDetailsStepState extends State<AdditionalDetailsStep> {
   Widget _buildImageWidget(File file) {
     final path = file.path;
 
-    if (path.startsWith('http://') || path.startsWith('https://')) {
+    if (path.startsWith(httpProtocol) || path.startsWith(httpsProtocol)) {
       return Image.network(
         path,
         fit: BoxFit.cover,
@@ -313,7 +318,7 @@ class _AdditionalDetailsStepState extends State<AdditionalDetailsStep> {
       initialValue: prov.selectedIdDocType,
       isExpanded: true,
       decoration: InputDecoration(
-        labelText: 'Document Type',
+        labelText: documentType,
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 12,
           vertical: 14,
@@ -338,7 +343,7 @@ class _AdditionalDetailsStepState extends State<AdditionalDetailsStep> {
         prov.selectedIdDocType = val;
         prov.notify();
       },
-      validator: (val) => val == null ? 'Please select document type' : null,
+      validator: (val) => val == null ? pleaseSelectDocumentType : null,
     );
   }
 
@@ -369,9 +374,7 @@ class _AdditionalDetailsStepState extends State<AdditionalDetailsStep> {
               const Icon(Icons.add_a_photo, color: Colors.grey, size: 30),
               const SizedBox(height: 8),
               textWidget(
-                text: allowOnlyImages
-                    ? "Tap to upload image"
-                    : "Tap to upload file (image or PDF)",
+                text: allowOnlyImages ? tapToUploadImage : tapToUploadFile,
                 color: Colors.grey,
                 fontSize: 12,
               ),
@@ -388,7 +391,7 @@ class _AdditionalDetailsStepState extends State<AdditionalDetailsStep> {
     final rowCount = (itemCount / crossAxisCount).ceil();
 
     return SizedBox(
-      height: rowCount * (itemHeight + spacing + 10),
+      height: rowCount * (itemHeight + spacing + 20),
       child: GridView.builder(
         padding: EdgeInsets.zero,
         shrinkWrap: true,
@@ -404,14 +407,7 @@ class _AdditionalDetailsStepState extends State<AdditionalDetailsStep> {
           if (i < files.length) {
             final file = files[i];
             final ext = file.path.split('.').last.toLowerCase();
-            final isImage = [
-              'jpg',
-              'jpeg',
-              'png',
-              'heic',
-              'gif',
-              'bmp',
-            ].contains(ext);
+            final isImage = imageExtensions.contains(ext);
 
             return ClipRRect(
               borderRadius: BorderRadius.circular(12),

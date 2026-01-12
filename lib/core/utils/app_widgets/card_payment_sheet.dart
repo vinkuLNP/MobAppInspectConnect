@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:inspect_connect/core/di/services/payment_services/payment_purpose.dart';
 import 'package:inspect_connect/core/di/services/payment_services/payment_request.dart';
 import 'package:inspect_connect/core/utils/app_widgets/card_widget.dart';
 import 'package:inspect_connect/core/utils/helpers/custom_exceptions/payment_cancelled_exception.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/wallet_provider.dart';
 import 'package:inspect_connect/features/client_flow/presentations/widgets/payment_success_widget.dart';
+import 'package:inspect_connect/features/inspector_flow/providers/inspector_main_provider.dart';
+import 'package:provider/provider.dart';
 
 Future<void> showCardPaymentSheet({
   required BuildContext context,
@@ -46,8 +49,12 @@ Future<void> showCardPaymentSheet({
             barrierDismissible: false,
             builder: (_) => const PaymentSuccessDialog(),
           );
-
-          provider.refreshAll(context);
+          if (request.purpose == PaymentPurpose.subscription) {
+            final provider = context.read<InspectorDashboardProvider>();
+            await provider.initializeUserState();
+          } else {
+            provider.refreshAll(context);
+          }
         } on PaymentCancelledException {
           if (context.mounted) {
             ScaffoldMessenger.of(context).showSnackBar(

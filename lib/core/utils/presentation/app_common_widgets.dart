@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/utils/auto_router_setup/auto_router.dart';
@@ -223,7 +224,7 @@ void showRaiseAmountSheet({
 }
 
 Future<bool> validateFileSize(File file, BuildContext context) async {
-  if (await file.length() <= 2 * 1024 * 1024) return true;
+  if (await file.length() <= maxFileSizeInBytes) return true;
 
   if (context.mounted) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -287,4 +288,18 @@ void showSnackBar(BuildContext context, {required String message}) {
       content: textWidget(text: message, color: AppColors.backgroundColor),
     ),
   );
+}
+
+String generatePrivateTempId({int length = 20}) {
+  const alphanumeric =
+      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+  final random = Random();
+  final buffer = StringBuffer();
+
+  for (int i = 0; i < length; i++) {
+    buffer.write(alphanumeric[random.nextInt(alphanumeric.length)]);
+  }
+
+  return buffer.toString();
 }

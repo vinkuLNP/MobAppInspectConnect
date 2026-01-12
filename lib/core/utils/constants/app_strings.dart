@@ -38,13 +38,15 @@ const String workDoneTxt = 'Work Done';
 const String cancelFeeTxt = '$cancelTxt Fee';
 const String applyShowUpFeeTxt = "Apply Show-Up Fee";
 const String logOutTxt = 'Log Out?';
+const String logOutTitle = 'Log Out';
+
 const String loggedOutTxt = 'Logged Out!';
 const String logOutMsgTxt = 'Are you sure you want to Log Out?';
 const String slctRaiseAmtTxt = "Select Raise Amount";
 const String slctRaiseAmtMsgTxt =
     "This amount will be added to the booking charge and requires client approval.";
 const String cnfrmRaiseTxt = "Confirm & Raise";
-const String fileMstBeUnder2Txt = 'File must be under 2 MB';
+const String fileMstBeUnder2Txt = 'File must be under 4 MB';
 const String cnclShowUpFeeMsgTxt =
     "Do you want to cancel the applied Show-Up Fee?";
 const String applyShowUpFeeMsgTxt =
@@ -75,22 +77,22 @@ const String collectingDeviceInfo = 'Collecting device info';
 const String parametersReady = 'Signup parameters ready';
 const String signupSuccess = 'Signup successful';
 const String signupFailed = 'Signup failed';
-const String verifyOtp = 'Verify Your OTP Now';
+const String verifyOtp = '$verifyTxt Your OTP Now';
 
-const String selectCertificateType = "Please select a certificate type";
+const String pleaseSelectCertificateType = "Please select a certificate type";
 
 const String uploadAtLeastOneDoc =
     "Please upload at least one certification document";
 
 const String fileSizeLimit = "File must be under 2 MB";
 
-const String uploadFailed = "Image upload failed";
+const String imageUploadFailed = "Image upload failed";
 
 const String logLoadedSavedData = 'Loaded saved inspector data';
 const String logSignupStart = '[SignUP] START';
 const String logSignupCleanup = '[SignUP] CLEANUP';
 const String logSignupException = '[SignUP] EXCEPTION';
-const String logApiError = '[SignUP] API ERROR';
+const String errorTxt = 'Error';
 
 const String errorSignupFailed = 'Signup failed. Please try again.';
 const String selectCountryError = "Please select a country";
@@ -102,17 +104,278 @@ const String mailingAddressRequired = "Please enter mailing address";
 const String zipRequired = "Please enter zip code";
 const String zipNumericOnly = "Zip must be numeric";
 
-const String defaultCountry = "Select Country";
-const String defaultState = "Select State";
-
 String cityNotFound(String city, String state) =>
     "City $city not found in $state";
 
-const maxFileSizeInBytes = 2 * 1024 * 1024;
+const maxFileSizeInBytes = 4 * 1024 * 1024;
 
 const certificateExtensions = ['pdf', 'doc', 'docx'];
-
+const imageExtensions = ['jpg', 'jpeg', 'png', 'heic', 'gif', 'bmp'];
 const mixedExtensions = ['jpg', 'jpeg', 'png', 'pdf', 'doc', 'docx'];
 
 const uploadTypeId = 'id';
 const uploadTypeRef = 'ref';
+const String signInTitle = 'Sign In';
+const String welcomeBack = 'Welcome Back';
+
+const String emailLabel = 'Email';
+const String emailHint = 'example@gmail.com';
+
+const String passwordLabel = 'Password';
+
+const String forgotPassword = 'Forget Password?';
+
+const String signingIn = 'Signing In...';
+
+const String dontHaveAccount = "Don’t have an account? ";
+const String createAccountSubtitle = 'Create Your Account!';
+
+const String alreadyHaveAccount = 'Already have an account?';
+
+const String fullNameLabel = 'Full Name';
+const String fullNameHint = 'Full Name';
+
+const String phoneNumberLabel = 'Phone Number';
+const String phoneNumberHint = 'Phone Number';
+
+const String phoneRequiredError = 'Phone is required';
+const String phoneInvalidError = 'Enter a valid phone';
+const String forgotPasswordSubtitle =
+    'Enter your email \nto receive a reset code';
+
+const String sendVerificationCode = 'Send Verification Code';
+const String sendingText = 'Sending...';
+
+const String rememberPasswordText = 'Remember your password? ';
+
+const String profileImageOptional = 'Profile Image(Optional)';
+const String profileImage = 'Profile Image';
+const String uploadIdLicense = 'Upload ID / License';
+const String idLicenseExpiryDate = 'ID / License Expiry Date';
+const String uploadCoiDocument = 'Upload COI Document';
+const String coiDocumentExpiryDate = 'COI Document Expiry Date';
+const String uploadReferenceLetters = 'Upload Reference Letters(Optional)';
+const String workHistoryDescription = 'Work History Description';
+const String workHistoryHint = 'Enter work experience details...';
+const String informationTruthful = 'I confirm all information is truthful.';
+const String selectExpiryDate = 'Select Expiry date';
+const String documentType = 'Document Type';
+const String pleaseSelectDocumentType = 'Please select document type';
+const String tapToUploadImage = "Tap to upload image";
+const String tapToUploadFile = "Tap to upload file (image or PDF)";
+const String httpProtocol = 'http://';
+const String httpsProtocol = 'https://';
+const String certificateType = 'Certificate Type';
+const String selectExpirationDate = 'Select Expiration Date';
+const String uploadCertificationDocuments =
+    'Upload Certification Documents (max 4)';
+const String select = 'Select';
+const String selectCertificateType = '$select $certificateType';
+
+const String uploadDocument = 'Upload Document';
+const String maxNumber = 'You can select a maximum of';
+const String citiesText = 'Cities';
+const String selectCities = '$select $citiesText';
+const String addressDetails = 'Address Details';
+const String selectYourServiceArea = '$select Your Service Area';
+
+const String countryTxt = 'Country';
+const String stateTxt = 'State';
+const String expiryTxt = 'Expiry';
+
+const String cityTxt = 'City';
+
+const String defaultCountry = "$select $countryTxt";
+const String defaultState = "$select $stateTxt";
+const String defaultCity = "$select $cityTxt";
+const String addEdit = 'Add / Edit';
+const String noCitiesSelected = 'No cities selected';
+const String uploadIccDocumentFor = 'Upload ICC Document for';
+const String zipCodeFor = 'Zip Code for';
+
+const String enterYourMailingAddress = 'Enter your Mailing Address';
+const String mailingAddress = 'Mailing address';
+const String searchCities = '$searchTxt Cities';
+const String doneTxt = 'Done';
+const String searchTxt = 'Search';
+const String iccDocumentRequiredFor = 'ICC document required for';
+const String expiryDateRequiredForIccIn = 'Expiry date required for ICC in';
+const String verifyCode = '$verifyTxt Code';
+const String enterTheCodeSent = 'Enter the code sent \nto your email or phone';
+const String enterTheOtpSent = 'Enter the OTP sent \nto ';
+const String enterTheCodeSentToPhone =
+    'Enter the code sent \nto your phone number';
+const String didntReceiveOtp = 'Didn’t receive OTP?';
+const String resendCode = 'Resend code';
+const String resendIn = 'Resend in ';
+const String verifyTxt = 'Verify';
+const String resetPassword = 'Reset Password';
+const String createAccount = 'Create Account';
+const String newPasswordLabel = 'New Password';
+const String confirmNewPasswordLabel = 'Confirm New Password';
+
+const String enterYourNewPassword = 'Enter your $newPasswordLabel';
+const String enterPasswordAndAddressDetailToContinue =
+    'Enter password and address detail to continue';
+const String addressLabel = 'Address';
+const String resetting = 'Resetting...';
+const String userNotFoundInLocal = 'User not found in local storage';
+const String bookingCreatedSuccessfully = 'Booking created successfully';
+const String bookingCreationFailed = 'Booking creation failed';
+const String bookingUpdatedSuccessfully = 'Booking Updated successfully.';
+const String bookingUpdateFailed = 'Booking update failed';
+const String bookingDeletedSuccessfully = 'Booking Deleted successfully.';
+const String bookingDeletionFailed = 'Booking Deletion failed';
+const String fetchingBookingDetailFailed = 'Fetching Booking Detail failed';
+const String failedTxt = 'Failed';
+const String showUpFeeStatusFailedToUpdate =
+    'Show Up fee Status failed to update.';
+const String paymentSuccessfulAndBookingApproved =
+    'Payment successful and booking approved.';
+const String pleaseSelect = 'Please select';
+const String pleaseSelectATime = '$pleaseSelect a time';
+const String pleaseSelectAnInspectionType = '$pleaseSelect an inspection type';
+
+const String pleaseSelectALocation = '$pleaseSelect a location';
+const String pleaseEnterADescription = 'Please enter a description';
+const String pleaseAddAtLeastOneImage = 'Please add at least one image';
+const String pleaseAgreeToPolicies =
+    'You must agree to the policies before continuing.';
+const String passwordUpdatedSuccessfully = 'Password updated successfully.';
+const String passwordUpdateFailed = 'Password update failed';
+const String requiredTxt = 'Required';
+const String minimumSixCharactersRequired = 'Minimum 6 characters required';
+const String includeUpperLowerNumberSymbol =
+    'Include upper, lower, number & symbol';
+const String confirmYourPassword = 'Confirm your password';
+const String passwordsDoNotMatch = 'Passwords do not match';
+const String sessionExpired = 'Session Expired';
+const String sessionExpiredMessage = 'Your session has expired.';
+const String pleaseLogInAgain = 'Please log in again.';
+const String okTxt = 'OK';
+const String recentTransactions = 'Recent Transactions';
+const String noTransactionsYet = 'No transactions yet';
+const String availableBalance = 'Available Balance';
+const String addMoney = 'Add Money';
+const String wallet = 'Wallet';
+const String somethingWentWrong = 'Something went wrong';
+const String enterAmountHint = 'Enter amount (e.g. 50)';
+const String proceedToPay = 'Proceed to Pay';
+const String pleaseEnterValidAmount =
+    'Please enter a valid amount - min \$50 AND max -\$100000';
+const String profileUpdatedSuccessfully = 'Profile updated successfully!';
+const String failedToUpdate = 'Failed to update';
+const String accountSettings = 'Account Settings';
+const String payments = 'Payments';
+const String nameRequired = 'Name required';
+const String saving = 'Saving...';
+const String saveChanges = 'Save Changes';
+const String bookingTxt = 'Booking';
+const String confirmBooking = 'Confirm $bookingTxt';
+
+const String viewBooking = 'View $bookingTxt';
+const String editBooking = 'Edit $bookingTxt';
+const String deleteBooking = '$deleteText $bookingTxt';
+
+const String labelTxt = 'label';
+const String valueTxt = 'value';
+
+const String allValueTxt = 'all';
+const String inspectionTxt = 'Inspection';
+
+const String allLabelTxt = 'All';
+const String awaitingYourApprovalLabelTxt = 'Awaiting Your Approval';
+const String waitingForClientApprovalLabelTxt = 'Waiting for Client Approval';
+const String acceptedLabelTxt = 'Accepted';
+const String pendingLabelTxt = 'Pending';
+const String rejectedLabelTxt = 'Rejected';
+const String inspectionStartedLabelTxt = 'Inspection Started';
+const String completedLabelTxt = 'Completed';
+const String expiredLabelTxt = 'Expired';
+const String pausedLabelTxt = 'Paused';
+const String stoppedLabelTxt = 'Stopped';
+const String cancelledByClientLabelTxt = 'Cancelled By Client';
+
+const String cancelledByInspectorLabelTxt = 'Cancelled By Inspector';
+const String cancelledByYouTxt = 'Cancelled (You)';
+const String cancelledByInspTxt = 'Cancelled (Inspector)';
+const String noDescriptionProvided = 'No description provided';
+const String inspectionCompletedApprovalRequired =
+    'Inspection Completed - Approval Required';
+const String inspectionDetails = '$inspectionTxt Details';
+const String dateTxt = 'Date';
+const String timeTxt = 'Time';
+const String locationTxt = 'Location';
+const String descriptionTxt = 'Description';
+const String durationTxt = 'Duration';
+const String zeroMinutes = '0 minutes';
+const String paymentInformationTxt = 'Payment Information';
+const String disagreeTxt = 'Disagree';
+const String deleteText = 'Delete';
+
+const String agreeAndPayTxt = 'Agree & Pay';
+
+const String wntDeleteBooking = '$deleteText Booking?';
+const String deleteBookingConfirmationTxt =
+    'Are you sure you want to delete this booking? This action cannot be undone.';
+
+const String cancellationFeeNotePrefixTxt =
+    '⚠ Note: Since the booking time is within the next 8 hours, a cancellation fee of \$';
+
+const String cancellationFeeNoteSuffixTxt = ' will be applied.';
+
+const String filterSortTitleTxt = 'Filter & Sort Options';
+
+const String sortByDateAscTxt = 'Sort by Date (Ascending)';
+const String sortByDateDescTxt = 'Sort by Date (Descending)';
+const String clearAllFiltersTxt = 'Clear All Filters';
+
+const String changePassword = 'Change Password';
+const String oldPassword = 'Old Password';
+const String confirmPassword = 'Confirm Password';
+const String updating = 'Updating...';
+const String updatePassword = 'Update Password';
+const String bookings = 'Bookings';
+const String profile = 'Profile';
+const String bookInspection = 'Book Inspection';
+const String myBookings = 'My Bookings';
+const String bookNow = 'Book Now';
+const String selectDateTime = 'Select Date & Time';
+const String pickTime = 'Pick Time';
+const String inspectionType = 'Inspection Type';
+const String confirmTxt = 'Confirm';
+const String selectInspectionType = '$select $inspectionType';
+const String descriptionHint = 'Add details...';
+const String uploadImages = 'Upload Images (max 5)';
+const String addImage = 'Add Image';
+
+const String retryTxt = 'Retry';
+const String paymentSuccessful = 'Payment Successful!';
+
+const String continueTxt = 'Continue';
+const String withdrawal = 'Withdrawal';
+const String iAgree = 'I AGREE';
+const String recentApprovedBooking = 'RECENT APPROVED BOOKING';
+const String bookingDate = 'Booking date';
+const String bookingTime = 'Booking time';
+const String deposit = 'Deposit';
+const String walletBalanceUpdatedSuccessfully =
+    'Your wallet balance has been updated successfully.';
+
+const String stripeAlreadyConnected = 'Stripe Already Connected';
+const String stripeTransfersEnabled = 'transfer enabled';
+
+String paymentDeductionInfoTxt(double amount) =>
+    'Upon your approval, a payment of \$${amount.toStringAsFixed(2)} '
+    'will be automatically deducted from your wallet and transferred '
+    'to the inspector.';
+
+String rateCalculationTxt({required double rate, required int blocks}) {
+  final total = rate * blocks;
+  return 'Rate: \$${rate.toStringAsFixed(2)} per 4-hour block × '
+      '$blocks = \$${total.toStringAsFixed(2)}';
+}
+
+String cancellationFeeWarningTxt(double fee) =>
+    '⚠ Note: Since the booking time is within the next 8 hours, '
+    'a cancellation fee of \$${fee.toStringAsFixed(2)} will be applied.';

@@ -1,5 +1,5 @@
-
 import 'package:flutter/material.dart';
+import 'package:inspect_connect/core/utils/constants/app_strings.dart';
 import '../../../../../core/utils/presentation/app_common_text_widget.dart';
 import '../../../../../core/utils/presentation/app_text_style.dart';
 
@@ -38,9 +38,7 @@ class AppSelectorField extends StatelessWidget {
                   value,
                   style: appTextStyle(
                     fontSize: 12,
-                    color: value.contains("Select")
-                        ? Colors.grey
-                        : Colors.black,
+                    color: value.contains(select) ? Colors.grey : Colors.black,
                   ),
                 ),
                 const Icon(Icons.arrow_drop_down),

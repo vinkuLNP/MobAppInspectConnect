@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/commondomain/entities/based_api_result/api_result_state.dart';
 import 'package:inspect_connect/core/di/app_component/app_component.dart';
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
+import 'package:inspect_connect/core/utils/constants/app_strings.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/features/auth_flow/data/models/certificate_inspector_type_datamodel.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/certificate_type_entity.dart';
@@ -46,65 +47,6 @@ class InspectorProfessionalStepService {
 
     provider.errorMessage = null;
     return true;
-  }
-
-  Future<void> uploadDocument(BuildContext context) async {
-    final picker = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['pdf', 'doc', 'docx'],
-    );
-    try {
-      provider.setProcessing(true);
-      if (picker == null && picker!.files.single.path == null) return;
-      final file = File(picker.files.single.path.toString());
-      if (await file.length() > 2 * 1024 * 1024) {
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: textWidget(
-                text: 'File must be under 2 MB',
-                color: AppColors.backgroundColor,
-              ),
-            ),
-          );
-        }
-        return;
-      }
-      final uploadImage = UploadImageDto(filePath: file.path);
-      final uploadImageUseCase = locator<UploadImageUseCase>();
-      final result = await provider
-          .executeParamsUseCase<UploadImageResponseModel, UploadImageParams>(
-            useCase: uploadImageUseCase,
-            query: UploadImageParams(filePath: uploadImage),
-            launchLoader: true,
-          );
-
-      result?.when(
-        data: (response) {
-          provider.documents.add(
-            picker.files.single.path != null
-                ? File(picker.files.single.path!)
-                : file,
-          );
-          provider.uploadedCertificateUrls.add(response.fileUrl);
-          provider.notify();
-        },
-        error: (e) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: textWidget(
-                text: e.message ?? 'Image upload failed',
-                color: AppColors.backgroundColor,
-              ),
-            ),
-          );
-        },
-      );
-    } catch (e) {
-      log('Error picking file: $e');
-    } finally {
-      provider.setProcessing(false);
-    }
   }
 
   void removeDocumentAt(int index) {
@@ -186,6 +128,69 @@ class InspectorProfessionalStepService {
     }
   }
 
+  Future<void> uploadDocument(BuildContext context) async {
+    final picker = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['pdf', 'doc', 'docx'],
+    );
+    try {
+      provider.setProcessing(true);
+      if (picker == null && picker!.files.single.path == null) return;
+      final file = File(picker.files.single.path.toString());
+      if (await file.length() > maxFileSizeInBytes) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: textWidget(
+                text: fileMstBeUnder2Txt,
+                color: AppColors.backgroundColor,
+              ),
+            ),
+          );
+        }
+        return;
+      }
+      final uploadImage = UploadImageDto(
+        filePath: file.path,
+        fileType: 'sensitive',
+        privateTempId: await provider.localDs.getPrivateTempId(),
+      );
+      final uploadImageUseCase = locator<UploadImageUseCase>();
+      final result = await provider
+          .executeParamsUseCase<UploadImageResponseModel, UploadImageParams>(
+            useCase: uploadImageUseCase,
+            query: UploadImageParams(uploadImageDto: uploadImage),
+            launchLoader: true,
+          );
+
+      result?.when(
+        data: (response) {
+          provider.documents.add(
+            picker.files.single.path != null
+                ? File(picker.files.single.path!)
+                : file,
+          );
+          provider.uploadedCertificateUrls.add(response.fileUrl);
+          provider.notify();
+        },
+        error: (e) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: textWidget(
+                text: e.message ?? 'Image upload failed',
+                color: AppColors.backgroundColor,
+              ),
+            ),
+          );
+        },
+      );
+    } catch (e) {
+      log('Error picking file: $e');
+    } finally {
+      provider.setProcessing(false);
+    }
+  }
+
   Future<void> saveProfessionalStep({
     required String certificateTypeId,
     required String certificateExpiryDate,
@@ -196,7 +201,6 @@ class InspectorProfessionalStepService {
       'certificateTypeId': certificateTypeId,
       'certificateExpiryDate': certificateExpiryDate,
       'certificateDocuments': uploadedCertificateUrls ?? [],
-      // 'certificateAgencyIds': agencyIds ?? [],
     });
   }
 }

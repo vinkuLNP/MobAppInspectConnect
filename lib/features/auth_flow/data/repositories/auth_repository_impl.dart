@@ -14,6 +14,7 @@ import 'package:inspect_connect/features/auth_flow/domain/entities/certificate_t
 import 'package:inspect_connect/features/auth_flow/domain/entities/inspector_documents_type.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/inspector_sign_up_entity.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/jurisdiction_entity.dart';
+import 'package:inspect_connect/features/auth_flow/domain/entities/settings_entity.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/user_detail.dart';
 import 'package:inspect_connect/features/auth_flow/domain/repositories/auth_repository.dart';
 
@@ -30,6 +31,11 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<ApiResultModel<List<JurisdictionEntity>>> getJurisdictionCities() {
     return _remote.getJurisdictionCities();
+  }
+
+  @override
+  Future<ApiResultModel<SettingEntity>> getSettings(String type) {
+    return _remote.getSettings(type);
   }
 
   @override

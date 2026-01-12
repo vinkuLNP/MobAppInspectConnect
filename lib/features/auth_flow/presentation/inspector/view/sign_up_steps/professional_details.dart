@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
+import 'package:inspect_connect/core/utils/constants/app_strings.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/core/utils/presentation/app_text_style.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/certificate_type_entity.dart';
@@ -29,20 +30,20 @@ class ProfessionalDetailsStep extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       textWidget(
-                        text: 'Professional Details',
+                        text: professionalDetails,
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
                       ),
                       const SizedBox(height: 8),
                       _section(
-                        title: 'Certificate Type',
+                        title: certificateType,
                         child: _inspectionTypeDropdown(prov),
                       ),
 
                       const SizedBox(height: 6),
 
                       _section(
-                        title: 'Select Expiration Date',
+                        title: selectExpirationDate,
                         child: IgnorePointer(
                           ignoring: false,
                           child: DateTimePickerWidget(
@@ -56,7 +57,7 @@ class ProfessionalDetailsStep extends StatelessWidget {
                       ),
                       const SizedBox(height: 6),
                       _section(
-                        title: 'Upload Certification Documents (max 4)',
+                        title: uploadCertificationDocuments,
                         child: _documentGrid(prov, context),
                       ),
                     ],
@@ -89,7 +90,7 @@ class ProfessionalDetailsStep extends StatelessWidget {
 
   Widget _inspectionTypeDropdown(InspectorViewModelProvider prov) {
     return DropdownButtonFormField<CertificateInspectorTypeEntity>(
-      decoration: _inputDecoration('Select Certificate Type'),
+      decoration: _inputDecoration(selectCertificateType),
       initialValue: prov.certificateInspectorType,
       style: appTextStyle(fontSize: 12),
       items: prov.certificateType
@@ -149,7 +150,7 @@ class ProfessionalDetailsStep extends StatelessWidget {
                   Icon(Icons.upload_file, size: 32, color: Colors.grey),
                   const SizedBox(height: 8),
                   textWidget(
-                    text: "Upload Document",
+                    text: uploadDocument,
                     color: Colors.grey,
                     fontSize: 12,
                   ),

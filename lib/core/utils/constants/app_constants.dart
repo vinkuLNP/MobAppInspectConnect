@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:inspect_connect/core/utils/constants/app_strings.dart';
 
 const String commonErrorUnexpectedMessage =
     'Something went wrong please try again';
@@ -29,15 +32,16 @@ const String contentMultipartTypeValue = 'multipart/form-data';
 const Duration timeOutDuration = Duration(seconds: 20);
 
 ///The app base Url should be provided in this value
-
+String webViewUrl =
+    "https://inspect-connect-cjdwdhh6b4erb5b8.westus2-01.azurewebsites.net";
 String socketUrl =
     "https://inspect-connect-api-auakczg0ave2bqex.westus2-01.azurewebsites.net/";
 // Platform.isIOS ? "http://localhost:5002" : "http://10.0.2.2:5002";
 
 String devBaseUrl =
-    // Platform.isIOS
-    //     ? 'http://localhost:5002/api/v1/'
-    //     : 'http://10.0.2.2:5002/api/v1/';
+    //  Platform.isIOS
+    // ? 'http://localhost:5002/api/v1/'
+    // : 'http://10.0.2.2:5002/api/v1/';
     'https://inspect-connect-api-auakczg0ave2bqex.westus2-01.azurewebsites.net/api/v1/';
 
 const String stripePublishableKey =
@@ -63,7 +67,7 @@ const String getInspectorCertificateTypesEndPoint = 'certificate/types';
 const String getInspectorCertificateTAgenciesEndPoint = 'certificate/agencies';
 const String getJurisdictionCitiesEndPoint = 'cities/jurisdictions';
 const String getInspectorDocumentTypeEndPoint = 'document/types';
-
+const String getSettingsEndPoint = 'settings';
 const String createBookingEndPoint = 'bookings';
 const String bookingStatusEndPoint = 'status';
 const String bookingTimerEndPoint = 'timer';
@@ -71,6 +75,10 @@ const String uploadImageEndPoint = 'uploads';
 const String walletEndPoint = 'wallet';
 const String paymentEndPOint = 'payments';
 const String paymentIntentEndPOint = 'payments/paymentIntent';
+const String onboardingEndPOint = 'payments/onboard';
+const String notificationsEndPoint = 'notifications';
+const String deductAndTransferWalletEndPoint =
+    '$walletEndPoint/deductAndTransferWallet';
 
 const String subscriptionEndPoint = 'subscriptionPlans';
 const String userSubscriptionByIdEndPoint = 'subscriptions';
@@ -99,37 +107,37 @@ const int bookingStatusStoppped = 10;
 String bookingStatusToText(int status) {
   switch (status) {
     case bookingStatusPending:
-      return 'Pending';
+      return pendingLabelTxt;
 
     case bookingStatusAccepted:
-      return 'Accepted';
+      return acceptedLabelTxt;
 
     case bookingStatusRejected:
-      return 'Rejected';
+      return rejectedLabelTxt;
 
     case bookingStatusStarted:
-      return 'Inspection Started';
+      return inspectionStartedLabelTxt;
 
     case bookingStatusStoppped:
-      return 'Stopped';
+      return stoppedLabelTxt;
 
     case bookingStatusCompleted:
-      return 'Completed';
+      return completedLabelTxt;
 
     case bookingStatusCancelledByClient:
-      return 'Cancelled By Client';
+      return cancelledByClientLabelTxt;
 
     case bookingStatusExpired:
-      return 'Expired';
+      return expiredLabelTxt;
 
     case bookingStatusAwaiting:
-      return 'Waiting for Client Approval';
+      return waitingForClientApprovalLabelTxt;
 
     case bookingStatusCancelledByInspector:
-      return 'Cancelled By Inspector';
+      return cancelledByInspectorLabelTxt;
 
     case bookingStatusPaused:
-      return 'Paused';
+      return pausedLabelTxt;
 
     default:
       return 'Other';
@@ -215,3 +223,22 @@ IconData statusIcon(int status) {
       return Icons.info_outline;
   }
 }
+
+const List<Map<String, dynamic>> statusOptions = [
+  {labelTxt: allLabelTxt, valueTxt: allValueTxt},
+  {labelTxt: awaitingYourApprovalLabelTxt, valueTxt: bookingStatusAwaiting},
+  {labelTxt: acceptedLabelTxt, valueTxt: bookingStatusAccepted},
+  {labelTxt: inspectionStartedLabelTxt, valueTxt: bookingStatusStarted},
+
+  {labelTxt: '$inspectionTxt $pausedLabelTxt', valueTxt: bookingStatusPaused},
+  {
+    labelTxt: '$inspectionTxt $stoppedLabelTxt',
+    valueTxt: bookingStatusStoppped,
+  },
+  {labelTxt: pendingLabelTxt, valueTxt: bookingStatusPending},
+  {labelTxt: rejectedLabelTxt, valueTxt: bookingStatusRejected},
+  {labelTxt: completedLabelTxt, valueTxt: bookingStatusCompleted},
+  {labelTxt: cancelledByYouTxt, valueTxt: bookingStatusCancelledByClient},
+  {labelTxt: cancelledByInspTxt, valueTxt: bookingStatusCancelledByInspector},
+  {labelTxt: expiredLabelTxt, valueTxt: bookingStatusExpired},
+];

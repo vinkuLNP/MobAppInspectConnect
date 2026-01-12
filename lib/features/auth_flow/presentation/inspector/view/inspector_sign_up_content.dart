@@ -124,7 +124,7 @@ class _InspectorSignUpContentState extends State<InspectorSignUpContent> {
                 log('ICC Local Files: ${vm.iccLocalFiles}');
                 log('ICC Uploaded URLs: ${vm.iccUploadedUrls}');
                 log('Selected Cities: ${vm.selectedCityNames}');
-                // final isValid = vm.validateServiceArea();
+                final isValid = vm.validateServiceArea();
                 if (!isValid) return;
                 vm.saveSelectedServiceDataToProvider();
 
@@ -145,10 +145,10 @@ class _InspectorSignUpContentState extends State<InspectorSignUpContent> {
 
                 break;
               case 3:
-                // vm.validateBeforeSubmit(context: ctx);
-                // if (!vm.agreedToTerms || !vm.confirmTruth) {
-                //   return;
-                // }
+                vm.validateBeforeSubmit(context: ctx);
+                if (!vm.agreedToTerms || !vm.confirmTruth) {
+                  return;
+                }
                 log("called");
                 String? getSafePath(dynamic fileOrUrl) {
                   if (fileOrUrl == null) return null;
@@ -156,8 +156,8 @@ class _InspectorSignUpContentState extends State<InspectorSignUpContent> {
                       ? fileOrUrl.path
                       : fileOrUrl.toString();
 
-                  if (path.startsWith('http://') ||
-                      path.startsWith('https://')) {
+                  if (path.startsWith(httpProtocol) ||
+                      path.startsWith(httpsProtocol)) {
                     return path;
                   }
                   return path;
@@ -167,8 +167,8 @@ class _InspectorSignUpContentState extends State<InspectorSignUpContent> {
                 final idPath = getSafePath(vm.idDocumentUploadedUrl);
                 final refs = vm.referenceLetters.map((f) {
                   final path = f.path;
-                  return (path.startsWith('http://') ||
-                          path.startsWith('https://'))
+                  return (path.startsWith(httpProtocol) ||
+                          path.startsWith(httpsProtocol))
                       ? path
                       : path;
                 }).toList();
@@ -196,21 +196,38 @@ class _InspectorSignUpContentState extends State<InspectorSignUpContent> {
             }
           },
         ),
-        form: Column(
+        form: Stack(
           children: [
-            AppCardContainer(
-              padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
-              child: Form(
-                key: steps[vm.currentStep].formKey,
-                autovalidateMode: vm.autoValidate
-                    ? AutovalidateMode.always
-                    : AutovalidateMode.disabled,
-                child: SingleChildScrollView(
-                  child: steps[vm.currentStep].content,
+            AbsorbPointer(
+              absorbing: vm.isProcessing,
+              child: Opacity(
+                opacity: vm.isProcessing ? 0.6 : 1.0,
+                child: Column(
+                  children: [
+                    AppCardContainer(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 18,
+                        horizontal: 16,
+                      ),
+                      child: Form(
+                        key: steps[vm.currentStep].formKey,
+                        autovalidateMode: vm.autoValidate
+                            ? AutovalidateMode.always
+                            : AutovalidateMode.disabled,
+                        child: SingleChildScrollView(
+                          child: steps[vm.currentStep].content,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                  ],
                 ),
               ),
             ),
-            const SizedBox(height: 12),
+            if (vm.isProcessing)
+              Positioned.fill(
+                child: const Center(child: CircularProgressIndicator()),
+              ),
           ],
         ),
       ),

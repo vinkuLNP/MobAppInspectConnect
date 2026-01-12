@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:inspect_connect/core/utils/constants/app_strings.dart';
 import '../../../utils/text_editor_controller.dart';
 import '../../client/widgets/input_fields.dart';
 
@@ -25,8 +26,8 @@ Future<List<T>> showMultiSelectSearchDialog<T>({
               child: Column(
                 children: [
                   AppInputField(
-                    label: "Search Cities",
-                    hint: "Search Cities",
+                    label: searchCities,
+                    hint: searchCities,
                     controller: inspCountrySearchCtrl,
                     onChanged: (value) {
                       setState(() {
@@ -76,14 +77,14 @@ Future<List<T>> showMultiSelectSearchDialog<T>({
                   Navigator.pop(context);
                   inspCountrySearchCtrl.clear();
                 },
-                child: const Text("Cancel"),
+                child: const Text(cancelTxt),
               ),
               TextButton(
                 onPressed: () {
                   Navigator.pop(context, selectedItems);
                   inspCountrySearchCtrl.clear();
                 },
-                child: const Text("Done"),
+                child: const Text(doneTxt),
               ),
             ],
           );
@@ -116,8 +117,8 @@ Future<T?> showSearchableListDialog<T>({
               child: Column(
                 children: [
                   AppInputField(
-                    label: "Search $title",
-                    hint: "Search $title",
+                    label: "$searchTxt $title",
+                    hint: "$searchTxt $title",
                     controller: inspCountrySearchCtrl,
                     onChanged: (value) {
                       setState(() {

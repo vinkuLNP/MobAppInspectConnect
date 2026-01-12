@@ -5,6 +5,7 @@ import 'package:inspect_connect/core/commondomain/entities/based_api_result/api_
 import 'package:inspect_connect/core/commondomain/entities/based_api_result/error_result_model.dart';
 import 'package:inspect_connect/core/di/app_component/app_component.dart';
 import 'package:inspect_connect/core/utils/constants/app_constants.dart';
+import 'package:inspect_connect/core/utils/constants/app_strings.dart';
 import 'package:inspect_connect/core/utils/helpers/http_strategy_helper/concrete_strategies/get_request_strategy.dart';
 import 'package:inspect_connect/core/utils/helpers/http_strategy_helper/concrete_strategies/post_request_strategy.dart';
 import 'package:inspect_connect/core/utils/helpers/http_strategy_helper/http_request_context.dart';
@@ -35,7 +36,7 @@ class InspectorRemoteDataSourceImpl implements InspectorRemoteDataSource {
     try {
       final user = await locator<AuthLocalDataSource>().getUser();
       if (user == null || user.authToken == null) {
-        throw Exception('User not found in local storage');
+        throw Exception(userNotFoundInLocal);
       }
 
       final ApiResultModel<http.Response> res = await _ctx.makeRequest(
@@ -85,7 +86,7 @@ class InspectorRemoteDataSourceImpl implements InspectorRemoteDataSource {
     try {
       final user = await locator<AuthLocalDataSource>().getUser();
       if (user == null || user.authToken == null) {
-        throw Exception('User not found in local storage');
+        throw Exception(userNotFoundInLocal);
       }
 
       final ApiResultModel<http.Response> res = await _ctx.makeRequest(
@@ -134,7 +135,7 @@ class InspectorRemoteDataSourceImpl implements InspectorRemoteDataSource {
     try {
       final user = await locator<AuthLocalDataSource>().getUser();
       if (user == null || user.authToken == null) {
-        throw Exception('User not found in local storage');
+        throw Exception(userNotFoundInLocal);
       }
 
       final ApiResultModel<http.Response> res = await _ctx.makeRequest(

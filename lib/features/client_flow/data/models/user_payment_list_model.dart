@@ -76,9 +76,6 @@ class PaymentModel extends PaymentEntity {
       updatedAt: json['updatedAt'] != null
           ? DateTime.parse(json['updatedAt'])
           : null,
-      // invoiceJson: json['invoiceJson'] != null
-      //     ? Map<String, dynamic>.from(json['invoiceJson'])
-      //     : null,
     );
   }
 

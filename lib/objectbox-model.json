@@ -37,7 +37,7 @@
     },
     {
       "id": "2:7510821947055321623",
-      "lastPropertyId": "46:2778237008367224666",
+      "lastPropertyId": "55:8381573198068334159",
       "name": "AuthUserLocalEntity",
       "properties": [
         {
@@ -127,11 +127,6 @@
           "type": 1
         },
         {
-          "id": "19:8140600119593809259",
-          "name": "stripeTransfersActive",
-          "type": 1
-        },
-        {
           "id": "20:7589101533977070173",
           "name": "currentSubscriptionTrialDays",
           "type": 6
@@ -140,11 +135,6 @@
           "id": "21:2205212665702389342",
           "name": "currentSubscriptionAutoRenew",
           "type": 6
-        },
-        {
-          "id": "22:3730392305248784100",
-          "name": "currentSubscriptionId",
-          "type": 9
         },
         {
           "id": "23:1561577677941793754",
@@ -237,11 +227,6 @@
           "type": 30
         },
         {
-          "id": "41:2822043330167833312",
-          "name": "uploadedIdOrLicenseDocument",
-          "type": 9
-        },
-        {
           "id": "42:7361908397267452669",
           "name": "workHistoryDescription",
           "type": 9
@@ -265,6 +250,51 @@
           "id": "46:2778237008367224666",
           "name": "certificateApproved",
           "type": 6
+        },
+        {
+          "id": "47:3087368259834947786",
+          "name": "stripeTransfersEnabled",
+          "type": 1
+        },
+        {
+          "id": "48:5938988651120465848",
+          "name": "statusUpdatedByAdmin",
+          "type": 1
+        },
+        {
+          "id": "49:1903062305422906928",
+          "name": "docxOk",
+          "type": 1
+        },
+        {
+          "id": "50:1671177585830292350",
+          "name": "connectorLinkUrl",
+          "type": 9
+        },
+        {
+          "id": "51:6280060655161164616",
+          "name": "documentTypeId",
+          "type": 9
+        },
+        {
+          "id": "52:2941370578795659748",
+          "name": "documentExpiryDate",
+          "type": 9
+        },
+        {
+          "id": "53:3411826669160965555",
+          "name": "coiExpiryDate",
+          "type": 9
+        },
+        {
+          "id": "54:1713348069903800072",
+          "name": "serviceAreasJson",
+          "type": 9
+        },
+        {
+          "id": "55:8381573198068334159",
+          "name": "documentsJson",
+          "type": 9
         }
       ],
       "relations": []
@@ -356,11 +386,6 @@
           "type": 9
         },
         {
-          "id": "17:8563527971304190649",
-          "name": "uploadedIdOrLicenseDocument",
-          "type": 9
-        },
-        {
           "id": "18:1303636506337963961",
           "name": "workHistoryDescription",
           "type": 9
@@ -419,11 +444,6 @@
           "id": "29:5971348717096684686",
           "name": "longitude",
           "type": 8
-        },
-        {
-          "id": "30:2827095630864152251",
-          "name": "uploadedCoiDocument",
-          "type": 9
         },
         {
           "id": "31:879714024604332109",
@@ -507,7 +527,7 @@
     },
     {
       "id": "5:1092552167430950126",
-      "lastPropertyId": "5:2791628972036703477",
+      "lastPropertyId": "7:5187960889873647968",
       "name": "IccDocumentLocalEntity",
       "properties": [
         {
@@ -538,6 +558,16 @@
           "type": 11,
           "flags": 520,
           "relationTarget": "InspectorSignUpLocalEntity"
+        },
+        {
+          "id": "6:1184967821527650118",
+          "name": "fileName",
+          "type": 9
+        },
+        {
+          "id": "7:5187960889873647968",
+          "name": "documentId",
+          "type": 9
         }
       ],
       "relations": []
@@ -552,7 +582,12 @@
   "retiredEntityUids": [],
   "retiredIndexUids": [],
   "retiredPropertyUids": [
-    5058542504887666690
+    5058542504887666690,
+    8140600119593809259,
+    3730392305248784100,
+    2822043330167833312,
+    8563527971304190649,
+    2827095630864152251
   ],
   "retiredRelationUids": [],
   "version": 1

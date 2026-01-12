@@ -5,6 +5,7 @@ import 'package:inspect_connect/core/basecomponents/base_responsive_widget.dart'
 import 'package:inspect_connect/core/utils/auto_router_setup/auto_router.dart';
 import 'package:inspect_connect/core/utils/constants/app_assets_constants.dart';
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
+import 'package:inspect_connect/core/utils/constants/app_strings.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_button.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/core/utils/presentation/app_text_style.dart';
@@ -33,9 +34,9 @@ class ClientSignUpView extends StatelessWidget {
         final vm = ctx.watch<ClientViewModelProvider>();
 
         return CommonAuthBar(
-          title: 'Sign Up',
+          title: signUpTitle,
           showBackButton: showBackButton,
-          subtitle: 'Create Your Account!',
+          subtitle: createAccountSubtitle,
           image: finalImage,
           rc: rc,
           form: Form(
@@ -47,8 +48,8 @@ class ClientSignUpView extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 AppInputField(
-                  label: 'Full Name',
-                  hint: 'Full Name',
+                  label: fullNameLabel,
+                  hint: fullNameHint,
                   controller: cltFullNameCtrl,
                   validator: vm.validateRequired,
                   onChanged: (_) {
@@ -56,7 +57,7 @@ class ClientSignUpView extends StatelessWidget {
                   },
                 ),
                 const SizedBox(height: 14),
-                textWidget(text: 'Phone Number', fontWeight: FontWeight.w400),
+                textWidget(text: phoneNumberLabel, fontWeight: FontWeight.w400),
                 const SizedBox(height: 8),
 
                 Consumer<ClientViewModelProvider>(
@@ -65,9 +66,9 @@ class ClientSignUpView extends StatelessWidget {
                       final p = vm.phoneRaw ?? '';
                       if (!vm.autoValidate) return null;
                       if ((vm.phoneE164 ?? '').isEmpty) {
-                        return 'Phone is required';
+                        return phoneRequiredError;
                       }
-                      if (p.length < 10) return 'Enter a valid phone';
+                      if (p.length < 10) return phoneInvalidError;
                       return null;
                     },
                     builder: (state) {
@@ -80,7 +81,7 @@ class ClientSignUpView extends StatelessWidget {
                             style: appTextStyle(fontSize: 12),
                             initialCountryCode: 'IN',
                             decoration: InputDecoration(
-                              hintText: 'Phone Number',
+                              hintText: phoneNumberLabel,
                               counterText: '',
                               errorStyle: appTextStyle(
                                 fontSize: 12,
@@ -165,8 +166,8 @@ class ClientSignUpView extends StatelessWidget {
 
                 const SizedBox(height: 14),
                 AppInputField(
-                  label: 'Email',
-                  hint: 'Email',
+                  label: emailLabel,
+                  hint: emailHint,
                   controller: cltEmailCtrlSignUp,
                   keyboardType: TextInputType.emailAddress,
                   validator: vm.validateEmail,
@@ -191,12 +192,12 @@ class ClientSignUpView extends StatelessWidget {
 
                     await vm.submitSignUp(formKey: formKey, context: context);
                   },
-                  text: 'Sign Up',
+                  text: signUpTitle,
                 ),
 
                 AuthFormSwitchRow(
-                  question: "Already have an account?",
-                  actionText: "Sign In",
+                  question: alreadyHaveAccount,
+                  actionText: signInTitle,
                   onTap: () {
                     cltEmailCtrlSignUp.clear();
                     cltPhoneCtrl.clear();

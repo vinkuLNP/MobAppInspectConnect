@@ -1,5 +1,7 @@
+import 'package:inspect_connect/features/auth_flow/data/models/user_document_data_model.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/icc_document_entity.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/service_area_entity.dart';
+import 'package:inspect_connect/features/auth_flow/domain/entities/user_document_entity.dart';
 import 'package:objectbox/objectbox.dart';
 
 @Entity()
@@ -20,8 +22,8 @@ class InspectorSignUpLocalEntity {
   String? city;
   String? zipCode;
   String? mailingAddress;
-  String? uploadedIdOrLicenseDocument;
-  String? uploadedCoiDocument;
+  UserDocumentDataModel? uploadedIdOrLicenseDocument;
+  UserDocumentDataModel? uploadedCoiDocument;
   String? workHistoryDescription;
   List<String>? referenceDocuments;
   String? profileImage;
@@ -123,7 +125,7 @@ extension InspectorSignUpEntityMapper on InspectorSignUpLocalEntity {
           "countryCode": s.countryCode,
           "stateCode": s.stateCode,
           "cityName": s.cityName,
-          "zipCode": s.zipCode,
+          "zipCode": s.zipCode ?? " ",
           "location": {
             "type": s.locationType,
             "coordinates": [s.longitude, s.latitude],
@@ -136,6 +138,8 @@ extension InspectorSignUpEntityMapper on InspectorSignUpLocalEntity {
           "serviceCity": d.serviceCity,
           "documentUrl": d.documentUrl,
           "expiryDate": d.expiryDate,
+          "fileName": d.fileName,
+          "id": d.documentId,
         };
       }).toList(),
     };

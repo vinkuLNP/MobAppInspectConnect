@@ -6,11 +6,13 @@ import 'package:inspect_connect/features/client_flow/presentations/screens/payme
 class WalletView extends StatelessWidget {
   final WalletProvider provider;
   final VoidCallback onAddMoney;
+  final VoidCallback onWithdraw;
 
   const WalletView({
     super.key,
     required this.provider,
     required this.onAddMoney,
+    required this.onWithdraw,
   });
 
   @override
@@ -28,6 +30,8 @@ class WalletView extends StatelessWidget {
               balance: wallet?.available ?? 0,
               pending: wallet?.pending ?? 0,
               onAddMoney: onAddMoney,
+              provider: provider,
+              onWithdraw: onWithdraw,
             ),
             const SizedBox(height: 24),
             RecentTransactions(

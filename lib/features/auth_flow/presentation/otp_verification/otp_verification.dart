@@ -3,6 +3,7 @@ import 'package:inspect_connect/core/basecomponents/base_responsive_widget.dart'
 import 'package:inspect_connect/core/utils/auto_router_setup/auto_router.dart';
 import 'package:inspect_connect/core/utils/constants/app_assets_constants.dart';
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
+import 'package:inspect_connect/core/utils/constants/app_strings.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_button.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/core/utils/presentation/app_text_style.dart';
@@ -50,12 +51,12 @@ class _OtpVerificationViewState extends State<OtpVerificationView> {
       buildWidget: (ctx, rc, app) {
         return CommonAuthBar(
           showBackButton: widget.addShowButton,
-          title: 'Verify Code',
+          title: verifyCode,
           subtitle: vm.otpPurpose == OtpPurpose.forgotPassword
               ? (vm.resetTargetLabel == null
-                    ? 'Enter the code sent \nto your email or phone'
-                    : 'Enter the OTP sent \nto ${vm.resetTargetLabel}')
-              : 'Enter the code sent \nto your phone number',
+                    ? enterTheCodeSent
+                    : '$enterTheOtpSent ${vm.resetTargetLabel}')
+              : enterTheCodeSentToPhone,
           image: finalImage,
           rc: rc,
           form: Form(
@@ -97,7 +98,7 @@ class _OtpVerificationViewState extends State<OtpVerificationView> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     textWidget(
-                      text: "Didn’t receive OTP?",
+                      text: didntReceiveOtp,
                       color: Colors.black,
                       fontSize: 14,
                     ),
@@ -109,8 +110,8 @@ class _OtpVerificationViewState extends State<OtpVerificationView> {
                           : null,
                       child: textWidget(
                         text: vm.canResend
-                            ? "Resend code"
-                            : "Resend in ${vm.secondsLeft}s",
+                            ? resendCode
+                            : "$resendIn ${vm.secondsLeft}s",
                         fontWeight: FontWeight.w600,
                         color: vm.canResend
                             ? AppColors.authThemeColor
@@ -124,7 +125,7 @@ class _OtpVerificationViewState extends State<OtpVerificationView> {
                 SizedBox(height: 28),
 
                 AppButton(
-                  text: 'Verify',
+                  text: verifyTxt,
                   buttonBackgroundColor: vm.canVerify
                       ? AppColors.authThemeColor
                       : Colors.grey,
@@ -133,15 +134,14 @@ class _OtpVerificationViewState extends State<OtpVerificationView> {
                       : Colors.grey,
                   isDisabled: !vm.canVerify,
                   onTap: () {
-                     if(  vm.canVerify)  vm.verify(context: context);
-                     if (!context.mounted) return;
-                  }
-                   
+                    if (vm.canVerify) vm.verify(context: context);
+                    if (!context.mounted) return;
+                  },
                 ),
 
                 AuthFormSwitchRow(
-                  question: "Already have an account? ",
-                  actionText: "Sign In",
+                  question: alreadyHaveAccount,
+                  actionText: signInTitle,
                   onTap: () {
                     context.router.replaceAll([
                       ClientSignInRoute(showBackButton: false),

@@ -8,7 +8,9 @@ import 'package:inspect_connect/core/utils/constants/app_colors.dart';
 import 'package:inspect_connect/core/utils/constants/app_strings.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/features/auth_flow/data/datasources/local_datasources/inspector_local_data_source.dart';
+import 'package:inspect_connect/features/auth_flow/data/models/settings_model.dart';
 import 'package:inspect_connect/features/auth_flow/data/models/ui_icc_document.dart';
+import 'package:inspect_connect/features/auth_flow/data/models/user_document_data_model.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/certificate_type_entity.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/icc_document_entity.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/inspector_documents_type.dart';
@@ -33,6 +35,7 @@ class InspectorViewModelProvider extends BaseViewModel {
     fetchCertificateTypes();
     loadCountries();
     fetchJurisdictions();
+    fetchMaxNumberOfCities();
     fetchInspectorDocumentsType();
     notifyListeners();
   }
@@ -71,7 +74,7 @@ class InspectorViewModelProvider extends BaseViewModel {
   String? countryError;
   String? stateError;
   String? cityError;
-  String? zipError;
+  String? iccError;
   String? mailingAddressError;
   final Map<String, List<IccDocumentLocalEntity>> iccLocalFiles = {};
   final Map<String, List<String>> iccUploadedUrls = {};
@@ -91,13 +94,19 @@ class InspectorViewModelProvider extends BaseViewModel {
   File? profileImage;
   String? profileImageUrl;
   File? idDocumentFile;
-  String? idDocumentUploadedUrl;
+  UserDocumentDataModel? idDocumentUploadedUrl;
 
   File? coiFile;
-  String? coiUploadedUrl;
+  UserDocumentDataModel? coiUploadedUrl;
 
   List<File> referenceLetters = [];
   List<String> referenceLettersUrls = [];
+  void removeIccDoc(String city, String docId) {
+    iccDocsByCity[city]?.removeWhere((d) => d.documentId == docId);
+    validateServiceArea();
+    notifyListeners();
+  }
+
   Future<void> addIccFile({
     required BuildContext context,
     required String city,
@@ -106,14 +115,15 @@ class InspectorViewModelProvider extends BaseViewModel {
     try {
       setProcessing(true);
 
-      if (await file.length() > 2 * 1024 * 1024) {
+      if (await file.length() > maxFileSizeInBytes) {
         if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('File must be under 2 MB')),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text(fileMstBeUnder2Txt)));
         }
         return;
       }
+      final privateTempId = await localDs.getPrivateTempId();
 
       final uploadUseCase = locator<UploadImageUseCase>();
 
@@ -124,7 +134,11 @@ class InspectorViewModelProvider extends BaseViewModel {
           >(
             useCase: uploadUseCase,
             query: UploadImageParams(
-              filePath: UploadImageDto(filePath: file.path),
+              uploadImageDto: UploadImageDto(
+                filePath: file.path,
+                privateTempId: privateTempId,
+                fileType: 'sensitive',
+              ),
             ),
             launchLoader: true,
           );
@@ -135,6 +149,7 @@ class InspectorViewModelProvider extends BaseViewModel {
           iccDocsByCity[city]!.add(
             IccUiDocument(localFile: file, uploadedUrl: response.fileUrl),
           );
+          validateServiceArea();
           notifyListeners();
         },
         error: (e) {
@@ -172,6 +187,7 @@ class InspectorViewModelProvider extends BaseViewModel {
 
   String get selectedcertificateExpiryDate => certificateExpiryDate;
   List<JurisdictionEntity> jurisdictions = [];
+  SettingsDataModel? setting;
   List<InspectorDocumentsTypeEntity> inspectorDocumentsType = [];
   Map<String, bool> cityRequiresIcc = {};
   List<IccDocumentLocalEntity> iccDocuments = [];
@@ -182,7 +198,8 @@ class InspectorViewModelProvider extends BaseViewModel {
   String? mailingAddress;
   String? zipCode;
   List<ServiceAreaLocalEntity> serviceAreas = [];
-
+  int maxCitiesAllowed = 0;
+  int get maxAllowedCities => setting?.maxCities ?? maxCitiesAllowed;
   bool _obscurePassword = true;
   bool get obscurePassword => _obscurePassword;
 
@@ -437,6 +454,8 @@ class InspectorViewModelProvider extends BaseViewModel {
 
   Future<void> fetchJurisdictions() =>
       inspectorServiceAreaService.fetchJurisdictions();
+  Future<void> fetchMaxNumberOfCities() =>
+      inspectorServiceAreaService.fetchMaxNumberOfCities();
 
   Future<void> fetchInspectorDocumentsType() =>
       additionalStepService.fetchDocumentTypes();
@@ -538,16 +557,23 @@ class InspectorViewModelProvider extends BaseViewModel {
     for (final e in storedDocs) {
       late final String city;
       late final String url;
+      late final String iccFileName;
+      late final String documentId;
+
       late final DateTime expiry;
 
       if (e is Map<String, dynamic>) {
         city = e['serviceCity'];
         url = e['documentUrl'];
         expiry = DateTime.parse(e['expiryDate']);
+        iccFileName = e['fileName'];
+        documentId = e['id'];
       } else if (e is IccDocumentLocalEntity) {
         city = e.serviceCity;
         url = e.documentUrl;
         expiry = DateTime.parse(e.expiryDate);
+        iccFileName = e.fileName;
+        documentId = e.documentId;
       } else {
         continue;
       }
@@ -555,9 +581,11 @@ class InspectorViewModelProvider extends BaseViewModel {
       iccDocsByCity.putIfAbsent(city, () => []);
       iccDocsByCity[city]!.add(
         IccUiDocument(
-          // : url.split('/').last,
           uploadedUrl: url,
           expiryDate: expiry,
+          documentId: documentId,
+          iccFileName: iccFileName,
+
           // isUploaded: true,
         ),
       );
@@ -586,14 +614,14 @@ class InspectorViewModelProvider extends BaseViewModel {
         final docs = iccDocuments.where((d) => d.serviceCity == city).toList();
 
         if (docs.isEmpty) {
-          cityError = 'ICC document required for $city';
+          cityError = '$iccDocumentRequiredFor $city';
           notify();
           return false;
         }
 
         for (final d in docs) {
           if (d.expiryDate == '') {
-            cityError = 'Expiry date required for ICC in $city';
+            cityError = '$expiryDateRequiredForIccIn $city';
             notify();
             return false;
           }

@@ -5,6 +5,7 @@ import 'package:inspect_connect/core/commondomain/entities/based_api_result/api_
 import 'package:inspect_connect/core/commondomain/entities/based_api_result/error_result_model.dart';
 import 'package:inspect_connect/core/di/app_component/app_component.dart';
 import 'package:inspect_connect/core/utils/constants/app_constants.dart';
+import 'package:inspect_connect/core/utils/constants/app_strings.dart';
 import 'package:inspect_connect/core/utils/helpers/http_strategy_helper/concrete_strategies/get_request_strategy.dart';
 import 'package:inspect_connect/core/utils/helpers/http_strategy_helper/concrete_strategies/post_request_strategy.dart';
 import 'package:inspect_connect/core/utils/helpers/http_strategy_helper/concrete_strategies/put_request_strategy.dart';
@@ -19,6 +20,7 @@ import 'package:inspect_connect/features/auth_flow/data/models/inspector_documen
 import 'package:inspect_connect/features/auth_flow/data/models/jurisdiction_data_model.dart';
 import 'package:inspect_connect/features/auth_flow/data/models/profile_update_dto.dart';
 import 'package:inspect_connect/features/auth_flow/data/models/resend_otp_request_model.dart';
+import 'package:inspect_connect/features/auth_flow/data/models/settings_model.dart';
 import 'package:inspect_connect/features/auth_flow/data/models/signin_request_model.dart';
 import 'package:inspect_connect/features/auth_flow/data/models/signup_request_model.dart';
 import 'package:inspect_connect/features/auth_flow/data/models/user_detail_dto.dart';
@@ -45,6 +47,7 @@ abstract class AuthRemoteDataSource {
   Future<ApiResultModel<List<CertificateInspectorTypeModelData>>>
   getCertificateType();
   Future<ApiResultModel<List<JurisdictionDataModel>>> getJurisdictionCities();
+  Future<ApiResultModel<SettingsDataModel>> getSettings(String type);
   Future<ApiResultModel<List<InspectorDocumentTypesDataModel>>>
   getIsnpectorDocumentsType();
   Future<ApiResultModel<List<AgencyModel>>> getCertificateAgency();
@@ -175,7 +178,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     try {
       final user = await locator<AuthLocalDataSource>().getUser();
       if (user == null || user.authToken == null) {
-        throw Exception('User not found in local storage');
+        throw Exception(userNotFoundInLocal);
       }
       log('------>user------------->$user');
       log('------>user-------token------>${user.authToken}');
@@ -221,7 +224,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     try {
       final user = await locator<AuthLocalDataSource>().getUser();
       if (user == null || user.authToken == null) {
-        throw Exception('User not found in local storage');
+        throw Exception(userNotFoundInLocal);
       }
       log('------>user---user ca;;ed---------->$user');
       log('------>user-------token------>${user.authToken}');
@@ -274,7 +277,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     try {
       final user = await locator<AuthLocalDataSource>().getUser();
       if (user == null || user.authToken == null) {
-        throw Exception('User not found in local storage');
+        throw Exception(userNotFoundInLocal);
       }
       log('------>user------------->$user');
       log('------>user-------token------>${user.authToken}');
@@ -322,7 +325,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     try {
       final user = await locator<AuthLocalDataSource>().getUser();
       if (user == null || user.authToken == null) {
-        throw Exception('User not found in local storage');
+        throw Exception(userNotFoundInLocal);
       }
       log('------>user------------->$user');
       log('------>user-------token------>${user.authToken}');
@@ -370,7 +373,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     try {
       final user = await locator<AuthLocalDataSource>().getUser();
       if (user == null || user.authToken == null) {
-        throw Exception('User not found in local storage');
+        throw Exception(userNotFoundInLocal);
       }
       log('------>user------------->$user');
       log('------>user-------token------>${user.authToken}');
@@ -439,6 +442,41 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
             ApiResultModel<List<JurisdictionDataModel>>.failure(
               errorResultEntity: e,
             ),
+      );
+    } catch (e) {
+      log('autoremoteresopoonse------> $e');
+      return const ApiResultModel.failure(
+        errorResultEntity: ErrorResultModel(
+          message: "Network error occurred",
+          statusCode: 500,
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<ApiResultModel<SettingsDataModel>> getSettings(String type) async {
+    try {
+      final ApiResultModel<http.Response> res = await _ctx.makeRequest(
+        uri: "$getSettingsEndPoint/$type",
+        httpRequestStrategy: GetRequestStrategy(),
+        headers: {'Accept': 'application/json'},
+      );
+      return res.when(
+        success: (http.Response response) {
+          final Map<String, dynamic> root = response.body.isEmpty
+              ? {}
+              : (jsonDecode(response.body) as Map<String, dynamic>);
+
+          final Map<String, dynamic>? body =
+              root['body'] as Map<String, dynamic>?;
+
+          final SettingsDataModel model = SettingsDataModel.fromJson(body!);
+
+          return ApiResultModel<SettingsDataModel>.success(data: model);
+        },
+        failure: (ErrorResultModel e) =>
+            ApiResultModel<SettingsDataModel>.failure(errorResultEntity: e),
       );
     } catch (e) {
       log('autoremoteresopoonse------> $e');

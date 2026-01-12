@@ -2,10 +2,13 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:injectable/injectable.dart';
+import 'package:inspect_connect/core/utils/presentation/app_common_widgets.dart';
 import 'package:inspect_connect/features/auth_flow/data/datasources/local_datasources/app_local_database.dart';
+import 'package:inspect_connect/features/auth_flow/data/models/user_document_data_model.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/icc_document_entity.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/inspector_sign_up_entity.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/service_area_entity.dart';
+import 'package:inspect_connect/features/auth_flow/domain/entities/user_document_entity.dart';
 
 @injectable
 class InspectorSignUpLocalDataSource {
@@ -86,8 +89,12 @@ class InspectorSignUpLocalDataSource {
           if (v != null) entity.profileImage = v as String?;
           break;
         case 'uploadedIdOrLicenseDocument':
-          if (v != null) entity.uploadedIdOrLicenseDocument = v as String?;
+          if (v != null) {
+            entity.uploadedIdOrLicenseDocument =
+                UserDocumentDataModel.fromEntity(v as UserDocumentEntity);
+          }
           break;
+
         case 'documentTypeId':
           if (v != null) entity.documentTypeId = v as String?;
           break;
@@ -95,7 +102,11 @@ class InspectorSignUpLocalDataSource {
           if (v != null) entity.documentExpiryDate = v as String?;
           break;
         case 'uploadedCoiDocument':
-          if (v != null) entity.uploadedCoiDocument = v as String?;
+          if (v != null) {
+            entity.uploadedCoiDocument = UserDocumentDataModel.fromEntity(
+              v as UserDocumentEntity,
+            );
+          }
           break;
         case 'coiExpiryDate':
           if (v != null) entity.coiExpiryDate = v as String?;
@@ -127,11 +138,14 @@ class InspectorSignUpLocalDataSource {
         case 'deviceType':
           entity.deviceType = v as String?;
           break;
+        case 'privateTempId':
+          entity.privateTempId = v as String?;
+          break;
         case 'deviceToken':
           entity.deviceToken = v as String?;
           break;
 
-        case 'iccDocuments':
+        case 'iccDocument':
           entity.iccDocuments.clear();
           for (final d in v) {
             entity.iccDocuments.add(
@@ -139,6 +153,8 @@ class InspectorSignUpLocalDataSource {
                 serviceCity: d['serviceCity'],
                 documentUrl: d['documentUrl'],
                 expiryDate: d['expiryDate'],
+                documentId: d['id'],
+                fileName: d['fileName'],
               ),
             );
           }
@@ -197,5 +213,16 @@ class InspectorSignUpLocalDataSource {
 
   Future<void> clear() async {
     _database.clear<InspectorSignUpLocalEntity>();
+  }
+
+  Future<String> getPrivateTempId() async {
+    final entity = await _getOrCreate();
+
+    if (entity.privateTempId == null || entity.privateTempId!.isEmpty) {
+      entity.privateTempId = generatePrivateTempId();
+      _database.saveInspector(entity);
+    }
+
+    return entity.privateTempId!;
   }
 }

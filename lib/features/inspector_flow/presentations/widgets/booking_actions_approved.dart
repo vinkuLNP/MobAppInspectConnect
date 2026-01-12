@@ -117,11 +117,14 @@ class BookingActionResolver {
       context: context,
       isApplied: isApplied,
       onConfirm: () async {
+        final user = context.read<UserProvider>().user;
+        final rootContext = Navigator.of(context).context;
         Navigator.pop(context);
         await provider.updateShowUpFeeStatus(
-          context: context,
+          context: rootContext,
           bookingId: booking.id,
           showUpFeeApplied: !isApplied,
+          userId: user!.userId,
         );
       },
     );

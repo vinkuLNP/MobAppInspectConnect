@@ -6,6 +6,7 @@ import 'package:inspect_connect/core/utils/app_widgets/common_address_auto_compl
 import 'package:inspect_connect/core/utils/auto_router_setup/auto_router.dart';
 import 'package:inspect_connect/core/utils/constants/app_assets_constants.dart';
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
+import 'package:inspect_connect/core/utils/constants/app_strings.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_button.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/client/client_view_model.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/client/widgets/auth_form_switch_row.dart';
@@ -37,11 +38,11 @@ class ResetPasswordView extends StatelessWidget {
         return CommonAuthBar(
           showBackButton: showBackButton,
           title: vm.otpPurpose == OtpPurpose.forgotPassword
-              ? 'Reset Password'
-              : 'Create Account',
+              ? resetPassword
+              : createAccount,
           subtitle: vm.otpPurpose == OtpPurpose.forgotPassword
-              ? 'Enter your new password'
-              : 'Enter password and address detail to continue',
+              ? enterYourNewPassword
+              : enterPasswordAndAddressDetailToContinue,
           image: finalImage,
           rc: rc,
           form: Form(
@@ -51,7 +52,7 @@ class ResetPasswordView extends StatelessWidget {
               children: [
                 Consumer<ClientViewModelProvider>(
                   builder: (_, vm, _) => AppPasswordField(
-                    label: 'New Password',
+                    label: newPasswordLabel,
                     controller: cltPasswordCtrlSignUp,
                     obscure: vm.obscurePassword,
                     onToggle: vm.toggleObscurePassword,
@@ -66,7 +67,7 @@ class ResetPasswordView extends StatelessWidget {
 
                 Consumer<ClientViewModelProvider>(
                   builder: (_, vm, _) => AppPasswordField(
-                    label: 'Confirm New Password',
+                    label: confirmNewPasswordLabel,
                     controller: cltConfirmPasswordCtrl,
                     obscure: vm.obscureConfirm,
                     onToggle: vm.toggleObscureConfirm,
@@ -80,7 +81,7 @@ class ResetPasswordView extends StatelessWidget {
                 const SizedBox(height: 14),
 
                 AddressAutocompleteField(
-                  label: "Address",
+                  label: addressLabel,
                   controller: cltAddressCtrl,
                   validator: vm.validateMailingAddress,
                   googleApiKey: dotenv.env['GOOGLE_API_KEY']!,
@@ -97,10 +98,10 @@ class ResetPasswordView extends StatelessWidget {
                 Consumer<ClientViewModelProvider>(
                   builder: (_, vm, _) => AppButton(
                     text: vm.isResetting
-                        ? 'Resetting...'
+                        ? resetting
                         : (vm.otpPurpose == OtpPurpose.forgotPassword
-                              ? 'Reset Password'
-                              : 'Submit'),
+                              ? resetPassword
+                              : submitTxt),
                     buttonBackgroundColor: AppColors.authThemeColor,
                     borderColor: AppColors.authThemeColor,
                     isLoading: vm.isResetting,
@@ -111,17 +112,14 @@ class ResetPasswordView extends StatelessWidget {
                         vm.enableAutoValidate();
                         return;
                       }
-                      await vm.resetPassword(
-                        formKey: formKey,
-                        context: context,
-                      );
+                      await vm.clientSignUp(formKey: formKey, context: context);
                     },
                   ),
                 ),
 
                 AuthFormSwitchRow(
-                  question: "Already have an account? ",
-                  actionText: "Sign In",
+                  question: alreadyHaveAccount,
+                  actionText: signInTitle,
                   onTap: () {
                     context.router.replaceAll([
                       ClientSignInRoute(showBackButton: false),

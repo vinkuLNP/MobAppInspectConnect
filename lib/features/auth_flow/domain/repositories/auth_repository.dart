@@ -5,12 +5,15 @@ import 'package:inspect_connect/features/auth_flow/domain/entities/certificate_t
 import 'package:inspect_connect/features/auth_flow/domain/entities/inspector_documents_type.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/inspector_sign_up_entity.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/jurisdiction_entity.dart';
+import 'package:inspect_connect/features/auth_flow/domain/entities/settings_entity.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/user_detail.dart';
 
 abstract class AuthRepository {
   Future<ApiResultModel<List<CertificateInspectorTypeEntity>>>
   getCertificateTypes();
   Future<ApiResultModel<List<JurisdictionEntity>>> getJurisdictionCities();
+  Future<ApiResultModel<SettingEntity>> getSettings(String type);
+
   Future<ApiResultModel<List<InspectorDocumentsTypeEntity>>>
   getIsnpectorDocumentsType();
 
