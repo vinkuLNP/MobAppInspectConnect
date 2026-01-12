@@ -1,4 +1,5 @@
 import 'package:inspect_connect/core/utils/helpers/device_helper/device_helper.dart';
+import 'package:inspect_connect/core/utils/presentation/app_common_widgets.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/inspector/inspector_view_model.dart';
 import 'package:inspect_connect/features/auth_flow/utils/text_editor_controller.dart';
 
@@ -58,10 +59,10 @@ class InspectorPersonalStepService {
 
     final deviceToken = await DeviceInfoHelper.getDeviceToken();
     final deviceType = await DeviceInfoHelper.getDeviceType();
+    final existing = await provider.localDs.getFullData();
     await provider.localDs.updateFields({
       'role': 2,
       'deviceType': deviceType,
-
       'deviceToken': deviceToken,
       'name': inspFullNameCtrl.text.trim(),
       'phoneNumber': inspPhoneCtrl.text.trim(),
@@ -82,6 +83,7 @@ class InspectorPersonalStepService {
               provider.phoneIso!.isNotEmpty
           ? provider.phoneIso
           : (await provider.localDs.getFullData())?.isoCode ?? 'IN',
+      'privateTempId': existing?.privateTempId ?? generatePrivateTempId(),
     });
   }
 }

@@ -164,7 +164,6 @@ class InsepctorPersistentDataService {
         AppLogger.error('SignUp', 'Saved data is null');
         return;
       }
-      saved.privateTempId = 'privatetempid';
       saved.country = "US";
       saved.state = "US";
       saved.city = "US";

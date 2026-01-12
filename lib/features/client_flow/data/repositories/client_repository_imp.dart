@@ -21,17 +21,16 @@ class ClientUserRepositoryImpl implements ClientUserRepository {
     return remote.getCertificateSubTypes();
   }
 
-    @override
-  Future<ApiResultModel<WalletModel>>
-  getUserWalletAmount() {
+  @override
+  Future<ApiResultModel<WalletModel>> getUserWalletAmount() {
     return remote.getUserWalletAmount();
   }
 
   @override
   Future<ApiResultModel<UploadImageResponseModel>> uploadImage({
-    required UploadImageDto filePath,
+    required UploadImageDto uploadImageDto,
   }) {
-    return remote.uploadImage(filePath);
+    return remote.uploadImage(uploadImageDto);
   }
 
   @override
@@ -60,8 +59,6 @@ class ClientUserRepositoryImpl implements ClientUserRepository {
     );
   }
 
-
-
   @override
   Future<ApiResultModel<PaymentsBodyModel>> getUserPaymentList({
     required int page,
@@ -80,33 +77,47 @@ class ClientUserRepositoryImpl implements ClientUserRepository {
     );
   }
 
+  @override
+  Future<ApiResultModel<BookingDetailModel>> getBookingDetail(
+    String bookingId,
+  ) {
+    return remote.getBookingDetail(bookingId);
+  }
 
   @override
-Future<ApiResultModel<BookingDetailModel>> getBookingDetail(String bookingId) {
-  return remote.getBookingDetail(bookingId);
-}
+  Future<ApiResultModel<bool>> deleteBooking(String bookingId) {
+    return remote.deleteBooking(bookingId);
+  }
 
-@override
-Future<ApiResultModel<bool>> deleteBooking(String bookingId) {
-  return remote.deleteBooking(bookingId);
-}
+  @override
+  Future<ApiResultModel<BookingData>> updateBooking(
+    String bookingId,
+    BookingEntity booking,
+  ) {
+    return remote.updateBooking(bookingId, booking);
+  }
 
-@override
-Future<ApiResultModel<BookingData>> updateBooking(String bookingId, BookingEntity booking) {
-  return remote.updateBooking(bookingId, booking);
-}
+  @override
+  Future<ApiResultModel<BookingData>> updateBookingStatus(
+    String bookingId,
+    int status,
+  ) {
+    return remote.updateBookingStatus(bookingId, status);
+  }
 
-@override
-Future<ApiResultModel<BookingData>> updateBookingStatus(String bookingId, int status) {
-  return remote.updateBookingStatus(bookingId, status);
-}
-@override
-Future<ApiResultModel<BookingData>> showUpFeeStatus(String bookingId, bool status) {
-  return remote.showUpFeeStatus(bookingId, status);
-}
-@override
-Future<ApiResultModel<BookingData>> updateBookingTimer(String bookingId, String action) {
-  return remote.updateBookingTimer(bookingId, action);
-}
+  @override
+  Future<ApiResultModel<BookingData>> showUpFeeStatus(
+    String bookingId,
+    bool status,
+  ) {
+    return remote.showUpFeeStatus(bookingId, status);
+  }
 
+  @override
+  Future<ApiResultModel<BookingData>> updateBookingTimer(
+    String bookingId,
+    String action,
+  ) {
+    return remote.updateBookingTimer(bookingId, action);
+  }
 }

@@ -49,11 +49,12 @@ class BookingImagesService {
 
       final uploadImage = UploadImageDto(filePath: file.path);
       final uploadImageUseCase = locator<UploadImageUseCase>();
-      final result = await provider.executeParamsUseCase<UploadImageResponseModel, UploadImageParams>(
-        useCase: uploadImageUseCase,
-        query: UploadImageParams(filePath: uploadImage),
-        launchLoader: true,
-      );
+      final result = await provider
+          .executeParamsUseCase<UploadImageResponseModel, UploadImageParams>(
+            useCase: uploadImageUseCase,
+            query: UploadImageParams(uploadImageDto: uploadImage),
+            launchLoader: true,
+          );
 
       result?.when(
         data: (response) {

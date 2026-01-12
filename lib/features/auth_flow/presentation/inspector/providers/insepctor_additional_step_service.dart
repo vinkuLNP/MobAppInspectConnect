@@ -55,7 +55,7 @@ class InsepctorAdditionalStepService {
         final result = await provider
             .executeParamsUseCase<UploadImageResponseModel, UploadImageParams>(
               useCase: uploadImageUseCase,
-              query: UploadImageParams(filePath: uploadImage),
+              query: UploadImageParams(uploadImageDto: uploadImage),
               launchLoader: true,
             );
         log("--5-profileImage------>${provider.profileImage.toString()}");
@@ -101,20 +101,27 @@ class InsepctorAdditionalStepService {
           }
           return;
         }
-        final uploadImage = UploadImageDto(filePath: file.path);
+        late final UploadImageDto uploadImage;
+        if (type == 'ref') {
+          uploadImage = UploadImageDto(filePath: file.path);
+        } else {
+          uploadImage = UploadImageDto(
+            filePath: file.path,
+            fileType: 'sensitive',
+            privateTempId: await provider.localDs.getPrivateTempId(),
+          );
+        }
         final uploadImageUseCase = locator<UploadImageUseCase>();
         final responseResult = await provider
             .executeParamsUseCase<UploadImageResponseModel, UploadImageParams>(
               useCase: uploadImageUseCase,
-              query: UploadImageParams(filePath: uploadImage),
+              query: UploadImageParams(uploadImageDto: uploadImage),
               launchLoader: true,
             );
 
         responseResult?.when(
           data: (response) {
             if (type == 'id') {
-              // provider.idLicense = file;
-              // provider.idLicenseUrl = File(response.fileUrl);
               provider.idDocumentFile = file;
               provider.idDocumentUploadedUrl = response.fileUrl;
             } else if (type == 'ref') {

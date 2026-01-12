@@ -115,9 +115,11 @@ class WalletProvider extends BaseViewModel {
         dto = CreatePaymentIntentDto(
           paymentType: 'subscription',
           totalAmount: request.amount,
-          type: 1,
+          type: 0,
           device: '1',
-          subscriptionId: request.referenceId,
+          priceId: request.priceId,
+
+          subscriptionId: request.subscriptionId,
         );
         break;
 

@@ -123,7 +123,7 @@ extension InspectorSignUpEntityMapper on InspectorSignUpLocalEntity {
           "countryCode": s.countryCode,
           "stateCode": s.stateCode,
           "cityName": s.cityName,
-          "zipCode": s.zipCode,
+          "zipCode": s.zipCode ?? " ",
           "location": {
             "type": s.locationType,
             "coordinates": [s.longitude, s.latitude],

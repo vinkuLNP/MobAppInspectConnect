@@ -220,7 +220,6 @@ class _AdditionalDetailsStepState extends State<AdditionalDetailsStep> {
 
         if (picked != null) {
           onPick(picked);
-          // onPick(DateTime(picked.year, picked.month, 1));
         }
       },
       child: Container(

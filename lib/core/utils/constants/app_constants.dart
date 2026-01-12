@@ -63,7 +63,7 @@ const String getInspectorCertificateTypesEndPoint = 'certificate/types';
 const String getInspectorCertificateTAgenciesEndPoint = 'certificate/agencies';
 const String getJurisdictionCitiesEndPoint = 'cities/jurisdictions';
 const String getInspectorDocumentTypeEndPoint = 'document/types';
-
+const String getSettingsEndPoint = 'settings';
 const String createBookingEndPoint = 'bookings';
 const String bookingStatusEndPoint = 'status';
 const String bookingTimerEndPoint = 'timer';

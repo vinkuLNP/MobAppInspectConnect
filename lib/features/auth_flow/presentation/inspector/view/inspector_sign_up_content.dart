@@ -124,7 +124,7 @@ class _InspectorSignUpContentState extends State<InspectorSignUpContent> {
                 log('ICC Local Files: ${vm.iccLocalFiles}');
                 log('ICC Uploaded URLs: ${vm.iccUploadedUrls}');
                 log('Selected Cities: ${vm.selectedCityNames}');
-                // final isValid = vm.validateServiceArea();
+                final isValid = vm.validateServiceArea();
                 if (!isValid) return;
                 vm.saveSelectedServiceDataToProvider();
 
@@ -145,10 +145,10 @@ class _InspectorSignUpContentState extends State<InspectorSignUpContent> {
 
                 break;
               case 3:
-                // vm.validateBeforeSubmit(context: ctx);
-                // if (!vm.agreedToTerms || !vm.confirmTruth) {
-                //   return;
-                // }
+                vm.validateBeforeSubmit(context: ctx);
+                if (!vm.agreedToTerms || !vm.confirmTruth) {
+                  return;
+                }
                 log("called");
                 String? getSafePath(dynamic fileOrUrl) {
                   if (fileOrUrl == null) return null;

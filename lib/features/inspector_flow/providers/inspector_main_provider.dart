@@ -4,6 +4,9 @@ import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:inspect_connect/core/basecomponents/base_view_model.dart';
 import 'package:inspect_connect/core/commondomain/entities/based_api_result/api_result_state.dart';
 import 'package:inspect_connect/core/di/app_component/app_component.dart';
+import 'package:inspect_connect/core/di/services/payment_services/payment_purpose.dart';
+import 'package:inspect_connect/core/di/services/payment_services/payment_request.dart';
+import 'package:inspect_connect/core/utils/app_widgets/card_payment_sheet.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/features/auth_flow/data/datasources/local_datasources/auth_local_datasource.dart';
 import 'package:inspect_connect/features/auth_flow/data/datasources/local_datasources/auth_user_local_entity.dart';
@@ -11,6 +14,7 @@ import 'package:inspect_connect/features/auth_flow/domain/entities/auth_user.dar
 import 'package:inspect_connect/features/auth_flow/domain/entities/user_detail.dart';
 import 'package:inspect_connect/features/auth_flow/domain/usecases/get_user__usercase.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/user_provider.dart';
+import 'package:inspect_connect/features/client_flow/presentations/providers/wallet_provider.dart';
 import 'package:inspect_connect/features/inspector_flow/data/models/payment_intent_response_model.dart';
 import 'package:inspect_connect/features/inspector_flow/data/models/subscription_model.dart';
 import 'package:inspect_connect/features/inspector_flow/data/models/user_subscription_model.dart';
@@ -97,7 +101,19 @@ class InspectorDashboardProvider extends BaseViewModel {
         data: (response) async {
           userSubscriptionModel = response;
           log("resposne of subscriptionas plan----------$response");
-          startPayment(context: context, plan: userSubscriptionModel!);
+          showCardPaymentSheet(
+            context: context,
+            provider: context.read<WalletProvider>(),
+            request: PaymentRequest(
+              purpose: PaymentPurpose.subscription,
+              amount: response.amount.toDouble().toString(),
+              priceId: response.priceId,
+              subscriptionId: response.stripeSubscriptionId,
+              totalAmount: plan.amount.toDouble().toString(),
+              type: 0,
+              device: '1',
+            ),
+          );
         },
         error: (e) {},
       );

@@ -35,7 +35,17 @@ class _ServiceAreaStepState extends State<ServiceAreaStep> {
     final vm = widget.vm;
 
     if (vm.selectedCountryCode == null || vm.selectedStateCode == null) return;
+    final maxCities = vm.maxAllowedCities;
+    final alreadySelected = vm.selectedCityNames.length;
 
+    if (maxCities > 0 && alreadySelected >= maxCities) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('You can select a maximum of $maxCities cities.'),
+        ),
+      );
+      return;
+    }
     final cities = (vm.cachedCities[widget.vm.selectedCountryCode] ?? [])
         .where((c) => c.stateCode == vm.selectedStateCode)
         .toList();
@@ -49,7 +59,13 @@ class _ServiceAreaStepState extends State<ServiceAreaStep> {
           .where((c) => vm.selectedCityNames.contains(c.name))
           .toList(),
     );
-
+    if (selected.isEmpty) return;
+    if (maxCities > 0 && selected.length > maxCities) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('You can select only $maxCities cities.')),
+      );
+      return;
+    }
     vm.selectedCityNames = selected.map((c) => c.name).toList();
 
     vm.selectedCities
@@ -66,6 +82,9 @@ class _ServiceAreaStepState extends State<ServiceAreaStep> {
   Widget build(BuildContext context) {
     return Consumer<InspectorViewModelProvider>(
       builder: (_, vm, _) {
+        final maxCities = vm.maxAllowedCities;
+        final limitReached =
+            maxCities > 0 && vm.selectedCityNames.length >= maxCities;
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -180,12 +199,14 @@ class _ServiceAreaStepState extends State<ServiceAreaStep> {
                       fontSize: 14,
                     ),
                     GestureDetector(
-                      onTap: openCitySelectionDialog,
+                      onTap: limitReached ? null : openCitySelectionDialog,
                       child: textWidget(
                         text: "Add / Edit",
                         fontWeight: FontWeight.w400,
                         fontSize: 12,
-                        color: AppColors.authThemeColor,
+                        color: limitReached
+                            ? Colors.grey
+                            : AppColors.authThemeColor,
                       ),
                     ),
                   ],
@@ -271,6 +292,7 @@ class _ServiceAreaStepState extends State<ServiceAreaStep> {
                               vm.iccDocsByCity[city]!.removeAt(index),
                           onPickExpiry: (index, date) {
                             vm.iccDocsByCity[city]![index].expiryDate = date;
+                            vm.validateServiceArea();
                             vm.notify();
                           },
                         ),
@@ -280,6 +302,15 @@ class _ServiceAreaStepState extends State<ServiceAreaStep> {
                 ),
               ],
             ),
+            if (vm.iccError != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 4, left: 4),
+                child: textWidget(
+                  text: vm.iccError!,
+                  color: Colors.red,
+                  fontSize: 12,
+                ),
+              ),
 
             const SizedBox(height: 18),
 

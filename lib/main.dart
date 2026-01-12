@@ -16,6 +16,7 @@ import 'package:inspect_connect/features/auth_flow/presentation/client/client_vi
 import 'package:inspect_connect/features/client_flow/presentations/providers/booking_provider.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/session_manager.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/user_provider.dart';
+import 'package:inspect_connect/features/client_flow/presentations/providers/wallet_provider.dart';
 import 'package:inspect_connect/features/inspector_flow/providers/inspector_main_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -88,6 +89,7 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider.value(value: locator<UserProvider>()),
         ChangeNotifierProvider.value(value: locator<BookingProvider>()),
         ChangeNotifierProvider.value(value: locator<AuthFlowProvider>()),
+        ChangeNotifierProvider.value(value: locator<WalletProvider>()),
         ChangeNotifierProvider.value(value: locator<ClientViewModelProvider>()),
         ChangeNotifierProvider.value(
           value: locator<InspectorDashboardProvider>(),

@@ -6,19 +6,20 @@ import 'package:inspect_connect/features/client_flow/domain/entities/upload_imag
 import 'package:inspect_connect/features/client_flow/domain/repositories/booking_repository.dart';
 
 class UploadImageParams extends Equatable {
-  final UploadImageDto filePath;
+  final UploadImageDto uploadImageDto;
 
-  const UploadImageParams({required this.filePath});
+  const UploadImageParams({required this.uploadImageDto});
 
   @override
-  List<Object?> get props => [filePath];
+  List<Object?> get props => [uploadImageDto];
 }
 
-class UploadImageUseCase extends BaseParamsUseCase<UploadImageResponseModel, UploadImageParams> {
+class UploadImageUseCase
+    extends BaseParamsUseCase<UploadImageResponseModel, UploadImageParams> {
   final ClientUserRepository _repo;
   UploadImageUseCase(this._repo);
 
   @override
   Future<ApiResultModel<UploadImageResponseModel>> call(UploadImageParams? p) =>
-      _repo.uploadImage(filePath: p!.filePath);
+      _repo.uploadImage(uploadImageDto: p!.uploadImageDto);
 }

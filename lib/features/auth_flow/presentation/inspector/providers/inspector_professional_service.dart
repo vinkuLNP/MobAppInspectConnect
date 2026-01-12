@@ -70,12 +70,16 @@ class InspectorProfessionalStepService {
         }
         return;
       }
-      final uploadImage = UploadImageDto(filePath: file.path);
+      final uploadImage = UploadImageDto(
+        filePath: file.path,
+        fileType: 'sensitive',
+        privateTempId: await provider.localDs.getPrivateTempId(),
+      );
       final uploadImageUseCase = locator<UploadImageUseCase>();
       final result = await provider
           .executeParamsUseCase<UploadImageResponseModel, UploadImageParams>(
             useCase: uploadImageUseCase,
-            query: UploadImageParams(filePath: uploadImage),
+            query: UploadImageParams(uploadImageDto: uploadImage),
             launchLoader: true,
           );
 
@@ -196,7 +200,6 @@ class InspectorProfessionalStepService {
       'certificateTypeId': certificateTypeId,
       'certificateExpiryDate': certificateExpiryDate,
       'certificateDocuments': uploadedCertificateUrls ?? [],
-      // 'certificateAgencyIds': agencyIds ?? [],
     });
   }
 }

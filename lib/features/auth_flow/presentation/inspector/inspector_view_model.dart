@@ -8,6 +8,7 @@ import 'package:inspect_connect/core/utils/constants/app_colors.dart';
 import 'package:inspect_connect/core/utils/constants/app_strings.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/features/auth_flow/data/datasources/local_datasources/inspector_local_data_source.dart';
+import 'package:inspect_connect/features/auth_flow/data/models/settings_model.dart';
 import 'package:inspect_connect/features/auth_flow/data/models/ui_icc_document.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/certificate_type_entity.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/icc_document_entity.dart';
@@ -33,6 +34,7 @@ class InspectorViewModelProvider extends BaseViewModel {
     fetchCertificateTypes();
     loadCountries();
     fetchJurisdictions();
+    fetchMaxNumberOfCities();
     fetchInspectorDocumentsType();
     notifyListeners();
   }
@@ -71,7 +73,7 @@ class InspectorViewModelProvider extends BaseViewModel {
   String? countryError;
   String? stateError;
   String? cityError;
-  String? zipError;
+  String? iccError;
   String? mailingAddressError;
   final Map<String, List<IccDocumentLocalEntity>> iccLocalFiles = {};
   final Map<String, List<String>> iccUploadedUrls = {};
@@ -114,6 +116,7 @@ class InspectorViewModelProvider extends BaseViewModel {
         }
         return;
       }
+      final privateTempId = await localDs.getPrivateTempId();
 
       final uploadUseCase = locator<UploadImageUseCase>();
 
@@ -124,7 +127,11 @@ class InspectorViewModelProvider extends BaseViewModel {
           >(
             useCase: uploadUseCase,
             query: UploadImageParams(
-              filePath: UploadImageDto(filePath: file.path),
+              uploadImageDto: UploadImageDto(
+                filePath: file.path,
+                privateTempId: privateTempId,
+                fileType: 'sensitive',
+              ),
             ),
             launchLoader: true,
           );
@@ -135,6 +142,7 @@ class InspectorViewModelProvider extends BaseViewModel {
           iccDocsByCity[city]!.add(
             IccUiDocument(localFile: file, uploadedUrl: response.fileUrl),
           );
+          validateServiceArea();
           notifyListeners();
         },
         error: (e) {
@@ -172,6 +180,7 @@ class InspectorViewModelProvider extends BaseViewModel {
 
   String get selectedcertificateExpiryDate => certificateExpiryDate;
   List<JurisdictionEntity> jurisdictions = [];
+  SettingsDataModel? setting;
   List<InspectorDocumentsTypeEntity> inspectorDocumentsType = [];
   Map<String, bool> cityRequiresIcc = {};
   List<IccDocumentLocalEntity> iccDocuments = [];
@@ -182,7 +191,8 @@ class InspectorViewModelProvider extends BaseViewModel {
   String? mailingAddress;
   String? zipCode;
   List<ServiceAreaLocalEntity> serviceAreas = [];
-
+  int maxCitiesAllowed = 0;
+  int get maxAllowedCities => setting?.maxCities ?? maxCitiesAllowed;
   bool _obscurePassword = true;
   bool get obscurePassword => _obscurePassword;
 
@@ -437,6 +447,8 @@ class InspectorViewModelProvider extends BaseViewModel {
 
   Future<void> fetchJurisdictions() =>
       inspectorServiceAreaService.fetchJurisdictions();
+  Future<void> fetchMaxNumberOfCities() =>
+      inspectorServiceAreaService.fetchMaxNumberOfCities();
 
   Future<void> fetchInspectorDocumentsType() =>
       additionalStepService.fetchDocumentTypes();
@@ -555,7 +567,6 @@ class InspectorViewModelProvider extends BaseViewModel {
       iccDocsByCity.putIfAbsent(city, () => []);
       iccDocsByCity[city]!.add(
         IccUiDocument(
-          // : url.split('/').last,
           uploadedUrl: url,
           expiryDate: expiry,
           // isUploaded: true,

@@ -9,34 +9,49 @@ import 'package:inspect_connect/features/client_flow/domain/entities/booking_ent
 import 'package:inspect_connect/features/client_flow/domain/entities/certificate_sub_type_entity.dart';
 
 abstract class ClientUserRepository {
- Future<ApiResultModel<List<CertificateSubTypeEntity>>>  getCertificateSubTypes();
-  Future<ApiResultModel<UploadImageResponseModel>> uploadImage({required UploadImageDto filePath});
-  Future<ApiResultModel<CreateBookingResponseModel>>  createBooking({required BookingEntity booking});
- Future<ApiResultModel<List<BookingData>>>  fetchBookings({
-   required int page,
+  Future<ApiResultModel<List<CertificateSubTypeEntity>>>
+  getCertificateSubTypes();
+  Future<ApiResultModel<UploadImageResponseModel>> uploadImage({
+    required UploadImageDto uploadImageDto,
+  });
+  Future<ApiResultModel<CreateBookingResponseModel>> createBooking({
+    required BookingEntity booking,
+  });
+  Future<ApiResultModel<List<BookingData>>> fetchBookings({
+    required int page,
     required int perPageLimit,
     String? search,
     String? sortBy,
     String? sortOrder,
     int? status,
- });
- Future<ApiResultModel<PaymentsBodyModel>>  getUserPaymentList({
-   required int page,
+  });
+  Future<ApiResultModel<PaymentsBodyModel>> getUserPaymentList({
+    required int page,
     required int limit,
     String? search,
     String? sortBy,
     String? sortOrder,
- });
- Future<ApiResultModel<WalletModel>>  getUserWalletAmount();
+  });
+  Future<ApiResultModel<WalletModel>> getUserWalletAmount();
 
   Future<ApiResultModel<BookingDetailModel>> getBookingDetail(String bookingId);
-Future<ApiResultModel<bool>> deleteBooking(String bookingId);
-Future<ApiResultModel<BookingData>> updateBooking(String bookingId, BookingEntity booking);
+  Future<ApiResultModel<bool>> deleteBooking(String bookingId);
+  Future<ApiResultModel<BookingData>> updateBooking(
+    String bookingId,
+    BookingEntity booking,
+  );
 
-Future<ApiResultModel<BookingData>> updateBookingStatus(String bookingId,int status);
-Future<ApiResultModel<BookingData>> showUpFeeStatus(String bookingId,bool showUpFeeApplied);
+  Future<ApiResultModel<BookingData>> updateBookingStatus(
+    String bookingId,
+    int status,
+  );
+  Future<ApiResultModel<BookingData>> showUpFeeStatus(
+    String bookingId,
+    bool showUpFeeApplied,
+  );
 
-
-Future<ApiResultModel<BookingData>> updateBookingTimer(String bookingId,String action);
-
+  Future<ApiResultModel<BookingData>> updateBookingTimer(
+    String bookingId,
+    String action,
+  );
 }
