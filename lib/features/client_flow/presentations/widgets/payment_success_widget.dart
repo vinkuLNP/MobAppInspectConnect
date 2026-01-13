@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:inspect_connect/core/utils/constants/app_strings.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_button.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 
@@ -61,7 +62,7 @@ class PaymentSuccessDialogState extends State<PaymentSuccessDialog> {
             ),
             const SizedBox(height: 22),
             textWidget(
-              text: "Payment Successful!",
+              text: paymentSuccessful,
 
               fontSize: 20,
               fontWeight: FontWeight.bold,
@@ -69,7 +70,7 @@ class PaymentSuccessDialogState extends State<PaymentSuccessDialog> {
             ),
             const SizedBox(height: 8),
             textWidget(
-              text: "Your wallet balance has been updated successfully.",
+              text: walletBalanceUpdatedSuccessfully,
               alignment: TextAlign.center,
               color: Colors.grey[700]!,
               fontSize: 14,
@@ -77,7 +78,7 @@ class PaymentSuccessDialogState extends State<PaymentSuccessDialog> {
 
             const SizedBox(height: 26),
             AppButton(
-              text: "Continue",
+              text: continueTxt,
               onTap: () {
                 Navigator.pop(context);
               },

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/di/services/payment_services/payment_purpose.dart';
 import 'package:inspect_connect/core/di/services/payment_services/payment_request.dart';
 import 'package:inspect_connect/core/utils/app_widgets/card_payment_sheet.dart';
+import 'package:inspect_connect/core/utils/constants/app_strings.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_button.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/features/client_flow/domain/enums/wallet_state_enum.dart';
@@ -38,7 +39,7 @@ class _WalletScreenState extends State<WalletScreen> {
       backgroundColor: Colors.grey[200],
       appBar: CommonAppBar(
         showBackButton: true,
-        title: "Wallet",
+        title: wallet,
         showLogo: false,
       ),
       body: RefreshIndicator(
@@ -54,7 +55,7 @@ class _WalletScreenState extends State<WalletScreen> {
         return const Center(child: CircularProgressIndicator());
       case WalletState.error:
         return ErrorView(
-          message: provider.error ?? "Something went wrong",
+          message: provider.error ?? somethingWentWrong,
           onRetry: () => provider.refreshAll(context),
         );
       case WalletState.loaded:
@@ -78,7 +79,7 @@ class _WalletScreenState extends State<WalletScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               textWidget(
-                text: "Add Money",
+                text: addMoney,
                 fontWeight: FontWeight.bold,
                 fontSize: 16,
               ),
@@ -102,7 +103,7 @@ class _WalletScreenState extends State<WalletScreen> {
                     minWidth: 0,
                     minHeight: 0,
                   ),
-                  hintText: "Enter amount (e.g. 50)",
+                  hintText: enterAmountHint,
                   filled: true,
                   fillColor: Colors.grey[100],
                   border: OutlineInputBorder(
@@ -113,7 +114,7 @@ class _WalletScreenState extends State<WalletScreen> {
               ),
               const SizedBox(height: 20),
               AppButton(
-                text: "Proceed to Pay",
+                text: proceedToPay,
                 onTap: () {
                   final amount = controller.text.trim();
                   if (amount.isEmpty ||
@@ -123,8 +124,7 @@ class _WalletScreenState extends State<WalletScreen> {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: textWidget(
-                          text:
-                              "Please enter a valid amount - min \$50 AND max -\$100000",
+                          text: pleaseEnterValidAmount,
                           color: Colors.white,
                         ),
                       ),
@@ -138,7 +138,6 @@ class _WalletScreenState extends State<WalletScreen> {
                     request: PaymentRequest(
                       purpose: PaymentPurpose.addMoneyToWallet,
                       amount: amount,
-                      // referenceId: orderId,
                     ),
                   );
                 },

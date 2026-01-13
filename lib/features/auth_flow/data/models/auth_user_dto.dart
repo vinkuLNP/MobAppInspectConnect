@@ -27,7 +27,7 @@ class AuthUserDto {
   final int? currentSubscriptionTrialDays;
   final int? currentSubscriptionAutoRenew;
   final bool? stripePayoutsEnabled;
-  final bool? stripeTransfersActive;
+  final bool? stripeTransfersEnabled;
   final int? certificateApproved;
   final String? rejectedReason;
   final bool? bookingInProgress;
@@ -73,7 +73,7 @@ class AuthUserDto {
     this.currentSubscriptionTrialDays,
     this.currentSubscriptionAutoRenew,
     this.stripePayoutsEnabled,
-    this.stripeTransfersActive,
+    this.stripeTransfersEnabled,
     this.certificateApproved,
     this.rejectedReason,
     this.bookingInProgress,
@@ -121,7 +121,7 @@ class AuthUserDto {
       currentSubscriptionTrialDays: json['currentSubscriptionTrialDays'],
       currentSubscriptionAutoRenew: json['currentSubscriptionAutoRenew'],
       stripePayoutsEnabled: json['stripePayoutsEnabled'],
-      stripeTransfersActive: json['stripeTransfersActive'],
+      stripeTransfersEnabled: json['stripeTransfersEnabled'],
       certificateApproved: json['certificateApproved'],
       rejectedReason: json['rejectedReason'],
       bookingInProgress: json['bookingInProgress'],

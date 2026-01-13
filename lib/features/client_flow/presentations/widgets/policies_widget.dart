@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
+import 'package:inspect_connect/core/utils/constants/app_strings.dart';
 import 'package:inspect_connect/features/client_flow/presentations/constants/booking_policy_text.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/booking_provider.dart';
 import 'package:provider/provider.dart';
@@ -123,7 +124,7 @@ class _PolicyAgreementRowState extends State<PolicyAgreementRow> {
           ),
           actions: [
             TextButton(
-              child: const Text("I AGREE"),
+              child: const Text(iAgree),
               onPressed: () {
                 prov.setAgreePolicy(true);
                 Navigator.pop(ctx);

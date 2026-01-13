@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
+import 'package:inspect_connect/core/utils/constants/app_strings.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/features/auth_flow/data/models/ui_icc_document.dart';
 
@@ -24,7 +25,7 @@ class AppFilePickerGrid extends StatelessWidget {
   Future<void> _pickFile() async {
     final result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
-      allowedExtensions: ['pdf', 'jpg', 'jpeg', 'png'],
+      allowedExtensions: mixedExtensions,
     );
 
     if (result != null && result.files.single.path != null) {
@@ -78,11 +79,7 @@ class AppFilePickerGrid extends StatelessWidget {
           children: [
             const Icon(Icons.upload_file, size: 32, color: Colors.grey),
             const SizedBox(height: 8),
-            textWidget(
-              text: "Upload Document",
-              color: Colors.grey,
-              fontSize: 12,
-            ),
+            textWidget(text: uploadDocument, color: Colors.grey, fontSize: 12),
           ],
         ),
       ),
@@ -153,8 +150,8 @@ class AppFilePickerGrid extends StatelessWidget {
             },
             child: textWidget(
               text: hasExpiry
-                  ? 'Expiry: ${doc.expiryDate!.toIso8601String().split("T").first}'
-                  : 'Select Expiry Date *',
+                  ? '$expiryTxt: ${doc.expiryDate!.toIso8601String().split("T").first}'
+                  : '$selectExpiryDate *',
               fontSize: 11,
               color: hasExpiry ? Colors.green : Colors.red,
             ),

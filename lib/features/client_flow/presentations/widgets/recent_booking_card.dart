@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/utils/constants/app_common_card_container.dart';
+import 'package:inspect_connect/core/utils/constants/app_strings.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/features/client_flow/domain/entities/booking_list_entity.dart';
 import 'package:intl/intl.dart';
@@ -32,7 +33,7 @@ class RecentBookingViewerCard extends StatelessWidget {
                 const SizedBox(width: 8),
                 Expanded(
                   child: textWidget(
-                    text: 'RECENT APPROVED BOOKING',
+                    text: recentApprovedBooking,
                     color: Colors.white,
                     textOverflow: TextOverflow.ellipsis,
                     fontSize: 14,
@@ -56,11 +57,11 @@ class RecentBookingViewerCard extends StatelessWidget {
 
                 const SizedBox(height: 10),
 
-                _iconRow(Icons.calendar_today, 'Booking date', dateStr),
+                _iconRow(Icons.calendar_today, bookingDate, dateStr),
                 const SizedBox(height: 6),
                 _iconRow(
                   Icons.access_time,
-                  'Booking time',
+                  bookingTime,
                   bookingListEntity.bookingTime,
                 ),
                 const SizedBox(height: 6),

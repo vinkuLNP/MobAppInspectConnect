@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
 import 'package:inspect_connect/core/utils/constants/app_common_card_container.dart';
 import 'package:inspect_connect/core/utils/constants/app_constants.dart';
+import 'package:inspect_connect/core/utils/constants/app_strings.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_button.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/features/client_flow/domain/entities/booking_list_entity.dart';
@@ -21,7 +22,7 @@ class BookingsScreen extends StatefulWidget {
 
 class _BookingsScreenState extends State<BookingsScreen> {
   final ScrollController _scrollController = ScrollController();
-  String selectedStatus = 'all';
+  String selectedStatus = allValueTxt;
   bool _shownApprovalDialog = false;
 
   @override
@@ -29,7 +30,7 @@ class _BookingsScreenState extends State<BookingsScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final provider = context.read<BookingProvider>();
-      setState(() => selectedStatus = 'all');
+      setState(() => selectedStatus = allValueTxt);
       provider.resetBookings();
       provider.clearFilters(triggerFetch: false);
 
@@ -81,25 +82,6 @@ class _BookingsScreenState extends State<BookingsScreen> {
     _scrollController.dispose();
     super.dispose();
   }
-
-  final List<Map<String, dynamic>> _statusOptions = [
-    {'label': 'All', 'value': 'all'},
-    {'label': 'Awaiting Your Approval', 'value': '$bookingStatusAwaiting'},
-    {'label': 'Accepted', 'value': '$bookingStatusAccepted'},
-    {'label': 'Inspection Started', 'value': '$bookingStatusStarted'},
-
-    {'label': 'Inspection Paused', 'value': '$bookingStatusPaused'},
-    {'label': 'Inspection Stopped', 'value': '$bookingStatusStoppped'},
-    {'label': 'Pending', 'value': '$bookingStatusPending'},
-    {'label': 'Rejected', 'value': '$bookingStatusRejected'},
-    {'label': 'Completed', 'value': '$bookingStatusCompleted'},
-    {'label': 'Cancelled (You)', 'value': '$bookingStatusCancelledByClient'},
-    {
-      'label': 'Cancelled (Inspector)',
-      'value': '$bookingStatusCancelledByInspector',
-    },
-    {'label': 'Expired', 'value': '$bookingStatusExpired'},
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -293,9 +275,9 @@ class _BookingsScreenState extends State<BookingsScreen> {
                         scrollDirection: Axis.horizontal,
                         physics: const BouncingScrollPhysics(),
                         child: Row(
-                          children: _statusOptions.map((option) {
+                          children: statusOptions.map((option) {
                             final isSelected =
-                                selectedStatus == option['value'];
+                                selectedStatus == option[valueTxt];
                             return Padding(
                               padding: const EdgeInsets.only(
                                 right: 8,
@@ -303,7 +285,7 @@ class _BookingsScreenState extends State<BookingsScreen> {
                               ),
                               child: ChoiceChip(
                                 label: textWidget(
-                                  text: option['label'],
+                                  text: option[labelTxt],
                                   color: isSelected
                                       ? Colors.white
                                       : Colors.grey[700]!,
@@ -320,16 +302,16 @@ class _BookingsScreenState extends State<BookingsScreen> {
                                 elevation: isSelected ? 3 : 0,
                                 onSelected: (selected) {
                                   setState(
-                                    () => selectedStatus = option['value'],
+                                    () => selectedStatus = option[valueTxt],
                                   );
                                   final provider = context
                                       .read<BookingProvider>();
 
-                                  if (option['value'] == 'all') {
+                                  if (option[valueTxt] == allValueTxt) {
                                     provider.clearFilters(triggerFetch: false);
                                     provider.fetchBookingsList(reset: true);
                                   } else {
-                                    provider.filterByStatus(option['value']);
+                                    provider.filterByStatus(option[valueTxt]);
                                   }
                                 },
                               ),
@@ -528,7 +510,7 @@ class _BookingsScreenState extends State<BookingsScreen> {
                     textWidget(
                       text: booking.description.isNotEmpty
                           ? booking.description
-                          : "No description provided",
+                          : noDescriptionProvided,
                       fontSize: 12,
                       color: Colors.grey[800]!,
                     ),
@@ -578,7 +560,7 @@ class _BookingsScreenState extends State<BookingsScreen> {
                       const SizedBox(width: 10),
                       Expanded(
                         child: textWidget(
-                          text: "Inspection Completed - Approval Required",
+                          text: inspectionCompletedApprovalRequired,
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
                         ),
@@ -610,7 +592,7 @@ class _BookingsScreenState extends State<BookingsScreen> {
                         ),
                         const SizedBox(width: 6),
                         textWidget(
-                          text: "Awaiting Your Approval",
+                          text: awaitingYourApprovalLabelTxt,
 
                           color: themeColor,
                           fontWeight: FontWeight.w600,
@@ -622,7 +604,7 @@ class _BookingsScreenState extends State<BookingsScreen> {
                   const SizedBox(height: 20),
                   Divider(color: Colors.grey[300]),
                   textWidget(
-                    text: "Inspection Details",
+                    text: inspectionDetails,
                     fontWeight: FontWeight.bold,
                     fontSize: 15,
                   ),
@@ -630,40 +612,39 @@ class _BookingsScreenState extends State<BookingsScreen> {
                   const SizedBox(height: 10),
 
                   _infoRow(
-                    "📅 Date",
+                    "📅 $dateTxt",
                     DateFormat(
                       'dd/MM/yyyy',
                     ).format(DateTime.parse(booking.bookingDate)),
                   ),
-                  _infoRow("⏰ Time", booking.bookingTime),
-                  _infoRow("📍 Location", booking.bookingLocation),
-                  _infoRow("📝 Description", booking.description),
+                  _infoRow("⏰ $timeTxt", booking.bookingTime),
+                  _infoRow("📍 $locationTxt", booking.bookingLocation),
+                  _infoRow("📝 $descriptionTxt", booking.description),
                   _infoRow(
-                    "⏱ Duration",
-                    booking.timerDuration?.toString() ?? "0 minutes",
+                    "⏱ $durationTxt",
+                    booking.timerDuration?.toString() ?? zeroMinutes,
                   ),
 
                   const SizedBox(height: 20),
                   Divider(color: Colors.grey[300]),
 
                   textWidget(
-                    text: "Payment Information",
+                    text: paymentInformationTxt,
                     fontWeight: FontWeight.bold,
                     fontSize: 15,
                   ),
 
                   const SizedBox(height: 10),
                   textWidget(
-                    text:
-                        "Upon your approval, a payment of \$160.00 will be automatically deducted "
-                        "from your wallet and transferred to the inspector.",
+                    text: paymentDeductionInfoTxt(160.00),
+
                     color: Colors.grey[700]!,
                     height: 1.4,
                   ),
 
                   const SizedBox(height: 8),
                   textWidget(
-                    text: "Rate: \$160 per 4-hour block × 1 = \$160",
+                    text: rateCalculationTxt(rate: 160, blocks: 1),
                     color: Colors.grey[600]!,
                     fontSize: 13,
                   ),
@@ -686,7 +667,7 @@ class _BookingsScreenState extends State<BookingsScreen> {
                               size: 18,
                               color: Colors.red,
                             ),
-                            text: "Disagree",
+                            text: disagreeTxt,
                             buttonBackgroundColor: AppColors.backgroundColor,
                             isBorder: true,
                             borderColor: Colors.red,
@@ -719,7 +700,7 @@ class _BookingsScreenState extends State<BookingsScreen> {
                             buttonBackgroundColor: AppColors.backgroundColor,
                             isBorder: true,
                             borderColor: AppColors.authThemeColor,
-                            text: "Cancel",
+                            text: cancelTxt,
                             textColor: AppColors.authThemeColor,
                             onTap: () => Navigator.pop(context),
                           ),
@@ -732,7 +713,7 @@ class _BookingsScreenState extends State<BookingsScreen> {
                           size: 18,
                           color: Colors.white,
                         ),
-                        text: "Agree & Pay",
+                        text: agreeAndPayTxt,
                         showIcon: true,
                         iconLeftMargin: 10,
                         onTap: () async {
@@ -826,11 +807,11 @@ class _BookingsScreenState extends State<BookingsScreen> {
               const SizedBox(height: 12),
               textWidget(
                 text:
-                    "Date: ${DateFormat('dd MMM yyyy').format(DateTime.parse(booking.bookingDate))}",
+                    "$dateTxt: ${DateFormat('dd MMM yyyy').format(DateTime.parse(booking.bookingDate))}",
               ),
-              textWidget(text: "Time: ${booking.bookingTime}"),
+              textWidget(text: "$timeTxt: ${booking.bookingTime}"),
               const SizedBox(height: 12),
-              textWidget(text: "Description: ${booking.description}"),
+              textWidget(text: "$descriptionTxt: ${booking.description}"),
               const SizedBox(height: 24),
 
               Row(
@@ -838,7 +819,7 @@ class _BookingsScreenState extends State<BookingsScreen> {
                   isPending
                       ? Expanded(
                           child: AppButton(
-                            text: 'Edit Booking',
+                            text: editBooking,
                             onTap: () async {
                               Navigator.pop(context);
 
@@ -856,7 +837,7 @@ class _BookingsScreenState extends State<BookingsScreen> {
                   SizedBox(width: isPending ? 12 : 0),
                   Expanded(
                     child: AppButton(
-                      text: 'View Booking',
+                      text: viewBooking,
                       onTap: () async {
                         Navigator.pop(context);
 
@@ -875,7 +856,7 @@ class _BookingsScreenState extends State<BookingsScreen> {
               if (isPending || isApproved || isRejected) ...[
                 const SizedBox(height: 12),
                 AppButton(
-                  text: 'Delete Booking',
+                  text: deleteBooking,
                   buttonBackgroundColor: Colors.redAccent,
                   onTap: () => _showDeleteBookingModal(
                     context,
@@ -980,22 +961,20 @@ class _BookingsScreenState extends State<BookingsScreen> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     textWidget(
-                      text: "Delete Booking?",
+                      text: wntDeleteBooking,
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                     const SizedBox(height: 16),
                     textWidget(
-                      text:
-                          "Are you sure you want to delete this booking? This action cannot be undone.",
+                      text: deleteBookingConfirmationTxt,
                       fontSize: 14,
                       color: Colors.grey[700]!,
                     ),
                     if (isWithin8Hours) ...[
                       const SizedBox(height: 12),
                       textWidget(
-                        text:
-                            "⚠ Note: Since the booking time is within the next 8 hours, a cancellation fee of \$${cancellationFee.toStringAsFixed(2)} will be applied.",
+                        text: cancellationFeeWarningTxt(cancellationFee),
                         fontSize: 14,
                         color: Colors.redAccent,
                         fontWeight: FontWeight.w600,
@@ -1009,7 +988,7 @@ class _BookingsScreenState extends State<BookingsScreen> {
                           onPressed: isLoading
                               ? null
                               : () => Navigator.pop(context),
-                          child: textWidget(text: "Cancel"),
+                          child: textWidget(text: cancelTxt),
                         ),
                         const SizedBox(width: 12),
                         AppButton(
@@ -1029,7 +1008,7 @@ class _BookingsScreenState extends State<BookingsScreen> {
                                   setState(() => isLoading = false);
                                   if (context.mounted) Navigator.pop(context);
                                 },
-                          text: "Delete",
+                          text: deleteText,
                         ),
                       ],
                     ),
@@ -1070,7 +1049,7 @@ class _BookingsScreenState extends State<BookingsScreen> {
                 ),
               ),
               textWidget(
-                text: 'Filter & Sort Options',
+                text: filterSortTitleTxt,
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
@@ -1078,7 +1057,7 @@ class _BookingsScreenState extends State<BookingsScreen> {
 
               ListTile(
                 leading: const Icon(Icons.arrow_upward),
-                title: textWidget(text: 'Sort by Date (Ascending)'),
+                title: textWidget(text: sortByDateAscTxt),
                 onTap: () {
                   provider.sortBookingsByDate(ascending: true);
                   Navigator.pop(context);
@@ -1086,7 +1065,7 @@ class _BookingsScreenState extends State<BookingsScreen> {
               ),
               ListTile(
                 leading: const Icon(Icons.arrow_downward),
-                title: textWidget(text: 'Sort by Date (Descending)'),
+                title: textWidget(text: sortByDateDescTxt),
                 onTap: () {
                   provider.sortBookingsByDate(ascending: false);
                   Navigator.pop(context);
@@ -1094,11 +1073,11 @@ class _BookingsScreenState extends State<BookingsScreen> {
               ),
               ListTile(
                 leading: const Icon(Icons.refresh),
-                title: textWidget(text: 'Clear All Filters'),
+                title: textWidget(text: clearAllFiltersTxt),
                 onTap: () {
                   provider.clearFilters();
                   provider.fetchBookingsList(reset: true);
-                  setState(() => selectedStatus = 'all');
+                  setState(() => selectedStatus = allValueTxt);
                   Navigator.pop(context);
                 },
               ),

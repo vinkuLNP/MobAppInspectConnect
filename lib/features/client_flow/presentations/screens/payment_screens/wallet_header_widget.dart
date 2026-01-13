@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
 import 'package:inspect_connect/core/utils/constants/app_common_card_container.dart';
+import 'package:inspect_connect/core/utils/constants/app_strings.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_button.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 
@@ -27,7 +28,7 @@ class WalletHeaderCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           textWidget(
-            text: "Available Balance",
+            text: availableBalance,
             color: Colors.white70,
             fontSize: 13,
           ),
@@ -43,7 +44,7 @@ class WalletHeaderCard extends StatelessWidget {
             children: [
               Expanded(
                 child: AppButton(
-                  text: "Add Money",
+                  text: addMoney,
                   onTap: onAddMoney,
                   buttonBackgroundColor: AppColors.backgroundColor.withValues(
                     alpha: 0.9,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:inspect_connect/core/utils/constants/app_strings.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/features/client_flow/domain/entities/payment_list_entity.dart';
 
@@ -34,7 +35,7 @@ class PaymentTile extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 textWidget(
-                  text: isCredit ? "Deposit" : "Withdrawal",
+                  text: isCredit ? deposit : withdrawal,
                   fontWeight: FontWeight.w500,
                   fontSize: 14,
                 ),

@@ -156,8 +156,8 @@ class _InspectorSignUpContentState extends State<InspectorSignUpContent> {
                       ? fileOrUrl.path
                       : fileOrUrl.toString();
 
-                  if (path.startsWith('http://') ||
-                      path.startsWith('https://')) {
+                  if (path.startsWith(httpProtocol) ||
+                      path.startsWith(httpsProtocol)) {
                     return path;
                   }
                   return path;
@@ -167,8 +167,8 @@ class _InspectorSignUpContentState extends State<InspectorSignUpContent> {
                 final idPath = getSafePath(vm.idDocumentUploadedUrl);
                 final refs = vm.referenceLetters.map((f) {
                   final path = f.path;
-                  return (path.startsWith('http://') ||
-                          path.startsWith('https://'))
+                  return (path.startsWith(httpProtocol) ||
+                          path.startsWith(httpsProtocol))
                       ? path
                       : path;
                 }).toList();

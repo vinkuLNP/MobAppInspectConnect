@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
+import 'package:inspect_connect/core/utils/constants/app_strings.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/features/client_flow/presentations/widgets/date_time_widget_provider.dart';
 import 'package:intl/intl.dart';
@@ -46,7 +47,7 @@ class _DateTimePickerWidgetState extends State<DateTimePickerWidget> {
           child: Consumer<DateTimePickerProvider>(
             builder: (context, provider, _) {
               return AlertDialog(
-                title: textWidget(text: "Select Date & Time"),
+                title: textWidget(text: selectDateTime),
                 content: SizedBox(
                   width: 300,
                   child: LayoutBuilder(
@@ -84,7 +85,7 @@ class _DateTimePickerWidgetState extends State<DateTimePickerWidget> {
                                       },
                                       icon: const Icon(Icons.access_time),
                                       label: textWidget(
-                                        text: "Pick Time",
+                                        text: pickTime,
                                         color: AppColors.whiteColor,
                                       ),
                                     )
@@ -107,7 +108,7 @@ class _DateTimePickerWidgetState extends State<DateTimePickerWidget> {
                 actions: [
                   TextButton(
                     onPressed: () => Navigator.pop(context),
-                    child: textWidget(text: "Cancel"),
+                    child: textWidget(text: cancelTxt),
                   ),
                   ElevatedButton(
                     onPressed: () {
@@ -118,7 +119,7 @@ class _DateTimePickerWidgetState extends State<DateTimePickerWidget> {
                       Navigator.pop(context);
                     },
                     child: textWidget(
-                      text: "Confirm",
+                      text: confirmTxt,
                       color: AppColors.whiteColor,
                     ),
                   ),

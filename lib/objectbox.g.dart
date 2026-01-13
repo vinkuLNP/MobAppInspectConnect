@@ -62,7 +62,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
     id: const obx_int.IdUid(2, 7510821947055321623),
     name: 'AuthUserLocalEntity',
-    lastPropertyId: const obx_int.IdUid(46, 2778237008367224666),
+    lastPropertyId: const obx_int.IdUid(55, 8381573198068334159),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
@@ -164,12 +164,6 @@ final _entities = <obx_int.ModelEntity>[
       obx_int.ModelProperty(
         id: const obx_int.IdUid(18, 8933747536940468220),
         name: 'stripePayoutsEnabled',
-        type: 1,
-        flags: 0,
-      ),
-      obx_int.ModelProperty(
-        id: const obx_int.IdUid(19, 8140600119593809259),
-        name: 'stripeTransfersActive',
         type: 1,
         flags: 0,
       ),
@@ -333,6 +327,60 @@ final _entities = <obx_int.ModelEntity>[
         id: const obx_int.IdUid(46, 2778237008367224666),
         name: 'certificateApproved',
         type: 6,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(47, 3087368259834947786),
+        name: 'stripeTransfersEnabled',
+        type: 1,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(48, 5938988651120465848),
+        name: 'statusUpdatedByAdmin',
+        type: 1,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(49, 1903062305422906928),
+        name: 'docxOk',
+        type: 1,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(50, 1671177585830292350),
+        name: 'connectorLinkUrl',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(51, 6280060655161164616),
+        name: 'documentTypeId',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(52, 2941370578795659748),
+        name: 'documentExpiryDate',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(53, 3411826669160965555),
+        name: 'coiExpiryDate',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(54, 1713348069903800072),
+        name: 'serviceAreasJson',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(55, 8381573198068334159),
+        name: 'documentsJson',
+        type: 9,
         flags: 0,
       ),
     ],
@@ -726,7 +774,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
     lastSequenceId: const obx_int.IdUid(0, 0),
     retiredEntityUids: const [],
     retiredIndexUids: const [],
-    retiredPropertyUids: const [5058542504887666690],
+    retiredPropertyUids: const [5058542504887666690, 8140600119593809259],
     retiredRelationUids: const [],
     modelVersion: 5,
     modelVersionParserMinimum: 5,
@@ -886,7 +934,25 @@ obx_int.ModelDefinition getObjectBoxModel() {
             ? null
             : fbb.writeString(object.zipCode!);
         final userIdOffset = fbb.writeString(object.userId);
-        fbb.startTable(47);
+        final connectorLinkUrlOffset = object.connectorLinkUrl == null
+            ? null
+            : fbb.writeString(object.connectorLinkUrl!);
+        final documentTypeIdOffset = object.documentTypeId == null
+            ? null
+            : fbb.writeString(object.documentTypeId!);
+        final documentExpiryDateOffset = object.documentExpiryDate == null
+            ? null
+            : fbb.writeString(object.documentExpiryDate!);
+        final coiExpiryDateOffset = object.coiExpiryDate == null
+            ? null
+            : fbb.writeString(object.coiExpiryDate!);
+        final serviceAreasJsonOffset = object.serviceAreasJson == null
+            ? null
+            : fbb.writeString(object.serviceAreasJson!);
+        final documentsJsonOffset = object.documentsJson == null
+            ? null
+            : fbb.writeString(object.documentsJson!);
+        fbb.startTable(56);
         fbb.addInt64(0, object.id);
         fbb.addOffset(1, authTokenOffset);
         fbb.addOffset(2, nameOffset);
@@ -904,7 +970,6 @@ obx_int.ModelDefinition getObjectBoxModel() {
         fbb.addOffset(15, stripeCustomerIdOffset);
         fbb.addOffset(16, stripeAccountIdOffset);
         fbb.addBool(17, object.stripePayoutsEnabled);
-        fbb.addBool(18, object.stripeTransfersActive);
         fbb.addInt64(19, object.currentSubscriptionTrialDays);
         fbb.addInt64(20, object.currentSubscriptionAutoRenew);
         fbb.addOffset(21, currentSubscriptionIdOffset);
@@ -932,6 +997,15 @@ obx_int.ModelDefinition getObjectBoxModel() {
         fbb.addOffset(43, zipCodeOffset);
         fbb.addOffset(44, userIdOffset);
         fbb.addInt64(45, object.certificateApproved);
+        fbb.addBool(46, object.stripeTransfersEnabled);
+        fbb.addBool(47, object.statusUpdatedByAdmin);
+        fbb.addBool(48, object.docxOk);
+        fbb.addOffset(49, connectorLinkUrlOffset);
+        fbb.addOffset(50, documentTypeIdOffset);
+        fbb.addOffset(51, documentExpiryDateOffset);
+        fbb.addOffset(52, coiExpiryDateOffset);
+        fbb.addOffset(53, serviceAreasJsonOffset);
+        fbb.addOffset(54, documentsJsonOffset);
         fbb.finish(fbb.endTable());
         return object.id;
       },
@@ -1017,8 +1091,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
         ).vTableGetNullable(buffer, rootOffset, 36);
         final stripePayoutsEnabledParam = const fb.BoolReader()
             .vTableGetNullable(buffer, rootOffset, 38);
-        final stripeTransfersActiveParam = const fb.BoolReader()
-            .vTableGetNullable(buffer, rootOffset, 40);
+        final stripeTransfersEnabledParam = const fb.BoolReader()
+            .vTableGetNullable(buffer, rootOffset, 96);
         final currentSubscriptionTrialDaysParam = const fb.Int64Reader()
             .vTableGetNullable(buffer, rootOffset, 42);
         final currentSubscriptionAutoRenewParam = const fb.Int64Reader()
@@ -1103,6 +1177,31 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final workHistoryDescriptionParam = const fb.StringReader(
           asciiOptimization: true,
         ).vTableGetNullable(buffer, rootOffset, 86);
+        final statusUpdatedByAdminParam = const fb.BoolReader()
+            .vTableGetNullable(buffer, rootOffset, 98);
+        final docxOkParam = const fb.BoolReader().vTableGetNullable(
+          buffer,
+          rootOffset,
+          100,
+        );
+        final connectorLinkUrlParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGetNullable(buffer, rootOffset, 102);
+        final documentTypeIdParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGetNullable(buffer, rootOffset, 104);
+        final documentExpiryDateParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGetNullable(buffer, rootOffset, 106);
+        final coiExpiryDateParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGetNullable(buffer, rootOffset, 108);
+        final serviceAreasJsonParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGetNullable(buffer, rootOffset, 110);
+        final documentsJsonParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGetNullable(buffer, rootOffset, 112);
         final object = AuthUserLocalEntity(
           authToken: authTokenParam,
           userId: userIdParam,
@@ -1122,7 +1221,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
           stripeCustomerId: stripeCustomerIdParam,
           stripeAccountId: stripeAccountIdParam,
           stripePayoutsEnabled: stripePayoutsEnabledParam,
-          stripeTransfersActive: stripeTransfersActiveParam,
+          stripeTransfersEnabled: stripeTransfersEnabledParam,
           currentSubscriptionTrialDays: currentSubscriptionTrialDaysParam,
           currentSubscriptionAutoRenew: currentSubscriptionAutoRenewParam,
           currentSubscriptionId: currentSubscriptionIdParam,
@@ -1148,6 +1247,14 @@ obx_int.ModelDefinition getObjectBoxModel() {
           referenceDocuments: referenceDocumentsParam,
           uploadedIdOrLicenseDocument: uploadedIdOrLicenseDocumentParam,
           workHistoryDescription: workHistoryDescriptionParam,
+          statusUpdatedByAdmin: statusUpdatedByAdminParam,
+          docxOk: docxOkParam,
+          connectorLinkUrl: connectorLinkUrlParam,
+          documentTypeId: documentTypeIdParam,
+          documentExpiryDate: documentExpiryDateParam,
+          coiExpiryDate: coiExpiryDateParam,
+          serviceAreasJson: serviceAreasJsonParam,
+          documentsJson: documentsJsonParam,
         )..id = const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0);
         obx_int.InternalToManyAccess.setRelInfo<AuthUserLocalEntity>(
           object.devices,
@@ -1762,148 +1869,188 @@ class AuthUserLocalEntity_ {
         _entities[1].properties[16],
       );
 
-  /// See [AuthUserLocalEntity.stripeTransfersActive].
-  static final stripeTransfersActive =
-      obx.QueryBooleanProperty<AuthUserLocalEntity>(
-        _entities[1].properties[17],
-      );
-
   /// See [AuthUserLocalEntity.currentSubscriptionTrialDays].
   static final currentSubscriptionTrialDays =
       obx.QueryIntegerProperty<AuthUserLocalEntity>(
-        _entities[1].properties[18],
+        _entities[1].properties[17],
       );
 
   /// See [AuthUserLocalEntity.currentSubscriptionAutoRenew].
   static final currentSubscriptionAutoRenew =
       obx.QueryIntegerProperty<AuthUserLocalEntity>(
-        _entities[1].properties[19],
+        _entities[1].properties[18],
       );
 
   /// See [AuthUserLocalEntity.currentSubscriptionId].
   static final currentSubscriptionId =
-      obx.QueryStringProperty<AuthUserLocalEntity>(_entities[1].properties[20]);
+      obx.QueryStringProperty<AuthUserLocalEntity>(_entities[1].properties[19]);
 
   /// See [AuthUserLocalEntity.stripeSubscriptionStatus].
   static final stripeSubscriptionStatus =
-      obx.QueryStringProperty<AuthUserLocalEntity>(_entities[1].properties[21]);
+      obx.QueryStringProperty<AuthUserLocalEntity>(_entities[1].properties[20]);
 
   /// See [AuthUserLocalEntity.walletId].
   static final walletId = obx.QueryStringProperty<AuthUserLocalEntity>(
-    _entities[1].properties[22],
+    _entities[1].properties[21],
   );
 
   /// See [AuthUserLocalEntity.locationName].
   static final locationName = obx.QueryStringProperty<AuthUserLocalEntity>(
-    _entities[1].properties[23],
+    _entities[1].properties[22],
   );
 
   /// See [AuthUserLocalEntity.latitude].
   static final latitude = obx.QueryDoubleProperty<AuthUserLocalEntity>(
-    _entities[1].properties[24],
+    _entities[1].properties[23],
   );
 
   /// See [AuthUserLocalEntity.longitude].
   static final longitude = obx.QueryDoubleProperty<AuthUserLocalEntity>(
-    _entities[1].properties[25],
+    _entities[1].properties[24],
   );
 
   /// See [AuthUserLocalEntity.createdAt].
   static final createdAt = obx.QueryDateProperty<AuthUserLocalEntity>(
-    _entities[1].properties[26],
+    _entities[1].properties[25],
   );
 
   /// See [AuthUserLocalEntity.updatedAt].
   static final updatedAt = obx.QueryDateProperty<AuthUserLocalEntity>(
-    _entities[1].properties[27],
+    _entities[1].properties[26],
   );
 
   /// See [AuthUserLocalEntity.profileImage].
   static final profileImage = obx.QueryStringProperty<AuthUserLocalEntity>(
-    _entities[1].properties[28],
+    _entities[1].properties[27],
   );
 
   /// See [AuthUserLocalEntity.bookingInProgress].
   static final bookingInProgress =
       obx.QueryBooleanProperty<AuthUserLocalEntity>(
-        _entities[1].properties[29],
+        _entities[1].properties[28],
       );
 
   /// See [AuthUserLocalEntity.isDeleted].
   static final isDeleted = obx.QueryBooleanProperty<AuthUserLocalEntity>(
-    _entities[1].properties[30],
+    _entities[1].properties[29],
   );
 
   /// See [AuthUserLocalEntity.country].
   static final country = obx.QueryStringProperty<AuthUserLocalEntity>(
-    _entities[1].properties[31],
+    _entities[1].properties[30],
   );
 
   /// See [AuthUserLocalEntity.state].
   static final state = obx.QueryStringProperty<AuthUserLocalEntity>(
-    _entities[1].properties[32],
+    _entities[1].properties[31],
   );
 
   /// See [AuthUserLocalEntity.city].
   static final city = obx.QueryStringProperty<AuthUserLocalEntity>(
-    _entities[1].properties[33],
+    _entities[1].properties[32],
   );
 
   /// See [AuthUserLocalEntity.certificateTypeId].
   static final certificateTypeId = obx.QueryStringProperty<AuthUserLocalEntity>(
-    _entities[1].properties[34],
+    _entities[1].properties[33],
   );
 
   /// See [AuthUserLocalEntity.certificateAgencyIds].
   static final certificateAgencyIds =
       obx.QueryStringVectorProperty<AuthUserLocalEntity>(
-        _entities[1].properties[35],
+        _entities[1].properties[34],
       );
 
   /// See [AuthUserLocalEntity.certificateDocuments].
   static final certificateDocuments =
       obx.QueryStringVectorProperty<AuthUserLocalEntity>(
-        _entities[1].properties[36],
+        _entities[1].properties[35],
       );
 
   /// See [AuthUserLocalEntity.certificateExpiryDate].
   static final certificateExpiryDate =
-      obx.QueryStringProperty<AuthUserLocalEntity>(_entities[1].properties[37]);
+      obx.QueryStringProperty<AuthUserLocalEntity>(_entities[1].properties[36]);
 
   /// See [AuthUserLocalEntity.referenceDocuments].
   static final referenceDocuments =
       obx.QueryStringVectorProperty<AuthUserLocalEntity>(
-        _entities[1].properties[38],
+        _entities[1].properties[37],
       );
 
   /// See [AuthUserLocalEntity.uploadedIdOrLicenseDocument].
   static final uploadedIdOrLicenseDocument =
-      obx.QueryStringProperty<AuthUserLocalEntity>(_entities[1].properties[39]);
+      obx.QueryStringProperty<AuthUserLocalEntity>(_entities[1].properties[38]);
 
   /// See [AuthUserLocalEntity.workHistoryDescription].
   static final workHistoryDescription =
-      obx.QueryStringProperty<AuthUserLocalEntity>(_entities[1].properties[40]);
+      obx.QueryStringProperty<AuthUserLocalEntity>(_entities[1].properties[39]);
 
   /// See [AuthUserLocalEntity.loginTime].
   static final loginTime = obx.QueryDateProperty<AuthUserLocalEntity>(
-    _entities[1].properties[41],
+    _entities[1].properties[40],
   );
 
   /// See [AuthUserLocalEntity.zipCode].
   static final zipCode = obx.QueryStringProperty<AuthUserLocalEntity>(
-    _entities[1].properties[42],
+    _entities[1].properties[41],
   );
 
   /// See [AuthUserLocalEntity.userId].
   static final userId = obx.QueryStringProperty<AuthUserLocalEntity>(
-    _entities[1].properties[43],
+    _entities[1].properties[42],
   );
 
   /// See [AuthUserLocalEntity.certificateApproved].
   static final certificateApproved =
       obx.QueryIntegerProperty<AuthUserLocalEntity>(
+        _entities[1].properties[43],
+      );
+
+  /// See [AuthUserLocalEntity.stripeTransfersEnabled].
+  static final stripeTransfersEnabled =
+      obx.QueryBooleanProperty<AuthUserLocalEntity>(
         _entities[1].properties[44],
       );
+
+  /// See [AuthUserLocalEntity.statusUpdatedByAdmin].
+  static final statusUpdatedByAdmin =
+      obx.QueryBooleanProperty<AuthUserLocalEntity>(
+        _entities[1].properties[45],
+      );
+
+  /// See [AuthUserLocalEntity.docxOk].
+  static final docxOk = obx.QueryBooleanProperty<AuthUserLocalEntity>(
+    _entities[1].properties[46],
+  );
+
+  /// See [AuthUserLocalEntity.connectorLinkUrl].
+  static final connectorLinkUrl = obx.QueryStringProperty<AuthUserLocalEntity>(
+    _entities[1].properties[47],
+  );
+
+  /// See [AuthUserLocalEntity.documentTypeId].
+  static final documentTypeId = obx.QueryStringProperty<AuthUserLocalEntity>(
+    _entities[1].properties[48],
+  );
+
+  /// See [AuthUserLocalEntity.documentExpiryDate].
+  static final documentExpiryDate =
+      obx.QueryStringProperty<AuthUserLocalEntity>(_entities[1].properties[49]);
+
+  /// See [AuthUserLocalEntity.coiExpiryDate].
+  static final coiExpiryDate = obx.QueryStringProperty<AuthUserLocalEntity>(
+    _entities[1].properties[50],
+  );
+
+  /// See [AuthUserLocalEntity.serviceAreasJson].
+  static final serviceAreasJson = obx.QueryStringProperty<AuthUserLocalEntity>(
+    _entities[1].properties[51],
+  );
+
+  /// See [AuthUserLocalEntity.documentsJson].
+  static final documentsJson = obx.QueryStringProperty<AuthUserLocalEntity>(
+    _entities[1].properties[52],
+  );
 
   /// see [AuthUserLocalEntity.devices]
   static final devices =

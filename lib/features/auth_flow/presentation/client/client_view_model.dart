@@ -9,6 +9,7 @@ import 'package:inspect_connect/core/commondomain/entities/based_api_result/api_
 import 'package:inspect_connect/core/di/app_component/app_component.dart';
 import 'package:inspect_connect/core/utils/auto_router_setup/auto_router.dart';
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
+import 'package:inspect_connect/core/utils/constants/app_strings.dart';
 import 'package:inspect_connect/core/utils/helpers/device_helper/device_helper.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/features/auth_flow/data/datasources/local_datasources/auth_local_datasource.dart';
@@ -332,7 +333,7 @@ class ClientViewModelProvider extends BaseViewModel {
       final user = await locator<AuthLocalDataSource>().getUser();
       if (user == null) {
         log('[VERIFY] No local user found.');
-        throw Exception('User not found in local storage');
+        throw Exception(userNotFoundInLocal);
       }
 
       log(
@@ -498,7 +499,7 @@ class ClientViewModelProvider extends BaseViewModel {
     try {
       final user = await locator<AuthLocalDataSource>().getUser();
       if (user == null || user.authToken == null) {
-        throw Exception('User not found in local storage');
+        throw Exception(userNotFoundInLocal);
       }
       final resendOtpUseCase = locator<ResendOtpUseCase>();
       final state = await executeParamsUseCase<AuthUser, ResendOtpParams>(
@@ -738,9 +739,9 @@ class ClientViewModelProvider extends BaseViewModel {
     log('   CurrentSubscriptionId: ${localUser.currentSubscriptionId}');
     log('---------------------------------------------');
 
-    final provider = InspectorDashboardProvider();
+    final provider = context.read<InspectorDashboardProvider>();
 
-    if (context.mounted) await provider.initializeUserState(context);
+    if (context.mounted) await provider.initializeUserState();
 
     log('📊 InspectorDashboardProvider initialized');
     log('🔸 Current status: ${provider.status}');

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:inspect_connect/core/utils/constants/app_strings.dart';
 
 const String commonErrorUnexpectedMessage =
     'Something went wrong please try again';
@@ -99,37 +100,37 @@ const int bookingStatusStoppped = 10;
 String bookingStatusToText(int status) {
   switch (status) {
     case bookingStatusPending:
-      return 'Pending';
+      return pendingLabelTxt;
 
     case bookingStatusAccepted:
-      return 'Accepted';
+      return acceptedLabelTxt;
 
     case bookingStatusRejected:
-      return 'Rejected';
+      return rejectedLabelTxt;
 
     case bookingStatusStarted:
-      return 'Inspection Started';
+      return inspectionStartedLabelTxt;
 
     case bookingStatusStoppped:
-      return 'Stopped';
+      return stoppedLabelTxt;
 
     case bookingStatusCompleted:
-      return 'Completed';
+      return completedLabelTxt;
 
     case bookingStatusCancelledByClient:
-      return 'Cancelled By Client';
+      return cancelledByClientLabelTxt;
 
     case bookingStatusExpired:
-      return 'Expired';
+      return expiredLabelTxt;
 
     case bookingStatusAwaiting:
-      return 'Waiting for Client Approval';
+      return waitingForClientApprovalLabelTxt;
 
     case bookingStatusCancelledByInspector:
-      return 'Cancelled By Inspector';
+      return cancelledByInspectorLabelTxt;
 
     case bookingStatusPaused:
-      return 'Paused';
+      return pausedLabelTxt;
 
     default:
       return 'Other';
@@ -215,3 +216,22 @@ IconData statusIcon(int status) {
       return Icons.info_outline;
   }
 }
+
+const List<Map<String, dynamic>> statusOptions = [
+  {labelTxt: allLabelTxt, valueTxt: allValueTxt},
+  {labelTxt: awaitingYourApprovalLabelTxt, valueTxt: bookingStatusAwaiting},
+  {labelTxt: acceptedLabelTxt, valueTxt: bookingStatusAccepted},
+  {labelTxt: inspectionStartedLabelTxt, valueTxt: bookingStatusStarted},
+
+  {labelTxt: '$inspectionTxt $pausedLabelTxt', valueTxt: bookingStatusPaused},
+  {
+    labelTxt: '$inspectionTxt $stoppedLabelTxt',
+    valueTxt: bookingStatusStoppped,
+  },
+  {labelTxt: pendingLabelTxt, valueTxt: bookingStatusPending},
+  {labelTxt: rejectedLabelTxt, valueTxt: bookingStatusRejected},
+  {labelTxt: completedLabelTxt, valueTxt: bookingStatusCompleted},
+  {labelTxt: cancelledByYouTxt, valueTxt: bookingStatusCancelledByClient},
+  {labelTxt: cancelledByInspTxt, valueTxt: bookingStatusCancelledByInspector},
+  {labelTxt: expiredLabelTxt, valueTxt: bookingStatusExpired},
+];

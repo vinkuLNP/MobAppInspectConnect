@@ -597,14 +597,14 @@ class InspectorViewModelProvider extends BaseViewModel {
         final docs = iccDocuments.where((d) => d.serviceCity == city).toList();
 
         if (docs.isEmpty) {
-          cityError = 'ICC document required for $city';
+          cityError = '$iccDocumentRequiredFor $city';
           notify();
           return false;
         }
 
         for (final d in docs) {
           if (d.expiryDate == '') {
-            cityError = 'Expiry date required for ICC in $city';
+            cityError = '$expiryDateRequiredForIccIn $city';
             notify();
             return false;
           }

@@ -7,9 +7,11 @@ import 'package:inspect_connect/core/di/app_component/app_component.dart';
 import 'package:inspect_connect/core/di/services/payment_services/payment_purpose.dart';
 import 'package:inspect_connect/core/di/services/payment_services/payment_request.dart';
 import 'package:inspect_connect/core/utils/app_widgets/card_payment_sheet.dart';
+import 'package:inspect_connect/core/utils/constants/app_strings.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/features/auth_flow/data/datasources/local_datasources/auth_local_datasource.dart';
 import 'package:inspect_connect/features/auth_flow/data/datasources/local_datasources/auth_user_local_entity.dart';
+import 'package:inspect_connect/features/auth_flow/data/models/document_model.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/auth_user.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/user_detail.dart';
 import 'package:inspect_connect/features/auth_flow/domain/usecases/get_user__usercase.dart';
@@ -20,10 +22,12 @@ import 'package:inspect_connect/features/inspector_flow/data/models/subscription
 import 'package:inspect_connect/features/inspector_flow/data/models/user_subscription_model.dart';
 import 'package:inspect_connect/features/inspector_flow/domain/entities/payment_intent_dto.dart';
 import 'package:inspect_connect/features/inspector_flow/domain/entities/user_subscription_by_id.dart';
+import 'package:inspect_connect/features/inspector_flow/domain/enum/inspector_documents_enum.dart';
 import 'package:inspect_connect/features/inspector_flow/domain/enum/inspector_status.dart';
 import 'package:inspect_connect/features/inspector_flow/domain/usecases/get_subscription_plans_usecase.dart';
 import 'package:inspect_connect/features/inspector_flow/domain/usecases/get_user_subscription_detail_usecase.dart';
 import 'package:inspect_connect/features/inspector_flow/domain/usecases/payment_intent_usecase.dart';
+import 'package:inspect_connect/main.dart';
 import 'package:provider/provider.dart';
 
 class InspectorDashboardProvider extends BaseViewModel {
@@ -38,11 +42,6 @@ class InspectorDashboardProvider extends BaseViewModel {
     try {
       isLoading = true;
       notifyListeners();
-      final user = await locator<AuthLocalDataSource>().getUser();
-      if (user == null || user.authToken == null) {
-        throw Exception('User not found in local storage');
-      }
-
       final getSubscriptionPlansUseCase =
           locator<GetSubscriptionPlansUseCase>();
       final state =
@@ -75,11 +74,6 @@ class InspectorDashboardProvider extends BaseViewModel {
     try {
       isLoading = true;
       notifyListeners();
-      final user = await locator<AuthLocalDataSource>().getUser();
-      if (user == null || user.authToken == null) {
-        throw Exception('User not found in local storage');
-      }
-
       final getSubscriptionPlansUseCase =
           locator<GetUserSubscriptionDetailUseCase>();
       final state =
@@ -265,8 +259,7 @@ class InspectorDashboardProvider extends BaseViewModel {
               onPressed: () async {
                 Navigator.pop(context);
 
-                final provider = context.read<InspectorDashboardProvider>();
-                await provider.initializeUserState(context);
+                initializeUserState();
               },
               child: textWidget(text: 'Continue'),
             ),
@@ -280,7 +273,9 @@ class InspectorDashboardProvider extends BaseViewModel {
   AuthUser? user;
   UserSubscriptionModel? subscription;
 
-  Future<void> initializeUserState(BuildContext context) async {
+  Future<void> initializeUserState() async {
+    final BuildContext? context =
+        rootNavigatorKey.currentState?.overlay?.context;
     isLoading = true;
     notifyListeners();
     status = InspectorStatus.initial;
@@ -292,12 +287,18 @@ class InspectorDashboardProvider extends BaseViewModel {
         return;
       }
 
-      if (context.mounted) {
+      if (context!.mounted) {
+        log(
+          '----localUser------?>>> certioficateApproved ${localUser.certificateApproved}',
+        );
         final userDetail = await fetchAndUpdateUserDetail(localUser, context);
 
         final mergedUser = localUser.mergeWithUserDetail(userDetail);
+        updateReviewState(mergedUser.toDomainEntity());
 
-        user = AuthUser.fromLocalEntity(mergedUser);
+        log(
+          '----mergedUser------?>>> certioficateApproved ${mergedUser.certificateApproved}',
+        );
 
         if (mergedUser.phoneOtpVerified != true) {
           status = InspectorStatus.unverified;
@@ -311,17 +312,21 @@ class InspectorDashboardProvider extends BaseViewModel {
           return;
         }
 
-        switch (mergedUser.certificateApproved) {
-          case 0:
+        switch (reviewStatus) {
+          case ReviewStatus.pending:
+            log('🟠 Status → UNDER_REVIEW');
             status = InspectorStatus.underReview;
             break;
-          case 1:
+
+          case ReviewStatus.approved:
+            log('🟢 Status → APPROVED');
             status = InspectorStatus.approved;
             break;
-          case 2:
+
+          case ReviewStatus.rejected:
+            log('🔴 Status → REJECTED');
             status = InspectorStatus.rejected;
             break;
-          default:
         }
       }
     } catch (e) {
@@ -332,10 +337,22 @@ class InspectorDashboardProvider extends BaseViewModel {
     }
   }
 
+  ReviewStatus reviewStatus = ReviewStatus.pending;
+  List<UserDocument> rejectedDocuments = [];
+
+  void updateReviewState(AuthUser user) {
+    reviewStatus = deriveReviewStatus(user);
+
+    rejectedDocuments =
+        user.documents?.where((d) => d.adminApproval == 2).toList() ?? [];
+  }
+
   Future<UserDetail> fetchAndUpdateUserDetail(
     AuthUserLocalEntity localUser,
-    BuildContext context,
+    BuildContext contextDetail,
   ) async {
+    final BuildContext? context =
+        rootNavigatorKey.currentState?.overlay?.context;
     log('👤 [FETCH_USER_DETAIL] Started → localUserId=${localUser.id}');
 
     final getUserUseCase = locator<GetUserUseCase>();
@@ -369,7 +386,7 @@ class InspectorDashboardProvider extends BaseViewModel {
         log('💾 [FETCH_USER_DETAIL] Saving merged user locally');
         await locator<AuthLocalDataSource>().saveUser(mergedUser);
 
-        if (context.mounted) {
+        if (context!.mounted) {
           log('🔄 [FETCH_USER_DETAIL] Updating UserProvider');
           context.read<UserProvider>().setUser(mergedUser);
         } else {

@@ -5,6 +5,7 @@ import 'package:inspect_connect/core/di/app_component/app_component.dart';
 import 'package:inspect_connect/core/di/services/app_sockets/socket_service.dart';
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
 import 'package:inspect_connect/core/utils/constants/app_constants.dart';
+import 'package:inspect_connect/core/utils/constants/app_strings.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/features/auth_flow/data/datasources/local_datasources/auth_local_datasource.dart';
 import 'package:inspect_connect/features/client_flow/data/models/booking_detail_model.dart';
@@ -48,7 +49,7 @@ class BookingActionsService {
       provider.setProcessing(true);
       final user = await locator<AuthLocalDataSource>().getUser();
       if (user == null || user.authToken == null) {
-        throw Exception('User not found in local storage');
+        throw Exception(userNotFoundInLocal);
       }
 
       final booking = BookingEntity(
@@ -92,7 +93,7 @@ class BookingActionsService {
                   color: AppColors.whiteColor,
                   text: response.message.isNotEmpty
                       ? response.message
-                      : 'Booking created successfully',
+                      : bookingCreatedSuccessfully,
                 ),
               ),
             );
@@ -112,7 +113,7 @@ class BookingActionsService {
               SnackBar(
                 content: textWidget(
                   color: AppColors.whiteColor,
-                  text: e.message ?? 'Booking creation failed',
+                  text: e.message ?? bookingCreationFailed,
                 ),
               ),
             );
@@ -178,7 +179,7 @@ class BookingActionsService {
       provider.setProcessing(true);
       final user = await locator<AuthLocalDataSource>().getUser();
       if (user == null || user.authToken == null) {
-        throw Exception('User not found in local storage');
+        throw Exception(userNotFoundInLocal);
       }
 
       final booking = BookingEntity(
@@ -221,7 +222,7 @@ class BookingActionsService {
               SnackBar(
                 content: textWidget(
                   color: AppColors.whiteColor,
-                  text: 'Booking Updated successfully.',
+                  text: bookingUpdatedSuccessfully,
                 ),
               ),
             );
@@ -235,7 +236,7 @@ class BookingActionsService {
               SnackBar(
                 content: textWidget(
                   color: AppColors.whiteColor,
-                  text: e.message ?? 'Booking update failed',
+                  text: e.message ?? bookingUpdateFailed,
                 ),
               ),
             );
@@ -257,7 +258,7 @@ class BookingActionsService {
       provider.setProcessing(true);
       final user = await locator<AuthLocalDataSource>().getUser();
       if (user == null || user.authToken == null) {
-        throw Exception('User not found in local storage');
+        throw Exception(userNotFoundInLocal);
       }
 
       final deleteBookingUseCase = locator<DeleteBookingDetailUseCase>();
@@ -278,7 +279,7 @@ class BookingActionsService {
               SnackBar(
                 content: textWidget(
                   color: AppColors.whiteColor,
-                  text: 'Booking Deleted successfully.',
+                  text: bookingDeletedSuccessfully,
                 ),
               ),
             );
@@ -290,7 +291,7 @@ class BookingActionsService {
               SnackBar(
                 content: textWidget(
                   color: AppColors.whiteColor,
-                  text: e.message ?? 'Booking Deletion failed',
+                  text: e.message ?? bookingDeletionFailed,
                 ),
               ),
             );
@@ -311,11 +312,6 @@ class BookingActionsService {
     try {
       provider.isLoadingBookingDetail = true;
       provider.notify();
-      final user = await locator<AuthLocalDataSource>().getUser();
-      if (user == null || user.authToken == null) {
-        throw Exception('User not found in local storage');
-      }
-
       final getBookingDetailUseCase = locator<GetBookingDetailUseCase>();
       final state = await provider
           .executeParamsUseCase<BookingDetailModel, GetBookingDetailParams>(
@@ -350,7 +346,7 @@ class BookingActionsService {
               SnackBar(
                 content: textWidget(
                   color: AppColors.whiteColor,
-                  text: e.message ?? 'Fetching Booking Detail failed',
+                  text: e.message ?? fetchingBookingDetailFailed,
                 ),
               ),
             );
@@ -408,7 +404,7 @@ class BookingActionsService {
               SnackBar(
                 content: textWidget(
                   color: AppColors.whiteColor,
-                  text: e.message ?? 'Booking update failed',
+                  text: e.message ?? bookingUpdateFailed,
                 ),
               ),
             );
@@ -421,7 +417,7 @@ class BookingActionsService {
           SnackBar(
             content: textWidget(
               color: AppColors.whiteColor,
-              text: 'Failed: $e',
+              text: '$failedTxt: $e',
             ),
           ),
         );
@@ -468,7 +464,7 @@ class BookingActionsService {
               SnackBar(
                 content: textWidget(
                   color: AppColors.whiteColor,
-                  text: e.message ?? 'Show Up fee Status failed to update.',
+                  text: e.message ?? showUpFeeStatusFailedToUpdate,
                 ),
               ),
             );
@@ -481,7 +477,7 @@ class BookingActionsService {
           SnackBar(
             content: textWidget(
               color: AppColors.whiteColor,
-              text: 'Failed: $e',
+              text: '$failedTxt: $e',
             ),
           ),
         );
@@ -512,7 +508,7 @@ class BookingActionsService {
           SnackBar(
             content: textWidget(
               color: AppColors.whiteColor,
-              text: "Payment successful and booking approved.",
+              text: paymentSuccessfulAndBookingApproved,
             ),
           ),
         );
@@ -522,7 +518,10 @@ class BookingActionsService {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: textWidget(color: AppColors.whiteColor, text: "Error: $e"),
+            content: textWidget(
+              color: AppColors.whiteColor,
+              text: "$errorTxt: $e",
+            ),
           ),
         );
       }
@@ -551,7 +550,10 @@ class BookingActionsService {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: textWidget(color: AppColors.whiteColor, text: "Error: $e"),
+            content: textWidget(
+              color: AppColors.whiteColor,
+              text: "$errorTxt: $e",
+            ),
           ),
         );
       }

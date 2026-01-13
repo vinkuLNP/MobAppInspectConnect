@@ -1,23 +1,23 @@
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/basecomponents/base_responsive_widget.dart';
 import 'package:inspect_connect/core/utils/constants/app_assets_constants.dart';
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
-import 'package:inspect_connect/features/auth_flow/domain/entities/auth_user.dart';
+import 'package:inspect_connect/features/auth_flow/data/models/document_model.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/client/widgets/common_auth_bar.dart';
+import 'package:inspect_connect/features/inspector_flow/domain/enum/inspector_documents_enum.dart';
 import 'package:inspect_connect/features/inspector_flow/providers/inspector_main_provider.dart';
 import 'package:provider/provider.dart';
 
 class ApprovalStatusScreen extends StatelessWidget {
-  final AuthUser user;
-
-  const ApprovalStatusScreen({super.key, required this.user});
+  const ApprovalStatusScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<InspectorDashboardProvider>();
-    final status = user.certificateApproved;
-    final reason = user.rejectedReason ?? '';
+
+    log('🧾 [ApprovalStatusScreen] reviewStatus=${provider.reviewStatus}');
 
     return BaseResponsiveWidget(
       initializeConfig: true,
@@ -27,16 +27,15 @@ class ApprovalStatusScreen extends StatelessWidget {
           body: CommonAuthBar(
             title: 'Inspector Profile Status',
             subtitle: 'Profile Review Status',
-
             showBackButton: false,
             image: finalImage,
             rc: rc,
             form: _buildStatusCard(
               rc: rc,
               provider: provider,
-              status: status,
-              reason: reason,
               context: context,
+              status: provider.reviewStatus,
+              rejectedDocuments: provider.rejectedDocuments,
             ),
           ),
         );
@@ -47,64 +46,55 @@ class ApprovalStatusScreen extends StatelessWidget {
   Widget _buildStatusCard({
     required dynamic rc,
     required InspectorDashboardProvider provider,
-    required int? status,
-    required String reason,
+    required ReviewStatus status,
     required BuildContext context,
+    required List<UserDocument> rejectedDocuments,
   }) {
-    IconData icon;
-    Color mainColor;
-    List<Color> gradientColors;
-    String title;
-    String message;
-    String buttonText;
-    VoidCallback onPressed;
+    late IconData icon;
+    late Color mainColor;
+    late List<Color> gradientColors;
+    late String title;
+    late String message;
+    late String buttonText;
+    late VoidCallback onPressed;
 
     switch (status) {
-      case 0:
+      case ReviewStatus.pending:
         icon = Icons.access_time_rounded;
         mainColor = AppColors.authThemeColor;
         gradientColors = [Colors.orange.shade400, Colors.deepOrange.shade600];
         title = 'Profile Under Review';
         message =
-            'Your profile is currently being reviewed by our team.\nThis may take 48–72 hours.\n\nYou’ll be notified once approved.';
+            'Your profile is currently being reviewed by our team.\n'
+            'This may take 48–72 hours.\n\n'
+            'You’ll be notified once approved.';
         buttonText = 'Check Again';
-        onPressed = () => provider.initializeUserState(context);
+        onPressed = () => provider.initializeUserState();
         break;
 
-      case 2:
+      case ReviewStatus.rejected:
         icon = Icons.cancel_rounded;
-        mainColor = AppColors.authThemeColor;
-        gradientColors = [Colors.red.shade500, Colors.deepOrange.shade700];
-        title = 'Profile Rejected';
+        mainColor = Colors.red;
+        gradientColors = [Colors.red.shade500, Colors.red.shade700];
+        title = 'Profile Requires Updates';
         message =
-            'Unfortunately, your profile has been rejected.\n\nReason: $reason\n\nPlease update your profile and resubmit for review.';
+            'Your profile requires updates before approval.\n\n'
+            'Please review the rejected documents and resubmit.';
         buttonText = 'Update Profile';
-        onPressed = () async {
-          await provider.initializeUserState(context);
-        };
+        onPressed = () {};
         break;
 
-      case 1:
+      case ReviewStatus.approved:
         icon = Icons.verified_rounded;
         mainColor = AppColors.authThemeColor;
         gradientColors = [Colors.green.shade500, Colors.teal.shade700];
         title = 'Profile Approved';
         message =
-            'Congratulations! Your profile has been approved.\nYou now have full access to your dashboard.';
+            'Congratulations! Your profile has been approved.\n'
+            'You now have full access to your dashboard.';
         buttonText = 'Go to Dashboard';
-        onPressed = () async {
-          await provider.initializeUserState(context);
-        };
+        onPressed = () => provider.initializeUserState();
         break;
-
-      default:
-        icon = Icons.info_outline_rounded;
-        mainColor = Colors.blueGrey;
-        gradientColors = [Colors.blueGrey.shade400, Colors.blueGrey.shade700];
-        title = 'Unknown Status';
-        message = 'We’re unable to determine your profile status at this time.';
-        buttonText = 'Try Again';
-        onPressed = () => provider.initializeUserState(context);
     }
 
     return Center(
@@ -133,7 +123,7 @@ class ApprovalStatusScreen extends StatelessWidget {
         ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(28),
-          child: Container(
+          child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 28),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -184,6 +174,42 @@ class ApprovalStatusScreen extends StatelessWidget {
                   fontWeight: FontWeight.w400,
                 ),
 
+                if (status == ReviewStatus.rejected &&
+                    rejectedDocuments.isNotEmpty) ...[
+                  const SizedBox(height: 16),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: rejectedDocuments.map((doc) {
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 10),
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            textWidget(
+                              text: doc.documentType?.name ?? 'Document',
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                            if (doc.adminNotes != null) ...[
+                              const SizedBox(height: 6),
+                              textWidget(
+                                text: 'Admin Notes: ${doc.adminNotes}',
+                                fontSize: 13,
+                                color: Colors.white70,
+                              ),
+                            ],
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ],
+
                 const SizedBox(height: 28),
 
                 SizedBox(
@@ -191,10 +217,7 @@ class ApprovalStatusScreen extends StatelessWidget {
                   child: ElevatedButton(
                     onPressed: provider.isLoading ? null : onPressed,
                     style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 14,
-                        horizontal: 36,
-                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
                       backgroundColor: Colors.white,
                       foregroundColor: mainColor,
                       shape: RoundedRectangleBorder(
@@ -206,10 +229,7 @@ class ApprovalStatusScreen extends StatelessWidget {
                         ? const SizedBox(
                             width: 22,
                             height: 22,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Colors.black,
-                            ),
+                            child: CircularProgressIndicator(strokeWidth: 2),
                           )
                         : textWidget(
                             text: buttonText,

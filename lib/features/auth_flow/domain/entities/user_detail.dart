@@ -39,13 +39,19 @@ class UserDetail {
   final String? connectorLinkUrl;
   final String? walletId;
   final bool? stripePayoutsEnabled;
-  final bool? stripeTransfersActive;
+  final bool? stripeTransfersEnabled;
   final List<Device>? devices;
   final Location? location;
   final String? createdAt;
   final String? updatedAt;
   final String? phoneOtpExpiryTime;
   final String? stripeCustomerId;
+  final bool? docxOk;
+  final CertificateType? documentTypeId;
+  final String? documentExpiryDate;
+  final String? coiExpiryDate;
+  final List<dynamic>? serviceAreas;
+  final List<dynamic>? documents;
 
   const UserDetail({
     required this.id,
@@ -86,13 +92,19 @@ class UserDetail {
     this.connectorLinkUrl,
     this.walletId,
     this.stripePayoutsEnabled,
-    this.stripeTransfersActive,
+    this.stripeTransfersEnabled,
     this.devices,
     this.location,
     this.createdAt,
     this.updatedAt,
     this.phoneOtpExpiryTime,
     this.stripeCustomerId,
+    this.docxOk,
+    this.documentTypeId,
+    this.documentExpiryDate,
+    this.coiExpiryDate,
+    this.serviceAreas,
+    this.documents,
   });
 
   factory UserDetail.fromJson(Map<String, dynamic> json) {
@@ -150,7 +162,7 @@ class UserDetail {
       connectorLinkUrl: body['connectorLinkUrl'],
       walletId: body['walletId'],
       stripePayoutsEnabled: body['stripePayoutsEnabled'],
-      stripeTransfersActive: body['stripeTransfersActive'],
+      stripeTransfersEnabled: body['stripeTransfersEnabled'],
       devices: (body['devices'] as List?)
           ?.map((e) => Device.fromJson(e))
           .toList(),
@@ -161,6 +173,17 @@ class UserDetail {
       updatedAt: body['updatedAt'],
       phoneOtpExpiryTime: body['phoneOtpExpiryTime'],
       stripeCustomerId: body['stripeCustomerId'],
+      docxOk: body['docxOk'],
+
+      documentTypeId: body['documentTypeId'] != null
+          ? CertificateType.fromJson(body['documentTypeId'])
+          : null,
+
+      documentExpiryDate: body['documentExpiryDate'],
+      coiExpiryDate: body['coiExpiryDate'],
+
+      serviceAreas: body['serviceAreas'],
+      documents: body['documents'],
     );
   }
 
@@ -205,13 +228,19 @@ class UserDetail {
       'connectorLinkUrl': connectorLinkUrl,
       'walletId': walletId,
       'stripePayoutsEnabled': stripePayoutsEnabled,
-      'stripeTransfersActive': stripeTransfersActive,
+      'stripeTransfersEnabled': stripeTransfersEnabled,
       'devices': devices?.map((e) => e.toJson()).toList(),
       'location': location?.toJson(),
       'createdAt': createdAt,
       'updatedAt': updatedAt,
       'phoneOtpExpiryTime': phoneOtpExpiryTime,
       'stripeCustomerId': stripeCustomerId,
+      'docxOk': docxOk,
+      'documentTypeId': documentTypeId?.toJson(),
+      'documentExpiryDate': documentExpiryDate,
+      'coiExpiryDate': coiExpiryDate,
+      'serviceAreas': serviceAreas,
+      'documents': documents,
     };
   }
 }

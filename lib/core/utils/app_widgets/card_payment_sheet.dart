@@ -51,7 +51,7 @@ Future<void> showCardPaymentSheet({
           );
           if (request.purpose == PaymentPurpose.subscription) {
             final provider = context.read<InspectorDashboardProvider>();
-            await provider.initializeUserState(context);
+            await provider.initializeUserState();
           } else {
             provider.refreshAll(context);
           }

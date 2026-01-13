@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/utils/constants/app_common_card_container.dart';
+import 'package:inspect_connect/core/utils/constants/app_strings.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/features/client_flow/domain/entities/payment_list_entity.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/wallet_provider.dart';
@@ -59,7 +60,7 @@ class RecentTransactionsState extends State<RecentTransactions> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           textWidget(
-            text: "Recent Transactions",
+            text: recentTransactions,
             fontSize: 16,
             fontWeight: FontWeight.w700,
           ),
@@ -68,10 +69,7 @@ class RecentTransactionsState extends State<RecentTransactions> {
             Center(
               child: Padding(
                 padding: EdgeInsets.symmetric(vertical: 32),
-                child: textWidget(
-                  text: "No transactions yet",
-                  color: Colors.grey,
-                ),
+                child: textWidget(text: noTransactionsYet, color: Colors.grey),
               ),
             )
           else

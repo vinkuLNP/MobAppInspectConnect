@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:inspect_connect/core/utils/constants/app_strings.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_button.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 
@@ -24,7 +25,7 @@ class ErrorView extends StatelessWidget {
               alignment: TextAlign.center,
             ),
             const SizedBox(height: 16),
-            AppButton(text: "Retry", onTap: onRetry),
+            AppButton(text: retryTxt, onTap: onRetry),
           ],
         ),
       ),

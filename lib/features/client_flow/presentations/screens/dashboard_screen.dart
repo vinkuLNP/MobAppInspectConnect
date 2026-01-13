@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/di/app_component/app_component.dart';
 import 'package:inspect_connect/core/di/services/app_sockets/socket_service.dart';
 import 'package:inspect_connect/core/di/services/notifcation_services/notification_permission_manager.dart';
+import 'package:inspect_connect/core/utils/constants/app_strings.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/user_provider.dart';
 import 'package:inspect_connect/features/client_flow/presentations/screens/booking_screen.dart';
@@ -65,10 +66,10 @@ class _ClientDashboardViewState extends State<ClientDashboardView> {
           : CommonAppBar(
               showLogo: true,
               title: _selectedIndex == 1
-                  ? 'Bookings'
+                  ? bookings
                   : _selectedIndex == 2
-                  ? 'Profile'
-                  : 'Book Inspection',
+                  ? profile
+                  : bookInspection,
             ),
       extendBody: true,
       body: _buildPage(_selectedIndex),
@@ -112,7 +113,7 @@ class _ClientDashboardViewState extends State<ClientDashboardView> {
                             child: _buildNavItem(
                               icon: Icons.assignment_outlined,
                               activeIcon: Icons.assignment,
-                              label: 'My Bookings',
+                              label: myBookings,
                               index: 1,
                               primary: primary,
                             ),
@@ -127,7 +128,7 @@ class _ClientDashboardViewState extends State<ClientDashboardView> {
                             child: _buildNavItem(
                               icon: Icons.person_outline,
                               activeIcon: Icons.person,
-                              label: 'Profile',
+                              label: profile,
                               index: 2,
                               primary: primary,
                             ),
@@ -177,7 +178,7 @@ class _ClientDashboardViewState extends State<ClientDashboardView> {
               Positioned(
                 bottom: 20,
                 child: textWidget(
-                  text: 'Book Now',
+                  text: bookNow,
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
                   color: _selectedIndex == 0

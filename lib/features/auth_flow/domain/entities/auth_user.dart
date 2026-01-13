@@ -1,4 +1,9 @@
+import 'dart:convert';
+
+import 'package:flutter/material.dart';
 import 'package:inspect_connect/features/auth_flow/data/datasources/local_datasources/auth_user_local_entity.dart';
+import 'package:inspect_connect/features/auth_flow/data/models/document_model.dart';
+import 'package:inspect_connect/features/auth_flow/data/models/service_model.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/user_detail.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/user_device_entity.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/user_location_entity.dart';
@@ -26,7 +31,7 @@ class AuthUser {
   final int? currentSubscriptionTrialDays;
   final int? currentSubscriptionAutoRenew;
   final bool? stripePayoutsEnabled;
-  final bool? stripeTransfersActive;
+  final bool? stripeTransfersEnabled;
 
   final int? certificateApproved;
   final String? rejectedReason;
@@ -52,6 +57,14 @@ class AuthUser {
   final DateTime? createdAt;
   final DateTime? updatedAt;
   final DateTime? loginTime;
+  final bool? statusUpdatedByAdmin;
+  final bool? docxOk;
+  final String? documentTypeId;
+  final String? documentExpiryDate;
+  final String? coiExpiryDate;
+
+  final List<ServiceArea>? serviceAreas;
+  final List<UserDocument>? documents;
 
   const AuthUser({
     required this.id,
@@ -74,7 +87,7 @@ class AuthUser {
     this.currentSubscriptionTrialDays,
     this.currentSubscriptionAutoRenew,
     this.stripePayoutsEnabled,
-    this.stripeTransfersActive,
+    this.stripeTransfersEnabled,
     this.certificateApproved,
     this.rejectedReason,
     this.location,
@@ -99,6 +112,13 @@ class AuthUser {
     this.createdAt,
     this.updatedAt,
     this.loginTime,
+    this.statusUpdatedByAdmin,
+    this.docxOk,
+    this.documentTypeId,
+    this.documentExpiryDate,
+    this.coiExpiryDate,
+    this.serviceAreas,
+    this.documents,
   });
 
   factory AuthUser.fromJson(Map<String, dynamic> json) {
@@ -124,7 +144,7 @@ class AuthUser {
       currentSubscriptionTrialDays: json['currentSubscriptionTrialDays'],
       currentSubscriptionAutoRenew: json['currentSubscriptionAutoRenew'],
       stripePayoutsEnabled: json['stripePayoutsEnabled'],
-      stripeTransfersActive: json['stripeTransfersActive'],
+      stripeTransfersEnabled: json['stripeTransfersEnabled'],
       certificateApproved: json['certificateApproved'],
       rejectedReason: json['rejectedReason'],
       connectorLinkUrl: json['connectorLinkUrl'],
@@ -150,6 +170,21 @@ class AuthUser {
           .toList(),
       uploadedIdOrLicenseDocument: json['uploadedIdOrLicenseDocument'],
       workHistoryDescription: json['workHistoryDescription'],
+      statusUpdatedByAdmin: json['statusUpdatedByAdmin'],
+      docxOk: json['docxOk'],
+      documentTypeId: json['documentTypeId'] is Map
+          ? json['documentTypeId']['_id']
+          : json['documentTypeId'],
+      documentExpiryDate: json['documentExpiryDate'],
+      coiExpiryDate: json['coiExpiryDate'],
+      documents: (json['documents'] as List?)
+          ?.map((e) => UserDocument.fromJson(e))
+          .toList(),
+
+      serviceAreas: (json['serviceAreas'] as List?)
+          ?.map((e) => ServiceArea.fromJson(e))
+          .toList(),
+
       location: loc != null
           ? UserLocation(
               name: loc['locationName'] ?? '',
@@ -200,7 +235,7 @@ class AuthUser {
       'currentSubscriptionTrialDays': currentSubscriptionTrialDays,
       'currentSubscriptionAutoRenew': currentSubscriptionAutoRenew,
       'stripePayoutsEnabled': stripePayoutsEnabled,
-      'stripeTransfersActive': stripeTransfersActive,
+      'stripeTransfersEnabled': stripeTransfersEnabled,
       'certificateApproved': certificateApproved,
       'rejectedReason': rejectedReason,
       'bookingInProgress': bookingInProgress,
@@ -223,6 +258,14 @@ class AuthUser {
       'createdAt': createdAt?.toIso8601String(),
       'updatedAt': updatedAt?.toIso8601String(),
       'loginTime': loginTime?.toIso8601String(),
+      'statusUpdatedByAdmin': statusUpdatedByAdmin,
+      'docxOk': docxOk,
+      'documentTypeId': documentTypeId,
+      'documentExpiryDate': documentExpiryDate,
+      'coiExpiryDate': coiExpiryDate,
+      'serviceAreas': serviceAreas,
+      'documents': documents,
+
       'location': location != null
           ? {
               'type': 'Point',
@@ -276,6 +319,23 @@ class AuthUser {
       referenceDocuments: entity.referenceDocuments,
       uploadedIdOrLicenseDocument: entity.uploadedIdOrLicenseDocument,
       workHistoryDescription: entity.workHistoryDescription,
+      statusUpdatedByAdmin: entity.statusUpdatedByAdmin,
+      docxOk: entity.docxOk,
+      connectorLinkUrl: entity.connectorLinkUrl,
+      documentTypeId: entity.documentTypeId,
+      documentExpiryDate: entity.documentExpiryDate,
+      coiExpiryDate: entity.coiExpiryDate,
+      documents: entity.documentsJson != null
+          ? (jsonDecode(entity.documentsJson!) as List)
+                .map((e) => UserDocument.fromJson(e))
+                .toList()
+          : null,
+
+      serviceAreas: entity.serviceAreasJson != null
+          ? (jsonDecode(entity.serviceAreasJson!) as List)
+                .map((e) => ServiceArea.fromJson(e))
+                .toList()
+          : null,
     );
   }
 }
@@ -302,7 +362,7 @@ extension AuthUserMapping on AuthUser {
       currentSubscriptionTrialDays: currentSubscriptionTrialDays,
       currentSubscriptionAutoRenew: currentSubscriptionAutoRenew,
       stripePayoutsEnabled: stripePayoutsEnabled,
-      stripeTransfersActive: stripeTransfersActive,
+      stripeTransfersEnabled: stripeTransfersEnabled,
       certificateApproved: certificateApproved,
       rejectedReason: rejectedReason,
       locationName: location?.name,
@@ -327,6 +387,19 @@ extension AuthUserMapping on AuthUser {
       referenceDocuments: referenceDocuments,
       uploadedIdOrLicenseDocument: uploadedIdOrLicenseDocument,
       workHistoryDescription: workHistoryDescription,
+      statusUpdatedByAdmin: statusUpdatedByAdmin,
+      docxOk: docxOk,
+      connectorLinkUrl: connectorLinkUrl,
+      documentTypeId: documentTypeId,
+      documentExpiryDate: documentExpiryDate,
+      coiExpiryDate: coiExpiryDate,
+      documentsJson: documents != null
+          ? jsonEncode(documents!.map((e) => e.toJson()).toList())
+          : null,
+
+      serviceAreasJson: serviceAreas != null
+          ? jsonEncode(serviceAreas!.map((e) => e.toJson()).toList())
+          : null,
     );
   }
 }
@@ -362,8 +435,8 @@ extension AuthUserLocalEntityMerge on AuthUserLocalEntity {
       currentSubscriptionAutoRenew:
           detail.currentSubscriptionAutoRenew ?? currentSubscriptionAutoRenew,
       stripePayoutsEnabled: detail.stripePayoutsEnabled ?? stripePayoutsEnabled,
-      stripeTransfersActive:
-          detail.stripeTransfersActive ?? stripeTransfersActive,
+      stripeTransfersEnabled:
+          detail.stripeTransfersEnabled ?? stripeTransfersEnabled,
       walletId: detail.walletId ?? walletId,
       locationName: detail.location?.locationName ?? locationName,
       latitude: detail.location?.coordinates?[1] ?? latitude,
@@ -391,6 +464,19 @@ extension AuthUserLocalEntityMerge on AuthUserLocalEntity {
           detail.uploadedIdOrLicenseDocument ?? uploadedIdOrLicenseDocument,
       workHistoryDescription:
           detail.workHistoryDescription ?? workHistoryDescription,
+      statusUpdatedByAdmin: detail.statusUpdatedByAdmin ?? statusUpdatedByAdmin,
+      docxOk: detail.docxOk ?? docxOk,
+      connectorLinkUrl: detail.connectorLinkUrl ?? connectorLinkUrl,
+      documentTypeId: detail.documentTypeId?.id ?? documentTypeId,
+      documentExpiryDate: detail.documentExpiryDate ?? documentExpiryDate,
+      coiExpiryDate: detail.coiExpiryDate ?? coiExpiryDate,
+      serviceAreasJson: detail.serviceAreas != null
+          ? jsonEncode(detail.serviceAreas)
+          : serviceAreasJson,
+
+      documentsJson: detail.documents != null
+          ? jsonEncode(detail.documents)
+          : documentsJson,
     );
   }
 }

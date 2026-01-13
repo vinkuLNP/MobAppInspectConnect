@@ -5,6 +5,7 @@ import 'package:inspect_connect/core/di/app_component/app_component.dart';
 import 'package:inspect_connect/core/utils/app_widgets/common_address_auto_complete_field.dart';
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
 import 'package:inspect_connect/core/utils/constants/app_common_card_container.dart';
+import 'package:inspect_connect/core/utils/constants/app_strings.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_button.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/core/utils/presentation/app_text_style.dart';
@@ -125,7 +126,7 @@ class _BookingFormWidgetState extends State<BookingFormWidget> {
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           _section(
-                            title: 'Select Date & Time',
+                            title: selectDateTime,
                             child: IgnorePointer(
                               ignoring: widget.isReadOnly,
                               child: DateTimePickerWidget(
@@ -153,7 +154,7 @@ class _BookingFormWidgetState extends State<BookingFormWidget> {
                           ),
 
                           _section(
-                            title: 'Inspection Type',
+                            title: inspectionType,
                             child: _inspectionTypeDropdown(prov),
                           ),
 
@@ -163,7 +164,7 @@ class _BookingFormWidgetState extends State<BookingFormWidget> {
                               vertical: 6,
                             ),
                             child: AddressAutocompleteField(
-                              label: "Address",
+                              label: addressLabel,
                               style: AddressFieldStyle.bookingInput,
                               controller: prov.locationController,
                               googleApiKey: dotenv.env['GOOGLE_API_KEY']!,
@@ -177,18 +178,18 @@ class _BookingFormWidgetState extends State<BookingFormWidget> {
                             ),
                           ),
                           BookingInputField(
-                            label: 'Description',
+                            label: descriptionTxt,
                             controller: prov.descriptionController,
                             readOnly: widget.isReadOnly,
                             maxLines: 4,
                             onChanged: widget.isReadOnly
                                 ? null
                                 : prov.setDescription,
-                            hint: 'Add details...',
+                            hint: descriptionHint,
                           ),
 
                           _section(
-                            title: 'Upload Images (max 5)',
+                            title: uploadImages,
                             child: _imageGrid(prov, context),
                           ),
                           widget.isReadOnly
@@ -210,8 +211,8 @@ class _BookingFormWidgetState extends State<BookingFormWidget> {
                                       ? AppColors.authThemeColor
                                       : AppColors.disableColor,
                                   text: widget.isEditing
-                                      ? 'Save Changes'
-                                      : 'Confirm Booking',
+                                      ? saveChanges
+                                      : confirmBooking,
                                   onTap: prov.isProcessing
                                       ? null
                                       : () {
@@ -268,7 +269,7 @@ class _BookingFormWidgetState extends State<BookingFormWidget> {
     return DropdownButtonFormField<CertificateSubTypeEntity>(
       isDense: true,
       isExpanded: true,
-      decoration: _inputDecoration('Select inspection type').copyWith(
+      decoration: _inputDecoration(selectInspectionType).copyWith(
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 10,
           vertical: 14,
@@ -319,7 +320,7 @@ class _BookingFormWidgetState extends State<BookingFormWidget> {
             children: [
               Icon(Icons.add_a_photo, size: 32, color: Colors.grey),
               SizedBox(height: 8),
-              textWidget(text: "Add Image", color: Colors.grey, fontSize: 12),
+              textWidget(text: addImage, color: Colors.grey, fontSize: 12),
             ],
           ),
         ),

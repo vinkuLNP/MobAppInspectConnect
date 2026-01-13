@@ -1,5 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:inspect_connect/core/utils/constants/app_strings.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_button.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/client/widgets/input_fields.dart';
@@ -50,7 +51,7 @@ class _AccountSettingsViewState extends State<AccountSettingsView> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: textWidget(
-              text: 'Profile updated successfully!',
+              text: profileUpdatedSuccessfully,
               color: Colors.white,
             ),
           ),
@@ -62,7 +63,7 @@ class _AccountSettingsViewState extends State<AccountSettingsView> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: textWidget(
-              text: 'Failed to update: $e',
+              text: '$failedToUpdate: $e',
               color: Colors.white,
             ),
           ),
@@ -91,7 +92,7 @@ class _AccountSettingsViewState extends State<AccountSettingsView> {
 
     return Scaffold(
       appBar: const CommonAppBar(
-        title: 'Account Settings',
+        title: accountSettings,
         showLogo: false,
         showBackButton: true,
       ),
@@ -102,22 +103,21 @@ class _AccountSettingsViewState extends State<AccountSettingsView> {
           children: [
             const SizedBox(height: 16),
             AppInputField(
-              label: 'Full Name',
+              label: fullNameLabel,
               controller: nameCtrl,
-              validator: (value) => value == null || value.trim().isEmpty
-                  ? 'Name required'
-                  : null,
+              validator: (value) =>
+                  value == null || value.trim().isEmpty ? nameRequired : null,
             ),
             const SizedBox(height: 20),
             AppInputField(
-              label: 'Email',
+              label: emailLabel,
               controller: emailCtrl,
               readOnly: true,
             ),
 
             const SizedBox(height: 20),
             AppInputField(
-              label: 'Phone Number',
+              label: phoneNumberLabel,
               controller: phoneCtrl,
               readOnly: true,
             ),
@@ -126,7 +126,7 @@ class _AccountSettingsViewState extends State<AccountSettingsView> {
 
             AppButton(
               isLoading: isUpdating,
-              text: isUpdating ? 'Saving...' : 'Save Changes',
+              text: isUpdating ? saving : saveChanges,
               onTap: isUpdating ? null : _updateProfile,
             ),
           ],

@@ -1,5 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:inspect_connect/core/utils/constants/app_strings.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_button.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/client/widgets/input_fields.dart';
 import 'package:inspect_connect/features/auth_flow/utils/text_editor_controller.dart';
@@ -18,7 +19,7 @@ class ChangePasswordView extends StatelessWidget {
       child: Consumer<ChangePasswordViewModel>(
         builder: (context, vm, _) => Scaffold(
           appBar: const CommonAppBar(
-            title: 'Change Password',
+            title: changePassword,
             showLogo: false,
             showBackButton: true,
           ),
@@ -33,7 +34,7 @@ class ChangePasswordView extends StatelessWidget {
                 const SizedBox(height: 8),
 
                 AppPasswordField(
-                  label: 'Old Password',
+                  label: oldPassword,
                   controller: oldPasswordCtrl,
                   obscure: !vm.showOldPassword,
                   onToggle: vm.toggleOldPasswordVisibility,
@@ -42,7 +43,7 @@ class ChangePasswordView extends StatelessWidget {
                 const SizedBox(height: 8),
 
                 AppPasswordField(
-                  label: 'New Password',
+                  label: newPasswordLabel,
                   controller: newPasswordCtrl,
                   obscure: !vm.showNewPassword,
                   onToggle: vm.toggleNewPasswordVisibility,
@@ -51,7 +52,7 @@ class ChangePasswordView extends StatelessWidget {
                 const SizedBox(height: 8),
 
                 AppPasswordField(
-                  label: 'Confirm Password',
+                  label: confirmPassword,
                   controller: confirmPasswordCtrl,
                   obscure: !vm.showConfirmPassword,
                   onToggle: vm.toggleConfirmPasswordVisibility,
@@ -63,7 +64,7 @@ class ChangePasswordView extends StatelessWidget {
                 AppButton(
                   isLoading: vm.isLoading,
 
-                  text: vm.isLoading ? 'Updating...' : 'Update Password',
+                  text: vm.isLoading ? updating : updatePassword,
                   onTap: vm.isLoading
                       ? null
                       : () async {
