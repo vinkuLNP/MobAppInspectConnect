@@ -5,6 +5,7 @@ import 'package:inspect_connect/core/utils/constants/app_colors.dart';
 import 'package:inspect_connect/core/utils/constants/app_constants.dart';
 import 'package:inspect_connect/core/utils/constants/app_strings.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
+import 'package:inspect_connect/features/client_flow/data/models/booking_model.dart';
 import 'package:inspect_connect/features/client_flow/domain/entities/booking_list_entity.dart';
 import 'package:inspect_connect/features/client_flow/domain/entities/certificate_sub_type_entity.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/booking_provider.dart';
@@ -199,7 +200,7 @@ class BookingFiltersService {
       );
 
       final state = await provider
-          .executeParamsUseCase<List<BookingListEntity>, FetchBookingsParams>(
+          .executeParamsUseCase<List<BookingData>, FetchBookingsParams>(
             useCase: fetchBookingUsecase,
             query: params,
             launchLoader: false,

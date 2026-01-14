@@ -7,7 +7,6 @@ import 'package:inspect_connect/core/di/app_component/app_component.dart';
 import 'package:inspect_connect/core/di/services/payment_services/payment_purpose.dart';
 import 'package:inspect_connect/core/di/services/payment_services/payment_request.dart';
 import 'package:inspect_connect/core/utils/app_widgets/card_payment_sheet.dart';
-import 'package:inspect_connect/core/utils/constants/app_strings.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/features/auth_flow/data/datasources/local_datasources/auth_local_datasource.dart';
 import 'package:inspect_connect/features/auth_flow/data/datasources/local_datasources/auth_user_local_entity.dart';
@@ -401,31 +400,7 @@ class InspectorDashboardProvider extends BaseViewModel {
           '❌ [FETCH_USER_DETAIL] API failed → '
           'using local fallback. Error: $e',
         );
-
-        detail = UserDetail(
-          id: localUser.id.toString(),
-          userId: localUser.userId.toString(),
-          name: localUser.name,
-          email: localUser.email,
-          phoneNumber: localUser.phoneNumber,
-          countryCode: localUser.countryCode,
-          phoneOtpVerified: localUser.phoneOtpVerified,
-          emailOtpVerified: localUser.emailOtpVerified,
-          agreedToTerms: localUser.agreedToTerms,
-          isTruthfully: localUser.isTruthfully,
-          stripeSubscriptionStatus: localUser.stripeSubscriptionStatus,
-          currentSubscriptionId: localUser.currentSubscriptionId != null
-              ? CurrentSubscription(id: localUser.currentSubscriptionId)
-              : null,
-          certificateApproved: localUser.certificateApproved,
-          location: localUser.latitude != null && localUser.longitude != null
-              ? Location(
-                  type: 'Point',
-                  locationName: localUser.locationName,
-                  coordinates: [localUser.latitude!, localUser.longitude!],
-                )
-              : null,
-        );
+        detail = UserDetail.fromJson(localUser.toDomainEntity().toJson());
 
         log(
           '🧩 [FETCH_USER_DETAIL] Fallback UserDetail created from local data',

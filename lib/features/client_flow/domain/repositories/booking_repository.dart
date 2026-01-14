@@ -1,6 +1,7 @@
 import 'package:inspect_connect/core/commondomain/entities/based_api_result/api_result_model.dart';
 import 'package:inspect_connect/features/client_flow/data/models/booking_detail_model.dart';
 import 'package:inspect_connect/features/client_flow/data/models/booking_model.dart';
+import 'package:inspect_connect/features/client_flow/data/models/notification_model.dart';
 import 'package:inspect_connect/features/client_flow/data/models/upload_image_model.dart';
 import 'package:inspect_connect/features/client_flow/data/models/user_payment_list_model.dart';
 import 'package:inspect_connect/features/client_flow/data/models/wallet_model.dart';
@@ -25,6 +26,10 @@ abstract class ClientUserRepository {
     String? sortOrder,
     int? status,
   });
+  Future<ApiResultModel<List<NotificationModel>>> getNotifications({
+    required int page,
+    required int perPageLimit,
+  });
   Future<ApiResultModel<PaymentsBodyModel>> getUserPaymentList({
     required int page,
     required int limit,
@@ -45,6 +50,11 @@ abstract class ClientUserRepository {
     String bookingId,
     int status,
   );
+  Future<ApiResultModel<String>> deductTransferWallet(
+    String bookingId,
+    String transferToId,
+  );
+  Future<ApiResultModel<String>> onBoardingUser();
   Future<ApiResultModel<BookingData>> showUpFeeStatus(
     String bookingId,
     bool showUpFeeApplied,

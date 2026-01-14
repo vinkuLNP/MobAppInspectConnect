@@ -12,6 +12,7 @@ import 'package:inspect_connect/features/client_flow/data/models/booking_detail_
 import 'package:inspect_connect/features/client_flow/data/models/booking_model.dart';
 import 'package:inspect_connect/features/client_flow/domain/entities/booking_entity.dart';
 import 'package:inspect_connect/features/client_flow/domain/usecases/create_booking_usecase.dart';
+import 'package:inspect_connect/features/client_flow/domain/usecases/deduct_transfer_wallet_usecase.dart';
 import 'package:inspect_connect/features/client_flow/domain/usecases/get_booking_Detail_usecase.dart';
 import 'package:inspect_connect/features/client_flow/domain/usecases/update_booking_detail_usecase.dart';
 import 'package:inspect_connect/features/client_flow/domain/usecases/delete_booking_usecase.dart';
@@ -432,6 +433,7 @@ class BookingActionsService {
     required BuildContext context,
     required String bookingId,
     required bool showUpFeeApplied,
+    required String userId,
   }) async {
     try {
       provider.isUpdatingBooking = true;
@@ -450,6 +452,15 @@ class BookingActionsService {
       state?.when(
         data: (response) async {
           provider.updatedBookingData = response;
+          if (showUpFeeApplied) {
+            await updateBookingStatus(
+              context: context,
+              bookingId: bookingId,
+              newStatus: bookingStatusCompleted,
+              userId: userId,
+            );
+          }
+
           final index = provider.bookings.indexWhere((b) => b.id == bookingId);
           if (index != -1) {
             provider.bookings = [...provider.bookings]
@@ -492,11 +503,18 @@ class BookingActionsService {
     BuildContext context,
     String bookingId,
     String userId,
+    String inspectorId,
   ) async {
     try {
       provider.isActionProcessing = true;
       provider.notify();
-
+      final deducted = await deductAndTransferWallet(
+        context: context,
+        bookingId: bookingId,
+        transferToId: inspectorId,
+      );
+      if (deducted == null) return;
+      if (!deducted) return;
       await updateBookingStatus(
         context: context,
         bookingId: bookingId,
@@ -528,6 +546,68 @@ class BookingActionsService {
     } finally {
       provider.isActionProcessing = false;
       provider.notify();
+    }
+  }
+
+  Future<bool?> deductAndTransferWallet({
+    required BuildContext context,
+    required String bookingId,
+    required String transferToId,
+  }) async {
+    try {
+      provider.notify();
+      final updateBookingStatusUseCase = locator<DeductTransferWalletUsecase>();
+      final state = await provider
+          .executeParamsUseCase<String, DeductTransferWalletParams>(
+            useCase: updateBookingStatusUseCase,
+            query: DeductTransferWalletParams(
+              transferToId: transferToId,
+              bookingId: bookingId,
+            ),
+            launchLoader: true,
+          );
+
+      return state?.when(
+        data: (response) async {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                response,
+                style: const TextStyle(color: Colors.white),
+              ),
+              backgroundColor: Colors.green,
+            ),
+          );
+          provider.notify();
+
+          return true;
+        },
+        error: (e) {
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: textWidget(
+                  color: AppColors.whiteColor,
+                  text: e.message ?? "Wallet deduction failed",
+                ),
+              ),
+            );
+          }
+          return false;
+        },
+      );
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: textWidget(
+              color: AppColors.whiteColor,
+              text: '$failedTxt: $e',
+            ),
+          ),
+        );
+      }
+      return false;
     }
   }
 

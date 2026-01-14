@@ -304,15 +304,21 @@ class CertificateAgency {
 class CurrentSubscription {
   final String? id;
   final Plan? planId;
+
+  final int? startDate;
+  final int? endDate;
   final int? trialStart;
   final int? trialEnd;
-  final int? amount;
+
+  final double? amount;
   final String? currency;
   final String? interval;
 
-  CurrentSubscription({
-    this.id,
+  const CurrentSubscription({
+    required this.id,
     this.planId,
+    this.startDate,
+    this.endDate,
     this.trialStart,
     this.trialEnd,
     this.amount,
@@ -320,20 +326,26 @@ class CurrentSubscription {
     this.interval,
   });
 
-  factory CurrentSubscription.fromJson(Map<String, dynamic> json) =>
-      CurrentSubscription(
-        id: json['_id'],
-        planId: json['planId'] != null ? Plan.fromJson(json['planId']) : null,
-        trialStart: json['trialStart'],
-        trialEnd: json['trialEnd'],
-        amount: json['amount'],
-        currency: json['currency'],
-        interval: json['interval'],
-      );
+  factory CurrentSubscription.fromJson(Map<String, dynamic> json) {
+    return CurrentSubscription(
+      id: json['_id'].toString(),
+      planId: json['planId'] != null ? Plan.fromJson(json['planId']) : null,
+      startDate: json['startDate'],
+      endDate: json['endDate'],
+      trialStart: json['trialStart'],
+      trialEnd: json['trialEnd'],
+
+      amount: (json['amount'] as num?)?.toDouble(),
+      currency: json['currency'],
+      interval: json['interval'],
+    );
+  }
 
   Map<String, dynamic> toJson() => {
     '_id': id,
     'planId': planId?.toJson(),
+    'startDate': startDate,
+    'endDate': endDate,
     'trialStart': trialStart,
     'trialEnd': trialEnd,
     'amount': amount,

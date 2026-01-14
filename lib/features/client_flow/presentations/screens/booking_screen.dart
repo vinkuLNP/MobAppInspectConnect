@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
 import 'package:inspect_connect/core/utils/constants/app_common_card_container.dart';
@@ -5,6 +7,8 @@ import 'package:inspect_connect/core/utils/constants/app_constants.dart';
 import 'package:inspect_connect/core/utils/constants/app_strings.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_button.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
+import 'package:inspect_connect/features/client_flow/data/models/booking_detail_model.dart';
+import 'package:inspect_connect/features/client_flow/data/models/booking_model.dart';
 import 'package:inspect_connect/features/client_flow/domain/entities/booking_list_entity.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/user_provider.dart';
 import 'package:intl/intl.dart';
@@ -57,7 +61,7 @@ class _BookingsScreenState extends State<BookingsScreen> {
     });
 
     final latestBooking = awaitingBookings.first;
-
+    log(latestBooking.toJson().toString());
     _shownApprovalDialog = true;
     Future.delayed(const Duration(milliseconds: 400), () {
       if (mounted) {
@@ -389,7 +393,7 @@ class _BookingsScreenState extends State<BookingsScreen> {
     );
   }
 
-  Widget _buildBookingCard(BuildContext context, BookingListEntity booking) {
+  Widget _buildBookingCard(BuildContext context, BookingData booking) {
     final color = statusColor(booking.status);
 
     return GestureDetector(
@@ -524,7 +528,7 @@ class _BookingsScreenState extends State<BookingsScreen> {
     );
   }
 
-  void _showApprovalDialog(BuildContext context, BookingListEntity booking) {
+  void _showApprovalDialog(BuildContext context, BookingData booking) {
     final themeColor = AppColors.authThemeColor;
 
     showDialog(
@@ -717,6 +721,10 @@ class _BookingsScreenState extends State<BookingsScreen> {
                         showIcon: true,
                         iconLeftMargin: 10,
                         onTap: () async {
+                          log(booking.inspector!.id.toString());
+                          // log(booking.inspectorId.toString());
+                          log(booking.id.toString());
+
                           final user = context.read<UserProvider>().user;
                           final rootContext = Navigator.of(context).context;
                           Navigator.pop(context);
@@ -726,6 +734,7 @@ class _BookingsScreenState extends State<BookingsScreen> {
                                 rootContext,
                                 booking.id,
                                 user!.userId,
+                                booking.inspector!.id.toString(),
                               );
                         },
                       ),
@@ -765,7 +774,7 @@ class _BookingsScreenState extends State<BookingsScreen> {
     );
   }
 
-  void _showBookingDetails(BuildContext context, BookingListEntity booking) {
+  void _showBookingDetails(BuildContext context, BookingData booking) {
     final isPending = booking.status == bookingStatusPending;
     final isApproved = booking.status == bookingStatusAccepted;
     final isRejected = booking.status == bookingStatusRejected;
@@ -908,7 +917,7 @@ class _BookingsScreenState extends State<BookingsScreen> {
 
   Future<void> _showDeleteBookingModal(
     BuildContext context,
-    BookingListEntity booking, {
+    BookingData booking, {
     required double cancellationFee,
   }) async {
     final bookingProvider = context.read<BookingProvider>();
@@ -1090,15 +1099,13 @@ class _BookingsScreenState extends State<BookingsScreen> {
     );
   }
 
-  List<BookingListEntity> _getTodaysApprovedBookings(
-    List<BookingListEntity> list,
-  ) {
+  List<BookingData> _getTodaysApprovedBookings(List<BookingData> list) {
     final now = DateTime.now();
 
     final startOfDay = DateTime(now.year, now.month, now.day);
     final endOfDay = DateTime(now.year, now.month, now.day, 23, 59, 59);
 
-    final todaysApproved = <BookingListEntity>[];
+    final todaysApproved = <BookingData>[];
 
     for (final b in list) {
       if (b.status == 1) {
@@ -1118,7 +1125,7 @@ class _BookingsScreenState extends State<BookingsScreen> {
     return todaysApproved;
   }
 
-  DateTime _bookingDateTime(BookingListEntity b) {
+  DateTime _bookingDateTime(BookingData b) {
     final date = DateTime.parse(b.bookingDate);
     DateTime time;
     final t = b.bookingTime.trim().toUpperCase().replaceAll('.', '');

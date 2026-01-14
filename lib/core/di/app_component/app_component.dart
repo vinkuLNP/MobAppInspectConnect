@@ -27,17 +27,21 @@ import 'package:inspect_connect/features/client_flow/data/repositories/client_re
 import 'package:inspect_connect/features/client_flow/domain/repositories/booking_repository.dart';
 import 'package:inspect_connect/features/client_flow/domain/usecases/apply_show_up_fee.dart';
 import 'package:inspect_connect/features/client_flow/domain/usecases/create_booking_usecase.dart';
+import 'package:inspect_connect/features/client_flow/domain/usecases/deduct_transfer_wallet_usecase.dart';
 import 'package:inspect_connect/features/client_flow/domain/usecases/delete_booking_usecase.dart';
 import 'package:inspect_connect/features/client_flow/domain/usecases/fetch_booking_list_usecase.dart';
 import 'package:inspect_connect/features/client_flow/domain/usecases/get_booking_Detail_usecase.dart';
 import 'package:inspect_connect/features/client_flow/domain/usecases/get_certificate_subtype_usecase.dart';
 import 'package:inspect_connect/features/client_flow/domain/usecases/get_user_payments_usecase.dart';
 import 'package:inspect_connect/features/client_flow/domain/usecases/get_user_wallet_amount_usecase.dart';
+import 'package:inspect_connect/features/client_flow/domain/usecases/notification_use_case.dart';
+import 'package:inspect_connect/features/client_flow/domain/usecases/onboarding_usecase.dart';
 import 'package:inspect_connect/features/client_flow/domain/usecases/update_booking_detail_usecase.dart';
 import 'package:inspect_connect/features/client_flow/domain/usecases/update_booking_status.dart';
 import 'package:inspect_connect/features/client_flow/domain/usecases/update_booking_timer.dart';
 import 'package:inspect_connect/features/client_flow/domain/usecases/upload_image_usecase.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/booking_provider.dart';
+import 'package:inspect_connect/features/client_flow/presentations/providers/notification_provider.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/session_manager.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/user_provider.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/wallet_provider.dart';
@@ -94,6 +98,10 @@ void setupLocator() {
   locator.registerLazySingleton(() => GetSubscriptionPlansUseCase(locator()));
   locator.registerLazySingleton(() => GetPaymentIntentUseCase(locator()));
   locator.registerLazySingleton(() => GetSettingsUseCase(locator()));
+  locator.registerLazySingleton(() => OnboardingUsecase(locator()));
+  locator.registerLazySingleton(() => NotificationUseCase(locator()));
+  locator.registerLazySingleton(() => DeductTransferWalletUsecase(locator()));
+
   locator.registerLazySingleton(
     () => GetUserSubscriptionDetailUseCase(locator()),
   );
@@ -126,6 +134,10 @@ void setupLocator() {
 
   locator.registerLazySingleton<InspectorDashboardProvider>(
     () => InspectorDashboardProvider(),
+  );
+
+  locator.registerLazySingleton<NotificationProvider>(
+    () => NotificationProvider(),
   );
 
   locator.registerLazySingleton<StripeService>(() => StripeServiceImpl());

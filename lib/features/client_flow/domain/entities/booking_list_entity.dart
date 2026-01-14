@@ -22,7 +22,7 @@ class BookingListEntity {
   final String? createdAt;
   final String? updatedAt;
 
-  final String? inspectorId;
+  final AuthUser? inspectorId;
 
   final String? timerStartedAt;
   final String? timerEndedAt;
@@ -109,8 +109,9 @@ class BookingListEntity {
       createdAt: json['createdAt'],
       updatedAt: json['updatedAt'],
 
-      inspectorId: json['inspectorId']?.toString(),
-
+      inspectorId: json['inspectorId'] is Map
+          ? AuthUser.fromJson(json['inspectorId'])
+          : null,
       timerStartedAt: json['timerStartedAt'],
       timerEndedAt: json['timerEndedAt'],
       timerDuration: json['timerDuration'],
@@ -128,68 +129,67 @@ class BookingListEntity {
     );
   }
   BookingListEntity copyWith({
-  String? id,
-  AuthUser? client,
-  List<String>? inspectorIds,
-  List<CertificateSubTypeModelData>? certificateSubTypes,
-  List<String>? images,
-  String? description,
-  String? bookingDate,
-  String? bookingTime,
-  String? bookingLocation,
-  List<double>? bookingLocationCoordinates,
-  String? bookingLocationZip,
-  int? status,
-  bool? isDeleted,
-  String? createdAt,
-  String? updatedAt,
-  String? inspectorId,
-  String? timerStartedAt,
-  String? timerEndedAt,
-  int? timerDuration,
-  int? finalBillingHours,
-  String? totalBillingAmount,
-  String? platformFee,
-  String? overRideAmount,
-  String? globalCharge,
-  int? finalRaisedAmount,
-  bool? showUpFeeApplied,
-  String? showUpFee,
-  bool? lateCancellation,
-  String? lateCancellationFee,
-}) {
-  return BookingListEntity(
-    id: id ?? this.id,
-    client: client ?? this.client,
-    inspectorIds: inspectorIds ?? this.inspectorIds,
-    certificateSubTypes: certificateSubTypes ?? this.certificateSubTypes,
-    images: images ?? this.images,
-    description: description ?? this.description,
-    bookingDate: bookingDate ?? this.bookingDate,
-    bookingTime: bookingTime ?? this.bookingTime,
-    bookingLocation: bookingLocation ?? this.bookingLocation,
-    bookingLocationCoordinates:
-        bookingLocationCoordinates ?? this.bookingLocationCoordinates,
-    bookingLocationZip: bookingLocationZip ?? this.bookingLocationZip,
-    status: status ?? this.status,
-    isDeleted: isDeleted ?? this.isDeleted,
-    createdAt: createdAt ?? this.createdAt,
-    updatedAt: updatedAt ?? this.updatedAt,
-    inspectorId: inspectorId ?? this.inspectorId,
-    timerStartedAt: timerStartedAt ?? this.timerStartedAt,
-    timerEndedAt: timerEndedAt ?? this.timerEndedAt,
-    timerDuration: timerDuration ?? this.timerDuration,
-    finalBillingHours: finalBillingHours ?? this.finalBillingHours,
-    totalBillingAmount: totalBillingAmount ?? this.totalBillingAmount,
-    platformFee: platformFee ?? this.platformFee,
-    overRideAmount: overRideAmount ?? this.overRideAmount,
-    globalCharge: globalCharge ?? this.globalCharge,
-    finalRaisedAmount: finalRaisedAmount ?? this.finalRaisedAmount,
-    showUpFeeApplied: showUpFeeApplied ?? this.showUpFeeApplied,
-    showUpFee: showUpFee ?? this.showUpFee,
-    lateCancellation: lateCancellation ?? this.lateCancellation,
-    lateCancellationFee: lateCancellationFee ?? this.lateCancellationFee,
-  );
-}
-
+    String? id,
+    AuthUser? client,
+    List<String>? inspectorIds,
+    List<CertificateSubTypeModelData>? certificateSubTypes,
+    List<String>? images,
+    String? description,
+    String? bookingDate,
+    String? bookingTime,
+    String? bookingLocation,
+    List<double>? bookingLocationCoordinates,
+    String? bookingLocationZip,
+    int? status,
+    bool? isDeleted,
+    String? createdAt,
+    String? updatedAt,
+    AuthUser? inspectorId,
+    String? timerStartedAt,
+    String? timerEndedAt,
+    int? timerDuration,
+    int? finalBillingHours,
+    String? totalBillingAmount,
+    String? platformFee,
+    String? overRideAmount,
+    String? globalCharge,
+    int? finalRaisedAmount,
+    bool? showUpFeeApplied,
+    String? showUpFee,
+    bool? lateCancellation,
+    String? lateCancellationFee,
+  }) {
+    return BookingListEntity(
+      id: id ?? this.id,
+      client: client ?? this.client,
+      inspectorIds: inspectorIds ?? this.inspectorIds,
+      certificateSubTypes: certificateSubTypes ?? this.certificateSubTypes,
+      images: images ?? this.images,
+      description: description ?? this.description,
+      bookingDate: bookingDate ?? this.bookingDate,
+      bookingTime: bookingTime ?? this.bookingTime,
+      bookingLocation: bookingLocation ?? this.bookingLocation,
+      bookingLocationCoordinates:
+          bookingLocationCoordinates ?? this.bookingLocationCoordinates,
+      bookingLocationZip: bookingLocationZip ?? this.bookingLocationZip,
+      status: status ?? this.status,
+      isDeleted: isDeleted ?? this.isDeleted,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      inspectorId: inspectorId ?? this.inspectorId,
+      timerStartedAt: timerStartedAt ?? this.timerStartedAt,
+      timerEndedAt: timerEndedAt ?? this.timerEndedAt,
+      timerDuration: timerDuration ?? this.timerDuration,
+      finalBillingHours: finalBillingHours ?? this.finalBillingHours,
+      totalBillingAmount: totalBillingAmount ?? this.totalBillingAmount,
+      platformFee: platformFee ?? this.platformFee,
+      overRideAmount: overRideAmount ?? this.overRideAmount,
+      globalCharge: globalCharge ?? this.globalCharge,
+      finalRaisedAmount: finalRaisedAmount ?? this.finalRaisedAmount,
+      showUpFeeApplied: showUpFeeApplied ?? this.showUpFeeApplied,
+      showUpFee: showUpFee ?? this.showUpFee,
+      lateCancellation: lateCancellation ?? this.lateCancellation,
+      lateCancellationFee: lateCancellationFee ?? this.lateCancellationFee,
+    );
+  }
 }

@@ -1,5 +1,3 @@
-import 'package:inspect_connect/core/utils/constants/app_constants.dart';
-
 const String importantPolicies = 'Important Policies';
 const String showUpFeePolicy = 'Show-Up Fee Policy';
 const String cancellationPolicy = 'Cancellation Policy';
@@ -363,6 +361,9 @@ const String bookingTime = 'Booking time';
 const String deposit = 'Deposit';
 const String walletBalanceUpdatedSuccessfully =
     'Your wallet balance has been updated successfully.';
+
+const String stripeAlreadyConnected = 'Stripe Already Connected';
+
 String paymentDeductionInfoTxt(double amount) =>
     'Upon your approval, a payment of \$${amount.toStringAsFixed(2)} '
     'will be automatically deducted from your wallet and transferred '

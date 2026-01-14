@@ -137,11 +137,6 @@
           "type": 6
         },
         {
-          "id": "22:3730392305248784100",
-          "name": "currentSubscriptionId",
-          "type": 9
-        },
-        {
           "id": "23:1561577677941793754",
           "name": "stripeSubscriptionStatus",
           "type": 9
@@ -593,7 +588,8 @@
   "retiredIndexUids": [],
   "retiredPropertyUids": [
     5058542504887666690,
-    8140600119593809259
+    8140600119593809259,
+    3730392305248784100
   ],
   "retiredRelationUids": [],
   "version": 1

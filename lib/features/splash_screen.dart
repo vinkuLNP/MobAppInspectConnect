@@ -127,14 +127,16 @@ class _SplashViewState extends State<SplashView>
     );
     switch (provider.status) {
       case InspectorStatus.needsSubscription:
-        if (context.mounted)
+        if (context.mounted) {
           context.router.replaceAll([const InspectorDashboardRoute()]);
+        }
         break;
       case InspectorStatus.underReview:
       case InspectorStatus.rejected:
       case InspectorStatus.approved:
-        if (context.mounted)
+        if (context.mounted) {
           context.router.replaceAll([const InspectorDashboardRoute()]);
+        }
         break;
       default:
         context.router.replaceAll([const OnBoardingRoute()]);

@@ -64,10 +64,12 @@ class PaymentEntity {
   });
 
   bool get isAdded {
-    switch (status.toLowerCase()) {
+    switch (type.toLowerCase()) {
       case 'paid':
+      case 'wallet_credit':
         return true;
       case 'pending':
+      case 'wallet_deduct':
       case 'processing':
       case 'action_required':
       case 'failed':
@@ -82,6 +84,7 @@ class PaymentEntity {
       case 'failed':
       case 'action_required':
       case 'pending':
+      case 'wallet_deduct':
       case 'processing':
         return false;
       case 'succeeded':
@@ -92,10 +95,12 @@ class PaymentEntity {
   }
 
   Color get statusColor {
-    switch (status.toLowerCase()) {
+    switch (type.toLowerCase()) {
       case 'paid':
+      case 'wallet_credit':
         return Colors.green;
       case 'succeeded':
+      case 'wallet_deduct':
         return Colors.red;
       case 'pending':
       case 'processing':
@@ -110,10 +115,12 @@ class PaymentEntity {
   }
 
   String get statusLabel {
-    switch (status.toLowerCase()) {
+    switch (type.toLowerCase()) {
       case 'paid':
+      case 'wallet_credit':
         return 'Added';
       case 'succeeded':
+      case 'wallet_deduct':
         return 'Deducted';
       case 'pending':
         return 'Pending';

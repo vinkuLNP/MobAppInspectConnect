@@ -112,10 +112,7 @@ class ResetPasswordView extends StatelessWidget {
                         vm.enableAutoValidate();
                         return;
                       }
-                      await vm.resetPassword(
-                        formKey: formKey,
-                        context: context,
-                      );
+                      await vm.clientSignUp(formKey: formKey, context: context);
                     },
                   ),
                 ),

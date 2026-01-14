@@ -65,7 +65,6 @@ class UserDocument {
     };
   }
 
-  // ---- helpers for UI ----
   bool get isRejected => adminApproval == 2;
   bool get isPending => adminApproval == 0;
   bool get isApproved => adminApproval == 1;

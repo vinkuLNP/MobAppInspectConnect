@@ -1,6 +1,4 @@
 import 'dart:convert';
-
-import 'package:flutter/material.dart';
 import 'package:inspect_connect/features/auth_flow/data/datasources/local_datasources/auth_user_local_entity.dart';
 import 'package:inspect_connect/features/auth_flow/data/models/document_model.dart';
 import 'package:inspect_connect/features/auth_flow/data/models/service_model.dart';
@@ -27,7 +25,7 @@ class AuthUser {
   final String? stripeAccountId;
   final String? stripeCustomerId;
   final String? stripeSubscriptionStatus;
-  final String? currentSubscriptionId;
+  final CurrentSubscription? currentSubscriptionId;
   final int? currentSubscriptionTrialDays;
   final int? currentSubscriptionAutoRenew;
   final bool? stripePayoutsEnabled;
@@ -140,7 +138,11 @@ class AuthUser {
       stripeAccountId: json['stripeAccountId'],
       stripeCustomerId: json['stripeCustomerId'],
       stripeSubscriptionStatus: json['stripeSubscriptionStatus'],
-      currentSubscriptionId: json['currentSubscriptionId'],
+      currentSubscriptionId: json['currentSubscriptionId'] != null
+          ? (json['currentSubscriptionId'] is String
+                ? CurrentSubscription(id: json['currentSubscriptionId'])
+                : CurrentSubscription.fromJson(json['currentSubscriptionId']))
+          : null,
       currentSubscriptionTrialDays: json['currentSubscriptionTrialDays'],
       currentSubscriptionAutoRenew: json['currentSubscriptionAutoRenew'],
       stripePayoutsEnabled: json['stripePayoutsEnabled'],
@@ -429,7 +431,7 @@ extension AuthUserLocalEntityMerge on AuthUserLocalEntity {
       stripeSubscriptionStatus:
           detail.stripeSubscriptionStatus ?? stripeSubscriptionStatus,
       currentSubscriptionId:
-          detail.currentSubscriptionId?.id ?? currentSubscriptionId,
+          detail.currentSubscriptionId ?? currentSubscriptionId,
       currentSubscriptionTrialDays:
           detail.currentSubscriptionTrialDays ?? currentSubscriptionTrialDays,
       currentSubscriptionAutoRenew:

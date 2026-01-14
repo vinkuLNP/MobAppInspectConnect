@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:inspect_connect/features/auth_flow/data/models/document_model.dart';
 import 'package:inspect_connect/features/auth_flow/data/models/service_model.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/auth_user.dart';
+import 'package:inspect_connect/features/auth_flow/domain/entities/user_detail.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/user_device_entity.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/user_location_entity.dart';
 import 'package:objectbox/objectbox.dart';
@@ -31,7 +32,7 @@ class AuthUserLocalEntity {
   bool? stripeTransfersEnabled;
   int? currentSubscriptionTrialDays;
   int? currentSubscriptionAutoRenew;
-  String? currentSubscriptionId;
+  CurrentSubscription? currentSubscriptionId;
   String? stripeSubscriptionStatus;
   String? walletId;
   String? locationName;
@@ -216,7 +217,11 @@ class AuthUserLocalEntity {
       stripePayoutsEnabled: user['stripePayoutsEnabled'],
       stripeTransfersEnabled: user['stripeTransfersEnabled'],
       stripeSubscriptionStatus: user['stripeSubscriptionStatus'],
-      currentSubscriptionId: user['currentSubscriptionId']?['_id'],
+      currentSubscriptionId: user['currentSubscriptionId'] != null
+          ? (user['currentSubscriptionId'] is String
+                ? CurrentSubscription(id: user['currentSubscriptionId'])
+                : CurrentSubscription.fromJson(user['currentSubscriptionId']))
+          : null,
       currentSubscriptionTrialDays: user['currentSubscriptionTrialDays'],
       currentSubscriptionAutoRenew: user['currentSubscriptionAutoRenew'],
 

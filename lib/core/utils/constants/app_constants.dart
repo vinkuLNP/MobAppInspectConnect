@@ -30,7 +30,8 @@ const String contentMultipartTypeValue = 'multipart/form-data';
 const Duration timeOutDuration = Duration(seconds: 20);
 
 ///The app base Url should be provided in this value
-
+String webViewUrl =
+    "https://inspect-connect-cjdwdhh6b4erb5b8.westus2-01.azurewebsites.net";
 String socketUrl =
     "https://inspect-connect-api-auakczg0ave2bqex.westus2-01.azurewebsites.net/";
 // Platform.isIOS ? "http://localhost:5002" : "http://10.0.2.2:5002";
@@ -72,6 +73,10 @@ const String uploadImageEndPoint = 'uploads';
 const String walletEndPoint = 'wallet';
 const String paymentEndPOint = 'payments';
 const String paymentIntentEndPOint = 'payments/paymentIntent';
+const String onboardingEndPOint = 'payments/onboard';
+const String notificationsEndPoint = 'notifications';
+const String deductAndTransferWalletEndPoint =
+    '$walletEndPoint/deductAndTransferWallet';
 
 const String subscriptionEndPoint = 'subscriptionPlans';
 const String userSubscriptionByIdEndPoint = 'subscriptions';

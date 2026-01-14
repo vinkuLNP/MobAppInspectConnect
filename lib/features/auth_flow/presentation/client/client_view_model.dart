@@ -199,7 +199,7 @@ class ClientViewModelProvider extends BaseViewModel {
     });
   }
 
-  Future<void> resetPassword({
+  Future<void> clientSignUp({
     required GlobalKey<FormState> formKey,
     required BuildContext context,
   }) async {
@@ -241,8 +241,8 @@ class ClientViewModelProvider extends BaseViewModel {
         isTruthfully: true,
         location: {
           "type": 'Point',
-          "locationName": placeName,
-          "coordinates": [selectedLat, selectedLng],
+          "locationName": placeName ?? 'unknown',
+          "coordinates": [selectedLat ?? 0.0, selectedLng ?? 0.0],
         },
       );
 

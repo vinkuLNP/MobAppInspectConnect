@@ -2,6 +2,7 @@ import 'package:inspect_connect/core/commondomain/entities/based_api_result/api_
 import 'package:inspect_connect/features/client_flow/data/datasources/remote_datasource/client_api_datasource.dart';
 import 'package:inspect_connect/features/client_flow/data/models/booking_detail_model.dart';
 import 'package:inspect_connect/features/client_flow/data/models/booking_model.dart';
+import 'package:inspect_connect/features/client_flow/data/models/notification_model.dart';
 import 'package:inspect_connect/features/client_flow/data/models/upload_image_model.dart';
 import 'package:inspect_connect/features/client_flow/data/models/user_payment_list_model.dart';
 import 'package:inspect_connect/features/client_flow/data/models/wallet_model.dart';
@@ -34,6 +35,11 @@ class ClientUserRepositoryImpl implements ClientUserRepository {
   }
 
   @override
+  Future<ApiResultModel<String>> onBoardingUser() {
+    return remote.onBoardingUser();
+  }
+
+  @override
   Future<ApiResultModel<CreateBookingResponseModel>> createBooking({
     required BookingEntity booking,
   }) async {
@@ -57,6 +63,14 @@ class ClientUserRepositoryImpl implements ClientUserRepository {
       sortOrder: sortOrder,
       status: status,
     );
+  }
+
+  @override
+  Future<ApiResultModel<List<NotificationModel>>> getNotifications({
+    required int page,
+    required int perPageLimit,
+  }) {
+    return remote.getNotifications(page: page, perPageLimit: perPageLimit);
   }
 
   @override
@@ -95,6 +109,14 @@ class ClientUserRepositoryImpl implements ClientUserRepository {
     BookingEntity booking,
   ) {
     return remote.updateBooking(bookingId, booking);
+  }
+
+  @override
+  Future<ApiResultModel<String>> deductTransferWallet(
+    String bookingId,
+    String transferToId,
+  ) {
+    return remote.deductTransferWallet(bookingId, transferToId);
   }
 
   @override
