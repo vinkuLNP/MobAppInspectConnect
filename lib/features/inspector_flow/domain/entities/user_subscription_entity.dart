@@ -13,7 +13,7 @@ class UserSubscriptionEntity {
   final int currentPeriodEnd;
   final int trialStart;
   final int trialEnd;
-  final int amount;
+  final double amount;
   final String currency;
   final String interval;
   final int intervalCount;

@@ -107,7 +107,12 @@ class _AdditionalDetailsStepState extends State<AdditionalDetailsStep> {
                               _imageUploader(
                                 context: context,
                                 files: prov.coiUploadedUrl != null
-                                    ? [File(prov.coiUploadedUrl!)]
+                                    ? [
+                                        File(
+                                          prov.coiUploadedUrl!.documentUrl
+                                              .toString(),
+                                        ),
+                                      ]
                                     : [],
                                 maxFiles: 1,
                                 onAdd: () => prov.pickFile(context, 'coi'),
@@ -214,8 +219,8 @@ class _AdditionalDetailsStepState extends State<AdditionalDetailsStep> {
       onTap: () async {
         final picked = await showDatePicker(
           context: context,
-          initialDate: date ?? DateTime.now(),
-          firstDate: DateTime.now(),
+          initialDate: date ?? DateTime.now().add(Duration(days: 30)),
+          firstDate: DateTime.now().add(Duration(days: 30)),
           lastDate: DateTime(2100),
         );
 
@@ -386,7 +391,7 @@ class _AdditionalDetailsStepState extends State<AdditionalDetailsStep> {
     final rowCount = (itemCount / crossAxisCount).ceil();
 
     return SizedBox(
-      height: rowCount * (itemHeight + spacing + 10),
+      height: rowCount * (itemHeight + spacing + 20),
       child: GridView.builder(
         padding: EdgeInsets.zero,
         shrinkWrap: true,

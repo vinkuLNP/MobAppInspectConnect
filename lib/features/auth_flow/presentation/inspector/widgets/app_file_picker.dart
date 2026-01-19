@@ -140,9 +140,10 @@ class AppFilePickerGrid extends StatelessWidget {
             onTap: () async {
               final date = await showDatePicker(
                 context: context,
-                firstDate: DateTime.now(),
+                firstDate: DateTime.now().add(Duration(days: 30)),
                 lastDate: DateTime(2100),
-                initialDate: doc.expiryDate ?? DateTime.now(),
+                initialDate:
+                    doc.expiryDate ?? DateTime.now().add(Duration(days: 30)),
               );
               if (date != null) {
                 onPickExpiry(index, date);

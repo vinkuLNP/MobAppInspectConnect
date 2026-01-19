@@ -80,13 +80,15 @@ class InsepctorPersistentDataService {
     if (saved.uploadedIdOrLicenseDocument != null) {
       provider.idDocumentUploadedUrl = saved.uploadedIdOrLicenseDocument;
       provider.idDocumentFile = File(
-        saved.uploadedIdOrLicenseDocument.toString(),
+        saved.uploadedIdOrLicenseDocument!.documentUrl.toString(),
       );
     }
 
     if (saved.uploadedCoiDocument != null) {
       provider.coiUploadedUrl = saved.uploadedCoiDocument;
-      provider.coiFile = File(saved.uploadedCoiDocument.toString());
+      provider.coiFile = File(
+        saved.uploadedCoiDocument!.documentUrl.toString(),
+      );
     }
 
     if (saved.coiExpiryDate != null) {

@@ -224,7 +224,7 @@ void showRaiseAmountSheet({
 }
 
 Future<bool> validateFileSize(File file, BuildContext context) async {
-  if (await file.length() <= 2 * 1024 * 1024) return true;
+  if (await file.length() <= maxFileSizeInBytes) return true;
 
   if (context.mounted) {
     ScaffoldMessenger.of(context).showSnackBar(

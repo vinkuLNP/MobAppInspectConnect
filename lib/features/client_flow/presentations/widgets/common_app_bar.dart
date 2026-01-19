@@ -101,7 +101,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
           if (showNotification)
             if (showNotification)
               Consumer<NotificationProvider>(
-                builder: (_, provider, __) {
+                builder: (_, provider, _) {
                   return Stack(
                     children: [
                       IconButton(

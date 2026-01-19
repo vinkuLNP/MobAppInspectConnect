@@ -101,7 +101,9 @@ class _StatusChip extends StatelessWidget {
   }
 }
 
-class _EmptyState extends StatelessWidget {
+class EmptyState extends StatelessWidget {
+  const EmptyState({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Center(

@@ -49,6 +49,7 @@ class InspectorPersonalStepService {
   }
 
   Future<void> savePersonalStep() async {
+    provider.setProcessing(true);
     if (provider.selectedCertificateTypeId != null) {
       await provider.fetchCertificateTypes(
         savedId: provider.selectedCertificateTypeId,
@@ -85,5 +86,6 @@ class InspectorPersonalStepService {
           : (await provider.localDs.getFullData())?.isoCode ?? 'IN',
       'privateTempId': existing?.privateTempId ?? generatePrivateTempId(),
     });
+    provider.setProcessing(false);
   }
 }

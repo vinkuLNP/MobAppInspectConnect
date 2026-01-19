@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:inspect_connect/features/auth_flow/data/datasources/local_datasources/auth_user_local_entity.dart';
 import 'package:inspect_connect/features/auth_flow/data/models/document_model.dart';
 import 'package:inspect_connect/features/auth_flow/data/models/service_model.dart';
+import 'package:inspect_connect/features/auth_flow/data/models/user_document_data_model.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/user_detail.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/user_device_entity.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/user_location_entity.dart';
@@ -49,7 +50,7 @@ class AuthUser {
   final List<String>? certificateDocuments;
   final String? certificateExpiryDate;
   final List<String>? referenceDocuments;
-  final String? uploadedIdOrLicenseDocument;
+  final UserDocumentDataModel? uploadedIdOrLicenseDocument;
   final String? workHistoryDescription;
   final String? connectorLinkUrl;
   final DateTime? createdAt;
@@ -276,69 +277,6 @@ class AuthUser {
             }
           : null,
     };
-  }
-
-  factory AuthUser.fromLocalEntity(AuthUserLocalEntity entity) {
-    return AuthUser(
-      id: entity.id.toString(),
-      name: entity.name,
-      userId: entity.userId,
-      emailHashed: entity.email,
-      authToken: entity.authToken,
-      phoneNumber: entity.phoneNumber,
-      countryCode: entity.countryCode,
-      phoneOtpVerified: entity.phoneOtpVerified ?? false,
-      emailOtpVerified: entity.emailOtpVerified ?? false,
-      agreedToTerms: entity.agreedToTerms ?? true,
-      isTruthfully: entity.isTruthfully ?? true,
-      stripeSubscriptionStatus: entity.stripeSubscriptionStatus,
-      currentSubscriptionId: entity.currentSubscriptionId,
-      currentSubscriptionTrialDays: entity.currentSubscriptionTrialDays,
-      currentSubscriptionAutoRenew: entity.currentSubscriptionAutoRenew,
-      certificateApproved: entity.certificateApproved,
-      rejectedReason: entity.rejectedReason,
-      location: entity.latitude != null && entity.longitude != null
-          ? UserLocation(
-              name: entity.locationName ?? '',
-              lat: entity.latitude!,
-              lng: entity.longitude!,
-            )
-          : null,
-      devices: [],
-      createdAt: entity.createdAt,
-      updatedAt: entity.updatedAt,
-      loginTime: entity.loginTime,
-      status: entity.status,
-      mailingAddress: entity.mailingAddress,
-      country: entity.country,
-      state: entity.state,
-      city: entity.city,
-      zip: entity.zipCode,
-      certificateTypeId: entity.certificateTypeId,
-      certificateAgencyIds: entity.certificateAgencyIds,
-      certificateDocuments: entity.certificateDocuments,
-      certificateExpiryDate: entity.certificateExpiryDate,
-      referenceDocuments: entity.referenceDocuments,
-      uploadedIdOrLicenseDocument: entity.uploadedIdOrLicenseDocument,
-      workHistoryDescription: entity.workHistoryDescription,
-      statusUpdatedByAdmin: entity.statusUpdatedByAdmin,
-      docxOk: entity.docxOk,
-      connectorLinkUrl: entity.connectorLinkUrl,
-      documentTypeId: entity.documentTypeId,
-      documentExpiryDate: entity.documentExpiryDate,
-      coiExpiryDate: entity.coiExpiryDate,
-      documents: entity.documentsJson != null
-          ? (jsonDecode(entity.documentsJson!) as List)
-                .map((e) => UserDocument.fromJson(e))
-                .toList()
-          : null,
-
-      serviceAreas: entity.serviceAreasJson != null
-          ? (jsonDecode(entity.serviceAreasJson!) as List)
-                .map((e) => ServiceArea.fromJson(e))
-                .toList()
-          : null,
-    );
   }
 }
 

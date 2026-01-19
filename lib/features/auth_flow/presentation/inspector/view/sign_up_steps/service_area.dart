@@ -284,9 +284,14 @@ class _ServiceAreaStepState extends State<ServiceAreaStep> {
                             city: city,
                             file: file,
                           ),
-                          onRemove: (index) =>
-                              vm.iccDocsByCity[city]!.removeAt(index),
+                          onRemove: (index) => vm.removeIccDoc(
+                            city,
+                            vm.iccDocsByCity[city]![index].documentId,
+                          ),
+                          // vm.iccDocsByCity[city]!.removeAt(index),
                           onPickExpiry: (index, date) {
+                            //                             final doc = vm.iccDocsByCity[city]!.firstWhere((d) => d.documentId == docId);
+                            // doc.expiryDate = newDate;
                             vm.iccDocsByCity[city]![index].expiryDate = date;
                             vm.validateServiceArea();
                             vm.notify();
@@ -315,7 +320,7 @@ class _ServiceAreaStepState extends State<ServiceAreaStep> {
                 final controller = vm.getCityZipController(city);
 
                 return AppInputField(
-                  label: "zipCodeFor $city",
+                  label: "$zipCodeFor $city",
                   controller: controller,
                   keyboardType: TextInputType.number,
                   onChanged: (value) {

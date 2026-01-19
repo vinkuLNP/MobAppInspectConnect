@@ -10,6 +10,7 @@ import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.d
 import 'package:inspect_connect/features/auth_flow/data/datasources/local_datasources/inspector_local_data_source.dart';
 import 'package:inspect_connect/features/auth_flow/data/models/settings_model.dart';
 import 'package:inspect_connect/features/auth_flow/data/models/ui_icc_document.dart';
+import 'package:inspect_connect/features/auth_flow/data/models/user_document_data_model.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/certificate_type_entity.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/icc_document_entity.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/inspector_documents_type.dart';
@@ -93,13 +94,19 @@ class InspectorViewModelProvider extends BaseViewModel {
   File? profileImage;
   String? profileImageUrl;
   File? idDocumentFile;
-  String? idDocumentUploadedUrl;
+  UserDocumentDataModel? idDocumentUploadedUrl;
 
   File? coiFile;
-  String? coiUploadedUrl;
+  UserDocumentDataModel? coiUploadedUrl;
 
   List<File> referenceLetters = [];
   List<String> referenceLettersUrls = [];
+  void removeIccDoc(String city, String docId) {
+    iccDocsByCity[city]?.removeWhere((d) => d.documentId == docId);
+    validateServiceArea();
+    notifyListeners();
+  }
+
   Future<void> addIccFile({
     required BuildContext context,
     required String city,
@@ -108,11 +115,11 @@ class InspectorViewModelProvider extends BaseViewModel {
     try {
       setProcessing(true);
 
-      if (await file.length() > 2 * 1024 * 1024) {
+      if (await file.length() > maxFileSizeInBytes) {
         if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('File must be under 2 MB')),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text(fileMstBeUnder2Txt)));
         }
         return;
       }
@@ -550,16 +557,23 @@ class InspectorViewModelProvider extends BaseViewModel {
     for (final e in storedDocs) {
       late final String city;
       late final String url;
+      late final String iccFileName;
+      late final String documentId;
+
       late final DateTime expiry;
 
       if (e is Map<String, dynamic>) {
         city = e['serviceCity'];
         url = e['documentUrl'];
         expiry = DateTime.parse(e['expiryDate']);
+        iccFileName = e['fileName'];
+        documentId = e['id'];
       } else if (e is IccDocumentLocalEntity) {
         city = e.serviceCity;
         url = e.documentUrl;
         expiry = DateTime.parse(e.expiryDate);
+        iccFileName = e.fileName;
+        documentId = e.documentId;
       } else {
         continue;
       }
@@ -569,6 +583,9 @@ class InspectorViewModelProvider extends BaseViewModel {
         IccUiDocument(
           uploadedUrl: url,
           expiryDate: expiry,
+          documentId: documentId,
+          iccFileName: iccFileName,
+
           // isUploaded: true,
         ),
       );

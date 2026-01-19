@@ -312,13 +312,15 @@ class InspectorServiceAreaService {
       }).toList();
     }
 
-    fieldsToUpdate['iccDocuments'] = provider.iccDocsByCity.entries.expand((
+    fieldsToUpdate['iccDocument'] = provider.iccDocsByCity.entries.expand((
       entry,
     ) {
       final city = entry.key;
       return entry.value.map((doc) {
         return {
           'serviceCity': city,
+          'id': doc.documentId,
+          'fileName': doc.fileName,
           'documentUrl': doc.uploadedUrl,
           'expiryDate': doc.expiryDate!.toIso8601String(),
         };

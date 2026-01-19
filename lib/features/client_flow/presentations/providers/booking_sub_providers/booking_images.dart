@@ -33,7 +33,7 @@ class BookingImagesService {
       }
 
       final file = File(picked.path);
-      if (await file.length() > 2 * 1024 * 1024) {
+      if (await file.length() > 4 * maxFileSizeInBytes) {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(

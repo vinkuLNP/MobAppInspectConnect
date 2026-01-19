@@ -8,6 +8,8 @@ class IccDocumentLocalEntity {
   String serviceCity;
   String documentUrl;
   String expiryDate;
+  String fileName;
+  String documentId;
 
   final inspector = ToOne<InspectorSignUpLocalEntity>();
 
@@ -16,5 +18,7 @@ class IccDocumentLocalEntity {
     required this.serviceCity,
     required this.documentUrl,
     required this.expiryDate,
+    required this.fileName,
+    required this.documentId,
   });
 }

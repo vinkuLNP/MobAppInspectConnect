@@ -136,7 +136,7 @@ class InspectorDashboardProvider extends BaseViewModel {
         subscriptionId: plan.stripeSubscriptionId,
         totalAmount: plan.amount.toDouble().toString(),
         type: 0,
-        device: '1',
+        device: 1,
       );
       final getPaymentIntentUseCase = locator<GetPaymentIntentUseCase>();
       final state =

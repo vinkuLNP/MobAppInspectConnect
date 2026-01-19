@@ -786,11 +786,11 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
             );
           }
 
-          if (link is bool && link == true) {
-            return const ApiResultModel<String>.success(
-              data: stripeAlreadyConnected,
-            );
-          }
+          // if (link is bool && link == true) {
+          //   return const ApiResultModel<String>.success(
+          //     data: stripeAlreadyConnected,
+          //   );
+          // }
 
           return ApiResultModel<String>.success(data: link);
         },

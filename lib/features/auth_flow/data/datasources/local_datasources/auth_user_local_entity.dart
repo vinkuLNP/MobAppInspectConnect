@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:inspect_connect/features/auth_flow/data/models/document_model.dart';
 import 'package:inspect_connect/features/auth_flow/data/models/service_model.dart';
+import 'package:inspect_connect/features/auth_flow/data/models/user_document_data_model.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/auth_user.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/user_detail.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/user_device_entity.dart';
@@ -54,7 +55,7 @@ class AuthUserLocalEntity {
   List<String>? certificateDocuments;
   String? certificateExpiryDate;
   List<String>? referenceDocuments;
-  String? uploadedIdOrLicenseDocument;
+  UserDocumentDataModel? uploadedIdOrLicenseDocument;
   String? workHistoryDescription;
   DateTime? loginTime;
   bool? statusUpdatedByAdmin;
@@ -162,87 +163,87 @@ class AuthUserLocalEntity {
     );
   }
 
-  factory AuthUserLocalEntity.fromApiResponse(Map<String, dynamic> response) {
-    final user = response['body'];
-    final location = user?['location'];
+  //   factory AuthUserLocalEntity.fromApiResponse(Map<String, dynamic> response) {
+  //     final user = response['body'];
+  //     final location = user?['location'];
 
-    double? latitude;
-    double? longitude;
-    String? locationName;
+  //     double? latitude;
+  //     double? longitude;
+  //     String? locationName;
 
-    if (location != null && location['coordinates'] != null) {
-      longitude = (location['coordinates'][0] as num?)?.toDouble();
-      latitude = (location['coordinates'][1] as num?)?.toDouble();
-      locationName = location['locationName'];
-    }
+  //     if (location != null && location['coordinates'] != null) {
+  //       longitude = (location['coordinates'][0] as num?)?.toDouble();
+  //       latitude = (location['coordinates'][1] as num?)?.toDouble();
+  //       locationName = location['locationName'];
+  //     }
 
-    return AuthUserLocalEntity(
-      userId: user['_id'],
-      name: user['name'],
-      email: user['email'],
-      phoneNumber: user['phoneNumber'],
-      countryCode: user['countryCode'],
-      mailingAddress: user['mailingAddress'],
-      role: user['role'],
-      status: user['status'],
-      statusUpdatedByAdmin: user['statusUpdatedByAdmin'],
-      phoneOtpVerified: user['phoneOtpVerified'],
-      emailOtpVerified: user['emailOtpVerified'],
-      agreedToTerms: user['agreedToTerms'],
-      isTruthfully: user['isTruthfully'],
-      bookingInProgress: user['bookingInProgress'],
-      isDeleted: user['isDeleted'],
-      profileImage: user['profileImage'] == "null"
-          ? null
-          : user['profileImage'],
-      country: user['country'],
-      state: user['state'],
-      city: user['city'],
-      zipCode: user['zip'],
+  //     return AuthUserLocalEntity(
+  //       userId: user['_id'],
+  //       name: user['name'],
+  //       email: user['email'],
+  //       phoneNumber: user['phoneNumber'],
+  //       countryCode: user['countryCode'],
+  //       mailingAddress: user['mailingAddress'],
+  //       role: user['role'],
+  //       status: user['status'],
+  //       statusUpdatedByAdmin: user['statusUpdatedByAdmin'],
+  //       phoneOtpVerified: user['phoneOtpVerified'],
+  //       emailOtpVerified: user['emailOtpVerified'],
+  //       agreedToTerms: user['agreedToTerms'],
+  //       isTruthfully: user['isTruthfully'],
+  //       bookingInProgress: user['bookingInProgress'],
+  //       isDeleted: user['isDeleted'],
+  //       profileImage: user['profileImage'] == "null"
+  //           ? null
+  //           : user['profileImage'],
+  //       country: user['country'],
+  //       state: user['state'],
+  //       city: user['city'],
+  //       zipCode: user['zip'],
 
-      certificateApproved: user['certificateApproved'],
-      rejectedReason: user['rejectedReason'],
-      certificateTypeId: user['certificateTypeId']?['_id'],
-      certificateDocuments: List<String>.from(
-        user['certificateDocuments'] ?? [],
-      ),
-      certificateExpiryDate: user['certificateExpiryDate'],
+  //       certificateApproved: user['certificateApproved'],
+  //       rejectedReason: user['rejectedReason'],
+  //       certificateTypeId: user['certificateTypeId']?['_id'],
+  //       certificateDocuments: List<String>.from(
+  //         user['certificateDocuments'] ?? [],
+  //       ),
+  //       certificateExpiryDate: user['certificateExpiryDate'],
 
-      documentTypeId: user['documentTypeId']?['_id'],
-      documentExpiryDate: user['documentExpiryDate'],
-      coiExpiryDate: user['coiExpiryDate'],
+  //       documentTypeId: user['documentTypeId']?['_id'],
+  //       documentExpiryDate: user['documentExpiryDate'],
+  //       coiExpiryDate: user['coiExpiryDate'],
 
-      stripeCustomerId: user['stripeCustomerId'],
-      stripeAccountId: user['stripeAccountId'],
-      stripePayoutsEnabled: user['stripePayoutsEnabled'],
-      stripeTransfersEnabled: user['stripeTransfersEnabled'],
-      stripeSubscriptionStatus: user['stripeSubscriptionStatus'],
-      currentSubscriptionId: user['currentSubscriptionId'] != null
-          ? (user['currentSubscriptionId'] is String
-                ? CurrentSubscription(id: user['currentSubscriptionId'])
-                : CurrentSubscription.fromJson(user['currentSubscriptionId']))
-          : null,
-      currentSubscriptionTrialDays: user['currentSubscriptionTrialDays'],
-      currentSubscriptionAutoRenew: user['currentSubscriptionAutoRenew'],
+  //       stripeCustomerId: user['stripeCustomerId'],
+  //       stripeAccountId: user['stripeAccountId'],
+  //       stripePayoutsEnabled: user['stripePayoutsEnabled'],
+  //       stripeTransfersEnabled: user['stripeTransfersEnabled'],
+  //       stripeSubscriptionStatus: user['stripeSubscriptionStatus'],
+  //       currentSubscriptionId: user['currentSubscriptionId'] != null
+  //           ? (user['currentSubscriptionId'] is String
+  //                 ? CurrentSubscription(id: user['currentSubscriptionId'])
+  //                 : CurrentSubscription.fromJson(user['currentSubscriptionId']))
+  //           : null,
+  //       currentSubscriptionTrialDays: user['currentSubscriptionTrialDays'],
+  //       currentSubscriptionAutoRenew: user['currentSubscriptionAutoRenew'],
 
-      walletId: user['walletId'],
-      docxOk: user['docxOk'],
-      connectorLinkUrl: user['connectorLinkUrl'],
+  //       walletId: user['walletId'],
+  //       docxOk: user['docxOk'],
+  //       connectorLinkUrl: user['connectorLinkUrl'],
 
-      locationName: locationName,
-      latitude: latitude,
-      longitude: longitude,
+  //       locationName: locationName,
+  //       latitude: latitude,
+  //       longitude: longitude,
 
-      serviceAreasJson: jsonEncode(user['serviceAreas'] ?? []),
-      documentsJson: jsonEncode(user['documents'] ?? []),
+  //       serviceAreasJson: jsonEncode(user['serviceAreas'] ?? []),
+  //       documentsJson: jsonEncode(user['documents'] ?? []),
 
-      loginTime: user['loginTime'] != null
-          ? DateTime.parse(user['loginTime'])
-          : null,
-      createdAt: DateTime.parse(user['createdAt']),
-      updatedAt: DateTime.parse(user['updatedAt']),
-    );
-  }
+  //       loginTime: user['loginTime'] != null
+  //           ? DateTime.parse(user['loginTime'])
+  //           : null,
+  //       createdAt: DateTime.parse(user['createdAt']),
+  //       updatedAt: DateTime.parse(user['updatedAt']),
+  //     );
+  //   }
 }
 
 @Entity()

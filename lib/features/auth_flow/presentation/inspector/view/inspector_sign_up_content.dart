@@ -196,21 +196,38 @@ class _InspectorSignUpContentState extends State<InspectorSignUpContent> {
             }
           },
         ),
-        form: Column(
+        form: Stack(
           children: [
-            AppCardContainer(
-              padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
-              child: Form(
-                key: steps[vm.currentStep].formKey,
-                autovalidateMode: vm.autoValidate
-                    ? AutovalidateMode.always
-                    : AutovalidateMode.disabled,
-                child: SingleChildScrollView(
-                  child: steps[vm.currentStep].content,
+            AbsorbPointer(
+              absorbing: vm.isProcessing,
+              child: Opacity(
+                opacity: vm.isProcessing ? 0.6 : 1.0,
+                child: Column(
+                  children: [
+                    AppCardContainer(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 18,
+                        horizontal: 16,
+                      ),
+                      child: Form(
+                        key: steps[vm.currentStep].formKey,
+                        autovalidateMode: vm.autoValidate
+                            ? AutovalidateMode.always
+                            : AutovalidateMode.disabled,
+                        child: SingleChildScrollView(
+                          child: steps[vm.currentStep].content,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                  ],
                 ),
               ),
             ),
-            const SizedBox(height: 12),
+            if (vm.isProcessing)
+              Positioned.fill(
+                child: const Center(child: CircularProgressIndicator()),
+              ),
           ],
         ),
       ),

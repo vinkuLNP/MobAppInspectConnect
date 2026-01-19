@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/utils/constants/app_strings.dart';
 
@@ -37,9 +39,9 @@ String socketUrl =
 // Platform.isIOS ? "http://localhost:5002" : "http://10.0.2.2:5002";
 
 String devBaseUrl =
-    // Platform.isIOS
-    //     ? 'http://localhost:5002/api/v1/'
-    //     : 'http://10.0.2.2:5002/api/v1/';
+    //  Platform.isIOS
+    // ? 'http://localhost:5002/api/v1/'
+    // : 'http://10.0.2.2:5002/api/v1/';
     'https://inspect-connect-api-auakczg0ave2bqex.westus2-01.azurewebsites.net/api/v1/';
 
 const String stripePublishableKey =

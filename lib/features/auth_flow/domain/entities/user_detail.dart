@@ -1,3 +1,5 @@
+import 'package:inspect_connect/features/auth_flow/data/models/user_document_data_model.dart';
+
 class UserDetail {
   final String id;
   final String userId;
@@ -21,7 +23,7 @@ class UserDetail {
   final List<String>? certificateDocuments;
   final String? certificateExpiryDate;
   final List<String>? referenceDocuments;
-  final String? uploadedIdOrLicenseDocument;
+  final UserDocumentDataModel? uploadedIdOrLicenseDocument;
   final String? workHistoryDescription;
 
   final bool? phoneOtpVerified;
@@ -140,7 +142,10 @@ class UserDetail {
       referenceDocuments: (body['referenceDocuments'] as List?)
           ?.map((e) => e.toString())
           .toList(),
-      uploadedIdOrLicenseDocument: body['uploadedIdOrLicenseDocument'],
+      uploadedIdOrLicenseDocument: body['uploadedIdOrLicenseDocument'] != null
+          ? UserDocumentDataModel.fromJson(body['uploadedIdOrLicenseDocument'])
+          : null,
+
       workHistoryDescription: body['workHistoryDescription'],
       phoneOtpVerified: body['phoneOtpVerified'],
       emailOtpVerified: body['emailOtpVerified'],

@@ -3,8 +3,8 @@ class CreatePaymentIntentDto {
   final String? priceId;
   final String? subscriptionId;
   final String totalAmount;
-  final int type;
-  final String device;
+  final int? type;
+  final int device;
 
   final String? transferToId;
   final String? bookingId;
@@ -14,7 +14,7 @@ class CreatePaymentIntentDto {
     this.priceId,
     this.subscriptionId,
     required this.totalAmount,
-    required this.type,
+    this.type,
     required this.device,
     this.transferToId,
     this.bookingId,

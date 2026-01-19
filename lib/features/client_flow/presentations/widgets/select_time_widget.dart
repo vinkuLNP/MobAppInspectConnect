@@ -34,7 +34,9 @@ class _DateTimePickerWidgetState extends State<DateTimePickerWidget> {
   }
 
   Future<void> _pickDateTime(BuildContext context) async {
-    final now = DateTime.now().add(const Duration(days: 1));
+    final now = DateTime.now().add(
+      Duration(days: widget.showTimePicker ? 1 : 30),
+    );
     await showDialog(
       context: context,
       barrierDismissible: false,

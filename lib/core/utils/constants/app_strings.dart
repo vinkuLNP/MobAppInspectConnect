@@ -46,7 +46,7 @@ const String slctRaiseAmtTxt = "Select Raise Amount";
 const String slctRaiseAmtMsgTxt =
     "This amount will be added to the booking charge and requires client approval.";
 const String cnfrmRaiseTxt = "Confirm & Raise";
-const String fileMstBeUnder2Txt = 'File must be under 2 MB';
+const String fileMstBeUnder2Txt = 'File must be under 4 MB';
 const String cnclShowUpFeeMsgTxt =
     "Do you want to cancel the applied Show-Up Fee?";
 const String applyShowUpFeeMsgTxt =
@@ -107,7 +107,7 @@ const String zipNumericOnly = "Zip must be numeric";
 String cityNotFound(String city, String state) =>
     "City $city not found in $state";
 
-const maxFileSizeInBytes = 2 * 1024 * 1024;
+const maxFileSizeInBytes = 4 * 1024 * 1024;
 
 const certificateExtensions = ['pdf', 'doc', 'docx'];
 const imageExtensions = ['jpg', 'jpeg', 'png', 'heic', 'gif', 'bmp'];
@@ -363,6 +363,7 @@ const String walletBalanceUpdatedSuccessfully =
     'Your wallet balance has been updated successfully.';
 
 const String stripeAlreadyConnected = 'Stripe Already Connected';
+const String stripeTransfersEnabled = 'transfer enabled';
 
 String paymentDeductionInfoTxt(double amount) =>
     'Upon your approval, a payment of \$${amount.toStringAsFixed(2)} '

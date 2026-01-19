@@ -165,7 +165,7 @@ class WalletProvider extends BaseViewModel {
           paymentType: 'payment-plain',
           totalAmount: request.amount,
           type: 0,
-          device: '1',
+          device: 1,
         );
         break;
 
@@ -174,7 +174,7 @@ class WalletProvider extends BaseViewModel {
           paymentType: 'subscription',
           totalAmount: request.amount,
           type: 0,
-          device: '1',
+          device: 1,
           priceId: request.priceId,
           subscriptionId: request.subscriptionId,
         );
@@ -185,7 +185,7 @@ class WalletProvider extends BaseViewModel {
           paymentType: 'booking',
           totalAmount: request.amount,
           type: 3,
-          device: '1',
+          device: 1,
         );
         break;
 
@@ -194,7 +194,7 @@ class WalletProvider extends BaseViewModel {
           paymentType: 'withdraw',
           totalAmount: request.amount,
           type: 1,
-          device: '1',
+          device: 1,
         );
         break;
     }
@@ -246,7 +246,9 @@ class WalletProvider extends BaseViewModel {
 
       result?.when(
         data: (String link) async {
-          if (link != stripeAlreadyConnected && link != null && link != '') {
+          if (link.toLowerCase() != stripeAlreadyConnected.toLowerCase() &&
+              link.toLowerCase() != stripeTransfersEnabled.toLowerCase() &&
+              link != '') {
             final completed = await Navigator.push<bool>(
               context,
               MaterialPageRoute(

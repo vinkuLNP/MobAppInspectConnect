@@ -227,11 +227,6 @@
           "type": 30
         },
         {
-          "id": "41:2822043330167833312",
-          "name": "uploadedIdOrLicenseDocument",
-          "type": 9
-        },
-        {
           "id": "42:7361908397267452669",
           "name": "workHistoryDescription",
           "type": 9
@@ -391,11 +386,6 @@
           "type": 9
         },
         {
-          "id": "17:8563527971304190649",
-          "name": "uploadedIdOrLicenseDocument",
-          "type": 9
-        },
-        {
           "id": "18:1303636506337963961",
           "name": "workHistoryDescription",
           "type": 9
@@ -454,11 +444,6 @@
           "id": "29:5971348717096684686",
           "name": "longitude",
           "type": 8
-        },
-        {
-          "id": "30:2827095630864152251",
-          "name": "uploadedCoiDocument",
-          "type": 9
         },
         {
           "id": "31:879714024604332109",
@@ -542,7 +527,7 @@
     },
     {
       "id": "5:1092552167430950126",
-      "lastPropertyId": "5:2791628972036703477",
+      "lastPropertyId": "7:5187960889873647968",
       "name": "IccDocumentLocalEntity",
       "properties": [
         {
@@ -573,6 +558,16 @@
           "type": 11,
           "flags": 520,
           "relationTarget": "InspectorSignUpLocalEntity"
+        },
+        {
+          "id": "6:1184967821527650118",
+          "name": "fileName",
+          "type": 9
+        },
+        {
+          "id": "7:5187960889873647968",
+          "name": "documentId",
+          "type": 9
         }
       ],
       "relations": []
@@ -589,7 +584,10 @@
   "retiredPropertyUids": [
     5058542504887666690,
     8140600119593809259,
-    3730392305248784100
+    3730392305248784100,
+    2822043330167833312,
+    8563527971304190649,
+    2827095630864152251
   ],
   "retiredRelationUids": [],
   "version": 1
