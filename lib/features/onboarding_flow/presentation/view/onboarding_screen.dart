@@ -1,5 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:inspect_connect/core/utils/constants/app_assets_constants.dart';
 import 'package:inspect_connect/features/auth_flow/enum/auth_user_enum.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/auth_user_provider.dart';
 import 'package:provider/provider.dart';
@@ -33,7 +34,7 @@ class _OnBoardingPageState extends State<OnBoardingPage>
       vsync: this,
       duration: const Duration(milliseconds: 600),
     );
-    _loadVideo('assets/videos/onboarding_video.mp4');
+    _loadVideo(onBoardingVideo);
   }
 
   bool _isVideoInitialized = false;

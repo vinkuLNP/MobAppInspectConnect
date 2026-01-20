@@ -17,6 +17,7 @@ import 'package:inspect_connect/features/auth_flow/domain/entities/inspector_doc
 import 'package:inspect_connect/features/auth_flow/domain/entities/inspector_sign_up_entity.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/jurisdiction_entity.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/service_area_entity.dart';
+import 'package:inspect_connect/features/auth_flow/domain/entities/user_document_entity.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/inspector/providers/insepctor_additional_step_service.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/inspector/providers/inspector_personal_step_service.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/inspector/providers/inspector_professional_service.dart';
@@ -94,10 +95,10 @@ class InspectorViewModelProvider extends BaseViewModel {
   File? profileImage;
   String? profileImageUrl;
   File? idDocumentFile;
-  UserDocumentDataModel? idDocumentUploadedUrl;
+  UserDocumentEntity? idDocumentUploadedUrl;
 
   File? coiFile;
-  UserDocumentDataModel? coiUploadedUrl;
+  UserDocumentEntity? coiUploadedUrl;
 
   List<File> referenceLetters = [];
   List<String> referenceLettersUrls = [];
@@ -183,7 +184,7 @@ class InspectorViewModelProvider extends BaseViewModel {
   bool get autoValidate => _autoValidate;
 
   String certificateExpiryDate = '';
-  DateTime certificateExpiryDateShow = DateTime.now();
+  DateTime certificateExpiryDateShow = DateTime.now().add(Duration(days: 30));
 
   String get selectedcertificateExpiryDate => certificateExpiryDate;
   List<JurisdictionEntity> jurisdictions = [];
@@ -338,7 +339,7 @@ class InspectorViewModelProvider extends BaseViewModel {
   }
 
   void removeIdImage(int i) {
-    idLicense = null;
+    idDocumentFile = null;
     notifyListeners();
   }
 

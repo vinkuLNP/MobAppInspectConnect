@@ -177,12 +177,16 @@ class InsepctorAdditionalStepService {
       if (profileImageUrlOrPath != null) 'profileImage': profileImageUrlOrPath,
 
       // if (idLicenseUrlOrPath != null)
-      //   'uploadedIdOrLicenseDocument': idLicenseUrlOrPath,
+      'uploadedIdOrLicenseDocument': provider.idDocumentUploadedUrl,
       "documentTypeId": provider.selectedIdDocType?.id,
-      "documentExpiryDate": provider.selectedIdDocExpiry?.toIso8601String(),
-      if (referenceDocs != null) 'referenceDocuments': referenceDocs,
+      "documentExpiryDate": provider.selectedIdDocExpiry
+          ?.toIso8601String()
+          .split('T')
+          .first,
+      // if (referenceDocs != null)
+      'referenceDocuments': provider.referenceLettersUrls,
       'uploadedCoiDocument': provider.coiUploadedUrl,
-      'coiExpiryDate': provider.coiExpiry?.toIso8601String(),
+      'coiExpiryDate': provider.coiExpiry?.toIso8601String().split('T').first,
       if (workHistoryDescription != null)
         'workHistoryDescription': workHistoryDescription,
 

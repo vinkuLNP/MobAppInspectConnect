@@ -22,8 +22,12 @@ class InspectorSignUpLocalEntity {
   String? city;
   String? zipCode;
   String? mailingAddress;
-  UserDocumentDataModel? uploadedIdOrLicenseDocument;
-  UserDocumentDataModel? uploadedCoiDocument;
+  // UserDocumentDataModel? uploadedIdOrLicenseDocument;
+  // UserDocumentDataModel? uploadedCoiDocument;
+  final uploadedIdOrLicenseDocument = ToOne<UserDocumentEntity>();
+
+  final uploadedCoiDocument = ToOne<UserDocumentEntity>();
+
   String? workHistoryDescription;
   List<String>? referenceDocuments;
   String? profileImage;
@@ -64,8 +68,8 @@ class InspectorSignUpLocalEntity {
     this.city,
     this.zipCode,
     this.mailingAddress,
-    this.uploadedIdOrLicenseDocument,
-    this.uploadedCoiDocument,
+    // this.uploadedIdOrLicenseDocument,
+    // this.uploadedCoiDocument,
     this.workHistoryDescription,
     this.referenceDocuments,
     this.profileImage,
@@ -101,8 +105,6 @@ extension InspectorSignUpEntityMapper on InspectorSignUpLocalEntity {
       "certificateTypeId": certificateTypeId,
       "certificateExpiryDate": certificateExpiryDate,
       "certificateDocuments": certificateDocuments,
-      "uploadedIdOrLicenseDocument": uploadedIdOrLicenseDocument,
-      "uploadedCoiDocument": uploadedCoiDocument,
       "coiExpiryDate": coiExpiryDate,
       "documentExpiryDate": documentExpiryDate,
       "documentTypeId": documentTypeId,
@@ -132,6 +134,9 @@ extension InspectorSignUpEntityMapper on InspectorSignUpLocalEntity {
           },
         };
       }).toList(),
+      "uploadedIdOrLicenseDocument": uploadedIdOrLicenseDocument.target
+          ?.toJson(),
+      "uploadedCoiDocument": uploadedCoiDocument.target?.toJson(),
 
       "iccDocument": iccDocuments.map((d) {
         return {

@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:inspect_connect/core/utils/constants/app_assets_constants.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/features/inspector_flow/domain/enum/inspector_status.dart';
 import 'package:inspect_connect/features/inspector_flow/providers/inspector_main_provider.dart';
@@ -164,7 +165,7 @@ class _SplashViewState extends State<SplashView>
               child: ScaleTransition(
                 scale: _scaleAnimation,
                 child: Image.asset(
-                  'assets/images/app_logo.png',
+                  appLogo,
                   color: AppColors.whiteColor,
                   width: size.width * 0.2,
                 ),

@@ -274,7 +274,7 @@ class InspectorServiceAreaService {
   }) async {
     log('Saving Service Area Step');
     log('ICC Local Files at save: ${provider.iccLocalFiles}');
-    log('ICC Uploaded URLs at save: ${provider.iccUploadedUrls}');
+    log('ICC Uploaded URLs at save: ${provider.iccDocsByCity}');
 
     final fieldsToUpdate = {
       ServiceAreaKeywords.keyCountry: provider.userCurrentCountry,
@@ -322,7 +322,7 @@ class InspectorServiceAreaService {
           'id': doc.documentId,
           'fileName': doc.fileName,
           'documentUrl': doc.uploadedUrl,
-          'expiryDate': doc.expiryDate!.toIso8601String(),
+          'expiryDate': doc.expiryDate!.toIso8601String().split('T').first,
         };
       });
     }).toList();

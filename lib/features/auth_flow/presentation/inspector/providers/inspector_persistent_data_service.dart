@@ -77,17 +77,30 @@ class InsepctorPersistentDataService {
     provider.mailingAddress = saved.mailingAddress.toString();
     inspZipController.text = saved.zipCode.toString();
 
-    if (saved.uploadedIdOrLicenseDocument != null) {
-      provider.idDocumentUploadedUrl = saved.uploadedIdOrLicenseDocument;
+    // if (saved.uploadedIdOrLicenseDocument != null) {
+    //   provider.idDocumentUploadedUrl = saved.uploadedIdOrLicenseDocument;
+    //   provider.idDocumentFile = File(
+    //     saved.uploadedIdOrLicenseDocument!.documentUrl.toString(),
+    //   );
+    // }
+
+    if (saved.uploadedIdOrLicenseDocument.target != null) {
+      provider.idDocumentUploadedUrl = saved.uploadedIdOrLicenseDocument.target;
       provider.idDocumentFile = File(
-        saved.uploadedIdOrLicenseDocument!.documentUrl.toString(),
+        saved.uploadedIdOrLicenseDocument.target!.documentUrl ?? '',
       );
     }
 
-    if (saved.uploadedCoiDocument != null) {
-      provider.coiUploadedUrl = saved.uploadedCoiDocument;
+    // if (saved.uploadedCoiDocument != null) {
+    //   provider.coiUploadedUrl = saved.uploadedCoiDocument;
+    //   provider.coiFile = File(
+    //     saved.uploadedCoiDocument!.documentUrl.toString(),
+    //   );
+    // }
+    if (saved.uploadedCoiDocument.target != null) {
+      provider.coiUploadedUrl = saved.uploadedCoiDocument.target;
       provider.coiFile = File(
-        saved.uploadedCoiDocument!.documentUrl.toString(),
+        saved.uploadedCoiDocument.target!.documentUrl ?? '',
       );
     }
 

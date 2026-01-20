@@ -58,7 +58,7 @@ class UserDocument {
       '_id': id,
       'documentTypeId': documentType?.toJson(),
       'fileUrl': fileUrl,
-      'expiryDate': expiryDate?.toIso8601String(),
+      'expiryDate': expiryDate,
       'adminApproval': adminApproval,
       'adminNotes': adminNotes,
       'serviceCity': serviceCity,

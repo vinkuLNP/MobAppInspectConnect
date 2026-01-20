@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
+import 'package:inspect_connect/core/utils/constants/app_assets_constants.dart';
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
 import 'package:inspect_connect/core/utils/constants/app_common_card_container.dart';
 import 'package:inspect_connect/core/utils/constants/app_constants.dart';
@@ -157,7 +158,7 @@ class _BookingsScreenState extends State<BookingsScreen> {
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Image.asset(
-                                        'assets/images/no_booking.webp',
+                                        noBookingImg,
                                         width: 150,
                                         height: 150,
                                       ),
@@ -193,11 +194,7 @@ class _BookingsScreenState extends State<BookingsScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Image.asset(
-                          'assets/images/no_booking.webp',
-                          width: 150,
-                          height: 150,
-                        ),
+                        Image.asset(noBookingImg, width: 150, height: 150),
                         const SizedBox(height: 16),
                         textWidget(
                           text: "No bookings found.",
