@@ -107,11 +107,7 @@ class InsepctorAdditionalStepService {
         if (type == 'ref') {
           uploadImage = UploadImageDto(filePath: file.path);
         } else {
-          uploadImage = UploadImageDto(
-            filePath: file.path,
-            fileType: 'sensitive',
-            privateTempId: await provider.localDs.getPrivateTempId(),
-          );
+          uploadImage = UploadImageDto(filePath: file.path);
         }
         final uploadImageUseCase = locator<UploadImageUseCase>();
         final responseResult = await provider
@@ -130,8 +126,6 @@ class InsepctorAdditionalStepService {
                 documentUrl: response.fileUrl,
                 fileName: fileName,
               );
-
-              //  response.fileUrl;
             } else if (type == 'ref') {
               provider.referenceLetters.add(file);
               provider.referenceLettersUrls.add(response.fileUrl);
@@ -176,13 +170,15 @@ class InsepctorAdditionalStepService {
     await provider.localDs.updateFields({
       if (profileImageUrlOrPath != null) 'profileImage': profileImageUrlOrPath,
 
-      // if (idLicenseUrlOrPath != null)
-      //   'uploadedIdOrLicenseDocument': idLicenseUrlOrPath,
+      'uploadedIdOrLicenseDocument': provider.idDocumentUploadedUrl,
       "documentTypeId": provider.selectedIdDocType?.id,
-      "documentExpiryDate": provider.selectedIdDocExpiry?.toIso8601String(),
-      if (referenceDocs != null) 'referenceDocuments': referenceDocs,
+      "documentExpiryDate": provider.selectedIdDocExpiry
+          ?.toIso8601String()
+          .split('T')
+          .first,
+      'referenceDocuments': provider.referenceLettersUrls,
       'uploadedCoiDocument': provider.coiUploadedUrl,
-      'coiExpiryDate': provider.coiExpiry?.toIso8601String(),
+      'coiExpiryDate': provider.coiExpiry?.toIso8601String().split('T').first,
       if (workHistoryDescription != null)
         'workHistoryDescription': workHistoryDescription,
 

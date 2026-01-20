@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
+import 'package:inspect_connect/features/auth_flow/presentation/otp_verification/otp_verification.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/user_provider.dart';
 import 'package:inspect_connect/features/inspector_flow/domain/enum/inspector_status.dart';
 import 'package:inspect_connect/features/inspector_flow/presentations/screens/inspector_main_dashboard.dart';
@@ -35,12 +36,9 @@ class InspectorDashboardView extends StatelessWidget {
 
           case InspectorStatus.unverified:
             log('🔴 [InspectorDashboard] Status: UNVERIFIED');
-            content = Scaffold(
-              body: Center(
-                child: textWidget(
-                  text: 'Please verify your phone number to continue.',
-                ),
-              ),
+            content = OtpVerificationView(
+              addShowButton: false,
+              showSignInText: true,
             );
             break;
 

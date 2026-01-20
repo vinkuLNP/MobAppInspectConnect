@@ -153,7 +153,6 @@ class AuthUserDto {
       referenceDocuments: (json['referenceDocuments'] is List)
           ? List<String>.from(json['referenceDocuments'])
           : [],
-      // uploadedIdOrLicenseDocument: json['uploadedIdOrLicenseDocument'],
       workHistoryDescription: json['workHistoryDescription'],
       connectorLinkUrl: json['connectorLinkUrl'],
       location: json['location'] != null

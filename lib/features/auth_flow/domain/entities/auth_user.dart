@@ -122,12 +122,13 @@ class AuthUser {
 
   factory AuthUser.fromJson(Map<String, dynamic> json) {
     final loc = json['location'];
+
     return AuthUser(
       id: json['_id'] ?? '',
       userId: json['_id'] ?? '',
-      name: json['name'] ?? '',
-      emailHashed: json['email'] ?? '',
-      authToken: json['authToken'] ?? '',
+      name: json['name'],
+      emailHashed: json['email'],
+      authToken: json['authToken'],
       role: json['role'],
       phoneNumber: json['phoneNumber'],
       countryCode: json['countryCode'],
@@ -135,57 +136,61 @@ class AuthUser {
       emailOtpVerified: json['emailOtpVerified'] ?? false,
       agreedToTerms: json['agreedToTerms'] ?? false,
       isTruthfully: json['isTruthfully'] ?? false,
+
+      bookingInProgress: json['bookingInProgress'],
+      isDeleted: json['isDeleted'],
       walletId: json['walletId'],
       stripeAccountId: json['stripeAccountId'],
       stripeCustomerId: json['stripeCustomerId'],
       stripeSubscriptionStatus: json['stripeSubscriptionStatus'],
+
       currentSubscriptionId: json['currentSubscriptionId'] != null
-          ? (json['currentSubscriptionId'] is String
-                ? CurrentSubscription(id: json['currentSubscriptionId'])
-                : CurrentSubscription.fromJson(json['currentSubscriptionId']))
+          ? CurrentSubscription.fromJson(json['currentSubscriptionId'])
           : null,
+
       currentSubscriptionTrialDays: json['currentSubscriptionTrialDays'],
       currentSubscriptionAutoRenew: json['currentSubscriptionAutoRenew'],
       stripePayoutsEnabled: json['stripePayoutsEnabled'],
       stripeTransfersEnabled: json['stripeTransfersEnabled'],
+
       certificateApproved: json['certificateApproved'],
       rejectedReason: json['rejectedReason'],
-      connectorLinkUrl: json['connectorLinkUrl'],
-      bookingInProgress: json['bookingInProgress'],
-      isDeleted: json['isDeleted'],
-      status: json['status'],
+
       profileImage: json['profileImage'],
+      status: json['status'],
+      mailingAddress: json['mailingAddress'],
       country: json['country'],
       state: json['state'],
       city: json['city'],
       zip: json['zip'],
-      mailingAddress: json['mailingAddress'],
-      certificateTypeId: json['certificateTypeId'],
-      certificateAgencyIds: (json['certificateAgencyIds'] as List?)
-          ?.map((e) => e.toString())
-          .toList(),
+
+      certificateTypeId: json['certificateTypeId']?['_id'],
       certificateDocuments: (json['certificateDocuments'] as List?)
           ?.map((e) => e.toString())
           .toList(),
+
       certificateExpiryDate: json['certificateExpiryDate'],
       referenceDocuments: (json['referenceDocuments'] as List?)
           ?.map((e) => e.toString())
           .toList(),
-      uploadedIdOrLicenseDocument: json['uploadedIdOrLicenseDocument'],
+
+      uploadedIdOrLicenseDocument: json['uploadedIdOrLicenseDocument'] != null
+          ? UserDocumentDataModel.fromJson(json['uploadedIdOrLicenseDocument'])
+          : null,
+
       workHistoryDescription: json['workHistoryDescription'],
-      statusUpdatedByAdmin: json['statusUpdatedByAdmin'],
-      docxOk: json['docxOk'],
-      documentTypeId: json['documentTypeId'] is Map
-          ? json['documentTypeId']['_id']
-          : json['documentTypeId'],
+      connectorLinkUrl: json['connectorLinkUrl'],
+
+      documentTypeId: json['documentTypeId']?['_id'],
       documentExpiryDate: json['documentExpiryDate'],
       coiExpiryDate: json['coiExpiryDate'],
-      documents: (json['documents'] as List?)
-          ?.map((e) => UserDocument.fromJson(e))
-          .toList(),
 
       serviceAreas: (json['serviceAreas'] as List?)
           ?.map((e) => ServiceArea.fromJson(e))
+          .toList(),
+
+      documents: (json['documents'] as List?)
+          ?.map((e) => UserDocument.fromJson(e))
           .toList(),
 
       location: loc != null
@@ -195,25 +200,22 @@ class AuthUser {
               lng: (loc['coordinates']?[0] ?? 0).toDouble(),
             )
           : null,
+
       devices:
           (json['devices'] as List?)
               ?.map(
-                (d) => UserDevice(
-                  token: d['deviceToken'] ?? '',
-                  type: d['deviceType'] ?? '',
-                ),
+                (d) =>
+                    UserDevice(token: d['deviceToken'], type: d['deviceType']),
               )
               .toList() ??
           [],
-      createdAt: json['createdAt'] != null
-          ? DateTime.tryParse(json['createdAt'])
-          : null,
-      updatedAt: json['updatedAt'] != null
-          ? DateTime.tryParse(json['updatedAt'])
-          : null,
-      loginTime: json['loginTime'] != null
-          ? DateTime.tryParse(json['loginTime'])
-          : null,
+
+      createdAt: DateTime.tryParse(json['createdAt'] ?? ''),
+      updatedAt: DateTime.tryParse(json['updatedAt'] ?? ''),
+      loginTime: DateTime.tryParse(json['loginTime'] ?? ''),
+
+      statusUpdatedByAdmin: json['statusUpdatedByAdmin'],
+      docxOk: json['docxOk'],
     );
   }
 
@@ -230,44 +232,48 @@ class AuthUser {
       'emailOtpVerified': emailOtpVerified,
       'agreedToTerms': agreedToTerms,
       'isTruthfully': isTruthfully,
+
       'walletId': walletId,
       'stripeAccountId': stripeAccountId,
       'stripeCustomerId': stripeCustomerId,
       'stripeSubscriptionStatus': stripeSubscriptionStatus,
-      'currentSubscriptionId': currentSubscriptionId,
+
+      'currentSubscriptionId': currentSubscriptionId?.toJson(),
       'currentSubscriptionTrialDays': currentSubscriptionTrialDays,
       'currentSubscriptionAutoRenew': currentSubscriptionAutoRenew,
       'stripePayoutsEnabled': stripePayoutsEnabled,
       'stripeTransfersEnabled': stripeTransfersEnabled,
+
       'certificateApproved': certificateApproved,
       'rejectedReason': rejectedReason,
+
       'bookingInProgress': bookingInProgress,
       'isDeleted': isDeleted,
       'status': status,
       'profileImage': profileImage,
+
       'country': country,
       'state': state,
       'city': city,
       'zip': zip,
       'mailingAddress': mailingAddress,
+
       'certificateTypeId': certificateTypeId,
-      'certificateAgencyIds': certificateAgencyIds,
       'certificateDocuments': certificateDocuments,
       'certificateExpiryDate': certificateExpiryDate,
       'referenceDocuments': referenceDocuments,
-      'uploadedIdOrLicenseDocument': uploadedIdOrLicenseDocument,
+
+      'uploadedIdOrLicenseDocument': uploadedIdOrLicenseDocument?.toJson(),
+
       'workHistoryDescription': workHistoryDescription,
       'connectorLinkUrl': connectorLinkUrl,
-      'createdAt': createdAt?.toIso8601String(),
-      'updatedAt': updatedAt?.toIso8601String(),
-      'loginTime': loginTime?.toIso8601String(),
-      'statusUpdatedByAdmin': statusUpdatedByAdmin,
-      'docxOk': docxOk,
+
       'documentTypeId': documentTypeId,
       'documentExpiryDate': documentExpiryDate,
       'coiExpiryDate': coiExpiryDate,
-      'serviceAreas': serviceAreas,
-      'documents': documents,
+
+      'documents': documents?.map((e) => e.toJson()).toList(),
+      'serviceAreas': serviceAreas?.map((e) => e.toJson()).toList(),
 
       'location': location != null
           ? {
@@ -276,6 +282,17 @@ class AuthUser {
               'coordinates': [location!.lng, location!.lat],
             }
           : null,
+
+      'devices': devices
+          .map((e) => {'deviceToken': e.token, 'deviceType': e.type})
+          .toList(),
+
+      'createdAt': createdAt?.toIso8601String(),
+      'updatedAt': updatedAt?.toIso8601String(),
+      'loginTime': loginTime?.toIso8601String(),
+
+      'statusUpdatedByAdmin': statusUpdatedByAdmin,
+      'docxOk': docxOk,
     };
   }
 }
@@ -420,3 +437,4 @@ extension AuthUserLocalEntityMerge on AuthUserLocalEntity {
     );
   }
 }
+//  certificateTypeId: {_id: 69156b84aabe487380eadfd5, name: Soils & Foundations, status: 1},from the respons eu can see, certificate type id is not a string isnrtadf a map, sometimes it can be setring but fro this it is map. and need id from that 

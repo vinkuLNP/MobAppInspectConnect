@@ -236,6 +236,7 @@ class _ServiceAreaStepState extends State<ServiceAreaStep> {
                               onDeleted: () {
                                 vm.removeCity(city);
                                 vm.selectedCityNames.remove(city);
+                                vm.iccDocsByCity[city]!.remove(city);
                                 widget.vm.selectedCities.remove(city);
                                 if (vm.selectedCityNames.isNotEmpty) {
                                   widget.vm.clearCityErrors();
@@ -288,10 +289,7 @@ class _ServiceAreaStepState extends State<ServiceAreaStep> {
                             city,
                             vm.iccDocsByCity[city]![index].documentId,
                           ),
-                          // vm.iccDocsByCity[city]!.removeAt(index),
                           onPickExpiry: (index, date) {
-                            //                             final doc = vm.iccDocsByCity[city]!.firstWhere((d) => d.documentId == docId);
-                            // doc.expiryDate = newDate;
                             vm.iccDocsByCity[city]![index].expiryDate = date;
                             vm.validateServiceArea();
                             vm.notify();

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
 import 'package:inspect_connect/core/utils/constants/app_strings.dart';
@@ -20,53 +22,40 @@ class ProfessionalDetailsStep extends StatelessWidget {
       value: vm,
       child: Consumer<InspectorViewModelProvider>(
         builder: (context, prov, _) {
-          return Stack(
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              AbsorbPointer(
-                absorbing: prov.isProcessing,
-                child: Opacity(
-                  opacity: prov.isProcessing ? 0.6 : 1.0,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      textWidget(
-                        text: professionalDetails,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                      const SizedBox(height: 8),
-                      _section(
-                        title: certificateType,
-                        child: _inspectionTypeDropdown(prov),
-                      ),
+              textWidget(
+                text: professionalDetails,
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+              const SizedBox(height: 8),
+              _section(
+                title: certificateType,
+                child: _inspectionTypeDropdown(prov),
+              ),
 
-                      const SizedBox(height: 6),
+              const SizedBox(height: 6),
 
-                      _section(
-                        title: selectExpirationDate,
-                        child: IgnorePointer(
-                          ignoring: false,
-                          child: DateTimePickerWidget(
-                            showTimePicker: false,
-                            initialDateTime: prov.certificateExpiryDateShow,
-                            onDateTimeSelected: (dt) {
-                              prov.setDate(dt);
-                            },
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      _section(
-                        title: uploadCertificationDocuments,
-                        child: _documentGrid(prov, context),
-                      ),
-                    ],
+              _section(
+                title: selectExpirationDate,
+                child: IgnorePointer(
+                  ignoring: false,
+                  child: DateTimePickerWidget(
+                    showTimePicker: false,
+                    initialDateTime: prov.certificateExpiryDateShow,
+                    onDateTimeSelected: (dt) {
+                      prov.setDate(dt);
+                    },
                   ),
                 ),
               ),
-
-              if (prov.isProcessing)
-                const Center(child: CircularProgressIndicator()),
+              const SizedBox(height: 6),
+              _section(
+                title: uploadCertificationDocuments,
+                child: _documentGrid(prov, context),
+              ),
             ],
           );
         },
@@ -85,6 +74,37 @@ class ProfessionalDetailsStep extends StatelessWidget {
           child,
         ],
       ),
+    );
+  }
+
+  bool _isImage(String path) {
+    final ext = path.split('.').last.toLowerCase();
+    return ['jpg', 'jpeg', 'png', 'webp', 'gif'].contains(ext);
+  }
+
+  Widget _buildImagePreview(File file) {
+    return Image.file(
+      file,
+      fit: BoxFit.cover,
+      width: double.infinity,
+      height: double.infinity,
+      errorBuilder: (_, __, ___) =>
+          const Center(child: Icon(Icons.broken_image, color: Colors.grey)),
+    );
+  }
+
+  Widget _buildNetworkImage(String url) {
+    return Image.network(
+      url,
+      fit: BoxFit.cover,
+      width: double.infinity,
+      height: double.infinity,
+      errorBuilder: (_, __, ___) =>
+          const Center(child: Icon(Icons.broken_image, color: Colors.grey)),
+      loadingBuilder: (c, w, p) {
+        if (p == null) return w;
+        return const Center(child: CircularProgressIndicator(strokeWidth: 2));
+      },
     );
   }
 
@@ -188,22 +208,33 @@ class ProfessionalDetailsStep extends StatelessWidget {
           final url = prov.existingDocumentUrls[i];
           final name = url.split('/').last;
 
+          if (_isImage(url)) {
+            return _imageTile(
+              child: _buildNetworkImage(url),
+              onDelete: () => prov.removeExistingDocumentAt(i),
+            );
+          }
+
           return _documentTile(
             name: name,
             onDelete: () => prov.removeExistingDocumentAt(i),
-            // onTap: () => prov.openDocument(url),
           );
         }
-
         final docIndex = i - prov.existingDocumentUrls.length;
         if (docIndex < prov.documents.length) {
           final file = prov.documents[docIndex];
           final name = file.path.split('/').last;
 
+          if (_isImage(file.path)) {
+            return _imageTile(
+              child: _buildImagePreview(file),
+              onDelete: () => prov.removeDocumentAt(docIndex),
+            );
+          }
+
           return _documentTile(
             name: name,
             onDelete: () => prov.removeDocumentAt(docIndex),
-            // onTap: () => prov.openLocalDocument(file),
           );
         }
 
@@ -221,6 +252,32 @@ class ProfessionalDetailsStep extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+
+  Widget _imageTile({required Widget child, required VoidCallback onDelete}) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(12),
+      child: Stack(
+        children: [
+          Container(color: Colors.grey.shade100, child: child),
+          Positioned(
+            top: 4,
+            right: 4,
+            child: GestureDetector(
+              onTap: onDelete,
+              child: Container(
+                padding: const EdgeInsets.all(4),
+                decoration: const BoxDecoration(
+                  color: Colors.black54,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.close, color: Colors.white, size: 16),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 

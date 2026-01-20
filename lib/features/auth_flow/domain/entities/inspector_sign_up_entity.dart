@@ -22,8 +22,10 @@ class InspectorSignUpLocalEntity {
   String? city;
   String? zipCode;
   String? mailingAddress;
-  UserDocumentDataModel? uploadedIdOrLicenseDocument;
-  UserDocumentDataModel? uploadedCoiDocument;
+  final uploadedIdOrLicenseDocument = ToOne<UserDocumentEntity>();
+
+  final uploadedCoiDocument = ToOne<UserDocumentEntity>();
+
   String? workHistoryDescription;
   List<String>? referenceDocuments;
   String? profileImage;
@@ -39,7 +41,6 @@ class InspectorSignUpLocalEntity {
   String? coiExpiryDate;
   String? documentExpiryDate;
   String? documentTypeId;
-  String? privateTempId;
 
   @Backlink('inspector')
   final serviceAreas = ToMany<ServiceAreaLocalEntity>();
@@ -64,8 +65,6 @@ class InspectorSignUpLocalEntity {
     this.city,
     this.zipCode,
     this.mailingAddress,
-    this.uploadedIdOrLicenseDocument,
-    this.uploadedCoiDocument,
     this.workHistoryDescription,
     this.referenceDocuments,
     this.profileImage,
@@ -81,7 +80,6 @@ class InspectorSignUpLocalEntity {
     this.coiExpiryDate,
     this.documentExpiryDate,
     this.documentTypeId,
-    this.privateTempId,
   });
 }
 
@@ -101,12 +99,9 @@ extension InspectorSignUpEntityMapper on InspectorSignUpLocalEntity {
       "certificateTypeId": certificateTypeId,
       "certificateExpiryDate": certificateExpiryDate,
       "certificateDocuments": certificateDocuments,
-      "uploadedIdOrLicenseDocument": uploadedIdOrLicenseDocument,
-      "uploadedCoiDocument": uploadedCoiDocument,
       "coiExpiryDate": coiExpiryDate,
       "documentExpiryDate": documentExpiryDate,
       "documentTypeId": documentTypeId,
-      "privateTempId": privateTempId,
       "workHistoryDescription": workHistoryDescription,
       "profileImage": profileImage,
       "referenceDocuments": referenceDocuments,
@@ -132,6 +127,9 @@ extension InspectorSignUpEntityMapper on InspectorSignUpLocalEntity {
           },
         };
       }).toList(),
+      "uploadedIdOrLicenseDocument": uploadedIdOrLicenseDocument.target
+          ?.toJson(),
+      "uploadedCoiDocument": uploadedCoiDocument.target?.toJson(),
 
       "iccDocument": iccDocuments.map((d) {
         return {

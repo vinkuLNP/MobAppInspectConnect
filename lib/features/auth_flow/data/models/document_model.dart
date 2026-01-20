@@ -1,3 +1,5 @@
+import 'package:inspect_connect/features/auth_flow/data/models/ui_icc_document.dart';
+
 class DocumentType {
   final String id;
   final String name;
@@ -26,6 +28,7 @@ class UserDocument {
   final int? adminApproval; // 0=pending, 1=approved, 2=rejected
   final String? adminNotes;
   final String? serviceCity;
+  final String? fileName;
 
   const UserDocument({
     required this.id,
@@ -34,6 +37,7 @@ class UserDocument {
     this.expiryDate,
     this.adminApproval,
     this.adminNotes,
+    this.fileName,
     this.serviceCity,
   });
 
@@ -44,6 +48,8 @@ class UserDocument {
           ? DocumentType.fromJson(json['documentTypeId'])
           : null,
       fileUrl: json['fileUrl'],
+      fileName: json['fileName'],
+
       expiryDate: json['expiryDate'] != null
           ? DateTime.tryParse(json['expiryDate'])
           : null,
@@ -58,6 +64,8 @@ class UserDocument {
       '_id': id,
       'documentTypeId': documentType?.toJson(),
       'fileUrl': fileUrl,
+      'fileName': fileName,
+
       'expiryDate': expiryDate?.toIso8601String(),
       'adminApproval': adminApproval,
       'adminNotes': adminNotes,
@@ -68,4 +76,30 @@ class UserDocument {
   bool get isRejected => adminApproval == 2;
   bool get isPending => adminApproval == 0;
   bool get isApproved => adminApproval == 1;
+}
+
+extension IccUiMapper on UserDocument {
+  IccUiDocument toIccUi() {
+    return IccUiDocument(
+      uploadedUrl: fileUrl,
+      expiryDate: expiryDate,
+      iccFileName: fileName,
+      documentId: id,
+    );
+  }
+}
+
+extension UserDocumentsX on List<UserDocument>? {
+  UserDocument? firstByType(String type) {
+    if (this == null) return null;
+    for (final d in this!) {
+      if (d.documentType!.name == type) return d;
+    }
+    return null;
+  }
+
+  List<UserDocument> allByType(String type) {
+    if (this == null) return [];
+    return this!.where((d) => d.documentType!.name == type).toList();
+  }
 }

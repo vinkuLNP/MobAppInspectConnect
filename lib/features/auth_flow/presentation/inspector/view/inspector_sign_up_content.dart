@@ -175,7 +175,7 @@ class _InspectorSignUpContentState extends State<InspectorSignUpContent> {
 
                 await vm.saveAdditionalStep(
                   profileImageUrlOrPath: profilePath.toString(),
-                  idLicenseUrlOrPath: idPath.toString(),
+                  idLicenseUrlOrPath: idPath,
                   referenceDocs: refs,
                   agreed: vm.agreedToTerms,
                   truthful: vm.confirmTruth,
@@ -187,7 +187,7 @@ class _InspectorSignUpContentState extends State<InspectorSignUpContent> {
             if (vm.currentStep < steps.length - 1) {
               vm.goNext();
             } else {
-              await vm.submit();
+              // await vm.submit();
               final saved = await vm.getSavedData();
               log('final data: ${saved?.toString()}');
               if (context.mounted) {

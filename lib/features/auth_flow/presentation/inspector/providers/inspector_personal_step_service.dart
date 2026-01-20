@@ -84,7 +84,6 @@ class InspectorPersonalStepService {
               provider.phoneIso!.isNotEmpty
           ? provider.phoneIso
           : (await provider.localDs.getFullData())?.isoCode ?? 'IN',
-      'privateTempId': existing?.privateTempId ?? generatePrivateTempId(),
     });
     provider.setProcessing(false);
   }

@@ -326,7 +326,7 @@ class ClientViewModelProvider extends BaseViewModel {
 
   Future<void> verify({required BuildContext context}) async {
     if (!canVerify) return;
-
+    setSigningIn(true);
     try {
       log('[VERIFY] Starting verification process...');
 
@@ -429,6 +429,7 @@ class ClientViewModelProvider extends BaseViewModel {
     } finally {
       cltEmailCtrl.clear();
       cltPasswordCtrl.clear();
+      setSigningIn(false);
       log('[VERIFY] Cleanup complete.');
     }
   }
@@ -438,7 +439,7 @@ class ClientViewModelProvider extends BaseViewModel {
     required BuildContext context,
   }) async {
     log('[FETCH_USER_DETAIL] Fetching user details for userId=${user.id}');
-
+    final userRole = user.role;
     final existingUser = await locator<AuthLocalDataSource>().getUser();
 
     final localUser = user.toLocalEntity();
@@ -488,14 +489,20 @@ class ClientViewModelProvider extends BaseViewModel {
       },
       error: (e) {
         log('[FETCH_USER_DETAIL] Failed to fetch user detail: ${e.message}');
-        context.router.replaceAll([const ClientDashboardRoute()]);
+        context.router.replaceAll([
+          userRole == 1
+              ? const ClientDashboardRoute()
+              : userRole == 2
+              ? const InspectorDashboardRoute()
+              : OnBoardingRoute(),
+        ]);
       },
     );
   }
 
   Future<void> resend({required BuildContext context}) async {
     if (!canResend) return;
-
+    setSigningIn(true);
     try {
       final user = await locator<AuthLocalDataSource>().getUser();
       if (user == null || user.authToken == null) {
@@ -539,6 +546,7 @@ class ClientViewModelProvider extends BaseViewModel {
     } finally {
       cltEmailCtrl.clear();
       cltPasswordCtrl.clear();
+      setSigningIn(false);
     }
   }
 
@@ -747,6 +755,16 @@ class ClientViewModelProvider extends BaseViewModel {
     log('🔸 Current status: ${provider.status}');
 
     switch (provider.status) {
+      case InspectorStatus.unverified:
+        log(
+          '➡️ Redirecting: Inspector needs subscription → InspectorDashboardRoute',
+        );
+        if (context.mounted) {
+          context.router.replaceAll([
+            OtpVerificationRoute(addShowButton: false, showSignInText: false),
+          ]);
+        }
+        break;
       case InspectorStatus.needsSubscription:
         log(
           '➡️ Redirecting: Inspector needs subscription → InspectorDashboardRoute',

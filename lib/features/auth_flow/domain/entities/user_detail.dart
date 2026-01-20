@@ -1,4 +1,8 @@
+import 'package:inspect_connect/features/auth_flow/data/models/document_model.dart';
+import 'package:inspect_connect/features/auth_flow/data/models/service_model.dart';
 import 'package:inspect_connect/features/auth_flow/data/models/user_document_data_model.dart';
+import 'package:inspect_connect/features/auth_flow/domain/entities/icc_document_entity.dart';
+import 'package:inspect_connect/features/auth_flow/domain/entities/user_api_document.dart';
 
 class UserDetail {
   final String id;
@@ -52,8 +56,8 @@ class UserDetail {
   final CertificateType? documentTypeId;
   final String? documentExpiryDate;
   final String? coiExpiryDate;
-  final List<dynamic>? serviceAreas;
-  final List<dynamic>? documents;
+  final List<ServiceArea>? serviceAreas;
+  final List<UserDocument>? documents;
 
   const UserDetail({
     required this.id,
@@ -187,8 +191,19 @@ class UserDetail {
       documentExpiryDate: body['documentExpiryDate'],
       coiExpiryDate: body['coiExpiryDate'],
 
-      serviceAreas: body['serviceAreas'],
-      documents: body['documents'],
+      // serviceAreas: body['serviceAreas'],
+      // documents: body['documents'],
+      serviceAreas: body['serviceAreas'] != []
+          ? (body['serviceAreas'] as List?)
+                ?.map((e) => ServiceArea.fromJson(e))
+                .toList()
+          : [],
+
+      documents: body['documents'] != []
+          ? (body['documents'] as List?)
+                ?.map((e) => UserDocument.fromJson(e))
+                .toList()
+          : [],
     );
   }
 

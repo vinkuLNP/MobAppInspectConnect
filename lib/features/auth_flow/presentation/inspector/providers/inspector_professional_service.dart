@@ -150,11 +150,7 @@ class InspectorProfessionalStepService {
         }
         return;
       }
-      final uploadImage = UploadImageDto(
-        filePath: file.path,
-        fileType: 'sensitive',
-        privateTempId: await provider.localDs.getPrivateTempId(),
-      );
+      final uploadImage = UploadImageDto(filePath: file.path);
       final uploadImageUseCase = locator<UploadImageUseCase>();
       final result = await provider
           .executeParamsUseCase<UploadImageResponseModel, UploadImageParams>(

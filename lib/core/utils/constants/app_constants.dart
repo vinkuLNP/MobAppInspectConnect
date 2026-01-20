@@ -29,7 +29,7 @@ const String contentTypeValue = 'application/json';
 const String contentMultipartTypeValue = 'multipart/form-data';
 
 ///This is the time limit for every api call
-const Duration timeOutDuration = Duration(seconds: 20);
+const Duration timeOutDuration = Duration(seconds: 60);
 
 ///The app base Url should be provided in this value
 String webViewUrl =

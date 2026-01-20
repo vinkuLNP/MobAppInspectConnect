@@ -33,7 +33,7 @@ class InspectorSignUpLocalDataSource {
     entity.serviceAreas.length;
     if (entity.iccDocuments.isNotEmpty) {
       log(
-        'Before update:  ${entity.name.toString()} ----- icc doc: ${entity.iccDocuments[0].documentUrl.toString()}    ${entity.iccDocuments[0].serviceCity.toString()} ----- zipcode : ${entity.serviceAreas[0].cityName.toString()} zipcode : ${entity.serviceAreas[0].zipCode.toString()}  certificate dfocuments ${entity.certificateDocuments}',
+        'Before update:  ${entity.name.toString()} ----- icc doc: ${entity.iccDocuments[0].toString()}    ${entity.iccDocuments[0].serviceCity.toString()} ----- zipcode : ${entity.serviceAreas[0].cityName.toString()} zipcode : ${entity.serviceAreas[0].zipCode.toString()}  certificate dfocuments ${entity.certificateDocuments}',
       );
     }
 
@@ -90,8 +90,21 @@ class InspectorSignUpLocalDataSource {
           break;
         case 'uploadedIdOrLicenseDocument':
           if (v != null) {
-            entity.uploadedIdOrLicenseDocument =
-                UserDocumentDataModel.fromEntity(v as UserDocumentEntity);
+            final doc = UserDocumentEntity(
+              documentUrl: (v as UserDocumentEntity).documentUrl,
+              fileName: v.fileName,
+            );
+            entity.uploadedIdOrLicenseDocument.target = doc;
+          }
+          break;
+
+        case 'uploadedCoiDocument':
+          if (v != null) {
+            final doc = UserDocumentEntity(
+              documentUrl: (v as UserDocumentEntity).documentUrl,
+              fileName: v.fileName,
+            );
+            entity.uploadedCoiDocument.target = doc;
           }
           break;
 
@@ -100,13 +113,6 @@ class InspectorSignUpLocalDataSource {
           break;
         case 'documentExpiryDate':
           if (v != null) entity.documentExpiryDate = v as String?;
-          break;
-        case 'uploadedCoiDocument':
-          if (v != null) {
-            entity.uploadedCoiDocument = UserDocumentDataModel.fromEntity(
-              v as UserDocumentEntity,
-            );
-          }
           break;
         case 'coiExpiryDate':
           if (v != null) entity.coiExpiryDate = v as String?;
@@ -138,26 +144,54 @@ class InspectorSignUpLocalDataSource {
         case 'deviceType':
           entity.deviceType = v as String?;
           break;
-        case 'privateTempId':
-          entity.privateTempId = v as String?;
-          break;
         case 'deviceToken':
           entity.deviceToken = v as String?;
           break;
 
         case 'iccDocument':
-          entity.iccDocuments.clear();
+          log('--- Incoming ICC Documents ---');
           for (final d in v) {
-            entity.iccDocuments.add(
-              IccDocumentLocalEntity(
-                serviceCity: d['serviceCity'],
-                documentUrl: d['documentUrl'],
-                expiryDate: d['expiryDate'],
-                documentId: d['id'],
-                fileName: d['fileName'],
-              ),
+            log(
+              'IN -> id:${d['id']} | city:${d['serviceCity']} | file:${d['fileName']} | expiry:${d['expiryDate']}',
             );
           }
+          if (v is Iterable) {
+            final incoming = v.cast<Map<String, dynamic>>();
+
+            entity.iccDocuments.removeWhere(
+              (old) => !incoming.any((n) => n['id'] == old.documentId),
+            );
+
+            for (final d in incoming) {
+              final existing = entity.iccDocuments.firstWhere(
+                (e) => e.documentId == d['id'],
+                orElse: () => IccDocumentLocalEntity(
+                  documentId: d['id'],
+                  serviceCity: d['serviceCity'],
+                  documentUrl: d['documentUrl'],
+                  expiryDate: d['expiryDate'],
+                  fileName: d['fileName'],
+                ),
+              );
+
+              existing
+                ..serviceCity = d['serviceCity']
+                ..documentUrl = d['documentUrl']
+                ..expiryDate = d['expiryDate']
+                ..fileName = d['fileName'];
+
+              if (!entity.iccDocuments.contains(existing)) {
+                entity.iccDocuments.add(existing);
+              }
+            }
+          }
+          log('--- Stored ICC Documents in Local DB ---');
+          for (final e in entity.iccDocuments) {
+            log(
+              'DB -> id:${e.documentId} | city:${e.serviceCity} | file:${e.fileName} | url:${e.documentUrl} | expiry:${e.expiryDate}',
+            );
+          }
+
           break;
         case 'serviceAreas':
           if (v is Iterable) {
@@ -191,7 +225,6 @@ class InspectorSignUpLocalDataSource {
           break;
       }
     });
-
     _database.saveInspector(entity);
     if (entity.iccDocuments.isNotEmpty) {
       log(
@@ -203,26 +236,15 @@ class InspectorSignUpLocalDataSource {
   Future<InspectorSignUpLocalEntity?> getFullData() async {
     final list = await _database.getAll<InspectorSignUpLocalEntity>();
     if (list != null && list.isNotEmpty) {
-      log(
-        '🔍 Retrieved inspector signup data: ${jsonEncode(list.first.toJson())}',
-      );
-      return list.first;
+      final entity = list.first;
+
+      log('🔍 Retrieved inspector signup data: ${jsonEncode(entity.toJson())}');
+      return entity;
     }
     return null;
   }
 
   Future<void> clear() async {
     _database.clear<InspectorSignUpLocalEntity>();
-  }
-
-  Future<String> getPrivateTempId() async {
-    final entity = await _getOrCreate();
-
-    if (entity.privateTempId == null || entity.privateTempId!.isEmpty) {
-      entity.privateTempId = generatePrivateTempId();
-      _database.saveInspector(entity);
-    }
-
-    return entity.privateTempId!;
   }
 }

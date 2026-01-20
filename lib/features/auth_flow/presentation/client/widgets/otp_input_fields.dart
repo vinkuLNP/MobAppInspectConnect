@@ -74,6 +74,7 @@ class _PerDigitOtpState extends State<PerDigitOtp> {
         widget.onCompleted?.call();
       }
     }
+    if (!mounted) return;
     setState(() {});
   }
 

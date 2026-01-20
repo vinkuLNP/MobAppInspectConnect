@@ -19,7 +19,12 @@ import 'package:provider/provider.dart';
 @RoutePage()
 class OtpVerificationView extends StatefulWidget {
   final bool addShowButton;
-  const OtpVerificationView({super.key, required this.addShowButton});
+  final bool showSignInText;
+  const OtpVerificationView({
+    super.key,
+    required this.addShowButton,
+    this.showSignInText = true,
+  });
 
   @override
   State<OtpVerificationView> createState() => _OtpVerificationViewState();
@@ -133,22 +138,24 @@ class _OtpVerificationViewState extends State<OtpVerificationView> {
                       ? AppColors.authThemeColor
                       : Colors.grey,
                   isDisabled: !vm.canVerify,
+                  isLoading: vm.isSigningIn,
                   onTap: () {
                     if (vm.canVerify) vm.verify(context: context);
                     if (!context.mounted) return;
                   },
                 ),
-
-                AuthFormSwitchRow(
-                  question: alreadyHaveAccount,
-                  actionText: signInTitle,
-                  onTap: () {
-                    context.router.replaceAll([
-                      ClientSignInRoute(showBackButton: false),
-                    ]);
-                  },
-                  actionColor: AppColors.authThemeLightColor,
-                ),
+                widget.showSignInText
+                    ? AuthFormSwitchRow(
+                        question: alreadyHaveAccount,
+                        actionText: signInTitle,
+                        onTap: () {
+                          context.router.replaceAll([
+                            ClientSignInRoute(showBackButton: false),
+                          ]);
+                        },
+                        actionColor: AppColors.authThemeLightColor,
+                      )
+                    : SizedBox(),
               ],
             ),
           ),

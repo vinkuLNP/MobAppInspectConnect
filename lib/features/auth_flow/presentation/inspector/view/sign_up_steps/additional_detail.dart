@@ -35,172 +35,156 @@ class _AdditionalDetailsStepState extends State<AdditionalDetailsStep> {
       value: provider,
       child: Consumer<InspectorViewModelProvider>(
         builder: (context, prov, _) {
-          return Stack(
-            children: [
-              AbsorbPointer(
-                absorbing: prov.isProcessing,
-                child: Opacity(
-                  opacity: prov.isProcessing ? 0.6 : 1.0,
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(12),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        const SectionTitle(additionalDetails),
-                        const SizedBox(height: 8),
+          return SingleChildScrollView(
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const SectionTitle(additionalDetails),
+                const SizedBox(height: 8),
 
-                        _section(
-                          title: profileImageOptional,
-                          child: _imageUploader(
-                            context: context,
-                            files: prov.profileImageUrl != null
-                                ? [prov.profileImage!]
-                                : [],
-                            maxFiles: 1,
-                            allowOnlyImages: true,
-                            onAdd: () => prov.pickFile(
-                              context,
-                              'profile',
-                              allowOnlyImages: true,
-                            ),
-                            onRemove: (index) => prov.removeProfileImage(),
-                          ),
-                        ),
-                        _section(
-                          title: uploadIdLicense,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              documentTypeDropdown(prov),
-
-                              const SizedBox(height: 8),
-
-                              _imageUploader(
-                                context: context,
-                                files: prov.idDocumentFile != null
-                                    ? [prov.idDocumentFile!]
-                                    : [],
-                                maxFiles: 1,
-                                onAdd: () => prov.pickFile(context, 'id'),
-                                onRemove: (_) => prov.removeIdImage(0),
-                              ),
-
-                              const SizedBox(height: 6),
-
-                              expiryPicker(
-                                context,
-                                label: idLicenseExpiryDate,
-                                date: prov.selectedIdDocExpiry,
-                                onPick: (date) {
-                                  prov.selectedIdDocExpiry = date;
-                                  prov.notify();
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
-                        _section(
-                          title: uploadCoiDocument,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              _imageUploader(
-                                context: context,
-                                files: prov.coiUploadedUrl != null
-                                    ? [
-                                        File(
-                                          prov.coiUploadedUrl!.documentUrl
-                                              .toString(),
-                                        ),
-                                      ]
-                                    : [],
-                                maxFiles: 1,
-                                onAdd: () => prov.pickFile(context, 'coi'),
-                                onRemove: (_) => prov.removeCoi(),
-                              ),
-
-                              const SizedBox(height: 6),
-
-                              expiryPicker(
-                                context,
-                                label: coiDocumentExpiryDate,
-                                date: prov.coiExpiry,
-                                onPick: (date) {
-                                  prov.coiExpiry = date;
-                                  prov.notify();
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        _section(
-                          title: uploadReferenceLetters,
-                          child: _imageUploader(
-                            context: context,
-                            files: prov.referenceLetters,
-                            maxFiles: 5,
-                            onAdd: () => prov.pickFile(context, 'ref'),
-                            onRemove: (index) =>
-                                prov.removeReferenceLetterImage(index),
-                          ),
-                        ),
-
-                        const SizedBox(height: 12),
-
-                        AppInputField(
-                          controller: inspWorkHistoryController,
-                          label: workHistoryDescription,
-                          maxLines: 4,
-                          hint: workHistoryHint,
-                        ),
-
-                        CheckboxListTile(
-                          value: prov.agreedToTerms,
-                          onChanged: (val) {
-                            prov.toggleTerms(val);
-                            setState(() => prov.showValidationError = false);
-                          },
-                          contentPadding: EdgeInsets.zero,
-                          visualDensity: VisualDensity.compact,
-                          dense: true,
-                          controlAffinity: ListTileControlAffinity.leading,
-                          title: textWidget(
-                            text: agreeToTerms,
-                            fontSize: 12,
-                            color:
-                                prov.showValidationError && !prov.agreedToTerms
-                                ? Colors.red
-                                : Colors.black,
-                          ),
-                        ),
-                        CheckboxListTile(
-                          value: prov.confirmTruth,
-                          onChanged: (val) {
-                            prov.toggleTruth(val);
-                            setState(() => prov.showValidationError = false);
-                          },
-                          visualDensity: VisualDensity.compact,
-                          dense: true,
-                          contentPadding: EdgeInsets.zero,
-                          controlAffinity: ListTileControlAffinity.leading,
-                          title: textWidget(
-                            text: informationTruthful,
-                            fontSize: 12,
-                            color:
-                                prov.showValidationError && !prov.confirmTruth
-                                ? Colors.red
-                                : Colors.black,
-                          ),
-                        ),
-                      ],
+                _section(
+                  title: profileImageOptional,
+                  child: _imageUploader(
+                    context: context,
+                    files: prov.profileImage != null
+                        ? [prov.profileImage!]
+                        : [],
+                    maxFiles: 1,
+                    allowOnlyImages: true,
+                    onAdd: () => prov.pickFile(
+                      context,
+                      'profile',
+                      allowOnlyImages: true,
                     ),
+                    onRemove: (index) => prov.removeProfileImage(),
                   ),
                 ),
-              ),
-              if (prov.isProcessing)
-                const Center(child: CircularProgressIndicator()),
-            ],
+                _section(
+                  title: uploadIdLicense,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      documentTypeDropdown(prov),
+
+                      const SizedBox(height: 8),
+
+                      _imageUploader(
+                        context: context,
+                        files: prov.idDocumentFile != null
+                            ? [prov.idDocumentFile!]
+                            : [],
+                        maxFiles: 1,
+                        onAdd: () => prov.pickFile(context, 'id'),
+                        onRemove: (_) => prov.removeIdImage(0),
+                      ),
+
+                      const SizedBox(height: 6),
+
+                      expiryPicker(
+                        context,
+                        label: idLicenseExpiryDate,
+                        date: prov.selectedIdDocExpiry,
+                        onPick: (date) {
+                          prov.selectedIdDocExpiry = date;
+                          prov.notify();
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                _section(
+                  title: uploadCoiDocument,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _imageUploader(
+                        context: context,
+                        files: prov.coiUploadedUrl != null
+                            ? [
+                                File(
+                                  prov.coiUploadedUrl!.documentUrl.toString(),
+                                ),
+                              ]
+                            : [],
+                        maxFiles: 1,
+                        onAdd: () => prov.pickFile(context, 'coi'),
+                        onRemove: (_) => prov.removeCoi(),
+                      ),
+
+                      const SizedBox(height: 6),
+
+                      expiryPicker(
+                        context,
+                        label: coiDocumentExpiryDate,
+                        date: prov.coiExpiry,
+                        onPick: (date) {
+                          prov.coiExpiry = date;
+                          prov.notify();
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+
+                _section(
+                  title: uploadReferenceLetters,
+                  child: _imageUploader(
+                    context: context,
+                    files: prov.referenceLetters,
+                    maxFiles: 5,
+                    onAdd: () => prov.pickFile(context, 'ref'),
+                    onRemove: (index) => prov.removeReferenceLetterImage(index),
+                  ),
+                ),
+
+                const SizedBox(height: 12),
+
+                AppInputField(
+                  controller: inspWorkHistoryController,
+                  label: workHistoryDescription,
+                  maxLines: 4,
+                  hint: workHistoryHint,
+                ),
+
+                CheckboxListTile(
+                  value: prov.agreedToTerms,
+                  onChanged: (val) {
+                    prov.toggleTerms(val);
+                    setState(() => prov.showValidationError = false);
+                  },
+                  contentPadding: EdgeInsets.zero,
+                  visualDensity: VisualDensity.compact,
+                  dense: true,
+                  controlAffinity: ListTileControlAffinity.leading,
+                  title: textWidget(
+                    text: agreeToTerms,
+                    fontSize: 12,
+                    color: prov.showValidationError && !prov.agreedToTerms
+                        ? Colors.red
+                        : Colors.black,
+                  ),
+                ),
+                CheckboxListTile(
+                  value: prov.confirmTruth,
+                  onChanged: (val) {
+                    prov.toggleTruth(val);
+                    setState(() => prov.showValidationError = false);
+                  },
+                  visualDensity: VisualDensity.compact,
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                  controlAffinity: ListTileControlAffinity.leading,
+                  title: textWidget(
+                    text: informationTruthful,
+                    fontSize: 12,
+                    color: prov.showValidationError && !prov.confirmTruth
+                        ? Colors.red
+                        : Colors.black,
+                  ),
+                ),
+              ],
+            ),
           );
         },
       ),

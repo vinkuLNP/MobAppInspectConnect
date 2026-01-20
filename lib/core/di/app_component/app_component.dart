@@ -22,6 +22,7 @@ import 'package:injectable/injectable.dart';
 import 'package:inspect_connect/features/auth_flow/domain/usecases/update_profile_usecase.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/auth_user_provider.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/client/client_view_model.dart';
+import 'package:inspect_connect/features/auth_flow/presentation/inspector/inspector_view_model.dart';
 import 'package:inspect_connect/features/client_flow/data/datasources/remote_datasource/client_api_datasource.dart';
 import 'package:inspect_connect/features/client_flow/data/repositories/client_repository_imp.dart';
 import 'package:inspect_connect/features/client_flow/domain/repositories/booking_repository.dart';
@@ -127,6 +128,9 @@ void setupLocator() {
   locator.registerLazySingleton<SessionManager>(() => SessionManager());
 
   locator.registerLazySingleton<AuthFlowProvider>(() => AuthFlowProvider());
+  locator.registerLazySingleton<InspectorViewModelProvider>(
+    () => InspectorViewModelProvider(),
+  );
 
   locator.registerLazySingleton<ClientViewModelProvider>(
     () => ClientViewModelProvider(),

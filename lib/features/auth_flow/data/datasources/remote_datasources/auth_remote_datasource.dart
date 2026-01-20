@@ -56,42 +56,6 @@ abstract class AuthRemoteDataSource {
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   AuthRemoteDataSourceImpl(this._ctx);
   final HttpRequestContext _ctx;
-
-  @override
-  Future<ApiResultModel<AuthUserDto>> signIn(SignInRequestDto dto) async {
-    try {
-      final ApiResultModel<http.Response> res = await _ctx.makeRequest(
-        uri: signInEndPoint,
-        httpRequestStrategy: PostRequestStrategy(),
-        requestData: dto.toJson(),
-      );
-
-      return res.when(
-        success: (http.Response response) {
-          final Map<String, dynamic> root = response.body.isEmpty
-              ? {}
-              : (jsonDecode(response.body) as Map<String, dynamic>);
-          final Map<String, dynamic> body =
-              (root['body'] as Map?)?.cast<String, dynamic>() ??
-              <String, dynamic>{};
-          log('--------------->body$body');
-          final dto = AuthUserDto.fromBody(body);
-          return ApiResultModel<AuthUserDto>.success(data: dto);
-        },
-        failure: (ErrorResultModel e) =>
-            ApiResultModel<AuthUserDto>.failure(errorResultEntity: e),
-      );
-    } catch (e) {
-      log('autoremoteresopoonse------> $e');
-      return const ApiResultModel.failure(
-        errorResultEntity: ErrorResultModel(
-          message: "Network error occurred",
-          statusCode: 500,
-        ),
-      );
-    }
-  }
-
   @override
   Future<ApiResultModel<AuthUserDto>> signUp(SignUpRequestDto dto) async {
     try {
@@ -127,6 +91,41 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       );
     } catch (e) {
       log('signup error: $e');
+      return const ApiResultModel.failure(
+        errorResultEntity: ErrorResultModel(
+          message: "Network error occurred",
+          statusCode: 500,
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<ApiResultModel<AuthUserDto>> signIn(SignInRequestDto dto) async {
+    try {
+      final ApiResultModel<http.Response> res = await _ctx.makeRequest(
+        uri: signInEndPoint,
+        httpRequestStrategy: PostRequestStrategy(),
+        requestData: dto.toJson(),
+      );
+
+      return res.when(
+        success: (http.Response response) {
+          final Map<String, dynamic> root = response.body.isEmpty
+              ? {}
+              : (jsonDecode(response.body) as Map<String, dynamic>);
+          final Map<String, dynamic> body =
+              (root['body'] as Map?)?.cast<String, dynamic>() ??
+              <String, dynamic>{};
+          log('--------------->body$body');
+          final dto = AuthUserDto.fromBody(body);
+          return ApiResultModel<AuthUserDto>.success(data: dto);
+        },
+        failure: (ErrorResultModel e) =>
+            ApiResultModel<AuthUserDto>.failure(errorResultEntity: e),
+      );
+    } catch (e) {
+      log('autoremoteresopoonse------> $e');
       return const ApiResultModel.failure(
         errorResultEntity: ErrorResultModel(
           message: "Network error occurred",
