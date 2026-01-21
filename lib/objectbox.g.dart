@@ -714,12 +714,6 @@ final _entities = <obx_int.ModelEntity>[
         type: 9,
         flags: 0,
       ),
-      obx_int.ModelProperty(
-        id: const obx_int.IdUid(34, 2355455532701006726),
-        name: 'privateTempId',
-        type: 9,
-        flags: 0,
-      ),
     ],
     relations: <obx_int.ModelRelation>[],
     backlinks: <obx_int.ModelBacklink>[
@@ -857,6 +851,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
       281102519960584207,
       281380528162074395,
       340893041376304159,
+      2355455532701006726,
     ],
     retiredRelationUids: const [],
     modelVersion: 5,
@@ -1607,9 +1602,6 @@ obx_int.ModelDefinition getObjectBoxModel() {
             final documentTypeIdOffset = object.documentTypeId == null
                 ? null
                 : fbb.writeString(object.documentTypeId!);
-            final privateTempIdOffset = object.privateTempId == null
-                ? null
-                : fbb.writeString(object.privateTempId!);
             fbb.startTable(35);
             fbb.addInt64(0, object.id);
             fbb.addOffset(1, nameOffset);
@@ -1644,7 +1636,6 @@ obx_int.ModelDefinition getObjectBoxModel() {
             fbb.addOffset(30, coiExpiryDateOffset);
             fbb.addOffset(31, documentExpiryDateOffset);
             fbb.addOffset(32, documentTypeIdOffset);
-            fbb.addOffset(33, privateTempIdOffset);
             fbb.finish(fbb.endTable());
             return object.id;
           },
@@ -1760,9 +1751,6 @@ obx_int.ModelDefinition getObjectBoxModel() {
             final documentTypeIdParam = const fb.StringReader(
               asciiOptimization: true,
             ).vTableGetNullable(buffer, rootOffset, 68);
-            final privateTempIdParam = const fb.StringReader(
-              asciiOptimization: true,
-            ).vTableGetNullable(buffer, rootOffset, 70);
             final object = InspectorSignUpLocalEntity(
               id: idParam,
               name: nameParam,
@@ -1795,7 +1783,6 @@ obx_int.ModelDefinition getObjectBoxModel() {
               coiExpiryDate: coiExpiryDateParam,
               documentExpiryDate: documentExpiryDateParam,
               documentTypeId: documentTypeIdParam,
-              privateTempId: privateTempIdParam,
             );
             object.uploadedIdOrLicenseDocument.targetId = const fb.Int64Reader()
                 .vTableGet(buffer, rootOffset, 36, 0);
@@ -2451,12 +2438,6 @@ class InspectorSignUpLocalEntity_ {
   static final documentTypeId =
       obx.QueryStringProperty<InspectorSignUpLocalEntity>(
         _entities[4].properties[32],
-      );
-
-  /// See [InspectorSignUpLocalEntity.privateTempId].
-  static final privateTempId =
-      obx.QueryStringProperty<InspectorSignUpLocalEntity>(
-        _entities[4].properties[33],
       );
 
   /// see [InspectorSignUpLocalEntity.serviceAreas]

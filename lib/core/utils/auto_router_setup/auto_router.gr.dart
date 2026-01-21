@@ -318,10 +318,15 @@ class OtpVerificationRoute extends PageRouteInfo<OtpVerificationRouteArgs> {
   OtpVerificationRoute({
     Key? key,
     required bool addShowButton,
+    bool showSignInText = true,
     List<PageRouteInfo>? children,
   }) : super(
          OtpVerificationRoute.name,
-         args: OtpVerificationRouteArgs(key: key, addShowButton: addShowButton),
+         args: OtpVerificationRouteArgs(
+           key: key,
+           addShowButton: addShowButton,
+           showSignInText: showSignInText,
+         ),
          initialChildren: children,
        );
 
@@ -334,32 +339,42 @@ class OtpVerificationRoute extends PageRouteInfo<OtpVerificationRouteArgs> {
       return OtpVerificationView(
         key: args.key,
         addShowButton: args.addShowButton,
+        showSignInText: args.showSignInText,
       );
     },
   );
 }
 
 class OtpVerificationRouteArgs {
-  const OtpVerificationRouteArgs({this.key, required this.addShowButton});
+  const OtpVerificationRouteArgs({
+    this.key,
+    required this.addShowButton,
+    this.showSignInText = true,
+  });
 
   final Key? key;
 
   final bool addShowButton;
 
+  final bool showSignInText;
+
   @override
   String toString() {
-    return 'OtpVerificationRouteArgs{key: $key, addShowButton: $addShowButton}';
+    return 'OtpVerificationRouteArgs{key: $key, addShowButton: $addShowButton, showSignInText: $showSignInText}';
   }
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     if (other is! OtpVerificationRouteArgs) return false;
-    return key == other.key && addShowButton == other.addShowButton;
+    return key == other.key &&
+        addShowButton == other.addShowButton &&
+        showSignInText == other.showSignInText;
   }
 
   @override
-  int get hashCode => key.hashCode ^ addShowButton.hashCode;
+  int get hashCode =>
+      key.hashCode ^ addShowButton.hashCode ^ showSignInText.hashCode;
 }
 
 /// generated route for

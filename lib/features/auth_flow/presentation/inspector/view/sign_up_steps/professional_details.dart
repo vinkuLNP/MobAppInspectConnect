@@ -204,16 +204,6 @@ class ProfessionalDetailsStep extends StatelessWidget {
       ),
       itemCount: canAddMore ? totalDocs + 1 : totalDocs,
       itemBuilder: (ctx, i) {
-        // if (i < prov.existingDocumentUrls.length) {
-        //   final url = prov.existingDocumentUrls[i];
-        //   final name = url.split('/').last;
-
-        //   return _documentTile(
-        //     name: name,
-        //     onDelete: () => prov.removeExistingDocumentAt(i),
-        //     // onTap: () => prov.openDocument(url),
-        //   );
-        // }
         if (i < prov.existingDocumentUrls.length) {
           final url = prov.existingDocumentUrls[i];
           final name = url.split('/').last;
@@ -230,19 +220,6 @@ class ProfessionalDetailsStep extends StatelessWidget {
             onDelete: () => prov.removeExistingDocumentAt(i),
           );
         }
-
-        // final docIndex = i - prov.existingDocumentUrls.length;
-        // if (docIndex < prov.documents.length) {
-        //   final file = prov.documents[docIndex];
-        //   final name = file.path.split('/').last;
-
-        //   return _documentTile(
-        //     name: name,
-        //     onDelete: () => prov.removeDocumentAt(docIndex),
-        //     // onTap: () => prov.openLocalDocument(file),
-        //   );
-        // }
-
         final docIndex = i - prov.existingDocumentUrls.length;
         if (docIndex < prov.documents.length) {
           final file = prov.documents[docIndex];

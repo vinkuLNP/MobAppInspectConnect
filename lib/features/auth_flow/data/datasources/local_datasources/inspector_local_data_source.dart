@@ -88,13 +88,6 @@ class InspectorSignUpLocalDataSource {
         case 'profileImage':
           if (v != null) entity.profileImage = v as String?;
           break;
-        //      case 'uploadedIdOrLicenseDocument':
-        // if (v != null) {
-        //   entity.uploadedIdOrLicenseDocument =
-        //       jsonEncode((v as UserDocumentEntity).toJson());
-        // }
-        // break;
-
         case 'uploadedIdOrLicenseDocument':
           if (v != null) {
             final doc = UserDocumentEntity(
@@ -151,9 +144,6 @@ class InspectorSignUpLocalDataSource {
         case 'deviceType':
           entity.deviceType = v as String?;
           break;
-        case 'privateTempId':
-          entity.privateTempId = v as String?;
-          break;
         case 'deviceToken':
           entity.deviceToken = v as String?;
           break;
@@ -168,7 +158,6 @@ class InspectorSignUpLocalDataSource {
           if (v is Iterable) {
             final incoming = v.cast<Map<String, dynamic>>();
 
-            // Remove deleted docs
             entity.iccDocuments.removeWhere(
               (old) => !incoming.any((n) => n['id'] == old.documentId),
             );
@@ -248,7 +237,6 @@ class InspectorSignUpLocalDataSource {
     final list = await _database.getAll<InspectorSignUpLocalEntity>();
     if (list != null && list.isNotEmpty) {
       final entity = list.first;
-      // _restoreUploadedDocuments(entity);
 
       log('🔍 Retrieved inspector signup data: ${jsonEncode(entity.toJson())}');
       return entity;
@@ -256,58 +244,7 @@ class InspectorSignUpLocalDataSource {
     return null;
   }
 
-  // void _persistUploadedDocuments(InspectorSignUpLocalEntity entity) {
-  //   final shadow = <String, dynamic>{};
-
-  //   if (entity.uploadedIdOrLicenseDocument != null) {
-  //     shadow['idOrLicense'] = entity.uploadedIdOrLicenseDocument!.toJson();
-  //   }
-
-  //   if (entity.uploadedCoiDocument != null) {
-  //     shadow['coi'] = entity.uploadedCoiDocument!.toJson();
-  //   }
-
-  //   if (shadow.isNotEmpty) {
-  //     entity.privateTempId = '__DOCS__${jsonEncode(shadow)}';
-  //   }
-  // }
-
   Future<void> clear() async {
     _database.clear<InspectorSignUpLocalEntity>();
-  }
-
-  // void _restoreUploadedDocuments(InspectorSignUpLocalEntity entity) {
-  //   final raw = entity.privateTempId;
-
-  //   if (raw == null || !raw.startsWith('__DOCS__')) return;
-
-  //   try {
-  //     final data = jsonDecode(raw.replaceFirst('__DOCS__', ''));
-
-  //     if (data['idOrLicense'] != null) {
-  //       entity.uploadedIdOrLicenseDocument = UserDocumentDataModel.fromJson(
-  //         Map<String, dynamic>.from(data['idOrLicense']),
-  //       );
-  //     }
-
-  //     if (data['coi'] != null) {
-  //       entity.uploadedCoiDocument = UserDocumentDataModel.fromJson(
-  //         Map<String, dynamic>.from(data['coi']),
-  //       );
-  //     }
-  //   } catch (e) {
-  //     log('❌ Failed to restore uploaded documents: $e');
-  //   }
-  // }
-
-  Future<String> getPrivateTempId() async {
-    final entity = await _getOrCreate();
-
-    if (entity.privateTempId == null || entity.privateTempId!.isEmpty) {
-      entity.privateTempId = generatePrivateTempId();
-      _database.saveInspector(entity);
-    }
-
-    return entity.privateTempId!;
   }
 }

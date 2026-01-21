@@ -47,9 +47,7 @@ class _AdditionalDetailsStepState extends State<AdditionalDetailsStep> {
                   title: profileImageOptional,
                   child: _imageUploader(
                     context: context,
-                    files:
-                        prov.profileImageUrl != null &&
-                            prov.profileImage != null
+                    files: prov.profileImage != null
                         ? [prov.profileImage!]
                         : [],
                     maxFiles: 1,

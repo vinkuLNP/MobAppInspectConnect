@@ -8,9 +8,12 @@ import 'package:inspect_connect/core/utils/constants/app_colors.dart';
 import 'package:inspect_connect/core/utils/constants/app_strings.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/features/auth_flow/data/datasources/local_datasources/inspector_local_data_source.dart';
+import 'package:inspect_connect/features/auth_flow/data/models/document_model.dart';
+import 'package:inspect_connect/features/auth_flow/data/models/service_model.dart';
 import 'package:inspect_connect/features/auth_flow/data/models/settings_model.dart';
 import 'package:inspect_connect/features/auth_flow/data/models/ui_icc_document.dart';
 import 'package:inspect_connect/features/auth_flow/data/models/user_document_data_model.dart';
+import 'package:inspect_connect/features/auth_flow/domain/entities/auth_user.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/certificate_type_entity.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/icc_document_entity.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/inspector_documents_type.dart';
@@ -29,6 +32,8 @@ import 'package:inspect_connect/features/auth_flow/utils/text_editor_controller.
 import 'package:inspect_connect/features/client_flow/data/models/upload_image_model.dart';
 import 'package:inspect_connect/features/client_flow/domain/entities/upload_image_dto.dart';
 import 'package:inspect_connect/features/client_flow/domain/usecases/upload_image_usecase.dart';
+import 'package:inspect_connect/features/client_flow/presentations/providers/user_provider.dart';
+import 'package:provider/provider.dart';
 
 class InspectorViewModelProvider extends BaseViewModel {
   Future<void> init() async {
@@ -124,7 +129,6 @@ class InspectorViewModelProvider extends BaseViewModel {
         }
         return;
       }
-      final privateTempId = await localDs.getPrivateTempId();
 
       final uploadUseCase = locator<UploadImageUseCase>();
 
@@ -135,11 +139,7 @@ class InspectorViewModelProvider extends BaseViewModel {
           >(
             useCase: uploadUseCase,
             query: UploadImageParams(
-              uploadImageDto: UploadImageDto(
-                filePath: file.path,
-                privateTempId: privateTempId,
-                fileType: 'sensitive',
-              ),
+              uploadImageDto: UploadImageDto(filePath: file.path),
             ),
             launchLoader: true,
           );
@@ -535,7 +535,7 @@ class InspectorViewModelProvider extends BaseViewModel {
 
   final Map<String, TextEditingController> cityZipControllers = {};
 
-  final Map<String, String> cityZipCodes = {};
+  Map<String, String> cityZipCodes = {};
 
   TextEditingController getCityZipController(String city) {
     return cityZipControllers.putIfAbsent(
@@ -632,6 +632,9 @@ class InspectorViewModelProvider extends BaseViewModel {
     return true;
   }
 
+  IccDocumentLocalEntity? coiDoc;
+  IccDocumentLocalEntity? idDoc;
+
   Future<void> pickIccExpiryDate(
     BuildContext context,
     IccDocumentLocalEntity doc,
@@ -647,5 +650,156 @@ class InspectorViewModelProvider extends BaseViewModel {
       doc.expiryDate = picked.toIso8601String().split('T').first;
       notify();
     }
+  }
+
+  UserDocument? firstByType(List<UserDocument>? docs, String type) {
+    if (docs == null) return null;
+
+    for (final d in docs) {
+      if (d.documentType!.name == type) return d;
+    }
+    return null;
+  }
+
+  Future<void> initFromUser(AuthUser user, BuildContext context) async {
+    log(
+      '🌐 Hydrating UI from API user0000-------user data  ${user.toString()}',
+    );
+    log(
+      '---------------> user getting profile image- 1 toDomainEntity? get user----${user.profileImage.toString()}',
+    );
+    final user2 = await context.read<UserProvider>().refreshUserFromServer(
+      context,
+    );
+    log(
+      '---------------> user getting profile image- 1 toDomainEntity? get user----${user2!.profileImage.toString()}',
+    );
+    init();
+
+    inspFullNameCtrl.text = user.name ?? '';
+    inspPhoneCtrl.text = user.phoneNumber ?? '';
+    phoneE164 = user.phoneNumber;
+    inspEmailCtrlSignUp.text = user.emailHashed ?? '';
+
+    mailingAddress = user.mailingAddress;
+    inspMailingAddressController.text = user.mailingAddress ?? '';
+    cityZipCodes = {
+      for (var area in user.serviceAreas!) area.cityName: area.zipCode,
+    };
+
+    if (user.profileImage != null &&
+        user.profileImage!.isNotEmpty &&
+        user.profileImage != 'null') {
+      profileImageUrl = user.profileImage;
+      profileImage = File(user.profileImage.toString());
+    }
+
+    if (user.phoneNumber != null && user.phoneNumber!.isNotEmpty) {
+      String dial = user.countryCode ?? '+91';
+      String raw = user.phoneNumber!;
+
+      final match = RegExp(r'^\+(\d{1,3})(\d+)$').firstMatch(raw);
+      if (match != null) {
+        dial = '+${match.group(1)}';
+        raw = match.group(2)!;
+      }
+
+      setPhoneParts(iso: '', dial: dial, number: raw, e164: user.phoneNumber!);
+    }
+    userCertificateInspectorType = certificateType.firstWhere(
+      (e) => e.id == user.certificateTypeId,
+    );
+    fetchCertificateTypes(savedId: user.certificateTypeId.toString());
+    // selectedCertificateTypeId = user.certificateTypeId;
+
+    if (user.certificateExpiryDate != null) {
+      setDate(DateTime.parse(user.certificateExpiryDate!));
+    }
+
+    uploadedCertificateUrls = user.certificateDocuments ?? [];
+    existingDocumentUrls = List.from(uploadedCertificateUrls);
+
+    inspWorkHistoryController.text = user.workHistoryDescription ?? '';
+
+    agreedToTerms = user.agreedToTerms;
+    confirmTruth = user.isTruthfully;
+
+    serviceAreas = user.serviceAreas?.map((e) => e.toLocal()).toList() ?? [];
+
+    if (user.serviceAreas != null && user.serviceAreas!.isNotEmpty) {
+      final areas = user.serviceAreas!;
+
+      await loadCountries();
+
+      final first = areas.first;
+
+      countryCode = first.countryCode;
+      stateCode = first.stateCode;
+
+      selectedCountryCode = first.countryCode;
+      selectedStateCode = first.stateCode;
+
+      selectedCities = areas.map((e) => e.cityName).toList();
+      selectedCityNames = List.from(selectedCities);
+
+      countryError = null;
+      stateError = null;
+      cityError = null;
+
+      await loadStates(first.countryCode);
+      await loadCities(first.countryCode);
+
+      setUserCurrentLocation();
+
+      cityZipCodes.clear();
+      for (final area in areas) {
+        if (area.cityName != null && area.zipCode != null) {
+          cityZipCodes[area.cityName!] = area.zipCode!;
+        }
+      }
+    }
+
+    recalculateCityIccRequirement();
+
+    final coiDoc = firstByType(user.documents, 'COI');
+    final idDoc = firstByType(user.documents, 'ID');
+
+    if (coiDoc != null) {
+      coiUploadedUrl = UserDocumentDataModel(
+        documentUrl: coiDoc.fileUrl,
+        fileName: coiDoc.fileName,
+      );
+      coiFile = File(coiDoc.fileUrl.toString());
+
+      if (coiDoc.expiryDate != null) {
+        coiExpiry = DateTime.parse(coiDoc.expiryDate.toString());
+      }
+    }
+
+    if (idDoc != null) {
+      idDocumentUploadedUrl = UserDocumentDataModel(
+        documentUrl: idDoc.fileUrl,
+        fileName: idDoc.fileName,
+      );
+      idDocumentFile = File(idDoc.fileUrl.toString());
+
+      if (idDoc.expiryDate != null) {
+        selectedIdDocExpiry = DateTime.parse(idDoc.expiryDate.toString());
+      }
+    }
+
+    iccDocsByCity.clear();
+
+    final iccDocs =
+        user.documents?.where((d) => d.documentType!.name == 'ICC') ?? [];
+
+    for (final doc in iccDocs) {
+      if (doc.serviceCity == null) continue;
+
+      iccDocsByCity.putIfAbsent(doc.serviceCity!, () => []);
+      iccDocsByCity[doc.serviceCity!]!.add(doc.toIccUi());
+    }
+
+    notifyListeners();
   }
 }

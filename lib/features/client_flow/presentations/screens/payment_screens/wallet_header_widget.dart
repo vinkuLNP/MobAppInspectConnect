@@ -86,7 +86,6 @@ class WalletHeaderCard extends StatelessWidget {
               Expanded(
                 child: AppButton(
                   text: isStripeReady ? addMoney : "Connect Stripe",
-                  // addMoney,
                   isLoading: provider.isConnectingStripe,
                   onTap: () {
                     if (!isStripeReady) {

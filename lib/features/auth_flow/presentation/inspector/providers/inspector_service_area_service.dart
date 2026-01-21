@@ -83,12 +83,22 @@ class InspectorServiceAreaService {
   bool isJurisdictionCity(String cityName) {
     log('--- Jurisdiction comparison start ---');
     log('Incoming city: "$cityName"');
+    log('Incoming normalized: "${cityName.toLowerCase().trim()}"');
+    final jurisdictionCities = provider.jurisdictions
+        .map((j) => j.name)
+        .toList();
+    final normalizedJurisdictionCities = provider.jurisdictions
+        .map((j) => j.name.toLowerCase().trim())
+        .toList();
+
+    log('Normalized jurisdiction cities: $normalizedJurisdictionCities');
+
+    log('Jurisdiction cities: $jurisdictionCities');
 
     for (final j in provider.jurisdictions) {
       log(
-        'Comparing with jurisdiction: '
-        '"${j.name}" → '
-        '("${j.name.toLowerCase().trim()}")',
+        'Jurisdiction city: '
+        '"${j.name}" → normalized: "${j.name.toLowerCase().trim()}"',
       );
     }
 

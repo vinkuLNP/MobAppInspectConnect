@@ -13,6 +13,7 @@ import 'package:inspect_connect/core/utils/helpers/app_flavor_helper/environment
 import 'package:flutter/material.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/auth_user_provider.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/client/client_view_model.dart';
+import 'package:inspect_connect/features/auth_flow/presentation/inspector/inspector_view_model.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/booking_provider.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/notification_provider.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/session_manager.dart';
@@ -92,6 +93,10 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider.value(value: locator<NotificationProvider>()),
         ChangeNotifierProvider.value(value: locator<AuthFlowProvider>()),
         ChangeNotifierProvider.value(value: locator<WalletProvider>()),
+        ChangeNotifierProvider.value(
+          value: locator<InspectorViewModelProvider>(),
+        ),
+
         ChangeNotifierProvider.value(value: locator<ClientViewModelProvider>()),
         ChangeNotifierProvider.value(
           value: locator<InspectorDashboardProvider>(),

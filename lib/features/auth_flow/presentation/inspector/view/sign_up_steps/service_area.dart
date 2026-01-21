@@ -289,7 +289,6 @@ class _ServiceAreaStepState extends State<ServiceAreaStep> {
                             city,
                             vm.iccDocsByCity[city]![index].documentId,
                           ),
-                          // vm.iccDocsByCity[city]!.removeAt(index),
                           onPickExpiry: (index, date) {
                             vm.iccDocsByCity[city]![index].expiryDate = date;
                             vm.validateServiceArea();

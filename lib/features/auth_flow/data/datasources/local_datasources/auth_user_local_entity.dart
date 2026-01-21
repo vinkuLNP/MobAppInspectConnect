@@ -142,6 +142,7 @@ class AuthUserLocalEntity {
     String? stripeAccountId,
     String? stripeCustomerId,
     UserLocation? location,
+    String? profileImage,
     List<UserDevice>? devices,
   }) {
     return AuthUserLocalEntity(
@@ -156,94 +157,13 @@ class AuthUserLocalEntity {
       emailOtpVerified: emailOtpVerified ?? this.emailOtpVerified,
       agreedToTerms: agreedToTerms ?? this.agreedToTerms,
       isTruthfully: isTruthfully ?? this.isTruthfully,
+      profileImage: profileImage ?? this.profileImage,
       walletId: walletId ?? this.walletId,
       stripeAccountId: stripeAccountId ?? this.stripeAccountId,
       stripeCustomerId: stripeCustomerId ?? this.stripeCustomerId,
       mailingAddress: mailingAddress ?? this.mailingAddress,
     );
   }
-
-  //   factory AuthUserLocalEntity.fromApiResponse(Map<String, dynamic> response) {
-  //     final user = response['body'];
-  //     final location = user?['location'];
-
-  //     double? latitude;
-  //     double? longitude;
-  //     String? locationName;
-
-  //     if (location != null && location['coordinates'] != null) {
-  //       longitude = (location['coordinates'][0] as num?)?.toDouble();
-  //       latitude = (location['coordinates'][1] as num?)?.toDouble();
-  //       locationName = location['locationName'];
-  //     }
-
-  //     return AuthUserLocalEntity(
-  //       userId: user['_id'],
-  //       name: user['name'],
-  //       email: user['email'],
-  //       phoneNumber: user['phoneNumber'],
-  //       countryCode: user['countryCode'],
-  //       mailingAddress: user['mailingAddress'],
-  //       role: user['role'],
-  //       status: user['status'],
-  //       statusUpdatedByAdmin: user['statusUpdatedByAdmin'],
-  //       phoneOtpVerified: user['phoneOtpVerified'],
-  //       emailOtpVerified: user['emailOtpVerified'],
-  //       agreedToTerms: user['agreedToTerms'],
-  //       isTruthfully: user['isTruthfully'],
-  //       bookingInProgress: user['bookingInProgress'],
-  //       isDeleted: user['isDeleted'],
-  //       profileImage: user['profileImage'] == "null"
-  //           ? null
-  //           : user['profileImage'],
-  //       country: user['country'],
-  //       state: user['state'],
-  //       city: user['city'],
-  //       zipCode: user['zip'],
-
-  //       certificateApproved: user['certificateApproved'],
-  //       rejectedReason: user['rejectedReason'],
-  //       certificateTypeId: user['certificateTypeId']?['_id'],
-  //       certificateDocuments: List<String>.from(
-  //         user['certificateDocuments'] ?? [],
-  //       ),
-  //       certificateExpiryDate: user['certificateExpiryDate'],
-
-  //       documentTypeId: user['documentTypeId']?['_id'],
-  //       documentExpiryDate: user['documentExpiryDate'],
-  //       coiExpiryDate: user['coiExpiryDate'],
-
-  //       stripeCustomerId: user['stripeCustomerId'],
-  //       stripeAccountId: user['stripeAccountId'],
-  //       stripePayoutsEnabled: user['stripePayoutsEnabled'],
-  //       stripeTransfersEnabled: user['stripeTransfersEnabled'],
-  //       stripeSubscriptionStatus: user['stripeSubscriptionStatus'],
-  //       currentSubscriptionId: user['currentSubscriptionId'] != null
-  //           ? (user['currentSubscriptionId'] is String
-  //                 ? CurrentSubscription(id: user['currentSubscriptionId'])
-  //                 : CurrentSubscription.fromJson(user['currentSubscriptionId']))
-  //           : null,
-  //       currentSubscriptionTrialDays: user['currentSubscriptionTrialDays'],
-  //       currentSubscriptionAutoRenew: user['currentSubscriptionAutoRenew'],
-
-  //       walletId: user['walletId'],
-  //       docxOk: user['docxOk'],
-  //       connectorLinkUrl: user['connectorLinkUrl'],
-
-  //       locationName: locationName,
-  //       latitude: latitude,
-  //       longitude: longitude,
-
-  //       serviceAreasJson: jsonEncode(user['serviceAreas'] ?? []),
-  //       documentsJson: jsonEncode(user['documents'] ?? []),
-
-  //       loginTime: user['loginTime'] != null
-  //           ? DateTime.parse(user['loginTime'])
-  //           : null,
-  //       createdAt: DateTime.parse(user['createdAt']),
-  //       updatedAt: DateTime.parse(user['updatedAt']),
-  //     );
-  //   }
 }
 
 @Entity()
