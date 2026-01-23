@@ -88,7 +88,7 @@ class ProfessionalDetailsStep extends StatelessWidget {
       fit: BoxFit.cover,
       width: double.infinity,
       height: double.infinity,
-      errorBuilder: (_, __, ___) =>
+      errorBuilder: (_, _, _) =>
           const Center(child: Icon(Icons.broken_image, color: Colors.grey)),
     );
   }
@@ -99,7 +99,7 @@ class ProfessionalDetailsStep extends StatelessWidget {
       fit: BoxFit.cover,
       width: double.infinity,
       height: double.infinity,
-      errorBuilder: (_, __, ___) =>
+      errorBuilder: (_, _, _) =>
           const Center(child: Icon(Icons.broken_image, color: Colors.grey)),
       loadingBuilder: (c, w, p) {
         if (p == null) return w;
@@ -200,7 +200,7 @@ class ProfessionalDetailsStep extends StatelessWidget {
         crossAxisCount: 2,
         mainAxisSpacing: spacing,
         crossAxisSpacing: spacing,
-        childAspectRatio: 3,
+        childAspectRatio: 1.6,
       ),
       itemCount: canAddMore ? totalDocs + 1 : totalDocs,
       itemBuilder: (ctx, i) {

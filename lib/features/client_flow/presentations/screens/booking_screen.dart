@@ -618,10 +618,12 @@ class _BookingsScreenState extends State<BookingsScreen> {
                   _infoRow("⏰ $timeTxt", booking.bookingTime),
                   _infoRow("📍 $locationTxt", booking.bookingLocation),
                   _infoRow("📝 $descriptionTxt", booking.description),
-                  _infoRow(
-                    "⏱ $durationTxt",
-                    booking.timerDuration?.toString() ?? zeroMinutes,
-                  ),
+                  booking.timerDuration != null && booking.timerDuration! > 0
+                      ? _infoRow(
+                          "⏱ $durationTxt",
+                          formatDuration(booking.timerDuration ?? 0),
+                        )
+                      : SizedBox(),
 
                   const SizedBox(height: 20),
                   Divider(color: Colors.grey[300]),
@@ -634,19 +636,13 @@ class _BookingsScreenState extends State<BookingsScreen> {
 
                   const SizedBox(height: 10),
                   textWidget(
-                    text: paymentDeductionInfoTxt(160.00),
+                    text: paymentDeductionInfoTxt(
+                      double.parse(booking.totalBillingAmount.toString()),
+                    ),
 
                     color: Colors.grey[700]!,
                     height: 1.4,
                   ),
-
-                  const SizedBox(height: 8),
-                  textWidget(
-                    text: rateCalculationTxt(rate: 160, blocks: 1),
-                    color: Colors.grey[600]!,
-                    fontSize: 13,
-                  ),
-
                   const SizedBox(height: 30),
 
                   Column(
@@ -716,7 +712,6 @@ class _BookingsScreenState extends State<BookingsScreen> {
                         iconLeftMargin: 10,
                         onTap: () async {
                           log(booking.inspector!.id.toString());
-                          // log(booking.inspectorId.toString());
                           log(booking.id.toString());
 
                           final user = context.read<UserProvider>().user;
@@ -741,6 +736,16 @@ class _BookingsScreenState extends State<BookingsScreen> {
         );
       },
     );
+  }
+
+  String formatDuration(int seconds) {
+    final hours = seconds ~/ 3600;
+    final minutes = (seconds % 3600) ~/ 60;
+
+    if (hours > 0) {
+      return '$hours hr $minutes min';
+    }
+    return '$minutes min';
   }
 
   Widget _infoRow(String label, String value) {
@@ -946,7 +951,6 @@ class _BookingsScreenState extends State<BookingsScreen> {
 
     await showDialog(
       context: context,
-      // barrierDismissible: false,
       builder: (context) {
         return StatefulBuilder(
           builder: (context, setState) {

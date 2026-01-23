@@ -1,4 +1,3 @@
-import 'package:inspect_connect/features/auth_flow/data/models/user_document_data_model.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/icc_document_entity.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/service_area_entity.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/user_document_entity.dart';

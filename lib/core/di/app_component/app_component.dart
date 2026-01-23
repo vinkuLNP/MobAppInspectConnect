@@ -35,12 +35,14 @@ import 'package:inspect_connect/features/client_flow/domain/usecases/get_booking
 import 'package:inspect_connect/features/client_flow/domain/usecases/get_certificate_subtype_usecase.dart';
 import 'package:inspect_connect/features/client_flow/domain/usecases/get_user_payments_usecase.dart';
 import 'package:inspect_connect/features/client_flow/domain/usecases/get_user_wallet_amount_usecase.dart';
+import 'package:inspect_connect/features/client_flow/domain/usecases/late_cancellation_usecase.dart';
 import 'package:inspect_connect/features/client_flow/domain/usecases/notification_use_case.dart';
 import 'package:inspect_connect/features/client_flow/domain/usecases/onboarding_usecase.dart';
 import 'package:inspect_connect/features/client_flow/domain/usecases/update_booking_detail_usecase.dart';
 import 'package:inspect_connect/features/client_flow/domain/usecases/update_booking_status.dart';
 import 'package:inspect_connect/features/client_flow/domain/usecases/update_booking_timer.dart';
 import 'package:inspect_connect/features/client_flow/domain/usecases/upload_image_usecase.dart';
+import 'package:inspect_connect/features/client_flow/domain/usecases/withdraw_money_usecase.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/booking_provider.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/notification_provider.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/session_manager.dart';
@@ -109,6 +111,8 @@ void setupLocator() {
   locator.registerLazySingleton(() => UpdateBookingStatusUseCase(locator()));
   locator.registerLazySingleton(() => UpdateBookingTimerUseCase(locator()));
   locator.registerLazySingleton(() => ShowUpFeeStatusUseCase(locator()));
+  locator.registerLazySingleton(() => LateCancellationUseCase(locator()));
+
   locator.registerLazySingleton(() => GetAgencyUseCase(locator()));
   locator.registerLazySingleton(() => GetCertificateTypeUseCase(locator()));
   locator.registerLazySingleton(() => InspectorSignUpUseCase(locator()));
@@ -118,6 +122,8 @@ void setupLocator() {
   );
 
   locator.registerLazySingleton(() => FetchBookingsUseCase(locator()));
+  locator.registerLazySingleton(() => WithdrawMoneyUsecase(locator()));
+
   locator.registerLazySingleton<SocketService>(() => SocketService());
 
   locator.registerLazySingleton(() => UploadImageUseCase(locator()));

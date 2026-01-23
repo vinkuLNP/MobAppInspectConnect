@@ -5,6 +5,7 @@ import 'package:inspect_connect/features/client_flow/data/models/notification_mo
 import 'package:inspect_connect/features/client_flow/data/models/upload_image_model.dart';
 import 'package:inspect_connect/features/client_flow/data/models/user_payment_list_model.dart';
 import 'package:inspect_connect/features/client_flow/data/models/wallet_model.dart';
+import 'package:inspect_connect/features/client_flow/data/models/withdraw_response_model.dart';
 import 'package:inspect_connect/features/client_flow/domain/entities/upload_image_dto.dart';
 import 'package:inspect_connect/features/client_flow/domain/entities/booking_entity.dart';
 import 'package:inspect_connect/features/client_flow/domain/entities/certificate_sub_type_entity.dart';
@@ -25,6 +26,7 @@ abstract class ClientUserRepository {
     String? sortBy,
     String? sortOrder,
     int? status,
+    int? type,
   });
   Future<ApiResultModel<List<NotificationModel>>> getNotifications({
     required int page,
@@ -50,6 +52,9 @@ abstract class ClientUserRepository {
     String bookingId,
     int status,
   );
+  Future<ApiResultModel<WithdrawMoneyModel>> withdrawMoney({
+    required int amount,
+  });
   Future<ApiResultModel<String>> deductTransferWallet(
     String bookingId,
     String transferToId,
@@ -59,7 +64,12 @@ abstract class ClientUserRepository {
     String bookingId,
     bool showUpFeeApplied,
   );
-
+  Future<ApiResultModel<BookingData>> lateCancellation(
+    String bookingId,
+    int status,
+    String clientId,
+    bool lateCancellation,
+  );
   Future<ApiResultModel<BookingData>> updateBookingTimer(
     String bookingId,
     String action,

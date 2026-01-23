@@ -20,27 +20,21 @@ class WalletView extends StatelessWidget {
     final wallet = provider.wallet;
     final payments = provider.payments;
 
-    return SingleChildScrollView(
-      physics: const AlwaysScrollableScrollPhysics(),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-        child: Column(
-          children: [
-            WalletHeaderCard(
-              balance: wallet?.available ?? 0,
-              pending: wallet?.pending ?? 0,
-              onAddMoney: onAddMoney,
-              provider: provider,
-              onWithdraw: onWithdraw,
-            ),
-            const SizedBox(height: 24),
-            RecentTransactions(
-              payments: payments,
-              isFetching: provider.isFetching,
-            ),
-          ],
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+      children: [
+        WalletHeaderCard(
+          balance: wallet?.available ?? 0,
+          totalAmount: wallet?.totalAmount ?? 0,
+          pending: wallet?.pending ?? 0,
+          onAddMoney: onAddMoney,
+          provider: provider,
+          onWithdraw: onWithdraw,
         ),
-      ),
+        const SizedBox(height: 24),
+        RecentTransactions(payments: payments, isFetching: provider.isFetching),
+        const SizedBox(height: 80),
+      ],
     );
   }
 }

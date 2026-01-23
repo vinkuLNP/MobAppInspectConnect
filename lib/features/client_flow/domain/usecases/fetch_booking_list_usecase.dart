@@ -11,6 +11,7 @@ class FetchBookingsParams extends Equatable {
   final String? sortBy;
   final String? sortOrder;
   final int? status;
+  final int? type;
 
   const FetchBookingsParams({
     required this.page,
@@ -19,10 +20,11 @@ class FetchBookingsParams extends Equatable {
     this.sortBy,
     this.sortOrder,
     this.status,
+    this.type,
   });
 
   @override
-  List<Object?> get props => [page, perPageLimit, search, sortBy, sortOrder, status];
+  List<Object?> get props => [page, perPageLimit, search, sortBy, sortOrder, status,type];
 }
 
 class FetchBookingsUseCase extends BaseParamsUseCase<List<BookingData>, FetchBookingsParams> {
@@ -38,6 +40,7 @@ class FetchBookingsUseCase extends BaseParamsUseCase<List<BookingData>, FetchBoo
       sortBy: p.sortBy,
       sortOrder: p.sortOrder,
       status: p.status,
+      type: p.type,
     );
   }
 }

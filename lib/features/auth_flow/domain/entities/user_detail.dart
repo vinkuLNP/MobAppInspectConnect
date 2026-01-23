@@ -1,8 +1,6 @@
 import 'package:inspect_connect/features/auth_flow/data/models/document_model.dart';
 import 'package:inspect_connect/features/auth_flow/data/models/service_model.dart';
 import 'package:inspect_connect/features/auth_flow/data/models/user_document_data_model.dart';
-import 'package:inspect_connect/features/auth_flow/domain/entities/icc_document_entity.dart';
-import 'package:inspect_connect/features/auth_flow/domain/entities/user_api_document.dart';
 
 class UserDetail {
   final String id;

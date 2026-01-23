@@ -6,6 +6,7 @@ import 'package:inspect_connect/features/client_flow/data/models/notification_mo
 import 'package:inspect_connect/features/client_flow/data/models/upload_image_model.dart';
 import 'package:inspect_connect/features/client_flow/data/models/user_payment_list_model.dart';
 import 'package:inspect_connect/features/client_flow/data/models/wallet_model.dart';
+import 'package:inspect_connect/features/client_flow/data/models/withdraw_response_model.dart';
 import 'package:inspect_connect/features/client_flow/domain/entities/upload_image_dto.dart';
 import 'package:inspect_connect/features/client_flow/domain/entities/booking_entity.dart';
 import 'package:inspect_connect/features/client_flow/domain/entities/certificate_sub_type_entity.dart';
@@ -35,6 +36,13 @@ class ClientUserRepositoryImpl implements ClientUserRepository {
   }
 
   @override
+  Future<ApiResultModel<WithdrawMoneyModel>> withdrawMoney({
+    required int amount,
+  }) {
+    return remote.withdrawMoney(amount);
+  }
+
+  @override
   Future<ApiResultModel<String>> onBoardingUser() {
     return remote.onBoardingUser();
   }
@@ -54,6 +62,7 @@ class ClientUserRepositoryImpl implements ClientUserRepository {
     String? sortBy,
     String? sortOrder,
     int? status,
+    int? type
   }) {
     return remote.getBookingList(
       page: page,
@@ -62,6 +71,7 @@ class ClientUserRepositoryImpl implements ClientUserRepository {
       sortBy: sortBy,
       sortOrder: sortOrder,
       status: status,
+      type: type,
     );
   }
 
@@ -133,6 +143,21 @@ class ClientUserRepositoryImpl implements ClientUserRepository {
     bool status,
   ) {
     return remote.showUpFeeStatus(bookingId, status);
+  }
+
+  @override
+  Future<ApiResultModel<BookingData>> lateCancellation(
+    String bookingId,
+    int status,
+    String clientId,
+    bool lateCancellation,
+  ) {
+    return remote.lateCancellation(
+      bookingId,
+      status,
+      clientId,
+      lateCancellation,
+    );
   }
 
   @override

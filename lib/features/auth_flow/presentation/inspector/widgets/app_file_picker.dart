@@ -32,7 +32,7 @@ class AppFilePickerGrid extends StatelessWidget {
       return Image.file(
         doc.localFile!,
         fit: BoxFit.cover,
-        errorBuilder: (_, __, ___) =>
+        errorBuilder: (_, _, _) =>
             const Icon(Icons.broken_image, color: Colors.grey),
       );
     }
@@ -41,7 +41,7 @@ class AppFilePickerGrid extends StatelessWidget {
       return Image.network(
         doc.uploadedUrl!,
         fit: BoxFit.cover,
-        errorBuilder: (_, __, ___) =>
+        errorBuilder: (_, _, _) =>
             const Icon(Icons.broken_image, color: Colors.grey),
       );
     }
@@ -112,22 +112,6 @@ class AppFilePickerGrid extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
-
-  bool _isImage(String path) {
-    final ext = path.split('.').last.toLowerCase();
-    return ['jpg', 'jpeg', 'png', 'webp', 'gif'].contains(ext);
-  }
-
-  Widget _buildImage(File file) {
-    return Image.file(
-      file,
-      fit: BoxFit.cover,
-      width: double.infinity,
-      height: double.infinity,
-      errorBuilder: (_, __, ___) =>
-          const Center(child: Icon(Icons.broken_image, color: Colors.grey)),
     );
   }
 

@@ -205,7 +205,7 @@ class _BaseInspectionListScreenState extends State<BaseInspectionListScreen>
                         children: [
                           _buildBookingCard(context, booking),
                           index == filteredBookings.length - 1
-                              ? SizedBox(height: 80)
+                              ? SizedBox(height: 130)
                               : SizedBox.shrink(),
                         ],
                       ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/di/services/payment_services/payment_purpose.dart';
 import 'package:inspect_connect/core/di/services/payment_services/payment_request.dart';
 import 'package:inspect_connect/core/utils/app_widgets/card_payment_sheet.dart';
+import 'package:inspect_connect/core/utils/constants/app_colors.dart';
 import 'package:inspect_connect/core/utils/constants/app_strings.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_button.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
@@ -84,10 +85,154 @@ class _WalletScreenState extends State<WalletScreen>
     }
   }
 
-  Future<void> showWithdrawDialog({
+  void showWithdrawDialog({
     required BuildContext context,
     required WalletProvider provider,
-  }) async {
+  }) {
+    final TextEditingController controller = TextEditingController();
+    final ValueNotifier<String?> errorNotifier = ValueNotifier(null);
+    final rootContext = context;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: const Text("Withdraw Money"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppColors.authThemeLightColor.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      "Available Balance",
+                      style: TextStyle(fontSize: 12),
+                    ),
+                    Text(
+                      "\$${provider.wallet!.available.toStringAsFixed(2)}",
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
+              TextField(
+                controller: controller,
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+                decoration: const InputDecoration(
+                  labelText: "Enter amount",
+                  prefixText: "\$ ",
+                  border: OutlineInputBorder(),
+                ),
+                onChanged: (value) {
+                  final entered = double.tryParse(value) ?? 0;
+
+                  if (entered <= 0) {
+                    errorNotifier.value = "Enter a valid amount";
+                  } else if (provider.wallet == null) {
+                    errorNotifier.value = "Insuffiecient balance";
+                  } else if (entered > provider.wallet!.available) {
+                    errorNotifier.value = "Amount exceeds available balance";
+                  } else {
+                    errorNotifier.value = null;
+                  }
+                },
+              ),
+
+              const SizedBox(height: 6),
+
+              ValueListenableBuilder<String?>(
+                valueListenable: errorNotifier,
+                builder: (_, error, _) {
+                  if (error == null) return const SizedBox.shrink();
+                  return Text(
+                    error,
+                    style: const TextStyle(color: Colors.red, fontSize: 11),
+                  );
+                },
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Cancel"),
+            ),
+            ValueListenableBuilder<String?>(
+              valueListenable: errorNotifier,
+              builder: (_, error, _) {
+                return ElevatedButton(
+                  onPressed: error != null
+                      ? null
+                      : () async {
+                          final amount = double.tryParse(
+                            controller.text.trim(),
+                          );
+
+                          if (amount == null || amount < 10) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                  "Minimum withdrawal amount is \$10",
+                                ),
+                              ),
+                            );
+                            return;
+                          }
+
+                          if (amount > (provider.wallet?.available ?? 0)) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text("Insufficient balance"),
+                              ),
+                            );
+                            return;
+                          }
+
+                          Navigator.pop(dialogContext);
+
+                          final message = await provider
+                              .withdrawMoneyFromWallet(amount.toInt());
+
+                          if (!rootContext.mounted) return;
+
+                          provider.refreshAll(rootContext);
+
+                          ScaffoldMessenger.of(rootContext).showSnackBar(
+                            SnackBar(
+                              content: Text(message ?? "Something went wrong"),
+                            ),
+                          );
+                        },
+                  child: const Text("Withdraw"),
+                );
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> showWithdrawDidalog({required WalletProvider provider}) async {
     final controller = TextEditingController();
 
     await showDialog(
@@ -148,8 +293,6 @@ class _WalletScreenState extends State<WalletScreen>
                   }
 
                   Navigator.pop(context);
-
-                  provider.withdrawMoney(amount.toStringAsFixed(2));
                 },
               ),
             ],

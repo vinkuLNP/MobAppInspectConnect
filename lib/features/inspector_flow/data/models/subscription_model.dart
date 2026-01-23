@@ -94,4 +94,5 @@ class SubscriptionPlanModel extends SubscriptionPlanEntity {
         'createdAt': createdAt.toIso8601String(),
         'updatedAt': updatedAt.toIso8601String(),
       };
+ 
 }

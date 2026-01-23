@@ -39,7 +39,10 @@ class SubscriptionScreen extends StatelessWidget {
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
-                    colors: [Colors.black.withValues(alpha:0.4), Colors.transparent],
+                    colors: [
+                      Colors.black.withValues(alpha: 0.4),
+                      Colors.transparent,
+                    ],
                   ),
                 ),
               ),
@@ -66,10 +69,11 @@ class SubscriptionScreen extends StatelessWidget {
 
                     SubscriptionCarousel(
                       plans: provider.subscriptionPlans,
-                      onSubscribe: (plan) {
+                      onSubscribe: (plan, isManual) {
                         provider.fetchUserSubscriptionModel(
                           context: context,
                           plan: plan,
+                          isManual: isManual,
                         );
                       },
                     ),

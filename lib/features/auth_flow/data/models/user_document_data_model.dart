@@ -16,6 +16,7 @@ class UserDocumentDataModel extends UserDocumentEntity {
     );
   }
 
+  @override
   Map<String, dynamic> toJson() => {
     'documentUrl': documentUrl,
     'fileName': fileName,

@@ -1,5 +1,4 @@
 import 'package:inspect_connect/core/utils/helpers/device_helper/device_helper.dart';
-import 'package:inspect_connect/core/utils/presentation/app_common_widgets.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/inspector/inspector_view_model.dart';
 import 'package:inspect_connect/features/auth_flow/utils/text_editor_controller.dart';
 
@@ -12,8 +11,11 @@ class InspectorPersonalStepService {
 
   String? validateEmail(String? v) {
     if (v == null || v.trim().isEmpty) return 'Email is required';
-    final ok = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(v.trim());
-    return ok ? null : 'Enter a valid email';
+
+    final email = v.trim();
+    final regex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+
+    return regex.hasMatch(email) ? null : 'Enter a valid email';
   }
 
   String? validatePhone(String? v) {
@@ -60,7 +62,6 @@ class InspectorPersonalStepService {
 
     final deviceToken = await DeviceInfoHelper.getDeviceToken();
     final deviceType = await DeviceInfoHelper.getDeviceType();
-    final existing = await provider.localDs.getFullData();
     await provider.localDs.updateFields({
       'role': 2,
       'deviceType': deviceType,
