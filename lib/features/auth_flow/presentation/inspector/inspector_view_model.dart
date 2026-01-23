@@ -753,8 +753,8 @@ class InspectorViewModelProvider extends BaseViewModel {
 
       cityZipCodes.clear();
       for (final area in areas) {
-        if (area.cityName != null && area.zipCode != null) {
-          cityZipCodes[area.cityName!] = area.zipCode!;
+        if (area.zipCode != "" && area.zipCode != "null") {
+          cityZipCodes[area.cityName] = area.zipCode;
         }
       }
     }

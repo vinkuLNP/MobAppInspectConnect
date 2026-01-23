@@ -6,6 +6,7 @@ import 'package:inspect_connect/features/client_flow/data/models/notification_mo
 import 'package:inspect_connect/features/client_flow/data/models/upload_image_model.dart';
 import 'package:inspect_connect/features/client_flow/data/models/user_payment_list_model.dart';
 import 'package:inspect_connect/features/client_flow/data/models/wallet_model.dart';
+import 'package:inspect_connect/features/client_flow/data/models/withdraw_response_model.dart';
 import 'package:inspect_connect/features/client_flow/domain/entities/upload_image_dto.dart';
 import 'package:inspect_connect/features/client_flow/domain/entities/booking_entity.dart';
 import 'package:inspect_connect/features/client_flow/domain/entities/certificate_sub_type_entity.dart';
@@ -32,6 +33,14 @@ class ClientUserRepositoryImpl implements ClientUserRepository {
     required UploadImageDto uploadImageDto,
   }) {
     return remote.uploadImage(uploadImageDto);
+  }
+
+
+  @override
+  Future<ApiResultModel<WithdrawMoneyModel>> withdrawMoney({
+    required int amount,
+  }) {
+    return remote.withdrawMoney(amount);
   }
 
   @override

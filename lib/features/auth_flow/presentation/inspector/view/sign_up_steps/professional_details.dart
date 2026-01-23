@@ -88,7 +88,7 @@ class ProfessionalDetailsStep extends StatelessWidget {
       fit: BoxFit.cover,
       width: double.infinity,
       height: double.infinity,
-      errorBuilder: (_, __, ___) =>
+      errorBuilder: (_, _, _) =>
           const Center(child: Icon(Icons.broken_image, color: Colors.grey)),
     );
   }
@@ -99,7 +99,7 @@ class ProfessionalDetailsStep extends StatelessWidget {
       fit: BoxFit.cover,
       width: double.infinity,
       height: double.infinity,
-      errorBuilder: (_, __, ___) =>
+      errorBuilder: (_, _,_) =>
           const Center(child: Icon(Icons.broken_image, color: Colors.grey)),
       loadingBuilder: (c, w, p) {
         if (p == null) return w;

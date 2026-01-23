@@ -20,6 +20,7 @@ import 'package:inspect_connect/features/client_flow/data/models/notification_mo
 import 'package:inspect_connect/features/client_flow/data/models/upload_image_model.dart';
 import 'package:inspect_connect/features/client_flow/data/models/user_payment_list_model.dart';
 import 'package:inspect_connect/features/client_flow/data/models/wallet_model.dart';
+import 'package:inspect_connect/features/client_flow/data/models/withdraw_response_model.dart';
 import 'package:inspect_connect/features/client_flow/domain/entities/booking_entity.dart';
 import 'package:inspect_connect/features/client_flow/domain/entities/upload_image_dto.dart';
 
@@ -29,6 +30,8 @@ abstract class BookingRemoteDataSource {
   Future<ApiResultModel<UploadImageResponseModel>> uploadImage(
     UploadImageDto filePath,
   );
+
+  Future<ApiResultModel<WithdrawMoneyModel>> withdrawMoney(int amount);
   Future<ApiResultModel<String>> onBoardingUser();
   Future<ApiResultModel<CreateBookingResponseModel>> createBooking(
     BookingEntity bookingEnity,
@@ -263,6 +266,47 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
       );
     } catch (e) {
       log('autoremoteresopoonse------> $e');
+      return const ApiResultModel.failure(
+        errorResultEntity: ErrorResultModel(
+          message: "Network error occurred",
+          statusCode: 500,
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<ApiResultModel<WithdrawMoneyModel>> withdrawMoney(int amount) async {
+    try {
+      final user = await locator<AuthLocalDataSource>().getUser();
+      if (user == null || user.authToken == null) {
+        throw Exception(userNotFoundInLocal);
+      }
+      final ApiResultModel<http.Response> res = await _ctx.makeRequest(
+        uri: withdrawMoneyEndPoint,
+        headers: {
+          'Authorization': 'Bearer ${user.authToken}',
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        httpRequestStrategy: PostRequestStrategy(),
+        requestData: {"amount": amount},
+      );
+
+      return res.when(
+        success: (http.Response response) {
+          final Map<String, dynamic> root = response.body.isEmpty
+              ? {}
+              : (jsonDecode(response.body) as Map<String, dynamic>);
+
+          final dto = WithdrawMoneyModel.fromJson(root);
+          return ApiResultModel<WithdrawMoneyModel>.success(data: dto);
+        },
+        failure: (ErrorResultModel e) =>
+            ApiResultModel<WithdrawMoneyModel>.failure(errorResultEntity: e),
+      );
+    } catch (e) {
+      log('createBooking error: $e');
       return const ApiResultModel.failure(
         errorResultEntity: ErrorResultModel(
           message: "Network error occurred",

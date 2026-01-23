@@ -107,19 +107,32 @@ class ViewBookingDetailsScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _infoRow("Show Up Fee", _formatMoneyFromDynamic(booking.showUpFee)),
+          booking.totalBillingAmount != ""
+              ? _infoRow(
+                  "Total Billing Amount",
+                  _formatMoneyFromDynamic(booking.totalBillingAmount),
+                )
+              : const SizedBox.shrink(),
+          booking.showUpFee != ""
+              ? _infoRow(
+                  "Show Up Fee",
+                  _formatMoneyFromDynamic(booking.showUpFee),
+                )
+              : const SizedBox.shrink(),
           _infoRow(
             "Platform Fee",
             _formatMoneyFromDynamic(booking.platformFee),
           ),
           _infoRow(
-            "Global Charge (per hour)",
-            _formatMoneyFromDynamic(booking.globalCharge),
-          ),
-          _infoRow(
             "Show-Up Fee Applied",
             booking.showUpFeeApplied ? "Yes" : "No",
           ),
+          booking.finalRaisedAmount > 0
+              ? _infoRow(
+                  "Raised Amount Applied",
+                  _formatMoneyFromDynamic(booking.finalRaisedAmount),
+                )
+              : const SizedBox.shrink(),
           _infoRow(
             "Late Cancellation",
             booking.lateCancellation ? "Yes" : "No",
@@ -246,7 +259,7 @@ class ViewBookingDetailsScreen extends StatelessWidget {
   }
 
   String _formatMoney(double amount) {
-    return "\$${amount.toStringAsFixed(1)}";
+    return "\$$amount";
   }
 
   String _formatMoneyFromDynamic(dynamic value) {

@@ -128,7 +128,7 @@ class _NotificationListScreenState extends State<NotificationListScreen> {
 
     return CircleAvatar(
       radius: 22,
-      backgroundColor: color.withOpacity(0.12),
+      backgroundColor: color.withValues(alpha: 0.12),
       child: Icon(icon, color: color, size: 22),
     );
   }

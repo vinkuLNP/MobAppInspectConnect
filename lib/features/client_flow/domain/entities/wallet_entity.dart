@@ -3,6 +3,7 @@ class WalletEntity {
   final String userId;
   final double available;
   final double pending;
+  final double totalAmount;
   final bool isDeleted;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -12,6 +13,7 @@ class WalletEntity {
     required this.userId,
     required this.available,
     required this.pending,
+    required this.totalAmount,
     required this.isDeleted,
     required this.createdAt,
     required this.updatedAt,

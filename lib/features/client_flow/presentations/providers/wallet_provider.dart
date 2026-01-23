@@ -12,11 +12,13 @@ import 'package:inspect_connect/features/auth_flow/data/datasources/local_dataso
 import 'package:inspect_connect/features/auth_flow/presentation/client/client_view_model.dart';
 import 'package:inspect_connect/features/client_flow/data/models/user_payment_list_model.dart';
 import 'package:inspect_connect/features/client_flow/data/models/wallet_model.dart';
+import 'package:inspect_connect/features/client_flow/data/models/withdraw_response_model.dart';
 import 'package:inspect_connect/features/client_flow/domain/entities/payment_list_entity.dart';
 import 'package:inspect_connect/features/client_flow/domain/enums/wallet_state_enum.dart';
 import 'package:inspect_connect/features/client_flow/domain/usecases/get_user_payments_usecase.dart';
 import 'package:inspect_connect/features/client_flow/domain/usecases/get_user_wallet_amount_usecase.dart';
 import 'package:inspect_connect/features/client_flow/domain/usecases/onboarding_usecase.dart';
+import 'package:inspect_connect/features/client_flow/domain/usecases/withdraw_money_usecase.dart';
 import 'package:inspect_connect/features/client_flow/presentations/screens/payment_screens/onboarding_web_view_screen.dart';
 import 'package:inspect_connect/features/inspector_flow/data/models/payment_intent_response_model.dart';
 import 'package:inspect_connect/features/inspector_flow/domain/entities/payment_intent_dto.dart';
@@ -37,6 +39,8 @@ class WalletProvider extends BaseViewModel {
 
   final StripeService _stripeService = locator<StripeService>();
   bool isConnectingStripe = false;
+  bool isWithdrawingFromWallet = false;
+
   AuthUserLocalEntity? user;
   Future<void> loadUser() async {
     user = await locator<AuthLocalDataSource>().getUser();
@@ -51,6 +55,14 @@ class WalletProvider extends BaseViewModel {
         // ||
         //  user!.stripePayoutsEnabled == true ||
         //  user!.stripeConnectStatus == 'READY'
+        );
+  }
+
+  bool get isUserClient {
+    if (user == null) return false;
+
+    return user!.role != null &&
+        (user!.role == 1
         );
   }
 
@@ -71,8 +83,9 @@ class WalletProvider extends BaseViewModel {
   }
 
   bool get isWithdrawButtonVisible {
-    final trialDays = user?.currentSubscriptionTrialDays ?? 9;
-    return subscriptionDurationDays > trialDays;
+    return true;
+    // final trialDays = user?.currentSubscriptionTrialDays ?? 9;
+    // return subscriptionDurationDays > trialDays;
   }
 
   bool get canWithdraw {
@@ -221,8 +234,6 @@ class WalletProvider extends BaseViewModel {
     await _stripeService.confirmCardPayment(clientSecret: clientSecret);
   }
 
-  Future<void> withdrawMoney(String amount) async {}
-
   Future<void> refreshAll(BuildContext context) async {
     _page = 1;
     _totalPages = 1;
@@ -230,6 +241,39 @@ class WalletProvider extends BaseViewModel {
 
     await fetchWallet(context);
     await fetchPayments(context, reset: true);
+  }
+
+  String message = '';
+  Future<String?> withdrawMoneyFromWallet(int amount) async {
+    try {
+      isWithdrawingFromWallet = true;
+      notifyListeners();
+      final useCase = locator<WithdrawMoneyUsecase>();
+
+      final result =
+          await executeParamsUseCase<WithdrawMoneyModel, WithdrawMoneyParams>(
+            useCase: useCase,
+            query: WithdrawMoneyParams(amount: amount),
+            launchLoader: false,
+          );
+
+      result?.when(
+        data: (data) {
+          message = data.message;
+        },
+        error: (error) {
+          message = error.message ?? "Withdrawal money failed";
+        },
+      );
+      isWithdrawingFromWallet = false;
+      notifyListeners();
+      return message;
+    } catch (e) {
+      return "Failed to withdraw money";
+    } finally {
+      isWithdrawingFromWallet = false;
+      notifyListeners();
+    }
   }
 
   Future<void> startStripeOnboarding(BuildContext context) async {

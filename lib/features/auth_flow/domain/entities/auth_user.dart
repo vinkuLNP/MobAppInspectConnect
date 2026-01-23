@@ -144,7 +144,7 @@ class AuthUser {
       stripeCustomerId: json['stripeCustomerId'],
       stripeSubscriptionStatus: json['stripeSubscriptionStatus'],
 
-      currentSubscriptionId: json['currentSubscriptionId'] != null
+      currentSubscriptionId: json['currentSubscriptionId'] != null && json['currentSubscriptionId'].isNotEmpty
           ? CurrentSubscription.fromJson(json['currentSubscriptionId'])
           : null,
 

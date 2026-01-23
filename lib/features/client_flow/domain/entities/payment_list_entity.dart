@@ -27,7 +27,7 @@ class UserEntity {
 class PaymentEntity {
   final String id;
   final UserEntity user;
-  final String? relatedUserId;
+  final UserEntity? relatedUserId;
   final String? bookingId;
   final String? stripeInvoiceId;
   final String? stripeSubscriptionId;

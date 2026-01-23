@@ -164,7 +164,7 @@ class _AccountSettingsViewState extends State<AccountSettingsView> {
       log(
         '---------------> user getting profile image- 1 toDomainEntity? get user----${user2!.toDomainEntity().profileImage.toString()}',
       );
-      vm.initFromUser(user2!.toDomainEntity(), context);
+      vm.initFromUser(user2.toDomainEntity(), context);
     });
   }
 
@@ -179,7 +179,7 @@ class _AccountSettingsViewState extends State<AccountSettingsView> {
       body: Form(
         key: _formKey,
         child: Consumer<InspectorViewModelProvider>(
-          builder: (_, vm, __) {
+          builder: (_, vm, _) {
             // if (!vm.isEditMode) {
             //   return const Center(child: CircularProgressIndicator());
             // }

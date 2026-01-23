@@ -1,10 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
-
 import 'package:injectable/injectable.dart';
-import 'package:inspect_connect/core/utils/presentation/app_common_widgets.dart';
 import 'package:inspect_connect/features/auth_flow/data/datasources/local_datasources/app_local_database.dart';
-import 'package:inspect_connect/features/auth_flow/data/models/user_document_data_model.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/icc_document_entity.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/inspector_sign_up_entity.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/service_area_entity.dart';

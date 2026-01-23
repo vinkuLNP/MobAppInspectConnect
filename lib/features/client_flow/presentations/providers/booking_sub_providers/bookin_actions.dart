@@ -452,6 +452,7 @@ class BookingActionsService {
       state?.when(
         data: (response) async {
           provider.updatedBookingData = response;
+          final finalSHowUpFeeStatus = response.showUpFeeApplied ?? false;
           if (showUpFeeApplied) {
             await updateBookingStatus(
               context: context,
@@ -466,7 +467,7 @@ class BookingActionsService {
             provider.bookings = [...provider.bookings]
               ..[index] = provider.updatedBookingData!;
           }
-          provider.showUpFeeStatusMap[bookingId] = showUpFeeApplied;
+          provider.showUpFeeStatusMap[bookingId] = finalSHowUpFeeStatus;
           provider.notify();
         },
         error: (e) {

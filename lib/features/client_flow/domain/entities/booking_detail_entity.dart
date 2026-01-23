@@ -12,7 +12,6 @@ class BookingDetailEntity {
   final String bookingLocation;
   final String totalPaidToInspector;
 
-
   final List<double> bookingLocationCoordinates;
   final String bookingLocationZip;
 
@@ -37,7 +36,6 @@ class BookingDetailEntity {
   final String updatedAt;
 
   final ClientInfoEntity? inspector;
-
 
   BookingDetailEntity({
     required this.id,

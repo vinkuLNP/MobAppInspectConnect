@@ -57,6 +57,12 @@ class PaymentModel extends PaymentEntity {
     return PaymentModel(
       id: json['_id'] ?? '',
       user: UserModel.fromJson(json['userId'] ?? {}),
+      relatedUserId:
+          json['relatedUserId'] != null &&
+              json['relatedUserId'] is Map<String, dynamic>
+          ? UserModel.fromJson(json['relatedUserId'])
+          : null,
+
       bookingId: json['bookingId'],
       stripeInvoiceId: json['stripeInvoiceId'],
       stripeSubscriptionId: json['stripeSubscriptionId'],
@@ -82,7 +88,9 @@ class PaymentModel extends PaymentEntity {
   Map<String, dynamic> toJson() => {
     '_id': id,
     'userId': (user as UserModel).toJson(),
-    'relatedUserId': relatedUserId,
+    'relatedUserId': relatedUserId != null
+        ? (relatedUserId as UserModel).toJson()
+        : null,
     'bookingId': bookingId,
     'stripeInvoiceId': stripeInvoiceId,
     'stripeSubscriptionId': stripeSubscriptionId,
