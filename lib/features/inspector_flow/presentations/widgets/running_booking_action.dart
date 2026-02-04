@@ -38,15 +38,6 @@ class RunningBookingActions extends StatelessWidget {
               fontSize: 13,
               fontWeight: FontWeight.bold,
             ),
-            if (!isStopped) ...[
-              SizedBox(width: MediaQuery.of(context).size.width * 0.15),
-              Flexible(
-                child: ShowUpFeeButton(
-                  isApplied: showUpFeeApplied,
-                  onConfirmTap: onToggleFee,
-                ),
-              ),
-            ],
           ],
         ),
         const SizedBox(height: 10),

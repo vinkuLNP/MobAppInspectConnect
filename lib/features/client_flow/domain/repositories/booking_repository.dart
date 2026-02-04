@@ -26,6 +26,7 @@ abstract class ClientUserRepository {
     String? sortBy,
     String? sortOrder,
     int? status,
+    int? type,
   });
   Future<ApiResultModel<List<NotificationModel>>> getNotifications({
     required int page,
@@ -51,7 +52,9 @@ abstract class ClientUserRepository {
     String bookingId,
     int status,
   );
-  Future<ApiResultModel<WithdrawMoneyModel>> withdrawMoney({required int amount});
+  Future<ApiResultModel<WithdrawMoneyModel>> withdrawMoney({
+    required int amount,
+  });
   Future<ApiResultModel<String>> deductTransferWallet(
     String bookingId,
     String transferToId,
@@ -61,7 +64,12 @@ abstract class ClientUserRepository {
     String bookingId,
     bool showUpFeeApplied,
   );
-
+  Future<ApiResultModel<BookingData>> lateCancellation(
+    String bookingId,
+    int status,
+    String clientId,
+    bool lateCancellation,
+  );
   Future<ApiResultModel<BookingData>> updateBookingTimer(
     String bookingId,
     String action,

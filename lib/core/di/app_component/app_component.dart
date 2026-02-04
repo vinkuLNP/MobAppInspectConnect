@@ -35,6 +35,7 @@ import 'package:inspect_connect/features/client_flow/domain/usecases/get_booking
 import 'package:inspect_connect/features/client_flow/domain/usecases/get_certificate_subtype_usecase.dart';
 import 'package:inspect_connect/features/client_flow/domain/usecases/get_user_payments_usecase.dart';
 import 'package:inspect_connect/features/client_flow/domain/usecases/get_user_wallet_amount_usecase.dart';
+import 'package:inspect_connect/features/client_flow/domain/usecases/late_cancellation_usecase.dart';
 import 'package:inspect_connect/features/client_flow/domain/usecases/notification_use_case.dart';
 import 'package:inspect_connect/features/client_flow/domain/usecases/onboarding_usecase.dart';
 import 'package:inspect_connect/features/client_flow/domain/usecases/update_booking_detail_usecase.dart';
@@ -110,6 +111,8 @@ void setupLocator() {
   locator.registerLazySingleton(() => UpdateBookingStatusUseCase(locator()));
   locator.registerLazySingleton(() => UpdateBookingTimerUseCase(locator()));
   locator.registerLazySingleton(() => ShowUpFeeStatusUseCase(locator()));
+  locator.registerLazySingleton(() => LateCancellationUseCase(locator()));
+
   locator.registerLazySingleton(() => GetAgencyUseCase(locator()));
   locator.registerLazySingleton(() => GetCertificateTypeUseCase(locator()));
   locator.registerLazySingleton(() => InspectorSignUpUseCase(locator()));

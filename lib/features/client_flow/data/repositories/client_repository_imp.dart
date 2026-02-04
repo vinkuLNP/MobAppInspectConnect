@@ -35,7 +35,6 @@ class ClientUserRepositoryImpl implements ClientUserRepository {
     return remote.uploadImage(uploadImageDto);
   }
 
-
   @override
   Future<ApiResultModel<WithdrawMoneyModel>> withdrawMoney({
     required int amount,
@@ -63,6 +62,7 @@ class ClientUserRepositoryImpl implements ClientUserRepository {
     String? sortBy,
     String? sortOrder,
     int? status,
+    int? type
   }) {
     return remote.getBookingList(
       page: page,
@@ -71,6 +71,7 @@ class ClientUserRepositoryImpl implements ClientUserRepository {
       sortBy: sortBy,
       sortOrder: sortOrder,
       status: status,
+      type: type,
     );
   }
 
@@ -142,6 +143,21 @@ class ClientUserRepositoryImpl implements ClientUserRepository {
     bool status,
   ) {
     return remote.showUpFeeStatus(bookingId, status);
+  }
+
+  @override
+  Future<ApiResultModel<BookingData>> lateCancellation(
+    String bookingId,
+    int status,
+    String clientId,
+    bool lateCancellation,
+  ) {
+    return remote.lateCancellation(
+      bookingId,
+      status,
+      clientId,
+      lateCancellation,
+    );
   }
 
   @override

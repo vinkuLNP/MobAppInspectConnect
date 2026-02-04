@@ -195,8 +195,9 @@ void showRaiseAmountSheet({
                       child: AppButton(
                         onTap: () => Navigator.pop(context),
                         text: cancelTxt,
+                        textColor: AppColors.black,
                         buttonBackgroundColor: AppColors.backgroundColor,
-                        borderColor: Colors.red,
+                        borderColor: AppColors.black,
                         isBorder: true,
                       ),
                     ),
@@ -213,7 +214,7 @@ void showRaiseAmountSheet({
                   ],
                 ),
 
-                const SizedBox(height: 10),
+                const SizedBox(height: 40),
               ],
             ),
           );

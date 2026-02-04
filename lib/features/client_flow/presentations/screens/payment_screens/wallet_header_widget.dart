@@ -101,7 +101,7 @@ class WalletHeaderCard extends StatelessWidget {
                 textColor: Colors.white,
               ),
 
-              if (provider.canWithdraw) ...[
+              if (provider.canWithdraw && isStripeReady) ...[
                 const SizedBox(height: 12),
                 AppButton(
                   text: "Withdraw",

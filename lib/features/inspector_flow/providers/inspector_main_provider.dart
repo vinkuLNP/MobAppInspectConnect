@@ -69,6 +69,7 @@ class InspectorDashboardProvider extends BaseViewModel {
   Future<void> fetchUserSubscriptionModel({
     required BuildContext context,
     required SubscriptionPlanModel plan,
+    required int isManual,
   }) async {
     try {
       isLoading = true;
@@ -84,7 +85,7 @@ class InspectorDashboardProvider extends BaseViewModel {
             query: GetUserSubscriptionDetailParams(
               userSubscriptionByIdDto: UserSubscriptionByIdDto(
                 planId: plan.id,
-                isManual: '0',
+                isManual: isManual.toString(),
               ),
             ),
             launchLoader: true,
