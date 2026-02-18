@@ -122,6 +122,7 @@ class PaymentTile extends StatelessWidget {
                     ),
                     const SizedBox(height: 6),
                     _StatusChip(label: txn.statusLabel, color: txn.statusColor),
+                    
                   ],
                 ),
               ],

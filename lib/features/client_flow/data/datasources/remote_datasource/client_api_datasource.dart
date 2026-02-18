@@ -447,7 +447,7 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
         if (sortBy != null && sortBy.isNotEmpty) 'sortBy': sortBy,
         if (sortOrder != null && sortOrder.isNotEmpty) 'sortOrder': sortOrder,
         if (status != null) 'status': status.toString(),
-        if (type != null || user.role == 2) 'type': user.role == 2 ? 1 : null,
+        // if (type != null || user.role == 2) 'type': user.role == 2 ? 1 : null,
       };
 
       final ApiResultModel<http.Response> res = await _ctx.makeRequest(

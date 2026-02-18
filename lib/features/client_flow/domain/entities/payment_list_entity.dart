@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 
 class PaymentsBodyEntity {
@@ -115,6 +117,9 @@ class PaymentEntity {
   }
 
   String get statusLabel {
+    log('---------type. $type');
+    log('---------status. $status');
+
     switch (type.toLowerCase()) {
       case 'paid':
       case 'wallet_credit':
@@ -135,3 +140,70 @@ class PaymentEntity {
     }
   }
 }
+
+
+/*
+const getStatusColor = (status: string) => {
+    switch (status) {
+      case "succeeded":
+      case "paid":
+        return "success";
+      case "pending":
+      case "processing":
+        return "warning";
+      case "failed":
+      case "action_required":
+        return "error";
+      default:
+        return "default";
+    }
+  };
+
+
+
+
+   const getTransactionIcon = (type: string, status: string) => {
+    if (status === "failed" || status === "action_required")
+      return <XCircle size={16} color="#ef4444" />;
+    if (status === "pending" || status === "processing")
+      return <Clock size={16} color="#f59e0b" />;
+    if (status === "succeeded" || status === "paid")
+      return <CheckCircle size={16} color="#10b981" />;
+    if (type === "charge" || type === "subscription")
+      return <TrendingUp size={16} color="#10b981" />;
+    if (type === "refund") return <TrendingDown size={16} color="#ef4444" />;
+    if (type === "wallet_credit")
+      return <BanknoteArrowUp size={16} color="#10b981" />;
+    if (type === "payout")
+      return <BanknoteArrowDown size={16} color="#ef4444" />;
+    if (type === "transfer") return <TrendingUp size={16} color="#3b82f6" />;
+    return <DollarSign size={16} color="#6b7280" />;
+  };
+   {getTransactionIcon(payment.type, payment.status)}
+                          <Typography
+                            variant="body2"
+                            sx={{ textTransform: "capitalize", fontWeight: 500 }}
+                          >
+                            {payment.type.replace("_", " ")}
+
+
+
+                              {payment.stripePayoutId ||
+                            payment.stripeTransferId ||
+                            payment.stripeChargeId ||
+                            payment.eventId ||
+                            payment.invoiceNumber ||
+                            "N/A"}
+
+
+
+                         
+*/
+
+
+
+
+
+
+
+

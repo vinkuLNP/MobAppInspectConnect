@@ -7,6 +7,8 @@ import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.d
 import 'package:inspect_connect/core/utils/presentation/app_text_style.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/certificate_type_entity.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/inspector/inspector_view_model.dart';
+import 'package:inspect_connect/features/auth_flow/presentation/inspector/widgets/common_upload_field.dart';
+import 'package:inspect_connect/features/auth_flow/presentation/inspector/widgets/field_upload_provider.dart';
 import 'package:inspect_connect/features/client_flow/presentations/widgets/select_time_widget.dart';
 import 'package:provider/provider.dart';
 
@@ -52,6 +54,8 @@ class ProfessionalDetailsStep extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 6),
+              CommonUploadField(maxFiles: 4, provider: FileUploadProvider()),
+
               _section(
                 title: uploadCertificationDocuments,
                 child: _documentGrid(prov, context),

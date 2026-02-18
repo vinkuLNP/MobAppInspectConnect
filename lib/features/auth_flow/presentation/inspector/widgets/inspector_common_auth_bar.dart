@@ -42,7 +42,6 @@ class InspectorCommonAuthBar extends StatelessWidget {
                   children: [
                     AspectRatio(
                       aspectRatio: 335 / 230,
-                      // 375/280
                       child: imageAsset(
                         image: image,
                         width: rc.screenWidth,

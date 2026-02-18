@@ -605,52 +605,9 @@ class InspectorViewModelProvider extends BaseViewModel {
     }
   }
 
-  List<IccDocumentLocalEntity> iccDocsForCity(String city) {
-    return iccDocuments.where((d) => d.serviceCity == city).toList();
-  }
-
-  bool validateIccDocuments() {
-    for (final city in selectedCityNames) {
-      if (cityRequiresIcc[city] == true) {
-        final docs = iccDocuments.where((d) => d.serviceCity == city).toList();
-
-        if (docs.isEmpty) {
-          cityError = '$iccDocumentRequiredFor $city';
-          notify();
-          return false;
-        }
-
-        for (final d in docs) {
-          if (d.expiryDate == '') {
-            cityError = '$expiryDateRequiredForIccIn $city';
-            notify();
-            return false;
-          }
-        }
-      }
-    }
-    return true;
-  }
-
   IccDocumentLocalEntity? coiDoc;
   IccDocumentLocalEntity? idDoc;
 
-  Future<void> pickIccExpiryDate(
-    BuildContext context,
-    IccDocumentLocalEntity doc,
-  ) async {
-    final picked = await showDatePicker(
-      context: context,
-      firstDate: DateTime.now(),
-      lastDate: DateTime.now().add(const Duration(days: 3650)),
-      initialDate: DateTime.now(),
-    );
-
-    if (picked != null) {
-      doc.expiryDate = picked.toIso8601String().split('T').first;
-      notify();
-    }
-  }
 
   UserDocument? firstByType(List<UserDocument>? docs, String type) {
     if (docs == null) return null;

@@ -89,6 +89,7 @@ class _InspectorSignUpContentState extends State<InspectorSignUpContent> {
           },
         ),
         bottomSection: SignupActionBar(
+          
           vm: vm,
           onNext: () async {
             final key = steps[vm.currentStep].formKey;
