@@ -7,29 +7,6 @@ import 'package:inspect_connect/features/common_features/domain/repositories/com
 class CommonRepositoryImpl implements CommonRepository {
   final CommonRemoteDataSource _remote;
   CommonRepositoryImpl(this._remote);
-  // List<CertificateInspectorTypeEntity>? _cachedTypes;
-  // @override
-  // Future<ApiResultModel<List<CertificateInspectorTypeEntity>>>
-  // fetchCertificateTypes() async {
-  //   if (_cachedTypes != null) {
-  //     return ApiResultModel.success(data: _cachedTypes!);
-  //   }
-  //   final result = await _remote.fetchCertificateTypes();
-
-  //   return result.when(
-  //     success: (model) {
-  //       final entities = model.map((e) => e.toEntity()).toList();
-  //       return ApiResultModel<List<CertificateInspectorTypeEntity>>.success(
-  //         data: entities,
-  //       );
-  //     },
-  //     failure: (e) =>
-  //         ApiResultModel<List<CertificateInspectorTypeEntity>>.failure(
-  //           errorResultEntity: e,
-  //         ),
-  //   );
-  // }
-
   @override
   Future<ApiResultModel<UploadImageEntity>> uploadImage({
     required UploadImageDto uploadImageDto,

@@ -78,7 +78,6 @@ class CommonDocumentGrid extends StatelessWidget {
         childAspectRatio: childAspectRatio,
       ),
       itemBuilder: (context, index) {
-        // NETWORK FILES FIRST
         if (index < networkUrls.length) {
           final url = networkUrls[index];
 
@@ -96,7 +95,6 @@ class CommonDocumentGrid extends StatelessWidget {
           );
         }
 
-        // LOCAL FILES
         final localIndex = index - networkUrls.length;
 
         if (localIndex < localFiles.length) {
@@ -116,7 +114,6 @@ class CommonDocumentGrid extends StatelessWidget {
           );
         }
 
-        // ADD BOX
         return GestureDetector(onTap: onAddTap, child: _addBox());
       },
     );

@@ -12,68 +12,14 @@ import 'package:inspect_connect/features/common_features/domain/params/upload_im
 import 'package:inspect_connect/features/common_features/domain/usecases/upload_image_usecase.dart';
 
 class CommonViewModel extends BaseViewModel {
-  // final GetCertificateTypeUseCase _getCertificateTypeUseCase;
   final CommonUploadImageUseCase _uploadImageUseCase;
 
   CommonViewModel({
-    // required GetCertificateTypeUseCase getCertificateTypeUseCase,
     required CommonUploadImageUseCase uploadImageUseCase,
   }) : 
-  // _getCertificateTypeUseCase = getCertificateTypeUseCase,
        _uploadImageUseCase = uploadImageUseCase;
-  // List<CertificateInspectorTypeEntity> certificateType = [];
   bool isProcessing = false;
-  // Future<void> fetchCertificateTypes({String? savedId}) async {
-  //   if (certificateType.isNotEmpty) return;
-  //   try {
-  //     isProcessing = true;
-  //     final state =
-  //         await executeParamsUseCase<
-  //           List<CertificateInspectorTypeEntity>,
-  //           NoParams
-  //         >(useCase: _getCertificateTypeUseCase, launchLoader: true);
-
-  //     state?.when(
-  //       data: (entities) {
-  //         if (entities.isEmpty) {
-  //           return;
-  //         }
-
-  //         certificateType = entities;
-
-  //         // final selected = getSelectedCertificateType(
-  //         //   entities: entities,
-  //         //   savedId: savedId,
-  //         // );
-
-  //         // selectedCertificateType = selected;
-  //         notifyListeners();
-  //       },
-  //       error: (e) {
-  //         isProcessing = false;
-  //         AppLogger.error("Error fetching certificate types: $e", error: e);
-  //       },
-  //     );
-  //   } catch (e) {
-  //     AppLogger.error("Exception in fetchCertificateTypes: $e");
-  //   } finally {
-  //     isProcessing = false;
-  //     notifyListeners();
-  //   }
-  // }
-
-  // CertificateInspectorTypeEntity getSelectedCertificateType({
-  //   required List<CertificateInspectorTypeEntity> entities,
-  //   String? savedId,
-  // }) {
-  //   if (savedId == null) return entities.first;
-
-  //   return entities.firstWhere(
-  //     (e) => e.id == savedId,
-  //     orElse: () => entities.first,
-  //   );
-  // }
-
+  
   Future<void> uploadDocument({
     required Function(File file, String url, FilePickerResult result) onSuccess,
     List<String>? allowedExtensions,

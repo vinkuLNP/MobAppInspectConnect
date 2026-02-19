@@ -3,8 +3,6 @@ import 'package:inspect_connect/features/common_features/data/dto/upload_image_d
 import 'package:inspect_connect/features/common_features/domain/entities/upload_image_entity.dart';
 
 abstract class CommonRepository {
-  // Future<ApiResultModel<List<CertificateInspectorTypeEntity>>>
-  // fetchCertificateTypes();
   Future<ApiResultModel<UploadImageEntity>> uploadImage({
     required UploadImageDto uploadImageDto,
   });
