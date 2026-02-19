@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:inspect_connect/core/utils/constants/app_assets_constants.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/features/inspector_flow/domain/enum/inspector_status.dart';
 import 'package:inspect_connect/features/inspector_flow/providers/inspector_main_provider.dart';
@@ -87,53 +88,61 @@ class _SplashViewState extends State<SplashView>
     _controller.forward();
 
     Future.delayed(const Duration(seconds: 3), () async {
-   
       final user = await locator<AuthLocalDataSource>().getUser();
-         if(mounted){
-      final userProvider = context.read<UserProvider>();
-      final bookingProvider = context.read<BookingProvider>();
+      if (mounted) {
+        final userProvider = context.read<UserProvider>();
+        final bookingProvider = context.read<BookingProvider>();
 
+        if (user != null) userProvider.setUser(user);
+        await userProvider.loadUser();
 
-      if (user != null) userProvider.setUser(user);
-      await userProvider.loadUser();
-
-      if (userProvider.isLoggedIn) {
-        if (userProvider.isUserClient) {
-          await bookingProvider.fetchBookingsList();
-        if(mounted)   context.router.replace(const ClientDashboardRoute());
-        } else if (userProvider.isUserInspector) {
-        if(mounted)   checkInspectorState(context);
+        if (userProvider.isLoggedIn) {
+          if (userProvider.isUserClient) {
+            await bookingProvider.fetchBookingsList();
+            if (mounted) context.router.replace(const ClientDashboardRoute());
+          } else if (userProvider.isUserInspector) {
+            if (mounted) checkInspectorState(context);
+          } else {
+            if (mounted) context.router.replace(const OnBoardingRoute());
+          }
         } else {
-       if(mounted)    context.router.replace(const OnBoardingRoute());
+          if (mounted) context.router.replace(const OnBoardingRoute());
         }
-      } else {
-       if(mounted)  context.router.replace(const OnBoardingRoute());
       }
-   } });
-  }
-Future<void> checkInspectorState(BuildContext context) async {
-  final localUser = await locator<AuthLocalDataSource>().getUser();
-  if (localUser == null) {
-    if(context.mounted) context.router.replaceAll([const OnBoardingRoute()]);
-    return;
+    });
   }
 
-  final provider = InspectorDashboardProvider();
-    if(context.mounted) await provider.initializeUserState(context);
+  Future<void> checkInspectorState(BuildContext context) async {
+    log('🧭 [checkInspectorState] START');
+    final localUser = await locator<AuthLocalDataSource>().getUser();
+    if (localUser == null) {
+      if (context.mounted) context.router.replaceAll([const OnBoardingRoute()]);
+      return;
+    }
 
-  switch (provider.status) {
-    case InspectorStatus.needsSubscription:
-      if(context.mounted)   context.router.replaceAll([const InspectorDashboardRoute()]);
-      break;
-    case InspectorStatus.underReview:
-    case InspectorStatus.rejected:
-    case InspectorStatus.approved:
-      if(context.mounted)   context.router.replaceAll([const InspectorDashboardRoute()]);
-      break;
-    default:
-      context.router.replaceAll([const OnBoardingRoute()]);
+    final provider = context.read<InspectorDashboardProvider>();
+    if (context.mounted) await provider.initializeUserState();
+    log(
+      '🧭 [checkInspectorState] status=${provider.status} '
+      '(${provider.status.label})',
+    );
+    switch (provider.status) {
+      case InspectorStatus.needsSubscription:
+        if (context.mounted) {
+          context.router.replaceAll([const InspectorDashboardRoute()]);
+        }
+        break;
+      case InspectorStatus.underReview:
+      case InspectorStatus.rejected:
+      case InspectorStatus.approved:
+        if (context.mounted) {
+          context.router.replaceAll([const InspectorDashboardRoute()]);
+        }
+        break;
+      default:
+        context.router.replaceAll([const OnBoardingRoute()]);
+    }
   }
-}
 
   @override
   void dispose() {
@@ -156,7 +165,7 @@ Future<void> checkInspectorState(BuildContext context) async {
               child: ScaleTransition(
                 scale: _scaleAnimation,
                 child: Image.asset(
-                  'assets/images/app_logo.png',
+                  appLogo,
                   color: AppColors.whiteColor,
                   width: size.width * 0.2,
                 ),
@@ -167,11 +176,11 @@ Future<void> checkInspectorState(BuildContext context) async {
               position: _textBounceAnimation,
               child: FadeTransition(
                 opacity: _fadeAnimation,
-                child: textWidget(text: 
-                  "Inspect Connect",
-                    fontSize: 24,
-                    color: AppColors.whiteColor,
-                    fontWeight: FontWeight.bold,
+                child: textWidget(
+                  text: "Inspect Connect",
+                  fontSize: 24,
+                  color: AppColors.whiteColor,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),

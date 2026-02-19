@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/utils/constants/app_constants.dart';
 import 'package:inspect_connect/core/utils/constants/app_strings.dart';
@@ -42,8 +44,8 @@ class BookingActionResolver {
     final canDecline = bookingTime.difference(now).inMinutes / 60 > 8;
 
     final showUpFeeApplied =
-        provider.showUpFeeStatusMap[booking.id] ??
         booking.showUpFeeApplied ??
+        provider.showUpFeeStatusMap[booking.id] ??
         false;
 
     return AcceptedBookingActions(
@@ -67,7 +69,7 @@ class BookingActionResolver {
     final isRunning = provider.isTimerRunning[booking.id] ?? false;
     final isStopped = booking.status == bookingStatusStoppped;
     final timer = provider.activeTimers[booking.id];
-
+    log('---------> ');
     final showUpFeeApplied =
         provider.showUpFeeStatusMap[booking.id] ??
         booking.showUpFeeApplied ??
@@ -117,11 +119,14 @@ class BookingActionResolver {
       context: context,
       isApplied: isApplied,
       onConfirm: () async {
+        final user = context.read<UserProvider>().user;
+        final rootContext = Navigator.of(context).context;
         Navigator.pop(context);
         await provider.updateShowUpFeeStatus(
-          context: context,
+          context: rootContext,
           bookingId: booking.id,
           showUpFeeApplied: !isApplied,
+          userId: user!.userId,
         );
       },
     );

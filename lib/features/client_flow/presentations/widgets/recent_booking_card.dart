@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:inspect_connect/core/utils/constants/app_common_card_container.dart';
+import 'package:inspect_connect/core/utils/constants/app_strings.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/features/client_flow/domain/entities/booking_list_entity.dart';
 import 'package:intl/intl.dart';
@@ -14,20 +16,11 @@ class RecentBookingViewerCard extends StatelessWidget {
       'dd MMM yyyy',
     ).format(DateTime.parse(bookingListEntity.bookingDate));
 
-    return Container(
+    return AppCardContainer(
       margin: const EdgeInsets.only(top: 12),
-      decoration: BoxDecoration(
-        color: Colors.grey.withValues(alpha:0.1),
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha:0.06),
-            blurRadius: 12,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      clipBehavior: Clip.antiAlias,
+      backgroundColor: Colors.grey.withValues(alpha: 0.1),
+      borderRadius: 18,
+      shadowColor: Colors.black.withValues(alpha: 0.06),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -40,7 +33,7 @@ class RecentBookingViewerCard extends StatelessWidget {
                 const SizedBox(width: 8),
                 Expanded(
                   child: textWidget(
-                    text: 'RECENT APPROVED BOOKING',
+                    text: recentApprovedBooking,
                     color: Colors.white,
                     textOverflow: TextOverflow.ellipsis,
                     fontSize: 14,
@@ -64,11 +57,11 @@ class RecentBookingViewerCard extends StatelessWidget {
 
                 const SizedBox(height: 10),
 
-                _iconRow(Icons.calendar_today, 'Booking date', dateStr),
+                _iconRow(Icons.calendar_today, bookingDate, dateStr),
                 const SizedBox(height: 6),
                 _iconRow(
                   Icons.access_time,
-                  'Booking time',
+                  bookingTime,
                   bookingListEntity.bookingTime,
                 ),
                 const SizedBox(height: 6),

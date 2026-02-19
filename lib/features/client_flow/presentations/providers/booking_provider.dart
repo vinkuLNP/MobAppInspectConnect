@@ -35,7 +35,7 @@ class BookingProvider extends BaseViewModel {
   bool isUpdatingBooking = false;
   BookingData? updatedBookingData;
   BookingDetailModel? bookingDetailModel;
-  List<BookingListEntity> bookings = [];
+  List<BookingData> bookings = [];
   Map<String, Duration> activeTimers = {};
   Map<String, bool> isTimerRunning = {};
   Map<String, bool> showUpFeeStatusMap = {};
@@ -118,10 +118,7 @@ class BookingProvider extends BaseViewModel {
   }
 
   Future<void> init() async {
-    isLoading = true;
-    notifyListeners();
     await fetchCertificateSubTypes();
-    isLoading = false;
     notifyListeners();
   }
 
@@ -275,18 +272,27 @@ class BookingProvider extends BaseViewModel {
   Future<void> updateShowUpFeeStatus({
     required BuildContext context,
     required String bookingId,
+    required String userId,
+
     required bool showUpFeeApplied,
   }) => actionsService.updateShowUpFeeStatus(
     context: context,
     bookingId: bookingId,
     showUpFeeApplied: showUpFeeApplied,
+    userId: userId,
   );
 
   Future<void> approveAndPayBooking(
     BuildContext context,
     String bookingId,
     String userId,
-  ) => actionsService.approveAndPayBooking(context, bookingId, userId);
+    String inspectorId,
+  ) => actionsService.approveAndPayBooking(
+    context,
+    bookingId,
+    userId,
+    inspectorId,
+  );
 
   Future<void> disagreeBooking(
     BuildContext context,

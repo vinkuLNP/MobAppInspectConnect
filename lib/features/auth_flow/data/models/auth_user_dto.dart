@@ -1,6 +1,7 @@
 import 'package:inspect_connect/features/auth_flow/data/models/device_dto.dart';
 import 'package:inspect_connect/features/auth_flow/data/models/location_dto.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/auth_user.dart';
+import 'package:inspect_connect/features/auth_flow/domain/entities/user_detail.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/user_device_entity.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/user_location_entity.dart';
 
@@ -23,11 +24,11 @@ class AuthUserDto {
   final String? stripeCustomerId;
   final String? authToken;
   final String? stripeSubscriptionStatus;
-  final String? currentSubscriptionId;
+  final CurrentSubscription? currentSubscriptionId;
   final int? currentSubscriptionTrialDays;
   final int? currentSubscriptionAutoRenew;
   final bool? stripePayoutsEnabled;
-  final bool? stripeTransfersActive;
+  final bool? stripeTransfersEnabled;
   final int? certificateApproved;
   final String? rejectedReason;
   final bool? bookingInProgress;
@@ -73,7 +74,7 @@ class AuthUserDto {
     this.currentSubscriptionTrialDays,
     this.currentSubscriptionAutoRenew,
     this.stripePayoutsEnabled,
-    this.stripeTransfersActive,
+    this.stripeTransfersEnabled,
     this.certificateApproved,
     this.rejectedReason,
     this.bookingInProgress,
@@ -98,6 +99,17 @@ class AuthUserDto {
   });
 
   factory AuthUserDto.fromBody(Map<String, dynamic> json) {
+    final dynamic subscriptionRaw = json['currentSubscriptionId'];
+
+    CurrentSubscription? parsedSubscription;
+
+    if (subscriptionRaw is Map<String, dynamic>) {
+      parsedSubscription = CurrentSubscription.fromJson(subscriptionRaw);
+    } else if (subscriptionRaw is String && subscriptionRaw.isNotEmpty) {
+      parsedSubscription = CurrentSubscription(id: subscriptionRaw);
+    } else {
+      parsedSubscription = null;
+    }
     return AuthUserDto(
       id: json['_id']?.toString() ?? '',
       userId: json['_id']?.toString() ?? '',
@@ -117,11 +129,11 @@ class AuthUserDto {
       stripeCustomerId: json['stripeCustomerId'],
       authToken: json['authToken'],
       stripeSubscriptionStatus: json['stripeSubscriptionStatus'],
-      currentSubscriptionId: json['currentSubscriptionId'],
+      currentSubscriptionId: parsedSubscription,
       currentSubscriptionTrialDays: json['currentSubscriptionTrialDays'],
       currentSubscriptionAutoRenew: json['currentSubscriptionAutoRenew'],
       stripePayoutsEnabled: json['stripePayoutsEnabled'],
-      stripeTransfersActive: json['stripeTransfersActive'],
+      stripeTransfersEnabled: json['stripeTransfersEnabled'],
       certificateApproved: json['certificateApproved'],
       rejectedReason: json['rejectedReason'],
       bookingInProgress: json['bookingInProgress'],
@@ -141,7 +153,6 @@ class AuthUserDto {
       referenceDocuments: (json['referenceDocuments'] is List)
           ? List<String>.from(json['referenceDocuments'])
           : [],
-      uploadedIdOrLicenseDocument: json['uploadedIdOrLicenseDocument'],
       workHistoryDescription: json['workHistoryDescription'],
       connectorLinkUrl: json['connectorLinkUrl'],
       location: json['location'] != null

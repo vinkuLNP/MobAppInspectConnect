@@ -1,25 +1,32 @@
-import 'dart:convert';
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
-import 'package:http/http.dart' as http;
 import 'package:inspect_connect/core/basecomponents/base_view_model.dart';
 import 'package:inspect_connect/core/commondomain/entities/based_api_result/api_result_state.dart';
 import 'package:inspect_connect/core/di/app_component/app_component.dart';
+import 'package:inspect_connect/core/di/services/payment_services/payment_purpose.dart';
+import 'package:inspect_connect/core/di/services/payment_services/payment_request.dart';
+import 'package:inspect_connect/core/utils/app_widgets/card_payment_sheet.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/features/auth_flow/data/datasources/local_datasources/auth_local_datasource.dart';
 import 'package:inspect_connect/features/auth_flow/data/datasources/local_datasources/auth_user_local_entity.dart';
+import 'package:inspect_connect/features/auth_flow/data/models/document_model.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/auth_user.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/user_detail.dart';
 import 'package:inspect_connect/features/auth_flow/domain/usecases/get_user__usercase.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/user_provider.dart';
+import 'package:inspect_connect/features/client_flow/presentations/providers/wallet_provider.dart';
+import 'package:inspect_connect/features/inspector_flow/data/models/payment_intent_response_model.dart';
 import 'package:inspect_connect/features/inspector_flow/data/models/subscription_model.dart';
-import 'package:inspect_connect/core/utils/constants/app_constants.dart';
 import 'package:inspect_connect/features/inspector_flow/data/models/user_subscription_model.dart';
+import 'package:inspect_connect/features/inspector_flow/domain/entities/payment_intent_dto.dart';
 import 'package:inspect_connect/features/inspector_flow/domain/entities/user_subscription_by_id.dart';
+import 'package:inspect_connect/features/inspector_flow/domain/enum/inspector_documents_enum.dart';
 import 'package:inspect_connect/features/inspector_flow/domain/enum/inspector_status.dart';
 import 'package:inspect_connect/features/inspector_flow/domain/usecases/get_subscription_plans_usecase.dart';
 import 'package:inspect_connect/features/inspector_flow/domain/usecases/get_user_subscription_detail_usecase.dart';
+import 'package:inspect_connect/features/inspector_flow/domain/usecases/payment_intent_usecase.dart';
+import 'package:inspect_connect/main.dart';
 import 'package:provider/provider.dart';
 
 class InspectorDashboardProvider extends BaseViewModel {
@@ -34,11 +41,6 @@ class InspectorDashboardProvider extends BaseViewModel {
     try {
       isLoading = true;
       notifyListeners();
-      final user = await locator<AuthLocalDataSource>().getUser();
-      if (user == null || user.authToken == null) {
-        throw Exception('User not found in local storage');
-      }
-
       final getSubscriptionPlansUseCase =
           locator<GetSubscriptionPlansUseCase>();
       final state =
@@ -67,15 +69,11 @@ class InspectorDashboardProvider extends BaseViewModel {
   Future<void> fetchUserSubscriptionModel({
     required BuildContext context,
     required SubscriptionPlanModel plan,
+    required int isManual,
   }) async {
     try {
       isLoading = true;
       notifyListeners();
-      final user = await locator<AuthLocalDataSource>().getUser();
-      if (user == null || user.authToken == null) {
-        throw Exception('User not found in local storage');
-      }
-
       final getSubscriptionPlansUseCase =
           locator<GetUserSubscriptionDetailUseCase>();
       final state =
@@ -84,11 +82,10 @@ class InspectorDashboardProvider extends BaseViewModel {
             GetUserSubscriptionDetailParams
           >(
             useCase: getSubscriptionPlansUseCase,
-
             query: GetUserSubscriptionDetailParams(
               userSubscriptionByIdDto: UserSubscriptionByIdDto(
                 planId: plan.id,
-                isManual: '0',
+                isManual: isManual.toString(),
               ),
             ),
             launchLoader: true,
@@ -97,8 +94,20 @@ class InspectorDashboardProvider extends BaseViewModel {
       state?.when(
         data: (response) async {
           userSubscriptionModel = response;
-
-          startPayment(context: context, plan: userSubscriptionModel!);
+          log("resposne of subscriptionas plan----------$response");
+          showCardPaymentSheet(
+            context: context,
+            provider: context.read<WalletProvider>(),
+            request: PaymentRequest(
+              purpose: PaymentPurpose.subscription,
+              amount: response.amount.toDouble().toString(),
+              priceId: response.priceId,
+              subscriptionId: response.stripeSubscriptionId,
+              totalAmount: plan.amount.toDouble().toString(),
+              type: 0,
+              device: '1',
+            ),
+          );
         },
         error: (e) {},
       );
@@ -120,29 +129,47 @@ class InspectorDashboardProvider extends BaseViewModel {
       if (user == null || user.authToken == null) {
         throw Exception('User not found');
       }
+      log("resposne of subscriptionas plan-----createPaymentIntent called----");
 
-      /*    final intentResponse = await createPaymentIntent(
-       user.authToken!,
-       plan.amount!.toDouble(),
-       plan.id!,
-       plan.stripeSubscriptionId,
-     );
+      final intentdto = CreatePaymentIntentDto(
+        paymentType: 'subscription',
+        priceId: plan.priceId,
+        subscriptionId: plan.stripeSubscriptionId,
+        totalAmount: plan.amount.toDouble().toString(),
+        type: 0,
+        device: 1,
+      );
+      final getPaymentIntentUseCase = locator<GetPaymentIntentUseCase>();
+      final state =
+          await executeParamsUseCase<
+            PaymentIntentModel,
+            GetPaymentIntnetParams
+          >(
+            useCase: getPaymentIntentUseCase,
+            query: GetPaymentIntnetParams(createPaymentIntentDto: intentdto),
+            launchLoader: true,
+          );
 
+      state?.when(
+        data: (response) async {
+          final intentResponse = response;
+          log("resposne of subscriptionas plan----------$response");
+          final clientSecret = intentResponse.clientSecret;
+          if (clientSecret == "" || clientSecret.isEmpty) {
+            throw Exception('Missing client secret from API');
+          }
 
-     final clientSecret = intentResponse['body']?['clientSecret'];
-     if (clientSecret == null) {
-       throw Exception('Missing client secret from API');
-     }
+          await Stripe.instance.confirmPayment(
+            paymentIntentClientSecret: clientSecret,
+            data: const PaymentMethodParams.card(
+              paymentMethodData: PaymentMethodData(),
+            ),
+          );
 
-
-     await Stripe.instance.confirmPayment(
-       paymentIntentClientSecret: clientSecret,
-       data: const PaymentMethodParams.card(
-         paymentMethodData: PaymentMethodData(),
-       ),
-     );
-*/
-      if (context.mounted) showPaymentSuccessDialog(context);
+          if (context.mounted) showPaymentSuccessDialog(context);
+        },
+        error: (e) {},
+      );
     } on StripeException catch (e) {
       log('⚠️ StripeException: $e');
       if (context.mounted) {
@@ -166,34 +193,6 @@ class InspectorDashboardProvider extends BaseViewModel {
     } finally {
       isProcessingPayment = false;
       notifyListeners();
-    }
-  }
-
-  Future<Map<String, dynamic>> createPaymentIntent(
-    String token,
-    double amount,
-    String priceId,
-    String subscriptionId,
-  ) async {
-    try {
-      final url = Uri.parse('$devBaseUrl/payments/paymentIntent');
-      final response = await http.post(
-        url,
-        headers: {'Authorization': 'Bearer $token'},
-        body: {
-          'totalAmount': amount.toString(),
-          'priceId': priceId,
-          'paymentType': 'subscription',
-          'device': '1',
-          'subscriptionId': subscriptionId,
-          'type': '0',
-        },
-      );
-
-      final decoded = json.decode(response.body);
-      return decoded;
-    } catch (e) {
-      rethrow;
     }
   }
 
@@ -260,8 +259,7 @@ class InspectorDashboardProvider extends BaseViewModel {
               onPressed: () async {
                 Navigator.pop(context);
 
-                final provider = context.read<InspectorDashboardProvider>();
-                await provider.initializeUserState(context);
+                initializeUserState();
               },
               child: textWidget(text: 'Continue'),
             ),
@@ -275,7 +273,9 @@ class InspectorDashboardProvider extends BaseViewModel {
   AuthUser? user;
   UserSubscriptionModel? subscription;
 
-  Future<void> initializeUserState(BuildContext context) async {
+  Future<void> initializeUserState() async {
+    final BuildContext? context =
+        rootNavigatorKey.currentState?.overlay?.context;
     isLoading = true;
     notifyListeners();
     status = InspectorStatus.initial;
@@ -287,12 +287,18 @@ class InspectorDashboardProvider extends BaseViewModel {
         return;
       }
 
-      if (context.mounted) {
+      if (context!.mounted) {
+        log(
+          '----localUser------?>>> certioficateApproved ${localUser.certificateApproved}',
+        );
         final userDetail = await fetchAndUpdateUserDetail(localUser, context);
 
         final mergedUser = localUser.mergeWithUserDetail(userDetail);
+        updateReviewState(mergedUser.toDomainEntity());
 
-        user = AuthUser.fromLocalEntity(mergedUser);
+        log(
+          '----mergedUser------?>>> certioficateApproved ${mergedUser.certificateApproved}',
+        );
 
         if (mergedUser.phoneOtpVerified != true) {
           status = InspectorStatus.unverified;
@@ -306,17 +312,21 @@ class InspectorDashboardProvider extends BaseViewModel {
           return;
         }
 
-        switch (mergedUser.certificateApproved) {
-          case 0:
+        switch (reviewStatus) {
+          case ReviewStatus.pending:
+            log('🟠 Status → UNDER_REVIEW');
             status = InspectorStatus.underReview;
             break;
-          case 1:
+
+          case ReviewStatus.approved:
+            log('🟢 Status → APPROVED');
             status = InspectorStatus.approved;
             break;
-          case 2:
+
+          case ReviewStatus.rejected:
+            log('🔴 Status → REJECTED');
             status = InspectorStatus.rejected;
             break;
-          default:
         }
       }
     } catch (e) {
@@ -327,10 +337,22 @@ class InspectorDashboardProvider extends BaseViewModel {
     }
   }
 
+  ReviewStatus reviewStatus = ReviewStatus.pending;
+  List<UserDocument> rejectedDocuments = [];
+
+  void updateReviewState(AuthUser user) {
+    reviewStatus = deriveReviewStatus(user);
+
+    rejectedDocuments =
+        user.documents?.where((d) => d.adminApproval == 2).toList() ?? [];
+  }
+
   Future<UserDetail> fetchAndUpdateUserDetail(
     AuthUserLocalEntity localUser,
-    BuildContext context,
+    BuildContext contextDetail,
   ) async {
+    final BuildContext? context =
+        rootNavigatorKey.currentState?.overlay?.context;
     log('👤 [FETCH_USER_DETAIL] Started → localUserId=${localUser.id}');
 
     final getUserUseCase = locator<GetUserUseCase>();
@@ -364,7 +386,7 @@ class InspectorDashboardProvider extends BaseViewModel {
         log('💾 [FETCH_USER_DETAIL] Saving merged user locally');
         await locator<AuthLocalDataSource>().saveUser(mergedUser);
 
-        if (context.mounted) {
+        if (context!.mounted) {
           log('🔄 [FETCH_USER_DETAIL] Updating UserProvider');
           context.read<UserProvider>().setUser(mergedUser);
         } else {
@@ -379,31 +401,7 @@ class InspectorDashboardProvider extends BaseViewModel {
           '❌ [FETCH_USER_DETAIL] API failed → '
           'using local fallback. Error: $e',
         );
-
-        detail = UserDetail(
-          id: localUser.id.toString(),
-          userId: localUser.userId.toString(),
-          name: localUser.name,
-          email: localUser.email,
-          phoneNumber: localUser.phoneNumber,
-          countryCode: localUser.countryCode,
-          phoneOtpVerified: localUser.phoneOtpVerified,
-          emailOtpVerified: localUser.emailOtpVerified,
-          agreedToTerms: localUser.agreedToTerms,
-          isTruthfully: localUser.isTruthfully,
-          stripeSubscriptionStatus: localUser.stripeSubscriptionStatus,
-          currentSubscriptionId: localUser.currentSubscriptionId != null
-              ? CurrentSubscription(id: localUser.currentSubscriptionId)
-              : null,
-          certificateApproved: localUser.certificateApproved,
-          location: localUser.latitude != null && localUser.longitude != null
-              ? Location(
-                  type: 'Point',
-                  locationName: localUser.locationName,
-                  coordinates: [localUser.latitude!, localUser.longitude!],
-                )
-              : null,
-        );
+        detail = UserDetail.fromJson(localUser.toDomainEntity().toJson());
 
         log(
           '🧩 [FETCH_USER_DETAIL] Fallback UserDetail created from local data',

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:inspect_connect/features/auth_flow/domain/entities/auth_user.dart';
 import 'package:inspect_connect/features/client_flow/data/models/certificate_subtype_model.dart';
 import 'package:inspect_connect/features/client_flow/domain/entities/booking_list_entity.dart';
@@ -128,5 +130,45 @@ class BookingData extends BookingListEntity {
       lateCancellation: json['lateCancellation'],
       lateCancellationFee: json['lateCancellationFee'],
     );
+  }
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'clientUser': clientUser?.toJson(),
+      'inspector': inspector?.toJson(),
+      'inspectorIds': inspectorIds,
+      'certificateSubTypes': certificateSubTypes
+          .map((e) => e.toJson())
+          .toList(),
+      'images': images,
+      'description': description,
+      'bookingDate': bookingDate,
+      'bookingTime': bookingTime,
+      'bookingLocation': bookingLocation,
+      'bookingLocationCoordinates': bookingLocationCoordinates,
+      'bookingLocationZip': bookingLocationZip,
+      'status': status,
+      'isDeleted': isDeleted,
+      'createdAt': createdAt,
+      'updatedAt': updatedAt,
+      'timerStartedAt': timerStartedAt,
+      'timerEndedAt': timerEndedAt,
+      'timerDuration': timerDuration,
+      'finalBillingHours': finalBillingHours,
+      'totalBillingAmount': totalBillingAmount,
+      'platformFee': platformFee,
+      'overRideAmount': overRideAmount,
+      'globalCharge': globalCharge,
+      'finalRaisedAmount': finalRaisedAmount,
+      'showUpFeeApplied': showUpFeeApplied,
+      'showUpFee': showUpFee,
+      'lateCancellation': lateCancellation,
+      'lateCancellationFee': lateCancellationFee,
+    };
+  }
+
+  @override
+  String toString() {
+    return const JsonEncoder.withIndent('  ').convert(toJson());
   }
 }

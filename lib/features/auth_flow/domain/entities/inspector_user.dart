@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:inspect_connect/features/auth_flow/data/models/user_document_data_model.dart';
 
 class InspectorUser extends Equatable {
   final String id;
@@ -21,7 +22,7 @@ class InspectorUser extends Equatable {
   final List<String> certificateDocuments;
   final String certificateExpiryDate;
   final List<String> referenceDocuments;
-  final String uploadedIdOrLicenseDocument;
+  final UserDocumentDataModel? uploadedIdOrLicenseDocument;
   final String? workHistoryDescription;
   final bool phoneOtpVerified;
   final bool emailOtpVerified;
@@ -62,102 +63,103 @@ class InspectorUser extends Equatable {
   });
 
   factory InspectorUser.fromJson(Map<String, dynamic> json) => InspectorUser(
-        id: json["_id"],
-        role: json["role"],
-        email: json["email"],
-        name: json["name"],
-        profileImage: json["profileImage"],
-        status: json["status"],
-        phoneNumber: json["phoneNumber"],
-        countryCode: json["countryCode"],
-        bookingInProgress: json["bookingInProgress"],
-        isDeleted: json["isDeleted"],
-        country: json["country"],
-        state: json["state"],
-        city: json["city"],
-        location: json["location"],
-        mailingAddress: json["mailingAddress"],
-        certificateTypeId: json["certificateTypeId"],
-        certificateAgencyIds:
-            List<String>.from(json["certificateAgencyIds"] ?? []),
-        certificateDocuments:
-            List<String>.from(json["certificateDocuments"] ?? []),
-        certificateExpiryDate: json["certificateExpiryDate"],
-        referenceDocuments:
-            List<String>.from(json["referenceDocuments"] ?? []),
-        uploadedIdOrLicenseDocument: json["uploadedIdOrLicenseDocument"],
-        workHistoryDescription: json["workHistoryDescription"],
-        phoneOtpVerified: json["phoneOtpVerified"],
-        emailOtpVerified: json["emailOtpVerified"],
-        agreedToTerms: json["agreedToTerms"],
-        isTruthfully: json["isTruthfully"],
-        stripeCustomerId: json["stripeCustomerId"],
-        authToken: json["authToken"],
-      );
+    id: json["_id"],
+    role: json["role"],
+    email: json["email"],
+    name: json["name"],
+    profileImage: json["profileImage"],
+    status: json["status"],
+    phoneNumber: json["phoneNumber"],
+    countryCode: json["countryCode"],
+    bookingInProgress: json["bookingInProgress"],
+    isDeleted: json["isDeleted"],
+    country: json["country"],
+    state: json["state"],
+    city: json["city"],
+    location: json["location"],
+    mailingAddress: json["mailingAddress"],
+    certificateTypeId: json["certificateTypeId"],
+    certificateAgencyIds: List<String>.from(json["certificateAgencyIds"] ?? []),
+    certificateDocuments: List<String>.from(json["certificateDocuments"] ?? []),
+    certificateExpiryDate: json["certificateExpiryDate"],
+    referenceDocuments: List<String>.from(json["referenceDocuments"] ?? []),
+    uploadedIdOrLicenseDocument: json['uploadedIdOrLicenseDocument'] != null
+        ? UserDocumentDataModel.fromJson(json['uploadedIdOrLicenseDocument'])
+        : null,
+
+    workHistoryDescription: json["workHistoryDescription"],
+    phoneOtpVerified: json["phoneOtpVerified"],
+    emailOtpVerified: json["emailOtpVerified"],
+    agreedToTerms: json["agreedToTerms"],
+    isTruthfully: json["isTruthfully"],
+    stripeCustomerId: json["stripeCustomerId"],
+    authToken: json["authToken"],
+  );
 
   Map<String, dynamic> toJson() => {
-        "_id": id,
-        "role": role,
-        "email": email,
-        "name": name,
-        "profileImage": profileImage,
-        "status": status,
-        "phoneNumber": phoneNumber,
-        "countryCode": countryCode,
-        "bookingInProgress": bookingInProgress,
-        "isDeleted": isDeleted,
-        "country": country,
-        "state": state,
-        "city": city,
-        "location": location,
-        "mailingAddress": mailingAddress,
-        "certificateTypeId": certificateTypeId,
-        "certificateAgencyIds": certificateAgencyIds,
-        "certificateDocuments": certificateDocuments,
-        "certificateExpiryDate": certificateExpiryDate,
-        "referenceDocuments": referenceDocuments,
-        "uploadedIdOrLicenseDocument": uploadedIdOrLicenseDocument,
-        "workHistoryDescription": workHistoryDescription,
-        "phoneOtpVerified": phoneOtpVerified,
-        "emailOtpVerified": emailOtpVerified,
-        "agreedToTerms": agreedToTerms,
-        "isTruthfully": isTruthfully,
-        "stripeCustomerId": stripeCustomerId,
-        "authToken": authToken,
-      };
+    "_id": id,
+    "role": role,
+    "email": email,
+    "name": name,
+    "profileImage": profileImage,
+    "status": status,
+    "phoneNumber": phoneNumber,
+    "countryCode": countryCode,
+    "bookingInProgress": bookingInProgress,
+    "isDeleted": isDeleted,
+    "country": country,
+    "state": state,
+    "city": city,
+    "location": location,
+    "mailingAddress": mailingAddress,
+    "certificateTypeId": certificateTypeId,
+    "certificateAgencyIds": certificateAgencyIds,
+    "certificateDocuments": certificateDocuments,
+    "certificateExpiryDate": certificateExpiryDate,
+    "referenceDocuments": referenceDocuments,
+    "uploadedIdOrLicenseDocument": uploadedIdOrLicenseDocument,
+    "workHistoryDescription": workHistoryDescription,
+    "phoneOtpVerified": phoneOtpVerified,
+    "emailOtpVerified": emailOtpVerified,
+    "agreedToTerms": agreedToTerms,
+    "isTruthfully": isTruthfully,
+    "stripeCustomerId": stripeCustomerId,
+    "authToken": authToken,
+  };
 
   @override
   List<Object?> get props => [
-        id,
-        role,
-        email,
-        name,
-        profileImage,
-        status,
-        phoneNumber,
-        countryCode,
-        bookingInProgress,
-        isDeleted,
-        country,
-        state,
-        city,
-        location,
-        mailingAddress,
-        certificateTypeId,
-        certificateAgencyIds,
-        certificateDocuments,
-        certificateExpiryDate,
-        referenceDocuments,
-        uploadedIdOrLicenseDocument,
-        workHistoryDescription,
-        phoneOtpVerified,
-        emailOtpVerified,
-        agreedToTerms,
-        isTruthfully,
-        stripeCustomerId,
-        authToken,
-      ];
+    id,
+    role,
+    email,
+    name,
+    profileImage,
+    status,
+    phoneNumber,
+    countryCode,
+    bookingInProgress,
+    isDeleted,
+    country,
+    state,
+    city,
+    location,
+    mailingAddress,
+    certificateTypeId,
+    certificateAgencyIds,
+    certificateDocuments,
+    certificateExpiryDate,
+    referenceDocuments,
+    uploadedIdOrLicenseDocument,
+    workHistoryDescription,
+    phoneOtpVerified,
+    emailOtpVerified,
+    agreedToTerms,
+    isTruthfully,
+    stripeCustomerId,
+    authToken,
+  ];
 }
+
 extension InspectorUserMapping on InspectorUser {
   InspectorUser toLocalEntity() {
     return InspectorUser(
@@ -192,4 +194,3 @@ extension InspectorUserMapping on InspectorUser {
     );
   }
 }
-

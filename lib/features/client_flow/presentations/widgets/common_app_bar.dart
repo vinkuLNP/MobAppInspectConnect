@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/utils/constants/app_assets_constants.dart';
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
+import 'package:inspect_connect/features/client_flow/presentations/providers/notification_provider.dart';
+import 'package:inspect_connect/features/client_flow/presentations/screens/notification_screens/notification_screen.dart';
+import 'package:provider/provider.dart';
 
 class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool showLogo;
@@ -96,22 +99,59 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
         ),
         actions: [
           if (showNotification)
-            IconButton(
-              icon: const Icon(
-                Icons.notifications_none,
-                color: AppColors.whiteColor,
-              ),
-              onPressed:
-                  onNotificationTap ??
-                  () => ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: textWidget(
-                        text: 'Notifications tapped',
-                        color: Colors.white,
+            if (showNotification)
+              Consumer<NotificationProvider>(
+                builder: (_, provider, _) {
+                  return Stack(
+                    children: [
+                      IconButton(
+                        icon: const Icon(
+                          Icons.notifications_none,
+                          color: AppColors.whiteColor,
+                        ),
+                        onPressed:
+                            onNotificationTap ??
+                            () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) =>
+                                      const NotificationListScreen(),
+                                ),
+                              );
+                            },
                       ),
-                    ),
-                  ),
-            ),
+                      if (provider.unreadCount > 0)
+                        Positioned(
+                          right: 6,
+                          top: 6,
+                          child: Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: const BoxDecoration(
+                              color: Colors.red,
+                              shape: BoxShape.circle,
+                            ),
+                            constraints: const BoxConstraints(
+                              minWidth: 16,
+                              minHeight: 16,
+                            ),
+                            child: Text(
+                              provider.unreadCount > 99
+                                  ? '99+'
+                                  : provider.unreadCount.toString(),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
+                  );
+                },
+              ),
+
           if (showBookButton)
             IconButton(
               icon: const Icon(

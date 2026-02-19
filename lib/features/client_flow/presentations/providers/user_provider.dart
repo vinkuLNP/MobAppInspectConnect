@@ -6,6 +6,8 @@ import 'package:inspect_connect/features/auth_flow/data/datasources/local_dataso
 import 'package:inspect_connect/features/auth_flow/data/datasources/local_datasources/auth_user_local_entity.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/auth_user.dart';
 import 'package:inspect_connect/features/auth_flow/domain/usecases/update_profile_usecase.dart';
+import 'package:inspect_connect/features/auth_flow/presentation/client/client_view_model.dart';
+import 'package:provider/provider.dart';
 
 class UserProvider extends BaseViewModel {
   AuthUserLocalEntity? _user;
@@ -17,16 +19,26 @@ class UserProvider extends BaseViewModel {
       _user?.authToken != null &&
       _user?.phoneOtpVerified == true;
 
-       bool get isUserClient =>
-      _user != null &&
-      _user?.role == 1;
+  bool get isUserClient => _user != null && _user?.role == 1;
 
-       bool get isUserInspector =>
-      _user != null &&
-      _user?.role == 2;
+  bool get isUserInspector => _user != null && _user?.role == 2;
 
   final AuthLocalDataSource _local = locator<AuthLocalDataSource>();
 
+  Future<AuthUserLocalEntity?> refreshUserFromServer(
+    BuildContext context,
+  ) async {
+    final vm = context.read<ClientViewModelProvider>();
+
+    final localUser = user!.toDomainEntity();
+
+    await vm.fetchUserDetail(context: context, user: localUser);
+
+    _user = await locator<AuthLocalDataSource>().getUser();
+    notifyListeners();
+
+    return _user;
+  }
 
   bool isLoading = false;
   Future<void> updateUserName(BuildContext context, String name) async {
@@ -44,15 +56,12 @@ class UserProvider extends BaseViewModel {
 
       state?.when(
         data: (_) async {
-          _user = _user!.copyWith(name: name,userId: user!.userId);
+          _user = _user!.copyWith(name: name, userId: user!.userId);
           notifyListeners();
 
           await locator<AuthLocalDataSource>().saveUser(_user!);
-       
         },
-        error: (e) {
-     
-        },
+        error: (e) {},
       );
     } finally {
       isLoading = false;

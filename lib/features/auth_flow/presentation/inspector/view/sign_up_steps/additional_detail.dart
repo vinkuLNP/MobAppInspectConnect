@@ -1,6 +1,10 @@
+import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:inspect_connect/core/utils/constants/app_strings.dart';
+import 'package:inspect_connect/features/auth_flow/domain/entities/inspector_documents_type.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/inspector/widgets/stepper_header.dart';
+import 'package:inspect_connect/features/auth_flow/utils/text_editor_controller.dart';
 import 'package:provider/provider.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/client/widgets/input_fields.dart';
@@ -31,122 +35,224 @@ class _AdditionalDetailsStepState extends State<AdditionalDetailsStep> {
       value: provider,
       child: Consumer<InspectorViewModelProvider>(
         builder: (context, prov, _) {
-          return Stack(
-            children: [
-              AbsorbPointer(
-                absorbing: prov.isProcessing,
-                child: Opacity(
-                  opacity: prov.isProcessing ? 0.6 : 1.0,
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(12),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        const SectionTitle('Additional Details'),
-                        const SizedBox(height: 8),
+          return SingleChildScrollView(
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const SectionTitle(additionalDetails),
+                const SizedBox(height: 8),
 
-                        _section(
-                          title: 'Profile Image(Optional)',
-                          child: _imageUploader(
-                            context: context,
-                            files: prov.profileImageUrl != null
-                                ? [prov.profileImageUrl!]
-                                : [],
-                            maxFiles: 1,
-                            allowOnlyImages: true,
-                            onAdd: () => prov.pickFile(
-                              context,
-                              'profile',
-                              allowOnlyImages: true,
-                            ),
-                            onRemove: (index) => prov.removeProfileImage(),
-                          ),
-                        ),
-
-                        _section(
-                          title: 'Upload ID / License(Optional)',
-                          child: _imageUploader(
-                            context: context,
-                            files: prov.idLicenseUrl != null
-                                ? [prov.idLicenseUrl!]
-                                : [],
-                            maxFiles: 1,
-                            onAdd: () => prov.pickFile(context, 'id'),
-                            onRemove: (index) => prov.removeIdImage(index),
-                          ),
-                        ),
-
-                        _section(
-                          title: 'Upload Reference Letters(Optional)',
-                          child: _imageUploader(
-                            context: context,
-                            files: prov.referenceLettersUrls,
-                            maxFiles: 5,
-                            onAdd: () => prov.pickFile(context, 'ref'),
-                            onRemove: (index) =>
-                                prov.removeReferenceLetterImage(index),
-                          ),
-                        ),
-
-                        const SizedBox(height: 12),
-
-                        AppInputField(
-                          controller: prov.workHistoryController,
-                          label: 'Work History Description',
-                          maxLines: 4,
-                          hint: 'Enter work experience details...',
-                        ),
-
-                        CheckboxListTile(
-                          value: prov.agreedToTerms,
-                          onChanged: (val) {
-                            prov.toggleTerms(val);
-                            setState(() => prov.showValidationError = false);
-                          },
-                          contentPadding: EdgeInsets.zero,
-                          visualDensity: VisualDensity.compact,
-                          dense: true,
-                          controlAffinity: ListTileControlAffinity.leading,
-                          title: textWidget(
-                            text: 'I agree to the Terms and Conditions.',
-                            fontSize: 12,
-                            color:
-                                prov.showValidationError && !prov.agreedToTerms
-                                ? Colors.red
-                                : Colors.black,
-                          ),
-                        ),
-                        CheckboxListTile(
-                          value: prov.confirmTruth,
-                          onChanged: (val) {
-                            prov.toggleTruth(val);
-                            setState(() => prov.showValidationError = false);
-                          },
-                          visualDensity: VisualDensity.compact,
-                          dense: true,
-                          contentPadding: EdgeInsets.zero,
-                          controlAffinity: ListTileControlAffinity.leading,
-                          title: textWidget(
-                            text: 'I confirm all information is truthful.',
-                            fontSize: 12,
-                            color:
-                                prov.showValidationError && !prov.confirmTruth
-                                ? Colors.red
-                                : Colors.black,
-                          ),
-                        ),
-                      ],
+                _section(
+                  title: profileImageOptional,
+                  child: _imageUploader(
+                    context: context,
+                    files: prov.profileImage != null
+                        ? [prov.profileImage!]
+                        : [],
+                    maxFiles: 1,
+                    allowOnlyImages: true,
+                    onAdd: () => prov.pickFile(
+                      context,
+                      'profile',
+                      allowOnlyImages: true,
                     ),
+                    onRemove: (index) => prov.removeProfileImage(),
                   ),
                 ),
-              ),
-              if (prov.isProcessing)
-                const Center(child: CircularProgressIndicator()),
-            ],
+                _section(
+                  title: uploadIdLicense,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      documentTypeDropdown(prov),
+
+                      const SizedBox(height: 8),
+
+                      _imageUploader(
+                        context: context,
+                        files: prov.idDocumentFile != null
+                            ? [prov.idDocumentFile!]
+                            : [],
+                        maxFiles: 1,
+                        onAdd: () => prov.pickFile(context, 'id'),
+                        onRemove: (_) => prov.removeIdImage(0),
+                      ),
+
+                      const SizedBox(height: 6),
+
+                      expiryPicker(
+                        context,
+                        label: idLicenseExpiryDate,
+                        date: prov.selectedIdDocExpiry,
+                        onPick: (date) {
+                          prov.selectedIdDocExpiry = date;
+                          prov.notify();
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                _section(
+                  title: uploadCoiDocument,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _imageUploader(
+                        context: context,
+                        files: prov.coiUploadedUrl != null
+                            ? [
+                                File(
+                                  prov.coiUploadedUrl!.documentUrl.toString(),
+                                ),
+                              ]
+                            : [],
+                        maxFiles: 1,
+                        onAdd: () => prov.pickFile(context, 'coi'),
+                        onRemove: (_) => prov.removeCoi(),
+                      ),
+
+                      const SizedBox(height: 6),
+
+                      expiryPicker(
+                        context,
+                        label: coiDocumentExpiryDate,
+                        date: prov.coiExpiry,
+                        onPick: (date) {
+                          prov.coiExpiry = date;
+                          prov.notify();
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+
+                _section(
+                  title: uploadReferenceLetters,
+                  child: _imageUploader(
+                    context: context,
+                    files: prov.referenceLetters,
+                    maxFiles: 5,
+                    onAdd: () => prov.pickFile(context, 'ref'),
+                    onRemove: (index) => prov.removeReferenceLetterImage(index),
+                  ),
+                ),
+
+                const SizedBox(height: 12),
+
+                AppInputField(
+                  controller: inspWorkHistoryController,
+                  label: workHistoryDescription,
+                  maxLines: 4,
+                  hint: workHistoryHint,
+                ),
+
+                CheckboxListTile(
+                  value: prov.agreedToTerms,
+                  onChanged: (val) {
+                    prov.toggleTerms(val);
+                    setState(() => prov.showValidationError = false);
+                  },
+                  contentPadding: EdgeInsets.zero,
+                  visualDensity: VisualDensity.compact,
+                  dense: true,
+                  controlAffinity: ListTileControlAffinity.leading,
+                  title: textWidget(
+                    text: agreeToTerms,
+                    fontSize: 12,
+                    color: prov.showValidationError && !prov.agreedToTerms
+                        ? Colors.red
+                        : Colors.black,
+                  ),
+                ),
+                CheckboxListTile(
+                  value: prov.confirmTruth,
+                  onChanged: (val) {
+                    prov.toggleTruth(val);
+                    setState(() => prov.showValidationError = false);
+                  },
+                  visualDensity: VisualDensity.compact,
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                  controlAffinity: ListTileControlAffinity.leading,
+                  title: textWidget(
+                    text: informationTruthful,
+                    fontSize: 12,
+                    color: prov.showValidationError && !prov.confirmTruth
+                        ? Colors.red
+                        : Colors.black,
+                  ),
+                ),
+              ],
+            ),
           );
         },
       ),
     );
+  }
+
+  Widget expiryPicker(
+    BuildContext context, {
+    required String label,
+    required DateTime? date,
+    required Function(DateTime) onPick,
+  }) {
+    final isSelected = date != null;
+
+    return GestureDetector(
+      onTap: () async {
+        final picked = await showDatePicker(
+          context: context,
+          initialDate: date ?? DateTime.now().add(Duration(days: 30)),
+          firstDate: DateTime.now().add(Duration(days: 30)),
+          lastDate: DateTime(2100),
+        );
+
+        if (picked != null) {
+          onPick(picked);
+        }
+      },
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color: isSelected ? Colors.black : Colors.grey.shade400,
+            width: 1.2,
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 11,
+                color: isSelected ? Colors.black : Colors.grey,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              isSelected ? _numericDate(date) : selectExpiryDate,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+                color: isSelected ? Colors.black : Colors.grey,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _numericDate(DateTime date) {
+    log(date.toString());
+    final day = date.day.toString().padLeft(2, '0');
+    final month = date.month.toString().padLeft(2, '0');
+    final year = date.year.toString();
+    return '$day-$month-$year';
   }
 
   Widget _section({required String title, required Widget child}) {
@@ -166,7 +272,7 @@ class _AdditionalDetailsStepState extends State<AdditionalDetailsStep> {
   Widget _buildImageWidget(File file) {
     final path = file.path;
 
-    if (path.startsWith('http://') || path.startsWith('https://')) {
+    if (path.startsWith(httpProtocol) || path.startsWith(httpsProtocol)) {
       return Image.network(
         path,
         fit: BoxFit.cover,
@@ -188,6 +294,40 @@ class _AdditionalDetailsStepState extends State<AdditionalDetailsStep> {
       height: double.infinity,
       errorBuilder: (_, _, _) =>
           const Center(child: Icon(Icons.broken_image, color: Colors.grey)),
+    );
+  }
+
+  Widget documentTypeDropdown(InspectorViewModelProvider prov) {
+    return DropdownButtonFormField<InspectorDocumentsTypeEntity>(
+      initialValue: prov.selectedIdDocType,
+      isExpanded: true,
+      decoration: InputDecoration(
+        labelText: documentType,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 12,
+          vertical: 14,
+        ),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(color: Colors.grey.shade400),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(
+            color: Theme.of(context).primaryColor,
+            width: 1.5,
+          ),
+        ),
+      ),
+      items: prov.inspectorDocumentsType.map((doc) {
+        return DropdownMenuItem(value: doc, child: Text(doc.name));
+      }).toList(),
+      onChanged: (val) {
+        prov.selectedIdDocType = val;
+        prov.notify();
+      },
+      validator: (val) => val == null ? pleaseSelectDocumentType : null,
     );
   }
 
@@ -218,9 +358,7 @@ class _AdditionalDetailsStepState extends State<AdditionalDetailsStep> {
               const Icon(Icons.add_a_photo, color: Colors.grey, size: 30),
               const SizedBox(height: 8),
               textWidget(
-                text: allowOnlyImages
-                    ? "Tap to upload image"
-                    : "Tap to upload file (image or PDF)",
+                text: allowOnlyImages ? tapToUploadImage : tapToUploadFile,
                 color: Colors.grey,
                 fontSize: 12,
               ),
@@ -237,7 +375,7 @@ class _AdditionalDetailsStepState extends State<AdditionalDetailsStep> {
     final rowCount = (itemCount / crossAxisCount).ceil();
 
     return SizedBox(
-      height: rowCount * (itemHeight + spacing + 10),
+      height: rowCount * (itemHeight + spacing + 20),
       child: GridView.builder(
         padding: EdgeInsets.zero,
         shrinkWrap: true,
@@ -253,14 +391,7 @@ class _AdditionalDetailsStepState extends State<AdditionalDetailsStep> {
           if (i < files.length) {
             final file = files[i];
             final ext = file.path.split('.').last.toLowerCase();
-            final isImage = [
-              'jpg',
-              'jpeg',
-              'png',
-              'heic',
-              'gif',
-              'bmp',
-            ].contains(ext);
+            final isImage = imageExtensions.contains(ext);
 
             return ClipRRect(
               borderRadius: BorderRadius.circular(12),

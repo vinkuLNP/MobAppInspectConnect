@@ -31,16 +31,12 @@ class RunningBookingActions extends StatelessWidget {
     return Column(
       children: [
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             textWidget(
               text: "$timerTxt: $timerText",
               fontSize: 13,
               fontWeight: FontWeight.bold,
-            ),
-            ShowUpFeeButton(
-              isApplied: showUpFeeApplied,
-              onConfirmTap: onToggleFee,
             ),
           ],
         ),

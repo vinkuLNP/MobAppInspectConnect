@@ -39,7 +39,7 @@ class BookingDetailModel extends BookingDetailEntity {
     return BookingDetailModel(
       id: json['_id'] ?? '',
       client: ClientInfoModel.fromJson(json['clientId'] ?? {}),
-totalPaidToInspector : json['totalPaidToInspector'] ?? "",
+      totalPaidToInspector: json['totalPaidToInspector'] ?? "",
       inspectorIds: List<String>.from(json['inspectorIds'] ?? []),
 
       certificateSubTypes:
@@ -88,9 +88,8 @@ totalPaidToInspector : json['totalPaidToInspector'] ?? "",
       updatedAt: json['updatedAt'] ?? '',
 
       inspector: json['inspectorId'] != null
-    ? ClientInfoModel.fromJson(json['inspectorId'])
-    : null,
-
+          ? ClientInfoModel.fromJson(json['inspectorId'])
+          : null,
     );
   }
 
@@ -107,7 +106,7 @@ totalPaidToInspector : json['totalPaidToInspector'] ?? "",
       'bookingDate': bookingDate,
       'bookingTime': bookingTime,
       'bookingLocation': bookingLocation,
-'totalPaidToInspector':totalPaidToInspector,
+      'totalPaidToInspector': totalPaidToInspector,
       'bookingLocationCoordinates': bookingLocationCoordinates,
       'bookingLocationZip': bookingLocationZip,
 
@@ -133,9 +132,8 @@ totalPaidToInspector : json['totalPaidToInspector'] ?? "",
       'updatedAt': updatedAt,
 
       'inspectorId': inspector != null
-    ? (inspector as ClientInfoModel).toJson()
-    : null,
-
+          ? (inspector as ClientInfoModel).toJson()
+          : null,
     };
   }
 }

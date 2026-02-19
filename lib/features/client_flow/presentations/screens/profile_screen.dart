@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/basecomponents/base_responsive_widget.dart';
 import 'package:inspect_connect/core/utils/auto_router_setup/auto_router.dart';
 import 'package:inspect_connect/core/utils/constants/app_assets_constants.dart';
+import 'package:inspect_connect/core/utils/constants/app_strings.dart';
 import 'package:inspect_connect/core/utils/presentation/app_assets_widget.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_widgets.dart';
@@ -120,7 +121,7 @@ class ProfileScreen extends StatelessWidget {
                         _buildOptionTile(
                           context,
                           icon: Icons.settings,
-                          label: 'Account Settings',
+                          label: accountSettings,
                           onTap: () =>
                               context.router.push(const AccountSettingsRoute()),
                         ),
@@ -128,7 +129,7 @@ class ProfileScreen extends StatelessWidget {
                         _buildOptionTile(
                           context,
                           icon: Icons.wallet,
-                          label: 'Payments',
+                          label: payments,
                           onTap: () => Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -143,7 +144,7 @@ class ProfileScreen extends StatelessWidget {
                         _buildOptionTile(
                           context,
                           icon: Icons.lock,
-                          label: 'Change Password',
+                          label: changePassword,
                           onTap: () =>
                               context.router.push(const ChangePasswordRoute()),
                         ),
@@ -151,7 +152,7 @@ class ProfileScreen extends StatelessWidget {
                         _buildOptionTile(
                           context,
                           icon: Icons.logout,
-                          label: 'Logout',
+                          label: logOutTitle,
                           color: Colors.redAccent,
                           onTap: () async {
                             logOutUser(context);

@@ -1,13 +1,11 @@
 class UploadImageDto {
   final String filePath;
 
- UploadImageDto({
-    required this.filePath,
+  UploadImageDto({required this.filePath});
 
-  });
+  Map<String, dynamic> toJson() {
+    final map = <String, dynamic>{'file': filePath};
 
-
-  Map<String, dynamic> toJson() => {
-        "filePath": filePath,
-      };
+    return map;
+  }
 }

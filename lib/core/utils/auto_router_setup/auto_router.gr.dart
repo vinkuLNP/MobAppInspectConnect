@@ -228,22 +228,6 @@ class ForgotpPasswordRouteArgs {
 }
 
 /// generated route for
-/// [InspectorAuthAutoWrapperView]
-class InspectorAuthAutoWrapperRoute extends PageRouteInfo<void> {
-  const InspectorAuthAutoWrapperRoute({List<PageRouteInfo>? children})
-    : super(InspectorAuthAutoWrapperRoute.name, initialChildren: children);
-
-  static const String name = 'InspectorAuthAutoWrapperRoute';
-
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      return WrappedRoute(child: const InspectorAuthAutoWrapperView());
-    },
-  );
-}
-
-/// generated route for
 /// [InspectorDashboardView]
 class InspectorDashboardRoute extends PageRouteInfo<void> {
   const InspectorDashboardRoute({List<PageRouteInfo>? children})
@@ -255,22 +239,6 @@ class InspectorDashboardRoute extends PageRouteInfo<void> {
     name,
     builder: (data) {
       return const InspectorDashboardView();
-    },
-  );
-}
-
-/// generated route for
-/// [InspectorSignInView]
-class InspectorSignInRoute extends PageRouteInfo<void> {
-  const InspectorSignInRoute({List<PageRouteInfo>? children})
-    : super(InspectorSignInRoute.name, initialChildren: children);
-
-  static const String name = 'InspectorSignInRoute';
-
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      return const InspectorSignInView();
     },
   );
 }
@@ -350,10 +318,15 @@ class OtpVerificationRoute extends PageRouteInfo<OtpVerificationRouteArgs> {
   OtpVerificationRoute({
     Key? key,
     required bool addShowButton,
+    bool showSignInText = true,
     List<PageRouteInfo>? children,
   }) : super(
          OtpVerificationRoute.name,
-         args: OtpVerificationRouteArgs(key: key, addShowButton: addShowButton),
+         args: OtpVerificationRouteArgs(
+           key: key,
+           addShowButton: addShowButton,
+           showSignInText: showSignInText,
+         ),
          initialChildren: children,
        );
 
@@ -366,32 +339,42 @@ class OtpVerificationRoute extends PageRouteInfo<OtpVerificationRouteArgs> {
       return OtpVerificationView(
         key: args.key,
         addShowButton: args.addShowButton,
+        showSignInText: args.showSignInText,
       );
     },
   );
 }
 
 class OtpVerificationRouteArgs {
-  const OtpVerificationRouteArgs({this.key, required this.addShowButton});
+  const OtpVerificationRouteArgs({
+    this.key,
+    required this.addShowButton,
+    this.showSignInText = true,
+  });
 
   final Key? key;
 
   final bool addShowButton;
 
+  final bool showSignInText;
+
   @override
   String toString() {
-    return 'OtpVerificationRouteArgs{key: $key, addShowButton: $addShowButton}';
+    return 'OtpVerificationRouteArgs{key: $key, addShowButton: $addShowButton, showSignInText: $showSignInText}';
   }
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     if (other is! OtpVerificationRouteArgs) return false;
-    return key == other.key && addShowButton == other.addShowButton;
+    return key == other.key &&
+        addShowButton == other.addShowButton &&
+        showSignInText == other.showSignInText;
   }
 
   @override
-  int get hashCode => key.hashCode ^ addShowButton.hashCode;
+  int get hashCode =>
+      key.hashCode ^ addShowButton.hashCode ^ showSignInText.hashCode;
 }
 
 /// generated route for

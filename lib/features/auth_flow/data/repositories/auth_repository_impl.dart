@@ -11,14 +11,67 @@ import 'package:inspect_connect/features/auth_flow/data/models/verify_otp_reques
 import 'package:inspect_connect/features/auth_flow/domain/entities/auth_user.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/certificate_agency_entity.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/certificate_type_entity.dart';
+import 'package:inspect_connect/features/auth_flow/domain/entities/inspector_documents_type.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/inspector_sign_up_entity.dart';
+import 'package:inspect_connect/features/auth_flow/domain/entities/jurisdiction_entity.dart';
+import 'package:inspect_connect/features/auth_flow/domain/entities/settings_entity.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/user_detail.dart';
 import 'package:inspect_connect/features/auth_flow/domain/repositories/auth_repository.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDataSource _remote;
   AuthRepositoryImpl(this._remote);
+  @override
+  Future<ApiResultModel<AuthUser>> signUp({
+    required int role,
+    required String email,
+    required String name,
+    required String phoneNumber,
+    required String countryCode,
+    required String password,
+    required String deviceToken,
+    required String deviceType,
+    required String mailingAddress,
+    required String zip,
+    required bool agreedToTerms,
+    required bool isTruthfully,
+    required Map<String, dynamic> location,
+  }) async {
+    final res = await _remote.signUp(
+      SignUpRequestDto(
+        role: role,
+        email: email,
+        name: name,
+        phoneNumber: phoneNumber,
+        countryCode: countryCode,
+        password: password,
+        deviceToken: deviceToken,
+        deviceType: deviceType,
+        mailingAddress: mailingAddress,
+        zip: zip,
+        agreedToTerms: agreedToTerms,
+        isTruthfully: isTruthfully,
+        location: location,
+      ),
+    );
 
+    return res.when(
+      success: (dto) {
+        try {
+          return ApiResultModel.success(data: dto.toEntity());
+        } catch (e) {
+          return const ApiResultModel.failure(
+            errorResultEntity: ErrorResultModel(
+              message: "Parsing error",
+              statusCode: 500,
+            ),
+          );
+        }
+      },
+      failure: (err) =>
+          ApiResultModel<AuthUser>.failure(errorResultEntity: err),
+    );
+  }
 
   @override
   Future<ApiResultModel<List<CertificateInspectorTypeEntity>>>
@@ -26,14 +79,26 @@ class AuthRepositoryImpl implements AuthRepository {
     return _remote.getCertificateType();
   }
 
-
-
   @override
-  Future<ApiResultModel<List<AgencyEntity>>>
-  getCertificateAgency() {
-    return _remote.getCertificateAgency();
+  Future<ApiResultModel<List<JurisdictionEntity>>> getJurisdictionCities() {
+    return _remote.getJurisdictionCities();
   }
 
+  @override
+  Future<ApiResultModel<SettingEntity>> getSettings(String type) {
+    return _remote.getSettings(type);
+  }
+
+  @override
+  Future<ApiResultModel<List<InspectorDocumentsTypeEntity>>>
+  getIsnpectorDocumentsType() {
+    return _remote.getIsnpectorDocumentsType();
+  }
+
+  @override
+  Future<ApiResultModel<List<AgencyEntity>>> getCertificateAgency() {
+    return _remote.getCertificateAgency();
+  }
 
   @override
   Future<ApiResultModel<AuthUser>> signIn({
@@ -52,9 +117,9 @@ class AuthRepositoryImpl implements AuthRepository {
     );
 
     return res.when(
-       success: (data) {
+      success: (data) {
         try {
-            final user = data.toEntity(); 
+          final user = data.toEntity();
           return ApiResultModel<AuthUser>.success(data: user);
         } catch (e) {
           return const ApiResultModel.failure(
@@ -65,92 +130,35 @@ class AuthRepositoryImpl implements AuthRepository {
           );
         }
       },
-      failure: (err) => ApiResultModel<AuthUser>.failure(errorResultEntity: err),
+      failure: (err) =>
+          ApiResultModel<AuthUser>.failure(errorResultEntity: err),
     );
   }
 
-
   @override
-Future<ApiResultModel<AuthUser>> inspectorSignUp({
-  required InspectorSignUpLocalEntity inspectorSignUpLocalEntity
-}) async {
-  final res = await _remote.inspectorSignUp(
-    inspectorSignUpLocalEntity
-  );
+  Future<ApiResultModel<AuthUser>> inspectorSignUp({
+    required InspectorSignUpLocalEntity inspectorSignUpLocalEntity,
+  }) async {
+    final res = await _remote.inspectorSignUp(inspectorSignUpLocalEntity);
 
-  return res.when(
-    success: (dto) {
-      try {
-         final user = dto.toEntity(); 
-        return ApiResultModel.success(data: user);
-      } catch (e) {
-        return const ApiResultModel.failure(
-          errorResultEntity: ErrorResultModel(
-            message: "Parsing error",
-            statusCode: 500,
-          ),
-        );
-      }
-    },
-    failure: (err) =>
-        ApiResultModel<AuthUser>.failure(errorResultEntity: err),
-  );
-}
-
-
-
-  @override
-Future<ApiResultModel<AuthUser>> signUp({
-  required int role,
-  required String email,
-  required String name,
-  required String phoneNumber,
-  required String countryCode,
-  required String password,
-  required String deviceToken,
-  required String deviceType,
-  required String mailingAddress,
-  required String zip,
-  required bool agreedToTerms,
-  required bool isTruthfully,
-  required Map<String, dynamic> location,
-}) async {
-  final res = await _remote.signUp(
-    SignUpRequestDto(
-      role: role,
-      email: email,
-      name: name,
-      phoneNumber: phoneNumber,
-      countryCode: countryCode,
-      password: password,
-      deviceToken: deviceToken,
-      deviceType: deviceType,
-      mailingAddress: mailingAddress,
-      zip: zip,
-      agreedToTerms: agreedToTerms,
-      isTruthfully: isTruthfully,
-      location: location,
-    ),
-  );
-
-  return res.when(
-    success: (dto) {
-      try {
-        return ApiResultModel.success(data: dto.toEntity());
-      } catch (e) {
-        return const ApiResultModel.failure(
-          errorResultEntity: ErrorResultModel(
-            message: "Parsing error",
-            statusCode: 500,
-          ),
-        );
-      }
-    },
-    failure: (err) =>
-        ApiResultModel<AuthUser>.failure(errorResultEntity: err),
-  );
-}
-
+    return res.when(
+      success: (dto) {
+        try {
+          final user = dto.toEntity();
+          return ApiResultModel.success(data: user);
+        } catch (e) {
+          return const ApiResultModel.failure(
+            errorResultEntity: ErrorResultModel(
+              message: "Parsing error",
+              statusCode: 500,
+            ),
+          );
+        }
+      },
+      failure: (err) =>
+          ApiResultModel<AuthUser>.failure(errorResultEntity: err),
+    );
+  }
 
   @override
   Future<ApiResultModel<AuthUser>> verifyOtp({
@@ -167,7 +175,7 @@ Future<ApiResultModel<AuthUser>> signUp({
     );
 
     return res.when(
-       success: (data) {
+      success: (data) {
         try {
           return ApiResultModel.success(data: data.toEntity());
         } catch (e) {
@@ -179,26 +187,22 @@ Future<ApiResultModel<AuthUser>> signUp({
           );
         }
       },
-      failure: (err) => ApiResultModel<AuthUser>.failure(errorResultEntity: err),
+      failure: (err) =>
+          ApiResultModel<AuthUser>.failure(errorResultEntity: err),
     );
   }
-
-
 
   @override
   Future<ApiResultModel<AuthUser>> resendOtp({
-     required String countryCode,
+    required String countryCode,
     required String phoneNumber,
   }) async {
     final res = await _remote.resendOtp(
-      ResendOtpRequestDto(
-        countryCode: countryCode,
-        phoneNumber: phoneNumber,
-      ),
+      ResendOtpRequestDto(countryCode: countryCode, phoneNumber: phoneNumber),
     );
 
     return res.when(
-       success: (data) {
+      success: (data) {
         try {
           return ApiResultModel.success(data: data.toEntity());
         } catch (e) {
@@ -210,24 +214,25 @@ Future<ApiResultModel<AuthUser>> signUp({
           );
         }
       },
-      failure: (err) => ApiResultModel<AuthUser>.failure(errorResultEntity: err),
+      failure: (err) =>
+          ApiResultModel<AuthUser>.failure(errorResultEntity: err),
     );
   }
-  
+
   @override
   Future<ApiResultModel<AuthUser>> changePassword({
     required String currentPassword,
-     required String newPassword,
+    required String newPassword,
   }) async {
     final res = await _remote.changePassword(
       ChangePasswordDto(
         password: newPassword,
-        currentPassword :currentPassword
+        currentPassword: currentPassword,
       ),
     );
 
     return res.when(
-       success: (data) {
+      success: (data) {
         try {
           return ApiResultModel.success(data: data.toEntity());
         } catch (e) {
@@ -239,23 +244,17 @@ Future<ApiResultModel<AuthUser>> signUp({
           );
         }
       },
-      failure: (err) => ApiResultModel<AuthUser>.failure(errorResultEntity: err),
+      failure: (err) =>
+          ApiResultModel<AuthUser>.failure(errorResultEntity: err),
     );
   }
-  
 
-    @override
-  Future<ApiResultModel<AuthUser>> updateProfile({
-    required String name,
-  }) async {
-    final res = await _remote.updateProfile(
-      ProfileUpdateDto(
-        name: name,
-      ),
-    );
+  @override
+  Future<ApiResultModel<AuthUser>> updateProfile({required String name}) async {
+    final res = await _remote.updateProfile(ProfileUpdateDto(name: name));
 
     return res.when(
-       success: (data) {
+      success: (data) {
         try {
           return ApiResultModel.success(data: data.toEntity());
         } catch (e) {
@@ -267,24 +266,19 @@ Future<ApiResultModel<AuthUser>> signUp({
           );
         }
       },
-      failure: (err) => ApiResultModel<AuthUser>.failure(errorResultEntity: err),
+      failure: (err) =>
+          ApiResultModel<AuthUser>.failure(errorResultEntity: err),
     );
   }
-  
 
-
-    @override
+  @override
   Future<ApiResultModel<UserDetail>> fetchUserDetail({
-     required String userId,
+    required String userId,
   }) async {
-    final res = await _remote.fetchUserDetail(
-      UserDetailDto(
-        userID: userId,
-      ),
-    );
+    final res = await _remote.fetchUserDetail(UserDetailDto(userID: userId));
 
     return res.when(
-       success: (data) {
+      success: (data) {
         try {
           return ApiResultModel.success(data: data);
         } catch (e) {
@@ -296,9 +290,8 @@ Future<ApiResultModel<AuthUser>> signUp({
           );
         }
       },
-      failure: (err) => ApiResultModel<UserDetail>.failure(errorResultEntity: err),
+      failure: (err) =>
+          ApiResultModel<UserDetail>.failure(errorResultEntity: err),
     );
   }
-  
-
 }

@@ -2,15 +2,17 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/commondomain/entities/based_api_result/api_result_state.dart';
 import 'package:inspect_connect/core/di/app_component/app_component.dart';
-import 'package:inspect_connect/core/di/app_sockets/socket_service.dart';
+import 'package:inspect_connect/core/di/services/app_sockets/socket_service.dart';
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
 import 'package:inspect_connect/core/utils/constants/app_constants.dart';
+import 'package:inspect_connect/core/utils/constants/app_strings.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/features/auth_flow/data/datasources/local_datasources/auth_local_datasource.dart';
 import 'package:inspect_connect/features/client_flow/data/models/booking_detail_model.dart';
 import 'package:inspect_connect/features/client_flow/data/models/booking_model.dart';
 import 'package:inspect_connect/features/client_flow/domain/entities/booking_entity.dart';
 import 'package:inspect_connect/features/client_flow/domain/usecases/create_booking_usecase.dart';
+import 'package:inspect_connect/features/client_flow/domain/usecases/deduct_transfer_wallet_usecase.dart';
 import 'package:inspect_connect/features/client_flow/domain/usecases/get_booking_Detail_usecase.dart';
 import 'package:inspect_connect/features/client_flow/domain/usecases/update_booking_detail_usecase.dart';
 import 'package:inspect_connect/features/client_flow/domain/usecases/delete_booking_usecase.dart';
@@ -48,7 +50,7 @@ class BookingActionsService {
       provider.setProcessing(true);
       final user = await locator<AuthLocalDataSource>().getUser();
       if (user == null || user.authToken == null) {
-        throw Exception('User not found in local storage');
+        throw Exception(userNotFoundInLocal);
       }
 
       final booking = BookingEntity(
@@ -92,7 +94,7 @@ class BookingActionsService {
                   color: AppColors.whiteColor,
                   text: response.message.isNotEmpty
                       ? response.message
-                      : 'Booking created successfully',
+                      : bookingCreatedSuccessfully,
                 ),
               ),
             );
@@ -104,7 +106,7 @@ class BookingActionsService {
             bookingId: response.body.id,
             inspectorIds: inspectorIds,
           );
-          // clearBookingData();
+          clearBookingData();
         },
         error: (e) {
           if (context.mounted) {
@@ -112,7 +114,7 @@ class BookingActionsService {
               SnackBar(
                 content: textWidget(
                   color: AppColors.whiteColor,
-                  text: e.message ?? 'Booking creation failed',
+                  text: e.message ?? bookingCreationFailed,
                 ),
               ),
             );
@@ -178,7 +180,7 @@ class BookingActionsService {
       provider.setProcessing(true);
       final user = await locator<AuthLocalDataSource>().getUser();
       if (user == null || user.authToken == null) {
-        throw Exception('User not found in local storage');
+        throw Exception(userNotFoundInLocal);
       }
 
       final booking = BookingEntity(
@@ -221,7 +223,7 @@ class BookingActionsService {
               SnackBar(
                 content: textWidget(
                   color: AppColors.whiteColor,
-                  text: 'Booking Updated successfully.',
+                  text: bookingUpdatedSuccessfully,
                 ),
               ),
             );
@@ -235,7 +237,7 @@ class BookingActionsService {
               SnackBar(
                 content: textWidget(
                   color: AppColors.whiteColor,
-                  text: e.message ?? 'Booking update failed',
+                  text: e.message ?? bookingUpdateFailed,
                 ),
               ),
             );
@@ -257,7 +259,7 @@ class BookingActionsService {
       provider.setProcessing(true);
       final user = await locator<AuthLocalDataSource>().getUser();
       if (user == null || user.authToken == null) {
-        throw Exception('User not found in local storage');
+        throw Exception(userNotFoundInLocal);
       }
 
       final deleteBookingUseCase = locator<DeleteBookingDetailUseCase>();
@@ -278,7 +280,7 @@ class BookingActionsService {
               SnackBar(
                 content: textWidget(
                   color: AppColors.whiteColor,
-                  text: 'Booking Deleted successfully.',
+                  text: bookingDeletedSuccessfully,
                 ),
               ),
             );
@@ -290,7 +292,7 @@ class BookingActionsService {
               SnackBar(
                 content: textWidget(
                   color: AppColors.whiteColor,
-                  text: e.message ?? 'Booking Deletion failed',
+                  text: e.message ?? bookingDeletionFailed,
                 ),
               ),
             );
@@ -311,11 +313,6 @@ class BookingActionsService {
     try {
       provider.isLoadingBookingDetail = true;
       provider.notify();
-      final user = await locator<AuthLocalDataSource>().getUser();
-      if (user == null || user.authToken == null) {
-        throw Exception('User not found in local storage');
-      }
-
       final getBookingDetailUseCase = locator<GetBookingDetailUseCase>();
       final state = await provider
           .executeParamsUseCase<BookingDetailModel, GetBookingDetailParams>(
@@ -350,7 +347,7 @@ class BookingActionsService {
               SnackBar(
                 content: textWidget(
                   color: AppColors.whiteColor,
-                  text: e.message ?? 'Fetching Booking Detail failed',
+                  text: e.message ?? fetchingBookingDetailFailed,
                 ),
               ),
             );
@@ -408,7 +405,7 @@ class BookingActionsService {
               SnackBar(
                 content: textWidget(
                   color: AppColors.whiteColor,
-                  text: e.message ?? 'Booking update failed',
+                  text: e.message ?? bookingUpdateFailed,
                 ),
               ),
             );
@@ -421,7 +418,7 @@ class BookingActionsService {
           SnackBar(
             content: textWidget(
               color: AppColors.whiteColor,
-              text: 'Failed: $e',
+              text: '$failedTxt: $e',
             ),
           ),
         );
@@ -436,6 +433,7 @@ class BookingActionsService {
     required BuildContext context,
     required String bookingId,
     required bool showUpFeeApplied,
+    required String userId,
   }) async {
     try {
       provider.isUpdatingBooking = true;
@@ -454,12 +452,22 @@ class BookingActionsService {
       state?.when(
         data: (response) async {
           provider.updatedBookingData = response;
+          final finalSHowUpFeeStatus = response.showUpFeeApplied ?? false;
+          if (showUpFeeApplied) {
+            await updateBookingStatus(
+              context: context,
+              bookingId: bookingId,
+              newStatus: bookingStatusCompleted,
+              userId: userId,
+            );
+          }
+
           final index = provider.bookings.indexWhere((b) => b.id == bookingId);
           if (index != -1) {
             provider.bookings = [...provider.bookings]
               ..[index] = provider.updatedBookingData!;
           }
-          provider.showUpFeeStatusMap[bookingId] = showUpFeeApplied;
+          provider.showUpFeeStatusMap[bookingId] = finalSHowUpFeeStatus;
           provider.notify();
         },
         error: (e) {
@@ -468,7 +476,7 @@ class BookingActionsService {
               SnackBar(
                 content: textWidget(
                   color: AppColors.whiteColor,
-                  text: e.message ?? 'Show Up fee Status failed to update.',
+                  text: e.message ?? showUpFeeStatusFailedToUpdate,
                 ),
               ),
             );
@@ -481,7 +489,7 @@ class BookingActionsService {
           SnackBar(
             content: textWidget(
               color: AppColors.whiteColor,
-              text: 'Failed: $e',
+              text: '$failedTxt: $e',
             ),
           ),
         );
@@ -496,10 +504,18 @@ class BookingActionsService {
     BuildContext context,
     String bookingId,
     String userId,
+    String inspectorId,
   ) async {
     try {
       provider.isActionProcessing = true;
       provider.notify();
+      final deducted = await deductAndTransferWallet(
+        context: context,
+        bookingId: bookingId,
+        transferToId: inspectorId,
+      );
+      if (deducted == null) return;
+      if (!deducted) return;
       await updateBookingStatus(
         context: context,
         bookingId: bookingId,
@@ -511,7 +527,7 @@ class BookingActionsService {
           SnackBar(
             content: textWidget(
               color: AppColors.whiteColor,
-              text: "Payment successful and booking approved.",
+              text: paymentSuccessfulAndBookingApproved,
             ),
           ),
         );
@@ -521,13 +537,78 @@ class BookingActionsService {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: textWidget(color: AppColors.whiteColor, text: "Error: $e"),
+            content: textWidget(
+              color: AppColors.whiteColor,
+              text: "$errorTxt: $e",
+            ),
           ),
         );
       }
     } finally {
       provider.isActionProcessing = false;
       provider.notify();
+    }
+  }
+
+  Future<bool?> deductAndTransferWallet({
+    required BuildContext context,
+    required String bookingId,
+    required String transferToId,
+  }) async {
+    try {
+      provider.notify();
+      final updateBookingStatusUseCase = locator<DeductTransferWalletUsecase>();
+      final state = await provider
+          .executeParamsUseCase<String, DeductTransferWalletParams>(
+            useCase: updateBookingStatusUseCase,
+            query: DeductTransferWalletParams(
+              transferToId: transferToId,
+              bookingId: bookingId,
+            ),
+            launchLoader: true,
+          );
+
+      return state?.when(
+        data: (response) async {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                response,
+                style: const TextStyle(color: Colors.white),
+              ),
+              backgroundColor: Colors.green,
+            ),
+          );
+          provider.notify();
+
+          return true;
+        },
+        error: (e) {
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: textWidget(
+                  color: AppColors.whiteColor,
+                  text: e.message ?? "Wallet deduction failed",
+                ),
+              ),
+            );
+          }
+          return false;
+        },
+      );
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: textWidget(
+              color: AppColors.whiteColor,
+              text: '$failedTxt: $e',
+            ),
+          ),
+        );
+      }
+      return false;
     }
   }
 
@@ -550,7 +631,10 @@ class BookingActionsService {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: textWidget(color: AppColors.whiteColor, text: "Error: $e"),
+            content: textWidget(
+              color: AppColors.whiteColor,
+              text: "$errorTxt: $e",
+            ),
           ),
         );
       }

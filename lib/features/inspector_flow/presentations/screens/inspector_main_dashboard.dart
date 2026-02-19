@@ -1,9 +1,9 @@
 import 'dart:developer';
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:inspect_connect/core/di/app_sockets/socket_manager.dart';
-import 'package:inspect_connect/core/di/app_sockets/socket_service.dart';
-import 'package:inspect_connect/core/di/notifcation_services/notification_permission_manager.dart';
+import 'package:inspect_connect/core/di/services/app_sockets/socket_manager.dart';
+import 'package:inspect_connect/core/di/services/app_sockets/socket_service.dart';
+import 'package:inspect_connect/core/di/services/notifcation_services/notification_permission_manager.dart';
 import 'package:inspect_connect/core/utils/constants/app_assets_constants.dart';
 import 'package:inspect_connect/core/utils/presentation/app_assets_widget.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';

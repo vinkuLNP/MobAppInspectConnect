@@ -1,3 +1,7 @@
+import 'package:inspect_connect/features/auth_flow/data/models/document_model.dart';
+import 'package:inspect_connect/features/auth_flow/data/models/service_model.dart';
+import 'package:inspect_connect/features/auth_flow/data/models/user_document_data_model.dart';
+
 class UserDetail {
   final String id;
   final String userId;
@@ -21,7 +25,7 @@ class UserDetail {
   final List<String>? certificateDocuments;
   final String? certificateExpiryDate;
   final List<String>? referenceDocuments;
-  final String? uploadedIdOrLicenseDocument;
+  final UserDocumentDataModel? uploadedIdOrLicenseDocument;
   final String? workHistoryDescription;
 
   final bool? phoneOtpVerified;
@@ -39,13 +43,19 @@ class UserDetail {
   final String? connectorLinkUrl;
   final String? walletId;
   final bool? stripePayoutsEnabled;
-  final bool? stripeTransfersActive;
+  final bool? stripeTransfersEnabled;
   final List<Device>? devices;
   final Location? location;
   final String? createdAt;
   final String? updatedAt;
   final String? phoneOtpExpiryTime;
   final String? stripeCustomerId;
+  final bool? docxOk;
+  final CertificateType? documentTypeId;
+  final String? documentExpiryDate;
+  final String? coiExpiryDate;
+  final List<ServiceArea>? serviceAreas;
+  final List<UserDocument>? documents;
 
   const UserDetail({
     required this.id,
@@ -86,13 +96,19 @@ class UserDetail {
     this.connectorLinkUrl,
     this.walletId,
     this.stripePayoutsEnabled,
-    this.stripeTransfersActive,
+    this.stripeTransfersEnabled,
     this.devices,
     this.location,
     this.createdAt,
     this.updatedAt,
     this.phoneOtpExpiryTime,
     this.stripeCustomerId,
+    this.docxOk,
+    this.documentTypeId,
+    this.documentExpiryDate,
+    this.coiExpiryDate,
+    this.serviceAreas,
+    this.documents,
   });
 
   factory UserDetail.fromJson(Map<String, dynamic> json) {
@@ -128,7 +144,10 @@ class UserDetail {
       referenceDocuments: (body['referenceDocuments'] as List?)
           ?.map((e) => e.toString())
           .toList(),
-      uploadedIdOrLicenseDocument: body['uploadedIdOrLicenseDocument'],
+      uploadedIdOrLicenseDocument: body['uploadedIdOrLicenseDocument'] != null
+          ? UserDocumentDataModel.fromJson(body['uploadedIdOrLicenseDocument'])
+          : null,
+
       workHistoryDescription: body['workHistoryDescription'],
       phoneOtpVerified: body['phoneOtpVerified'],
       emailOtpVerified: body['emailOtpVerified'],
@@ -150,7 +169,7 @@ class UserDetail {
       connectorLinkUrl: body['connectorLinkUrl'],
       walletId: body['walletId'],
       stripePayoutsEnabled: body['stripePayoutsEnabled'],
-      stripeTransfersActive: body['stripeTransfersActive'],
+      stripeTransfersEnabled: body['stripeTransfersEnabled'],
       devices: (body['devices'] as List?)
           ?.map((e) => Device.fromJson(e))
           .toList(),
@@ -161,6 +180,28 @@ class UserDetail {
       updatedAt: body['updatedAt'],
       phoneOtpExpiryTime: body['phoneOtpExpiryTime'],
       stripeCustomerId: body['stripeCustomerId'],
+      docxOk: body['docxOk'],
+
+      documentTypeId: body['documentTypeId'] != null
+          ? CertificateType.fromJson(body['documentTypeId'])
+          : null,
+
+      documentExpiryDate: body['documentExpiryDate'],
+      coiExpiryDate: body['coiExpiryDate'],
+
+      // serviceAreas: body['serviceAreas'],
+      // documents: body['documents'],
+      serviceAreas: body['serviceAreas'] != []
+          ? (body['serviceAreas'] as List?)
+                ?.map((e) => ServiceArea.fromJson(e))
+                .toList()
+          : [],
+
+      documents: body['documents'] != []
+          ? (body['documents'] as List?)
+                ?.map((e) => UserDocument.fromJson(e))
+                .toList()
+          : [],
     );
   }
 
@@ -205,13 +246,19 @@ class UserDetail {
       'connectorLinkUrl': connectorLinkUrl,
       'walletId': walletId,
       'stripePayoutsEnabled': stripePayoutsEnabled,
-      'stripeTransfersActive': stripeTransfersActive,
+      'stripeTransfersEnabled': stripeTransfersEnabled,
       'devices': devices?.map((e) => e.toJson()).toList(),
       'location': location?.toJson(),
       'createdAt': createdAt,
       'updatedAt': updatedAt,
       'phoneOtpExpiryTime': phoneOtpExpiryTime,
       'stripeCustomerId': stripeCustomerId,
+      'docxOk': docxOk,
+      'documentTypeId': documentTypeId?.toJson(),
+      'documentExpiryDate': documentExpiryDate,
+      'coiExpiryDate': coiExpiryDate,
+      'serviceAreas': serviceAreas,
+      'documents': documents,
     };
   }
 }
@@ -275,15 +322,21 @@ class CertificateAgency {
 class CurrentSubscription {
   final String? id;
   final Plan? planId;
+
+  final int? startDate;
+  final int? endDate;
   final int? trialStart;
   final int? trialEnd;
-  final int? amount;
+
+  final double? amount;
   final String? currency;
   final String? interval;
 
-  CurrentSubscription({
-    this.id,
+  const CurrentSubscription({
+    required this.id,
     this.planId,
+    this.startDate,
+    this.endDate,
     this.trialStart,
     this.trialEnd,
     this.amount,
@@ -291,20 +344,26 @@ class CurrentSubscription {
     this.interval,
   });
 
-  factory CurrentSubscription.fromJson(Map<String, dynamic> json) =>
-      CurrentSubscription(
-        id: json['_id'],
-        planId: json['planId'] != null ? Plan.fromJson(json['planId']) : null,
-        trialStart: json['trialStart'],
-        trialEnd: json['trialEnd'],
-        amount: json['amount'],
-        currency: json['currency'],
-        interval: json['interval'],
-      );
+  factory CurrentSubscription.fromJson(Map<String, dynamic> json) {
+    return CurrentSubscription(
+      id: json['_id'].toString(),
+      planId: json['planId'] != null ? Plan.fromJson(json['planId']) : null,
+      startDate: json['startDate'],
+      endDate: json['endDate'],
+      trialStart: json['trialStart'],
+      trialEnd: json['trialEnd'],
+
+      amount: (json['amount'] as num?)?.toDouble(),
+      currency: json['currency'],
+      interval: json['interval'],
+    );
+  }
 
   Map<String, dynamic> toJson() => {
     '_id': id,
     'planId': planId?.toJson(),
+    'startDate': startDate,
+    'endDate': endDate,
     'trialStart': trialStart,
     'trialEnd': trialEnd,
     'amount': amount,

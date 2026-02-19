@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/utils/auto_router_setup/auto_router.dart';
@@ -194,8 +195,9 @@ void showRaiseAmountSheet({
                       child: AppButton(
                         onTap: () => Navigator.pop(context),
                         text: cancelTxt,
+                        textColor: AppColors.black,
                         buttonBackgroundColor: AppColors.backgroundColor,
-                        borderColor: Colors.red,
+                        borderColor: AppColors.black,
                         isBorder: true,
                       ),
                     ),
@@ -212,7 +214,7 @@ void showRaiseAmountSheet({
                   ],
                 ),
 
-                const SizedBox(height: 10),
+                const SizedBox(height: 40),
               ],
             ),
           );
@@ -223,7 +225,7 @@ void showRaiseAmountSheet({
 }
 
 Future<bool> validateFileSize(File file, BuildContext context) async {
-  if (await file.length() <= 2 * 1024 * 1024) return true;
+  if (await file.length() <= maxFileSizeInBytes) return true;
 
   if (context.mounted) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -277,4 +279,35 @@ DateTime bookingDateTime(BookingListEntity booking) {
   } catch (_) {
     return DateTime(date.year, date.month, date.day, 10, 0);
   }
+}
+
+void showSnackBar(BuildContext context, {required String message}) {
+  if (!context.mounted) return;
+
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: textWidget(text: message, color: AppColors.backgroundColor),
+    ),
+  );
+}
+
+String generatePrivateTempId({int length = 20}) {
+  const alphanumeric =
+      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+  final random = Random();
+  final buffer = StringBuffer();
+
+  for (int i = 0; i < length; i++) {
+    buffer.write(alphanumeric[random.nextInt(alphanumeric.length)]);
+  }
+
+  return buffer.toString();
+}
+
+String formatDate(DateTime date) {
+  final y = date.year.toString().padLeft(4, '0');
+  final m = date.month.toString().padLeft(2, '0');
+  final d = date.day.toString().padLeft(2, '0');
+  return '$y-$m-$d';
 }

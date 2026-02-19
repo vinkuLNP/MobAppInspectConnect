@@ -6,6 +6,7 @@ import 'package:inspect_connect/core/utils/app_widgets/common_address_auto_compl
 import 'package:inspect_connect/core/utils/auto_router_setup/auto_router.dart';
 import 'package:inspect_connect/core/utils/constants/app_assets_constants.dart';
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
+import 'package:inspect_connect/core/utils/constants/app_strings.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_button.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/client/client_view_model.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/client/widgets/auth_form_switch_row.dart';
@@ -28,21 +29,20 @@ class ResetPasswordView extends StatelessWidget {
     return BaseResponsiveWidget(
       initializeConfig: true,
       buildWidget: (ctx, rc, app) {
-
         final vm = ctx.read<ClientViewModelProvider>();
-   log('----vm-->${fullNameCtrl.text}');
-                    log('---vm--->${emailCtrlSignUp.text}');
-                    log('---v--->${phoneCtrl.text}');
-                    log('------>${countryCodeCtrl.text}');
+        log('----vm-->${cltFullNameCtrl.text}');
+        log('---vm--->${cltEmailCtrlSignUp.text}');
+        log('---v--->${cltPhoneCtrl.text}');
+        log('------>${cltCountryCodeCtrl.text}');
 
         return CommonAuthBar(
           showBackButton: showBackButton,
           title: vm.otpPurpose == OtpPurpose.forgotPassword
-              ? 'Reset Password'
-              : 'Create Account',
+              ? resetPassword
+              : createAccount,
           subtitle: vm.otpPurpose == OtpPurpose.forgotPassword
-              ? 'Enter your new password'
-              : 'Enter password and address detail to continue',
+              ? enterYourNewPassword
+              : enterPasswordAndAddressDetailToContinue,
           image: finalImage,
           rc: rc,
           form: Form(
@@ -50,11 +50,10 @@ class ResetPasswordView extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-
                 Consumer<ClientViewModelProvider>(
                   builder: (_, vm, _) => AppPasswordField(
-                    label: 'New Password',
-                    controller:  passwordCtrlSignUp,
+                    label: newPasswordLabel,
+                    controller: cltPasswordCtrlSignUp,
                     obscure: vm.obscurePassword,
                     onToggle: vm.toggleObscurePassword,
                     validator: vm.validatePassword,
@@ -68,8 +67,8 @@ class ResetPasswordView extends StatelessWidget {
 
                 Consumer<ClientViewModelProvider>(
                   builder: (_, vm, _) => AppPasswordField(
-                    label: 'Confirm New Password',
-                    controller:  confirmPasswordCtrl,
+                    label: confirmNewPasswordLabel,
+                    controller: cltConfirmPasswordCtrl,
                     obscure: vm.obscureConfirm,
                     onToggle: vm.toggleObscureConfirm,
                     validator: vm.validateConfirmPassword,
@@ -82,15 +81,15 @@ class ResetPasswordView extends StatelessWidget {
                 const SizedBox(height: 14),
 
                 AddressAutocompleteField(
-                  label: "Address",
-                  controller: addressCtrl,
+                  label: addressLabel,
+                  controller: cltAddressCtrl,
                   validator: vm.validateMailingAddress,
                   googleApiKey: dotenv.env['GOOGLE_API_KEY']!,
                   onAddressSelected: (prediction) {
                     log("Selected: ${prediction.fullText}");
                   },
                   onFullAddressFetched: (data) {
-                    vm.setAddressData(data); 
+                    vm.setAddressData(data);
                   },
                 ),
 
@@ -99,10 +98,10 @@ class ResetPasswordView extends StatelessWidget {
                 Consumer<ClientViewModelProvider>(
                   builder: (_, vm, _) => AppButton(
                     text: vm.isResetting
-                        ? 'Resetting...'
+                        ? resetting
                         : (vm.otpPurpose == OtpPurpose.forgotPassword
-                            ? 'Reset Password'
-                            : 'Submit'),
+                              ? resetPassword
+                              : submitTxt),
                     buttonBackgroundColor: AppColors.authThemeColor,
                     borderColor: AppColors.authThemeColor,
                     isLoading: vm.isResetting,
@@ -113,14 +112,14 @@ class ResetPasswordView extends StatelessWidget {
                         vm.enableAutoValidate();
                         return;
                       }
-                      await vm.resetPassword(formKey: formKey, context: context);
+                      await vm.clientSignUp(formKey: formKey, context: context);
                     },
                   ),
                 ),
 
                 AuthFormSwitchRow(
-                  question: "Already have an account? ",
-                  actionText: "Sign In",
+                  question: alreadyHaveAccount,
+                  actionText: signInTitle,
                   onTap: () {
                     context.router.replaceAll([
                       ClientSignInRoute(showBackButton: false),

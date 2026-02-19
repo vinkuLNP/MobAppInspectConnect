@@ -5,6 +5,7 @@ import 'package:inspect_connect/core/basecomponents/base_responsive_widget.dart'
 import 'package:inspect_connect/core/utils/auto_router_setup/auto_router.dart';
 import 'package:inspect_connect/core/utils/constants/app_assets_constants.dart';
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
+import 'package:inspect_connect/core/utils/constants/app_strings.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_button.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/auth_user_provider.dart';
@@ -30,8 +31,8 @@ class ClientSignInView extends StatelessWidget {
       buildWidget: (ctx, rc, app) {
         final provider = ctx.watch<ClientViewModelProvider>();
         return CommonAuthBar(
-          title: 'Sign in',
-          subtitle: 'Welcome Back',
+          title: signInTitle,
+          subtitle: welcomeBack,
           showBackButton: showBackButton,
           image: finalImage,
           rc: rc,
@@ -41,10 +42,10 @@ class ClientSignInView extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 AppInputField(
-                  label: 'Email',
-                  controller: emailCtrl,
+                  label: emailLabel,
+                  controller: cltEmailCtrl,
                   keyboardType: TextInputType.emailAddress,
-                  hint: 'example@gmail.com',
+                  hint: emailHint,
                   validator: provider.validateEmail,
                   onChanged: (_) {
                     if (provider.autoValidate) formKey.currentState?.validate();
@@ -52,8 +53,8 @@ class ClientSignInView extends StatelessWidget {
                 ),
                 const SizedBox(height: 14),
                 AppPasswordField(
-                  label: 'Password',
-                  controller: passwordCtrl,
+                  label: passwordLabel,
+                  controller: cltPasswordCtrl,
                   obscure: provider.obscure,
                   onToggle: provider.toggleObscure,
                   validator: provider.validatePassword,
@@ -70,7 +71,7 @@ class ClientSignInView extends StatelessWidget {
                       );
                     },
                     child: textWidget(
-                      text: 'Forget Password?',
+                      text: forgotPassword,
                       fontWeight: FontWeight.w400,
                       fontSize: 14,
                       color: AppColors.authThemeLightColor,
@@ -79,7 +80,7 @@ class ClientSignInView extends StatelessWidget {
                 ),
                 const SizedBox(height: 14),
                 AppButton(
-                  text: provider.isSigningIn ? 'Signing In...' : 'Sign In',
+                  text: provider.isSigningIn ? signingIn : signInTitle,
                   buttonBackgroundColor: AppColors.authThemeColor,
                   borderColor: AppColors.authThemeColor,
                   isLoading: provider.isSigningIn,
@@ -97,11 +98,11 @@ class ClientSignInView extends StatelessWidget {
                   },
                 ),
                 AuthFormSwitchRow(
-                  question: "Don’t have an account? ",
-                  actionText: "Sign Up",
+                  question: dontHaveAccount,
+                  actionText: signUpTitle,
                   onTap: () {
-                    passwordCtrl.clear();
-                    emailCtrl.clear();
+                    cltPasswordCtrl.clear();
+                    cltEmailCtrl.clear();
                     final stackString = context.router.stack.toString();
                     log('stack raw: $stackString');
 

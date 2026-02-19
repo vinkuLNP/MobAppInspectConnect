@@ -1,10 +1,11 @@
 import 'dart:convert';
 import 'dart:developer';
-
 import 'package:injectable/injectable.dart';
 import 'package:inspect_connect/features/auth_flow/data/datasources/local_datasources/app_local_database.dart';
+import 'package:inspect_connect/features/auth_flow/domain/entities/icc_document_entity.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/inspector_sign_up_entity.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/service_area_entity.dart';
+import 'package:inspect_connect/features/auth_flow/domain/entities/user_document_entity.dart';
 
 @injectable
 class InspectorSignUpLocalDataSource {
@@ -27,9 +28,11 @@ class InspectorSignUpLocalDataSource {
     final entity = await _getOrCreate();
 
     entity.serviceAreas.length;
-    log(
-      'Before update:  ${entity.name.toString()} ----- zipCode: ${entity.zipCode.toString()} ----- serviceAreas: ${entity.serviceAreas.length}',
-    );
+    if (entity.iccDocuments.isNotEmpty) {
+      log(
+        'Before update:  ${entity.name.toString()} ----- icc doc: ${entity.iccDocuments[0].toString()}    ${entity.iccDocuments[0].serviceCity.toString()} ----- zipcode : ${entity.serviceAreas[0].cityName.toString()} zipcode : ${entity.serviceAreas[0].zipCode.toString()}  certificate dfocuments ${entity.certificateDocuments}',
+      );
+    }
 
     fields.forEach((k, v) {
       switch (k) {
@@ -83,7 +86,33 @@ class InspectorSignUpLocalDataSource {
           if (v != null) entity.profileImage = v as String?;
           break;
         case 'uploadedIdOrLicenseDocument':
-          if (v != null) entity.uploadedIdOrLicenseDocument = v as String?;
+          if (v != null) {
+            final doc = UserDocumentEntity(
+              documentUrl: (v as UserDocumentEntity).documentUrl,
+              fileName: v.fileName,
+            );
+            entity.uploadedIdOrLicenseDocument.target = doc;
+          }
+          break;
+
+        case 'uploadedCoiDocument':
+          if (v != null) {
+            final doc = UserDocumentEntity(
+              documentUrl: (v as UserDocumentEntity).documentUrl,
+              fileName: v.fileName,
+            );
+            entity.uploadedCoiDocument.target = doc;
+          }
+          break;
+
+        case 'documentTypeId':
+          if (v != null) entity.documentTypeId = v as String?;
+          break;
+        case 'documentExpiryDate':
+          if (v != null) entity.documentExpiryDate = v as String?;
+          break;
+        case 'coiExpiryDate':
+          if (v != null) entity.coiExpiryDate = v as String?;
           break;
         case 'referenceDocuments':
           entity.referenceDocuments = List<String>.from(v as Iterable);
@@ -116,6 +145,51 @@ class InspectorSignUpLocalDataSource {
           entity.deviceToken = v as String?;
           break;
 
+        case 'iccDocument':
+          log('--- Incoming ICC Documents ---');
+          for (final d in v) {
+            log(
+              'IN -> id:${d['id']} | city:${d['serviceCity']} | file:${d['fileName']} | expiry:${d['expiryDate']}',
+            );
+          }
+          if (v is Iterable) {
+            final incoming = v.cast<Map<String, dynamic>>();
+
+            entity.iccDocuments.removeWhere(
+              (old) => !incoming.any((n) => n['id'] == old.documentId),
+            );
+
+            for (final d in incoming) {
+              final existing = entity.iccDocuments.firstWhere(
+                (e) => e.documentId == d['id'],
+                orElse: () => IccDocumentLocalEntity(
+                  documentId: d['id'],
+                  serviceCity: d['serviceCity'],
+                  documentUrl: d['documentUrl'],
+                  expiryDate: d['expiryDate'],
+                  fileName: d['fileName'],
+                ),
+              );
+
+              existing
+                ..serviceCity = d['serviceCity']
+                ..documentUrl = d['documentUrl']
+                ..expiryDate = d['expiryDate']
+                ..fileName = d['fileName'];
+
+              if (!entity.iccDocuments.contains(existing)) {
+                entity.iccDocuments.add(existing);
+              }
+            }
+          }
+          log('--- Stored ICC Documents in Local DB ---');
+          for (final e in entity.iccDocuments) {
+            log(
+              'DB -> id:${e.documentId} | city:${e.serviceCity} | file:${e.fileName} | url:${e.documentUrl} | expiry:${e.expiryDate}',
+            );
+          }
+
+          break;
         case 'serviceAreas':
           if (v is Iterable) {
             for (var old in entity.serviceAreas) {
@@ -130,6 +204,7 @@ class InspectorSignUpLocalDataSource {
                 countryCode: s['countryCode'] as String?,
                 stateCode: s['stateCode'] as String?,
                 cityName: s['cityName'] as String?,
+                zipCode: s['zipCode'] as String?,
                 locationType: loc?['type'] as String?,
                 latitude: (loc != null)
                     ? double.tryParse(loc['coordinates'][1].toString())
@@ -147,21 +222,21 @@ class InspectorSignUpLocalDataSource {
           break;
       }
     });
-
     _database.saveInspector(entity);
-
-    log(
-      'After update: ${entity.name.toString()} ----- zipCode: ${entity.zipCode.toString()} ----- serviceAreas: ${entity.serviceAreas.iterator}',
-    );
+    if (entity.iccDocuments.isNotEmpty) {
+      log(
+        'After update:   ${entity.name.toString()} ----- icc doc: ${entity.iccDocuments[0].documentUrl.toString()}    ${entity.iccDocuments[0].serviceCity.toString()} ----- zipcode : ${entity.serviceAreas[0].cityName.toString()} zipcode : ${entity.serviceAreas[0].zipCode.toString()}  certificate dfocuments ${entity.certificateDocuments}',
+      );
+    }
   }
 
   Future<InspectorSignUpLocalEntity?> getFullData() async {
     final list = await _database.getAll<InspectorSignUpLocalEntity>();
     if (list != null && list.isNotEmpty) {
-      log(
-        '🔍 Retrieved inspector signup data: ${jsonEncode(list.first.toJson())}',
-      );
-      return list.first;
+      final entity = list.first;
+
+      log('🔍 Retrieved inspector signup data: ${jsonEncode(entity.toJson())}');
+      return entity;
     }
     return null;
   }

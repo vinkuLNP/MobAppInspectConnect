@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/commondomain/entities/based_api_result/api_result_state.dart';
 import 'package:inspect_connect/core/di/app_component/app_component.dart';
 import 'package:inspect_connect/core/utils/constants/app_constants.dart';
+import 'package:inspect_connect/core/utils/constants/app_strings.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/features/client_flow/data/models/booking_model.dart';
 import 'package:inspect_connect/features/client_flow/domain/entities/booking_list_entity.dart';
@@ -103,7 +104,7 @@ class BookingTimerService {
           if (context.mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: textWidget(text: e.message ?? 'Booking update failed'),
+                content: textWidget(text: e.message ?? bookingUpdateFailed),
               ),
             );
           }

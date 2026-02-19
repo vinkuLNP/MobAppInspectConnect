@@ -1,4 +1,10 @@
+import 'dart:convert';
+
+import 'package:inspect_connect/features/auth_flow/data/models/document_model.dart';
+import 'package:inspect_connect/features/auth_flow/data/models/service_model.dart';
+import 'package:inspect_connect/features/auth_flow/data/models/user_document_data_model.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/auth_user.dart';
+import 'package:inspect_connect/features/auth_flow/domain/entities/user_detail.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/user_device_entity.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/user_location_entity.dart';
 import 'package:objectbox/objectbox.dart';
@@ -24,10 +30,10 @@ class AuthUserLocalEntity {
   String? stripeCustomerId;
   String? stripeAccountId;
   bool? stripePayoutsEnabled;
-  bool? stripeTransfersActive;
+  bool? stripeTransfersEnabled;
   int? currentSubscriptionTrialDays;
   int? currentSubscriptionAutoRenew;
-  String? currentSubscriptionId;
+  CurrentSubscription? currentSubscriptionId;
   String? stripeSubscriptionStatus;
   String? walletId;
   String? locationName;
@@ -49,9 +55,18 @@ class AuthUserLocalEntity {
   List<String>? certificateDocuments;
   String? certificateExpiryDate;
   List<String>? referenceDocuments;
-  String? uploadedIdOrLicenseDocument;
+  UserDocumentDataModel? uploadedIdOrLicenseDocument;
   String? workHistoryDescription;
   DateTime? loginTime;
+  bool? statusUpdatedByAdmin;
+  bool? docxOk;
+  String? connectorLinkUrl;
+  String? documentTypeId;
+  String? documentExpiryDate;
+  String? coiExpiryDate;
+  String? serviceAreasJson;
+  String? documentsJson;
+
   @Backlink()
   final devices = ToMany<AuthUserDeviceEntity>();
 
@@ -74,7 +89,7 @@ class AuthUserLocalEntity {
     this.stripeCustomerId,
     this.stripeAccountId,
     this.stripePayoutsEnabled,
-    this.stripeTransfersActive,
+    this.stripeTransfersEnabled,
     this.currentSubscriptionTrialDays,
     this.currentSubscriptionAutoRenew,
     this.currentSubscriptionId,
@@ -101,6 +116,14 @@ class AuthUserLocalEntity {
     this.referenceDocuments,
     this.uploadedIdOrLicenseDocument,
     this.workHistoryDescription,
+    this.statusUpdatedByAdmin,
+    this.docxOk,
+    this.connectorLinkUrl,
+    this.documentTypeId,
+    this.documentExpiryDate,
+    this.coiExpiryDate,
+    this.serviceAreasJson,
+    this.documentsJson,
   });
   AuthUserLocalEntity copyWith({
     String? name,
@@ -119,6 +142,7 @@ class AuthUserLocalEntity {
     String? stripeAccountId,
     String? stripeCustomerId,
     UserLocation? location,
+    String? profileImage,
     List<UserDevice>? devices,
   }) {
     return AuthUserLocalEntity(
@@ -133,85 +157,11 @@ class AuthUserLocalEntity {
       emailOtpVerified: emailOtpVerified ?? this.emailOtpVerified,
       agreedToTerms: agreedToTerms ?? this.agreedToTerms,
       isTruthfully: isTruthfully ?? this.isTruthfully,
+      profileImage: profileImage ?? this.profileImage,
       walletId: walletId ?? this.walletId,
       stripeAccountId: stripeAccountId ?? this.stripeAccountId,
       stripeCustomerId: stripeCustomerId ?? this.stripeCustomerId,
       mailingAddress: mailingAddress ?? this.mailingAddress,
-    );
-  }
-
-  factory AuthUserLocalEntity.fromApiResponse(Map<String, dynamic> response) {
-    Map<String, dynamic>? user = response['body']?['user'] ?? response['body'];
-    String? authToken =
-        response['body']?['authToken'] ??
-        response['body']?['user']?['authToken'];
-    Map<String, dynamic>? location = user?['location'];
-    double? latitude;
-    double? longitude;
-    String? locationName;
-    if (location != null && location['coordinates'] != null) {
-      longitude = (location['coordinates'][0] as num?)?.toDouble();
-      latitude = (location['coordinates'][1] as num?)?.toDouble();
-      locationName = location['locationName'];
-    }
-
-    return AuthUserLocalEntity(
-      authToken: authToken,
-      name: user?['name'],
-      userId: user?['_id'],
-
-      email: user?['email'],
-      phoneNumber: user?['phoneNumber'],
-      countryCode: user?['countryCode'],
-      mailingAddress: user?['mailingAddress'],
-      role: user?['role'],
-      status: user?['status'],
-      phoneOtpVerified: user?['phoneOtpVerified'],
-      emailOtpVerified: user?['emailOtpVerified'],
-      agreedToTerms: user?['agreedToTerms'],
-      isTruthfully: user?['isTruthfully'],
-      certificateApproved: user?['certificateApproved'],
-      rejectedReason: user?['rejectedReason'],
-      stripeCustomerId: user?['stripeCustomerId'],
-      stripeAccountId: user?['stripeAccountId'],
-      stripePayoutsEnabled: user?['stripePayoutsEnabled'],
-      stripeTransfersActive: user?['stripeTransfersActive'],
-      currentSubscriptionTrialDays: user?['currentSubscriptionTrialDays'],
-      currentSubscriptionAutoRenew: user?['currentSubscriptionAutoRenew'],
-      currentSubscriptionId: user?['currentSubscriptionId'],
-      stripeSubscriptionStatus: user?['stripeSubscriptionStatus'],
-      walletId: user?['walletId'],
-      locationName: locationName,
-      latitude: latitude,
-      longitude: longitude,
-      createdAt: user?['createdAt'] != null
-          ? DateTime.parse(user!['createdAt'])
-          : null,
-      updatedAt: user?['updatedAt'] != null
-          ? DateTime.parse(user!['updatedAt'])
-          : null,
-      loginTime: user?['loginTime'] != null
-          ? DateTime.parse(user!['loginTime'])
-          : null,
-      zipCode: user?['zipCode'],
-      profileImage: user?["profileImage"],
-      bookingInProgress: user?["bookingInProgress"],
-      isDeleted: user?["isDeleted"],
-      country: user?["country"],
-      state: user?["state"],
-      city: user?["city"],
-      location: user?["location"],
-      certificateTypeId: user?["certificateTypeId"],
-      certificateAgencyIds: List<String>.from(
-        user?["certificateAgencyIds"] ?? [],
-      ),
-      certificateDocuments: List<String>.from(
-        user?["certificateDocuments"] ?? [],
-      ),
-      certificateExpiryDate: user?["certificateExpiryDate"],
-      referenceDocuments: List<String>.from(user?["referenceDocuments"] ?? []),
-      uploadedIdOrLicenseDocument: user?["uploadedIdOrLicenseDocument"],
-      workHistoryDescription: user?["workHistoryDescription"],
     );
   }
 }
@@ -245,6 +195,14 @@ extension AuthUserLocalMapping on AuthUserLocalEntity {
       walletId: walletId,
       stripeAccountId: stripeAccountId,
       stripeCustomerId: stripeCustomerId,
+      stripeSubscriptionStatus: stripeSubscriptionStatus,
+      currentSubscriptionId: currentSubscriptionId,
+      currentSubscriptionTrialDays: currentSubscriptionTrialDays,
+      currentSubscriptionAutoRenew: currentSubscriptionAutoRenew,
+      stripePayoutsEnabled: stripePayoutsEnabled,
+      stripeTransfersEnabled: stripeTransfersEnabled,
+      certificateApproved: certificateApproved,
+      rejectedReason: rejectedReason,
       location: (latitude != null && longitude != null)
           ? UserLocation(
               name: locationName ?? '',
@@ -254,21 +212,40 @@ extension AuthUserLocalMapping on AuthUserLocalEntity {
           : null,
       devices: devices.map((d) => d.toDomainEntity()).toList(),
       bookingInProgress: bookingInProgress,
+      isDeleted: isDeleted,
+      status: status,
+      statusUpdatedByAdmin: statusUpdatedByAdmin,
+      profileImage: profileImage,
+      mailingAddress: mailingAddress,
+      country: country,
+      state: state,
+      city: city,
+      zip: zipCode,
+      certificateTypeId: certificateTypeId,
       certificateAgencyIds: certificateAgencyIds,
       certificateDocuments: certificateDocuments,
       certificateExpiryDate: certificateExpiryDate,
-      isDeleted: isDeleted,
-      referenceDocuments: referenceDocuments,
-      status: status,
-      mailingAddress: mailingAddress,
-      profileImage: profileImage,
-      certificateTypeId: certificateTypeId,
-      country: country,
-      state: state,
-      zip: zipCode,
-      city: city,
       uploadedIdOrLicenseDocument: uploadedIdOrLicenseDocument,
+      documentTypeId: documentTypeId,
+      documentExpiryDate: documentExpiryDate,
+      coiExpiryDate: coiExpiryDate,
+      docxOk: docxOk,
       workHistoryDescription: workHistoryDescription,
+      referenceDocuments: referenceDocuments,
+      connectorLinkUrl: connectorLinkUrl,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
+      loginTime: loginTime,
+      documents: documentsJson != null
+          ? (jsonDecode(documentsJson!) as List)
+                .map((e) => UserDocument.fromJson(e))
+                .toList()
+          : null,
+      serviceAreas: serviceAreasJson != null
+          ? (jsonDecode(serviceAreasJson!) as List)
+                .map((e) => ServiceArea.fromJson(e))
+                .toList()
+          : null,
     );
   }
 }
@@ -305,8 +282,8 @@ extension AuthUserLocalEntityMergeData on AuthUserLocalEntity {
             stripeAccountId: newUser.stripeAccountId ?? stripeAccountId,
             stripePayoutsEnabled:
                 newUser.stripePayoutsEnabled ?? stripePayoutsEnabled,
-            stripeTransfersActive:
-                newUser.stripeTransfersActive ?? stripeTransfersActive,
+            stripeTransfersEnabled:
+                newUser.stripeTransfersEnabled ?? stripeTransfersEnabled,
             currentSubscriptionTrialDays:
                 newUser.currentSubscriptionTrialDays ??
                 currentSubscriptionTrialDays,
@@ -325,6 +302,16 @@ extension AuthUserLocalEntityMergeData on AuthUserLocalEntity {
             zipCode: zipCode ?? newUser.zipCode,
             updatedAt: newUser.updatedAt ?? updatedAt,
             loginTime: newUser.loginTime ?? loginTime,
+            docxOk: newUser.docxOk ?? docxOk,
+            connectorLinkUrl: newUser.connectorLinkUrl ?? connectorLinkUrl,
+            statusUpdatedByAdmin:
+                newUser.statusUpdatedByAdmin ?? statusUpdatedByAdmin,
+            documentTypeId: newUser.documentTypeId ?? documentTypeId,
+            documentExpiryDate:
+                newUser.documentExpiryDate ?? documentExpiryDate,
+            coiExpiryDate: newUser.coiExpiryDate ?? coiExpiryDate,
+            serviceAreasJson: newUser.serviceAreasJson ?? serviceAreasJson,
+            documentsJson: newUser.documentsJson ?? documentsJson,
           )
           ..id = id
           ..devices.addAll(

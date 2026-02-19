@@ -3,8 +3,8 @@ import 'dart:developer';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/di/app_component/app_component.dart';
-import 'package:inspect_connect/core/di/app_sockets/socket_service.dart';
-import 'package:inspect_connect/core/di/notifcation_services/app_notification.dart';
+import 'package:inspect_connect/core/di/services/app_sockets/socket_service.dart';
+import 'package:inspect_connect/core/di/services/notifcation_services/app_notification.dart';
 import 'package:inspect_connect/core/utils/constants/app_constants.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_button.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/booking_provider.dart';
@@ -174,7 +174,7 @@ class SocketManager {
 
       _showNotification(
         title: "Price Change Requested",
-        body: "New amount: ₹$raisedAmount",
+        body: "Raised amount by: \$$raisedAmount",
         bookingId: bookingId,
       );
     }
@@ -232,8 +232,8 @@ class SocketManager {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: Text("Price change for Booking $bookingId"),
-        content: Text("New amount: ₹$raisedAmount"),
+        title: Text("Price change for Booking"),
+        content: Text("Raised amount by: \$$raisedAmount"),
         actions: [
           TextButton(
             child: const Text("Reject"),
@@ -260,12 +260,12 @@ class SocketManager {
                 'raisedAmount': raisedAmount,
               });
 
-              bookingProvider.actionsService.updateBookingStatus(
-                context: context,
-                bookingId: bookingId,
-                newStatus: bookingStatusAccepted,
-                userId: userId,
-              );
+              // bookingProvider.actionsService.updateBookingStatus(
+              //   context: context,
+              //   bookingId: bookingId,
+              //   newStatus: bookingStatusAccepted,
+              //   userId: userId,
+              // );
               Navigator.pop(context);
               isRaiseDialogOpen = false;
             },

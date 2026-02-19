@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
+import 'package:inspect_connect/core/utils/constants/app_assets_constants.dart';
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_button.dart';
 import 'package:inspect_connect/features/client_flow/presentations/widgets/common_app_bar.dart';
@@ -120,10 +121,7 @@ class _BaseInspectionListScreenState extends State<BaseInspectionListScreen>
                           scale: 1.05,
                           duration: const Duration(seconds: 2),
                           curve: Curves.easeInOut,
-                          child: Image.asset(
-                            'assets/images/no_booking.webp',
-                            width: 160,
-                          ),
+                          child: Image.asset(noBookingImg, width: 160),
                         ),
 
                         const SizedBox(height: 20),
@@ -207,7 +205,7 @@ class _BaseInspectionListScreenState extends State<BaseInspectionListScreen>
                         children: [
                           _buildBookingCard(context, booking),
                           index == filteredBookings.length - 1
-                              ? SizedBox(height: 80)
+                              ? SizedBox(height: 130)
                               : SizedBox.shrink(),
                         ],
                       ),

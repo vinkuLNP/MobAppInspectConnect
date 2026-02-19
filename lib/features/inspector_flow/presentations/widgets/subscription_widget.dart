@@ -1,5 +1,3 @@
-
-
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
@@ -9,7 +7,7 @@ import 'package:inspect_connect/features/inspector_flow/data/models/subscription
 
 class SubscriptionCarousel extends StatefulWidget {
   final List<SubscriptionPlanModel> plans;
-  final void Function(SubscriptionPlanModel plan)? onSubscribe;
+  final void Function(SubscriptionPlanModel plan, int isMnaual)? onSubscribe;
 
   const SubscriptionCarousel({
     super.key,
@@ -23,7 +21,7 @@ class SubscriptionCarousel extends StatefulWidget {
 
 class _SubscriptionCarouselState extends State<SubscriptionCarousel> {
   int _currentIndex = 0;
-
+  bool _autoRenew = true;
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
@@ -66,7 +64,7 @@ class _SubscriptionCarouselState extends State<SubscriptionCarousel> {
             Positioned(
               bottom: 120,
               left: MediaQuery.of(context).size.width / 2.8,
-              child: _buildDotsIndicator(),
+              child: Column(children: [_buildDotsIndicator()]),
             ),
           ],
         ),
@@ -110,7 +108,10 @@ class _SubscriptionCarouselState extends State<SubscriptionCarousel> {
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withValues(alpha:0.25), width: 2),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.25),
+          width: 2,
+        ),
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(24),
@@ -118,6 +119,7 @@ class _SubscriptionCarouselState extends State<SubscriptionCarousel> {
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Column(
                 children: [
@@ -134,7 +136,7 @@ class _SubscriptionCarouselState extends State<SubscriptionCarousel> {
                     fontWeight: FontWeight.w600,
                     color: Colors.white70,
                   ),
-              
+
                   const SizedBox(height: 8),
                   Container(
                     padding: const EdgeInsets.symmetric(
@@ -142,12 +144,12 @@ class _SubscriptionCarouselState extends State<SubscriptionCarousel> {
                       vertical: 6,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.greenAccent.withValues(alpha:0.15),
+                      color: Colors.greenAccent.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(color: Colors.greenAccent, width: 1),
                     ),
                     child: textWidget(
-                      text: "${plan.trialDays}-day Free Trial",
+                      text: "${plan.trialDays}-days Trial Period",
                       fontSize: 12,
                       color: Colors.greenAccent,
                       fontWeight: FontWeight.bold,
@@ -156,15 +158,12 @@ class _SubscriptionCarouselState extends State<SubscriptionCarousel> {
                 ],
               ),
 
-              const SizedBox(height: 16),
-
-              Expanded(
+              Flexible(
                 child: SingleChildScrollView(
                   physics: const BouncingScrollPhysics(),
                   padding: const EdgeInsets.symmetric(vertical: 10),
                   child: Column(
-                    children: plan.features
-                    .map((feature) {
+                    children: plan.features.map((feature) {
                       return Padding(
                         padding: const EdgeInsets.symmetric(vertical: 6),
                         child: Row(
@@ -199,18 +198,69 @@ class _SubscriptionCarouselState extends State<SubscriptionCarousel> {
                 ),
               ),
 
-              const SizedBox(height: 16),
+              Column(
+                children: [
+                  const SizedBox(height: 12),
 
-              SizedBox(
-                width: double.infinity,
-                child: AppButton(
-                  buttonBackgroundColor: AppColors.backgroundColor,
-                  textColor: AppColors.authThemeColor,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  onTap: () => widget.onSubscribe?.call(plan),
-                  text: 'Subscribe Now',
-                ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 10,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.08),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.2),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.autorenew_rounded,
+                              color: _autoRenew
+                                  ? Colors.greenAccent
+                                  : Colors.white54,
+                              size: 20,
+                            ),
+                            const SizedBox(width: 8),
+                            textWidget(
+                              text: "Auto Renew",
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ],
+                        ),
+                        Switch(
+                          value: _autoRenew,
+                          activeColor: Colors.greenAccent,
+                          inactiveThumbColor: Colors.grey.shade400,
+                          inactiveTrackColor: Colors.white24,
+                          onChanged: (value) {
+                            setState(() => _autoRenew = value);
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    width: double.infinity,
+                    child: AppButton(
+                      buttonBackgroundColor: AppColors.backgroundColor,
+                      textColor: AppColors.authThemeColor,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      onTap: () =>
+                          widget.onSubscribe?.call(plan, _autoRenew ? 0 : 1),
+                      text: 'Subscribe Now',
+                    ),
+                  ),
+                ],
               ),
             ],
           ),

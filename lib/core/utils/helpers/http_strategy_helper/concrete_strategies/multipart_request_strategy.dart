@@ -17,39 +17,40 @@ class MultipartPostRequestStrategy implements HttpRequestStrategy {
     Map<String, dynamic> requestData = const <String, dynamic>{},
   }) async {
     try {
-     log('📤 MultipartPostRequestStrategy.executeRequest called');
+      log('📤 MultipartPostRequestStrategy.executeRequest called');
       log('➡️ URI: $uri');
       log('➡️ Headers: $headers');
       log('➡️ RequestData: $requestData');
-      final filePath = requestData['filePath'] as String?;
- 
+      final filePath = requestData['file'] as String?;
+
       if (filePath == null || filePath.isEmpty) {
         throw Exception("File path is missing in requestData");
       }
-final file = File(filePath);
+      final file = File(filePath);
       if (!file.existsSync()) {
         throw Exception(" File does not exist at $filePath");
       }
       final request = http.MultipartRequest('POST', Uri.parse(uri));
 
-      request.headers.addAll({
-        ...headers,
-      });
+      request.headers.addAll({...headers});
       requestData.forEach((key, value) {
-        if (key != 'filePath') {
+        if (key != 'file') {
           request.fields[key] = value.toString();
         }
       });
 
-   final mimeType = lookupMimeType(file.path) ?? 'application/octet-stream';
+      final mimeType = lookupMimeType(file.path) ?? 'application/octet-stream';
       final parts = mimeType.split('/');
       log('📎 Detected MIME type: $mimeType');
-      final multipartFile = await http.MultipartFile.fromPath('file', file.path,   contentType: MediaType(parts[0], parts[1]),);
+      final multipartFile = await http.MultipartFile.fromPath(
+        'file',
+        file.path,
+        contentType: MediaType(parts[0], parts[1]),
+      );
       request.files.add(multipartFile);
 
       log('Uploading file: ${file.path}');
-      final streamedResponse =
-          await request.send().timeout(timeOutDuration);
+      final streamedResponse = await request.send().timeout(timeOutDuration);
 
       final response = await http.Response.fromStream(streamedResponse);
       log('Upload Response: ${response.body}');
@@ -66,6 +67,3 @@ final file = File(filePath);
     }
   }
 }
-
-
-

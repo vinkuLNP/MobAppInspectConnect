@@ -52,25 +52,26 @@ class SubscriptionPlanEntity extends Equatable {
     required this.updatedAt,
   });
 
-  String get displayPrice => '\$$amount / ${interval.toLowerCase()}';
+  String get displayPrice =>
+      '\$$amount for ${intervalCount.toString()} ${interval.toLowerCase()}';
 
   @override
   List<Object?> get props => [
-        id,
-        name,
-        description,
-        amount,
-        currency,
-        trialDays,
-        userType,
-        interval,
-        intervalCount,
-        status,
-        features,
-        isDeleted,
-        stripePriceId,
-        stripeProductId,
-        createdAt,
-        updatedAt,
-      ];
+    id,
+    name,
+    description,
+    amount,
+    currency,
+    trialDays,
+    userType,
+    interval,
+    intervalCount,
+    status,
+    features,
+    isDeleted,
+    stripePriceId,
+    stripeProductId,
+    createdAt,
+    updatedAt,
+  ];
 }

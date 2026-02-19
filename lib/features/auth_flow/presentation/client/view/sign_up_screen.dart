@@ -1,10 +1,10 @@
 import 'dart:developer';
-
 import 'package:auto_route/auto_route.dart';
 import 'package:inspect_connect/core/basecomponents/base_responsive_widget.dart';
 import 'package:inspect_connect/core/utils/auto_router_setup/auto_router.dart';
 import 'package:inspect_connect/core/utils/constants/app_assets_constants.dart';
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
+import 'package:inspect_connect/core/utils/constants/app_strings.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_button.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/core/utils/presentation/app_text_style.dart';
@@ -33,9 +33,9 @@ class ClientSignUpView extends StatelessWidget {
         final vm = ctx.watch<ClientViewModelProvider>();
 
         return CommonAuthBar(
-          title: 'Sign Up',
+          title: signUpTitle,
           showBackButton: showBackButton,
-          subtitle: 'Create Your Account!',
+          subtitle: createAccountSubtitle,
           image: finalImage,
           rc: rc,
           form: Form(
@@ -47,16 +47,16 @@ class ClientSignUpView extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 AppInputField(
-                  label: 'Full Name',
-                  hint: 'Full Name',
-                  controller: fullNameCtrl,
+                  label: fullNameLabel,
+                  hint: fullNameHint,
+                  controller: cltFullNameCtrl,
                   validator: vm.validateRequired,
                   onChanged: (_) {
                     if (vm.autoValidate) formKey.currentState?.validate();
                   },
                 ),
                 const SizedBox(height: 14),
-                textWidget(text: 'Phone Number', fontWeight: FontWeight.w400),
+                textWidget(text: phoneNumberLabel, fontWeight: FontWeight.w400),
                 const SizedBox(height: 8),
 
                 Consumer<ClientViewModelProvider>(
@@ -65,9 +65,9 @@ class ClientSignUpView extends StatelessWidget {
                       final p = vm.phoneRaw ?? '';
                       if (!vm.autoValidate) return null;
                       if ((vm.phoneE164 ?? '').isEmpty) {
-                        return 'Phone is required';
+                        return phoneRequiredError;
                       }
-                      if (p.length < 10) return 'Enter a valid phone';
+                      if (p.length < 10) return phoneInvalidError;
                       return null;
                     },
                     builder: (state) {
@@ -75,12 +75,12 @@ class ClientSignUpView extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           IntlPhoneField(
-                            controller: phoneCtrl,
+                            controller: cltPhoneCtrl,
 
                             style: appTextStyle(fontSize: 12),
                             initialCountryCode: 'IN',
                             decoration: InputDecoration(
-                              hintText: 'Phone Number',
+                              hintText: phoneNumberLabel,
                               counterText: '',
                               errorStyle: appTextStyle(
                                 fontSize: 12,
@@ -145,7 +145,7 @@ class ClientSignUpView extends StatelessWidget {
                                     ? '+${country.dialCode}${vm.phoneRaw}'
                                     : '',
                               );
-                              countryCodeCtrl.text = '+${country.dialCode}';
+                              cltCountryCodeCtrl.text = '+${country.dialCode}';
                               if (vm.autoValidate) state.validate();
                             },
                           ),
@@ -165,9 +165,9 @@ class ClientSignUpView extends StatelessWidget {
 
                 const SizedBox(height: 14),
                 AppInputField(
-                  label: 'Email',
-                  hint: 'Email',
-                  controller: emailCtrlSignUp,
+                  label: emailLabel,
+                  hint: emailHint,
+                  controller: cltEmailCtrlSignUp,
                   keyboardType: TextInputType.emailAddress,
                   validator: vm.validateEmail,
                   onChanged: (_) {
@@ -184,24 +184,23 @@ class ClientSignUpView extends StatelessWidget {
                       vm.enableAutoValidate();
                       return;
                     }
-                    log('------>${fullNameCtrl.text}');
-                    log('------>${emailCtrlSignUp.text}');
-                    log('------>${phoneCtrl.text}');
-                    log('------>${countryCodeCtrl.text}');
-
+                    log('------>${cltFullNameCtrl.text}');
+                    log('------>${cltEmailCtrlSignUp.text}');
+                    log('------>${cltPhoneCtrl.text}');
+                    log('------>${cltCountryCodeCtrl.text}');
 
                     await vm.submitSignUp(formKey: formKey, context: context);
                   },
-                  text: 'Sign Up',
+                  text: signUpTitle,
                 ),
 
                 AuthFormSwitchRow(
-                  question: "Already have an account?",
-                  actionText: "Sign In",
+                  question: alreadyHaveAccount,
+                  actionText: signInTitle,
                   onTap: () {
-                    emailCtrlSignUp.clear();
-                    phoneCtrl.clear();
-                    fullNameCtrl.clear();
+                    cltEmailCtrlSignUp.clear();
+                    cltPhoneCtrl.clear();
+                    cltFullNameCtrl.clear();
 
                     final stackString = context.router.stack.toString();
                     log('stack raw: $stackString');
