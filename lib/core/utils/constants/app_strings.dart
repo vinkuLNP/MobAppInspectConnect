@@ -71,7 +71,15 @@ const String additionalDetailsLabel = 'Additional\nDetails';
 const String invalidInput = 'Invalid input';
 
 const String agreeToTerms = 'Please agree to all terms before continuing.';
-
+const imageExtensions = [
+  'jpg',
+  'jpeg',
+  'png',
+  'heic',
+  'webp'
+      'gif',
+  'bmp',
+];
 const String signupStart = 'Starting signup process';
 const String collectingDeviceInfo = 'Collecting device info';
 const String parametersReady = 'Signup parameters ready';
@@ -110,7 +118,6 @@ String cityNotFound(String city, String state) =>
 const maxFileSizeInBytes = 4 * 1024 * 1024;
 
 const certificateExtensions = ['pdf', 'doc', 'docx'];
-const imageExtensions = ['jpg', 'jpeg', 'png', 'heic', 'gif', 'bmp'];
 const mixedExtensions = ['jpg', 'jpeg', 'png', 'pdf', 'doc', 'docx'];
 
 const uploadTypeId = 'id';
@@ -167,8 +174,7 @@ const String httpProtocol = 'http://';
 const String httpsProtocol = 'https://';
 const String certificateType = 'Certificate Type';
 const String selectExpirationDate = 'Select Expiration Date';
-const String uploadCertificationDocuments =
-    'Upload Certification Documents (max 4)';
+const String uploadCertificationDocuments = 'Upload ICC Documents (max 4)';
 const String select = 'Select';
 const String selectCertificateType = '$select $certificateType';
 
@@ -190,7 +196,7 @@ const String defaultState = "$select $stateTxt";
 const String defaultCity = "$select $cityTxt";
 const String addEdit = 'Add / Edit';
 const String noCitiesSelected = 'No cities selected';
-const String uploadIccDocumentFor = 'Upload ICC Document for';
+const String uploadIccDocumentFor = 'Upload Residency Document for';
 const String zipCodeFor = 'Zip Code for';
 
 const String enterYourMailingAddress = 'Enter your Mailing Address';
@@ -198,8 +204,9 @@ const String mailingAddress = 'Mailing address';
 const String searchCities = '$searchTxt Cities';
 const String doneTxt = 'Done';
 const String searchTxt = 'Search';
-const String iccDocumentRequiredFor = 'ICC document required for';
-const String expiryDateRequiredForIccIn = 'Expiry date required for ICC in';
+const String iccDocumentRequiredFor = 'Residency document required for';
+const String expiryDateRequiredForIccIn =
+    'Expiry date required for Residency Document for';
 const String verifyCode = '$verifyTxt Code';
 const String enterTheCodeSent = 'Enter the code sent \nto your email or phone';
 const String enterTheOtpSent = 'Enter the OTP sent \nto ';
@@ -379,3 +386,80 @@ String rateCalculationTxt({required double rate, required int blocks}) {
 String cancellationFeeWarningTxt(double fee) =>
     '⚠ Note: Since the booking time is within the next 8 hours, '
     'a cancellation fee of \$${fee.toStringAsFixed(2)} will be applied.';
+
+const String inspectConnectTitle = "Inspect Connect";
+const String clientTxt = "Client";
+const String loginTxt = "Log in";
+
+const String successToastTxt = "Success";
+const String warningToastTxt = "Warning";
+const String infoToastTxt = "Info";
+const String errorToastTxt = "Error";
+const String signInSuccess = 'Sign-in successful';
+const String signInFailed = 'Sign-in failed';
+const String noInternet = 'No internet connection';
+const String loginCompleted = 'Sign-in process completed';
+
+const String emailRequired = 'Email is required';
+const String invalidEmail = 'Enter a valid email';
+const String passwordRequired = 'Please enter password';
+const String invalidPassword = 'Enter valid password';
+const String addressHintDefault = 'Enter address';
+const String googlePlacesInitFailed =
+    'Google Places initialization failed, switching to fallback mode';
+
+const String alreadyHaveAccTxt = "Already have an account? ";
+const String inspectorTxt = "Inspector";
+const String onBoardingBullet1 =
+    "Connecting Quality Inspections\nwith Quality Projects\nfor Every Build that Matters";
+const String onBoardingBullet2 =
+    "Join a Trusted Network\nof Inspectors Connecting\nyou with Quality Opportunities";
+const String onBoardingBullet3 =
+    "Welcome to Inspect Connect - \nWhere Projects and Inspectors\nMeet to Build Better Together";
+
+const String defaultCountryCode = 'IN';
+
+const String fieldRequiredError = 'Required';
+
+const String emailRequiredError = 'Email address is required';
+const String emailInvalidError = 'Enter a valid email address';
+
+const String passwordRequiredError = 'Password is required';
+const String passwordMinLengthError = 'Password must be at least 8 characters';
+
+const String confirmPasswordRequiredError = 'Confirm password is required';
+const String passwordMismatchError = 'Passwords do not match';
+
+const String addressRequiredError = 'Address is required';
+const String emailRegexExpression =
+    r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$';
+
+const String passwordRegexExpression =
+    r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{6,}$';
+
+const String networkError = "Network error occurred";
+const String tapToSelectDateTime = "Tap to select date & time";
+const String tapToChooseDate = "Tap to choose date";
+const String inspectorProfileStatus = 'Inspector Profile Status';
+
+const String inspectorProfileStatusApproved = 'Approved';
+const String inspectorProfileStatusPending = 'Pending';
+const String inspectorProfileStatusDeclined = 'Declined';
+const String profileReviewStatus = 'Profile Review Status';
+const String profileUnderReview = 'Profile Under Review';
+const String profileUnderReviewMessage =
+    "Your profile is currently being reviewed by our team.\n\nThis may take 48–72 hours.\n\nYou’ll be notified once approved.";
+const String checkAgainButton = 'Check Again';
+const String profileRequiresUpdates = 'Profile Requires Updates';
+const String profileRequiresUpdatesMessage =
+    'Your profile requires updates before approval.\n\n'
+    'Please review the rejected documents and resubmit.\n\n'
+    'Rejected Reason:';
+const String updateProfile = 'Update Profile';
+const String profileApproved = 'Profile Approved';
+const String profileApprovedMessage =
+    'Congratulations! Your profile has been approved.\n'
+    'You now have full access to your dashboard.';
+const String goToDashboard = 'Go to Dashboard';
+const String documentTxt = 'Document';
+const String adminNotes = 'Admin Notes:';

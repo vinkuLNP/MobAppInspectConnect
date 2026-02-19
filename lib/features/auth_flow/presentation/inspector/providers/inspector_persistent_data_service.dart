@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/commondomain/entities/based_api_result/api_result_state.dart';
 import 'package:inspect_connect/core/di/app_component/app_component.dart';
 import 'package:inspect_connect/core/utils/auto_router_setup/auto_router.dart';
-import 'package:inspect_connect/core/utils/constants/app_loggers.dart';
 import 'package:inspect_connect/core/utils/constants/app_strings.dart';
+import 'package:inspect_connect/core/utils/helpers/app_logger/app_logger.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_widgets.dart';
 import 'package:inspect_connect/features/auth_flow/data/datasources/local_datasources/auth_local_datasource.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/auth_user.dart';
@@ -157,12 +157,12 @@ class InsepctorPersistentDataService {
     provider.setProcessing(true);
 
     try {
-      AppLogger.info('SignUp', '🚀 Starting signup process');
-      AppLogger.info('SignUp', 'Collecting device info');
+      AppLogger.info(tag: 'SignUp', '🚀 Starting signup process');
+      AppLogger.info(tag: 'SignUp', 'Collecting device info');
 
       final saved = await provider.localDs.getFullData();
       if (saved == null) {
-        AppLogger.error('SignUp', 'Saved data is null');
+        AppLogger.error(tag: 'SignUp', 'Saved data is null');
         return;
       }
       saved.country = "US";
@@ -176,11 +176,11 @@ class InsepctorPersistentDataService {
       final useCase = locator<InspectorSignUpUseCase>();
       final params = InspectorSignUpParams(inspectorSignUpLocalEntity: saved);
 
-      AppLogger.info('SignUp', 'Parameters ready');
-      AppLogger.info('SignUp', 'name=${saved.name}');
-      AppLogger.info('SignUp', 'email=${saved.email}');
-      AppLogger.info('SignUp', 'phone=${saved.phoneNumber}');
-      AppLogger.info('SignUp', 'countryCode=${saved.countryCode}');
+      AppLogger.info(tag: 'SignUp', 'Parameters ready');
+      AppLogger.info(tag: 'SignUp', 'name=${saved.name}');
+      AppLogger.info(tag: 'SignUp', 'email=${saved.email}');
+      AppLogger.info(tag: 'SignUp', 'phone=${saved.phoneNumber}');
+      AppLogger.info(tag: 'SignUp', 'countryCode=${saved.countryCode}');
 
       final state = await provider
           .executeParamsUseCase<AuthUser, InspectorSignUpParams>(
@@ -191,7 +191,7 @@ class InsepctorPersistentDataService {
 
       state?.when(
         data: (user) async {
-          AppLogger.info('SignUp', 'Signup success → userId=${user.id}');
+          AppLogger.info(tag: 'SignUp', 'Signup success → userId=${user.id}');
 
           final localUser = user.toLocalEntity();
           await locator<AuthLocalDataSource>().saveUser(localUser);
@@ -207,18 +207,18 @@ class InsepctorPersistentDataService {
           }
         },
         error: (e) {
-          AppLogger.error('SignUp', e.message ?? signupFailed);
+          AppLogger.error(tag: 'SignUp', e.message ?? signupFailed);
 
           showSnackBar(context, message: e.message ?? signupFailed);
         },
       );
     } catch (e, s) {
-      AppLogger.error('SignUp', 'Exception: $e');
+      AppLogger.error(tag: 'SignUp', 'Exception: $e');
       log(s.toString());
     } finally {
       provider.setProcessing(false);
       provider.notify();
-      AppLogger.info('SignUp', 'Cleanup complete');
+      AppLogger.info(tag: 'SignUp', 'Cleanup complete');
     }
   }
 }

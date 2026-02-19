@@ -25,22 +25,21 @@ class AuthUserLocalEntity {
   bool? emailOtpVerified;
   bool? agreedToTerms;
   bool? isTruthfully;
+  bool? statusUpdatedByAdmin;
   int? certificateApproved;
-  String? rejectedReason;
-  String? stripeCustomerId;
-  String? stripeAccountId;
-  bool? stripePayoutsEnabled;
-  bool? stripeTransfersEnabled;
-  int? currentSubscriptionTrialDays;
-  int? currentSubscriptionAutoRenew;
-  CurrentSubscription? currentSubscriptionId;
-  String? stripeSubscriptionStatus;
-  String? walletId;
-  String? locationName;
-  double? latitude;
-  double? longitude;
-  DateTime? createdAt;
-  DateTime? updatedAt;
+  String? certificateTypeId;
+  String? certificateTypeJson;
+  List<String>? certificateAgencyIds;
+  List<String>? certificateDocuments;
+  String? certificateExpiryDate;
+  bool? noRejectedDocx;
+  String? documentTypeId;
+  String? documentExpiryDate;
+  String? coiExpiryDate;
+  String? documentsJson;
+  String? serviceAreasJson;
+  String? lockedServiceCitiesJson;
+  int? docxOk;
   String? profileImage;
   bool? bookingInProgress;
   bool? isDeleted;
@@ -48,31 +47,32 @@ class AuthUserLocalEntity {
   String? state;
   String? city;
   String? zipCode;
-
+  String? locationName;
+  double? latitude;
+  double? longitude;
   Map<String, dynamic>? location;
-  String? certificateTypeId;
-  List<String>? certificateAgencyIds;
-  List<String>? certificateDocuments;
-  String? certificateExpiryDate;
-  List<String>? referenceDocuments;
-  UserDocumentDataModel? uploadedIdOrLicenseDocument;
-  String? workHistoryDescription;
-  DateTime? loginTime;
-  bool? statusUpdatedByAdmin;
-  bool? docxOk;
+  String? stripeCustomerId;
+  String? stripeAccountId;
+  bool? stripePayoutsEnabled;
+  bool? stripeTransfersEnabled;
+  String? stripeSubscriptionStatus;
+  String? stripeConnectStatus;
+  int? currentSubscriptionTrialDays;
+  int? currentSubscriptionAutoRenew;
+  CurrentSubscription? currentSubscriptionId;
+  String? walletId;
   String? connectorLinkUrl;
-  String? documentTypeId;
-  String? documentExpiryDate;
-  String? coiExpiryDate;
-  String? serviceAreasJson;
-  String? documentsJson;
+  String? rejectedReason;
+  String? workHistoryDescription;
+  UserDocumentDataModel? uploadedIdOrLicenseDocument;
+  List<String>? referenceDocuments;
 
   @Backlink()
   final devices = ToMany<AuthUserDeviceEntity>();
 
   AuthUserLocalEntity({
-    this.authToken,
     required this.userId,
+    this.authToken,
     this.name,
     this.email,
     this.phoneNumber,
@@ -84,84 +84,170 @@ class AuthUserLocalEntity {
     this.emailOtpVerified,
     this.agreedToTerms,
     this.isTruthfully,
+    this.statusUpdatedByAdmin,
     this.certificateApproved,
-    this.rejectedReason,
-    this.stripeCustomerId,
-    this.stripeAccountId,
-    this.stripePayoutsEnabled,
-    this.stripeTransfersEnabled,
-    this.currentSubscriptionTrialDays,
-    this.currentSubscriptionAutoRenew,
-    this.currentSubscriptionId,
-    this.stripeSubscriptionStatus,
-    this.walletId,
-    this.locationName,
-    this.latitude,
-    this.longitude,
-    this.createdAt,
-    this.updatedAt,
-    this.loginTime,
+    this.certificateTypeId,
+    this.certificateTypeJson,
+    this.certificateAgencyIds,
+    this.certificateDocuments,
+    this.certificateExpiryDate,
+    this.noRejectedDocx,
+    this.documentTypeId,
+    this.documentExpiryDate,
+    this.coiExpiryDate,
+    this.documentsJson,
+    this.serviceAreasJson,
+    this.lockedServiceCitiesJson,
+    this.docxOk,
     this.profileImage,
     this.bookingInProgress,
     this.isDeleted,
     this.country,
     this.state,
     this.city,
-    this.location,
     this.zipCode,
-    this.certificateTypeId,
-    this.certificateAgencyIds,
-    this.certificateDocuments,
-    this.certificateExpiryDate,
-    this.referenceDocuments,
-    this.uploadedIdOrLicenseDocument,
-    this.workHistoryDescription,
-    this.statusUpdatedByAdmin,
-    this.docxOk,
+    this.locationName,
+    this.latitude,
+    this.longitude,
+    this.location,
+    this.stripeCustomerId,
+    this.stripeAccountId,
+    this.stripePayoutsEnabled,
+    this.stripeTransfersEnabled,
+    this.stripeSubscriptionStatus,
+    this.stripeConnectStatus,
+    this.currentSubscriptionTrialDays,
+    this.currentSubscriptionAutoRenew,
+    this.currentSubscriptionId,
+    this.walletId,
     this.connectorLinkUrl,
-    this.documentTypeId,
-    this.documentExpiryDate,
-    this.coiExpiryDate,
-    this.serviceAreasJson,
-    this.documentsJson,
+    this.rejectedReason,
+    this.workHistoryDescription,
+    this.uploadedIdOrLicenseDocument,
+    this.referenceDocuments,
   });
+
   AuthUserLocalEntity copyWith({
+    int? id,
+    String? userId,
+    String? authToken,
     String? name,
     String? email,
-    required String userId,
-    String? authToken,
-    int? role,
     String? phoneNumber,
-    String? mailingAddress,
     String? countryCode,
+    String? mailingAddress,
+    int? role,
+    int? status,
     bool? phoneOtpVerified,
     bool? emailOtpVerified,
     bool? agreedToTerms,
     bool? isTruthfully,
-    String? walletId,
-    String? stripeAccountId,
-    String? stripeCustomerId,
-    UserLocation? location,
+    bool? statusUpdatedByAdmin,
+    int? certificateApproved,
+    String? certificateTypeId,
+    String? certificateTypeJson,
+    List<String>? certificateAgencyIds,
+    List<String>? certificateDocuments,
+    String? certificateExpiryDate,
+    bool? noRejectedDocx,
+    String? documentTypeId,
+    String? documentExpiryDate,
+    String? coiExpiryDate,
+    String? documentsJson,
+    String? serviceAreasJson,
+    String? lockedServiceCitiesJson,
+    int? docxOk,
     String? profileImage,
-    List<UserDevice>? devices,
+    bool? bookingInProgress,
+    bool? isDeleted,
+    String? country,
+    String? state,
+    String? city,
+    String? zipCode,
+    String? locationName,
+    double? latitude,
+    double? longitude,
+    Map<String, dynamic>? location,
+    String? stripeCustomerId,
+    String? stripeAccountId,
+    bool? stripePayoutsEnabled,
+    bool? stripeTransfersEnabled,
+    String? stripeSubscriptionStatus,
+    String? stripeConnectStatus,
+    int? currentSubscriptionTrialDays,
+    int? currentSubscriptionAutoRenew,
+    CurrentSubscription? currentSubscriptionId,
+    String? walletId,
+    String? connectorLinkUrl,
+    String? rejectedReason,
+    String? workHistoryDescription,
+    UserDocumentDataModel? uploadedIdOrLicenseDocument,
+    List<String>? referenceDocuments,
   }) {
     return AuthUserLocalEntity(
+      userId: userId ?? this.userId,
+      authToken: authToken ?? this.authToken,
       name: name ?? this.name,
       email: email ?? this.email,
-      userId: userId,
-      authToken: authToken ?? this.authToken,
-      role: role ?? this.role,
       phoneNumber: phoneNumber ?? this.phoneNumber,
       countryCode: countryCode ?? this.countryCode,
+      mailingAddress: mailingAddress ?? this.mailingAddress,
+      role: role ?? this.role,
+      status: status ?? this.status,
       phoneOtpVerified: phoneOtpVerified ?? this.phoneOtpVerified,
       emailOtpVerified: emailOtpVerified ?? this.emailOtpVerified,
       agreedToTerms: agreedToTerms ?? this.agreedToTerms,
       isTruthfully: isTruthfully ?? this.isTruthfully,
+      statusUpdatedByAdmin: statusUpdatedByAdmin ?? this.statusUpdatedByAdmin,
+      certificateApproved: certificateApproved ?? this.certificateApproved,
+      certificateTypeId: certificateTypeId ?? this.certificateTypeId,
+      certificateTypeJson: certificateTypeJson ?? this.certificateTypeJson,
+      certificateAgencyIds: certificateAgencyIds ?? this.certificateAgencyIds,
+      certificateDocuments: certificateDocuments ?? this.certificateDocuments,
+      certificateExpiryDate:
+          certificateExpiryDate ?? this.certificateExpiryDate,
+      noRejectedDocx: noRejectedDocx ?? this.noRejectedDocx,
+      documentTypeId: documentTypeId ?? this.documentTypeId,
+      documentExpiryDate: documentExpiryDate ?? this.documentExpiryDate,
+      coiExpiryDate: coiExpiryDate ?? this.coiExpiryDate,
+      documentsJson: documentsJson ?? this.documentsJson,
+      serviceAreasJson: serviceAreasJson ?? this.serviceAreasJson,
+      lockedServiceCitiesJson:
+          lockedServiceCitiesJson ?? this.lockedServiceCitiesJson,
+      docxOk: docxOk ?? this.docxOk,
       profileImage: profileImage ?? this.profileImage,
-      walletId: walletId ?? this.walletId,
-      stripeAccountId: stripeAccountId ?? this.stripeAccountId,
+      bookingInProgress: bookingInProgress ?? this.bookingInProgress,
+      isDeleted: isDeleted ?? this.isDeleted,
+      country: country ?? this.country,
+      state: state ?? this.state,
+      city: city ?? this.city,
+      zipCode: zipCode ?? this.zipCode,
+      locationName: locationName ?? this.locationName,
+      latitude: latitude ?? this.latitude,
+      longitude: longitude ?? this.longitude,
+      location: location ?? this.location,
       stripeCustomerId: stripeCustomerId ?? this.stripeCustomerId,
-      mailingAddress: mailingAddress ?? this.mailingAddress,
+      stripeAccountId: stripeAccountId ?? this.stripeAccountId,
+      stripePayoutsEnabled: stripePayoutsEnabled ?? this.stripePayoutsEnabled,
+      stripeTransfersEnabled:
+          stripeTransfersEnabled ?? this.stripeTransfersEnabled,
+      stripeSubscriptionStatus:
+          stripeSubscriptionStatus ?? this.stripeSubscriptionStatus,
+      stripeConnectStatus: stripeConnectStatus ?? this.stripeConnectStatus,
+      currentSubscriptionTrialDays:
+          currentSubscriptionTrialDays ?? this.currentSubscriptionTrialDays,
+      currentSubscriptionAutoRenew:
+          currentSubscriptionAutoRenew ?? this.currentSubscriptionAutoRenew,
+      currentSubscriptionId:
+          currentSubscriptionId ?? this.currentSubscriptionId,
+      walletId: walletId ?? this.walletId,
+      connectorLinkUrl: connectorLinkUrl ?? this.connectorLinkUrl,
+      rejectedReason: rejectedReason ?? this.rejectedReason,
+      workHistoryDescription:
+          workHistoryDescription ?? this.workHistoryDescription,
+      uploadedIdOrLicenseDocument:
+          uploadedIdOrLicenseDocument ?? this.uploadedIdOrLicenseDocument,
+      referenceDocuments: referenceDocuments ?? this.referenceDocuments,
     );
   }
 }
@@ -176,7 +262,6 @@ class AuthUserDeviceEntity {
 
   AuthUserDeviceEntity({this.deviceToken, this.deviceType});
 }
-
 extension AuthUserLocalMapping on AuthUserLocalEntity {
   AuthUser toDomainEntity() {
     return AuthUser(
@@ -196,6 +281,11 @@ extension AuthUserLocalMapping on AuthUserLocalEntity {
       stripeAccountId: stripeAccountId,
       stripeCustomerId: stripeCustomerId,
       stripeSubscriptionStatus: stripeSubscriptionStatus,
+      stripeConnectStatus: stripeConnectStatus,
+      noRejectedDocx: noRejectedDocx,
+      coiExpiryDate: coiExpiryDate,
+      workHistoryDescription: workHistoryDescription,
+      docxOk: docxOk,
       currentSubscriptionId: currentSubscriptionId,
       currentSubscriptionTrialDays: currentSubscriptionTrialDays,
       currentSubscriptionAutoRenew: currentSubscriptionAutoRenew,
@@ -210,7 +300,6 @@ extension AuthUserLocalMapping on AuthUserLocalEntity {
               lng: longitude!,
             )
           : null,
-      devices: devices.map((d) => d.toDomainEntity()).toList(),
       bookingInProgress: bookingInProgress,
       isDeleted: isDeleted,
       status: status,
@@ -222,30 +311,27 @@ extension AuthUserLocalMapping on AuthUserLocalEntity {
       city: city,
       zip: zipCode,
       certificateTypeId: certificateTypeId,
-      certificateAgencyIds: certificateAgencyIds,
       certificateDocuments: certificateDocuments,
       certificateExpiryDate: certificateExpiryDate,
       uploadedIdOrLicenseDocument: uploadedIdOrLicenseDocument,
       documentTypeId: documentTypeId,
       documentExpiryDate: documentExpiryDate,
-      coiExpiryDate: coiExpiryDate,
-      docxOk: docxOk,
-      workHistoryDescription: workHistoryDescription,
       referenceDocuments: referenceDocuments,
       connectorLinkUrl: connectorLinkUrl,
-      createdAt: createdAt,
-      updatedAt: updatedAt,
-      loginTime: loginTime,
       documents: documentsJson != null
           ? (jsonDecode(documentsJson!) as List)
-                .map((e) => UserDocument.fromJson(e))
-                .toList()
+              .map((e) => UserDocument.fromJson(e))
+              .toList()
           : null,
       serviceAreas: serviceAreasJson != null
           ? (jsonDecode(serviceAreasJson!) as List)
-                .map((e) => ServiceArea.fromJson(e))
-                .toList()
+              .map((e) => ServiceArea.fromJson(e))
+              .toList()
           : null,
+      lockedServiceCities: lockedServiceCitiesJson != null
+          ? List<String>.from(jsonDecode(lockedServiceCitiesJson!))
+          : null,
+      devices: devices.map((d) => d.toDomainEntity()).toList(),
     );
   }
 }
@@ -298,10 +384,7 @@ extension AuthUserLocalEntityMergeData on AuthUserLocalEntity {
             locationName: newUser.locationName ?? locationName,
             latitude: newUser.latitude ?? latitude,
             longitude: newUser.longitude ?? longitude,
-            createdAt: createdAt ?? newUser.createdAt,
             zipCode: zipCode ?? newUser.zipCode,
-            updatedAt: newUser.updatedAt ?? updatedAt,
-            loginTime: newUser.loginTime ?? loginTime,
             docxOk: newUser.docxOk ?? docxOk,
             connectorLinkUrl: newUser.connectorLinkUrl ?? connectorLinkUrl,
             statusUpdatedByAdmin:

@@ -305,8 +305,11 @@ class InspectorDashboardProvider extends BaseViewModel {
           return;
         }
 
-        if (mergedUser.stripeSubscriptionStatus != 'active' ||
-            mergedUser.currentSubscriptionId == null) {
+        if (mergedUser.stripeSubscriptionStatus == 'inactive' ||
+            mergedUser.stripeSubscriptionStatus == 'past_due' ||
+            mergedUser.stripeSubscriptionStatus == 'canceled' ||
+            mergedUser.currentSubscriptionId == null ||
+            mergedUser.currentSubscriptionId!.id == '') {
           status = InspectorStatus.needsSubscription;
           await fetchSubscriptionPlans();
           return;
@@ -339,12 +342,14 @@ class InspectorDashboardProvider extends BaseViewModel {
 
   ReviewStatus reviewStatus = ReviewStatus.pending;
   List<UserDocument> rejectedDocuments = [];
+  String rejectedReason = '';
 
   void updateReviewState(AuthUser user) {
     reviewStatus = deriveReviewStatus(user);
 
     rejectedDocuments =
         user.documents?.where((d) => d.adminApproval == 2).toList() ?? [];
+    rejectedReason = user.rejectedReason ?? '';
   }
 
   Future<UserDetail> fetchAndUpdateUserDetail(

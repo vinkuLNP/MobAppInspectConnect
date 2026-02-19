@@ -170,12 +170,12 @@ class InspectorServiceAreaService {
     final docs = provider.iccDocsByCity[city];
 
     if (docs == null || docs.isEmpty) {
-      return "ICC document required for $city";
+      return "$iccDocumentRequiredFor $city";
     }
 
     for (final doc in docs) {
       if (doc.expiryDate == null) {
-        return "Expiry date required for ICC document ($city)";
+        return "$expiryDateRequiredForIccIn $city";
       }
     }
 

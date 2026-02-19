@@ -50,12 +50,15 @@ class UserDetail {
   final String? updatedAt;
   final String? phoneOtpExpiryTime;
   final String? stripeCustomerId;
-  final bool? docxOk;
+  final int? docxOk;
   final CertificateType? documentTypeId;
   final String? documentExpiryDate;
   final String? coiExpiryDate;
   final List<ServiceArea>? serviceAreas;
   final List<UserDocument>? documents;
+  final bool? noRejectedDocx;
+  final String? stripeConnectStatus;
+  final List<String>? lockedServiceCities;
 
   const UserDetail({
     required this.id,
@@ -109,6 +112,9 @@ class UserDetail {
     this.coiExpiryDate,
     this.serviceAreas,
     this.documents,
+    this.noRejectedDocx,
+    this.stripeConnectStatus,
+    this.lockedServiceCities,
   });
 
   factory UserDetail.fromJson(Map<String, dynamic> json) {
@@ -160,6 +166,13 @@ class UserDetail {
                 ? CurrentSubscription(id: body['currentSubscriptionId'])
                 : CurrentSubscription.fromJson(body['currentSubscriptionId']))
           : null,
+
+      noRejectedDocx: json['noRejectedDocx'],
+      stripeConnectStatus: json['stripeConnectStatus'],
+
+      lockedServiceCities: (json['lockedServiceCities'] as List?)
+          ?.map((e) => e.toString())
+          .toList(),
 
       currentSubscriptionTrialDays: body['currentSubscriptionTrialDays'],
       currentSubscriptionAutoRenew: body['currentSubscriptionAutoRenew'],
@@ -259,6 +272,9 @@ class UserDetail {
       'coiExpiryDate': coiExpiryDate,
       'serviceAreas': serviceAreas,
       'documents': documents,
+      'noRejectedDocx': noRejectedDocx,
+      'stripeConnectStatus': stripeConnectStatus,
+      'lockedServiceCities': lockedServiceCities,
     };
   }
 }
