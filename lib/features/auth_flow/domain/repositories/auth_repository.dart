@@ -61,5 +61,8 @@ abstract class AuthRepository {
   });
 
   Future<ApiResultModel<UserDetail>> fetchUserDetail({required String userId});
-  Future<ApiResultModel<AuthUser>> updateProfile({required String name});
+  Future<ApiResultModel<AuthUser>> updateProfile({
+    String? name,
+     int? status,
+  });
 }

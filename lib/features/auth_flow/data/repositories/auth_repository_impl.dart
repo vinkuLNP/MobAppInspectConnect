@@ -250,8 +250,13 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<ApiResultModel<AuthUser>> updateProfile({required String name}) async {
-    final res = await _remote.updateProfile(ProfileUpdateDto(name: name));
+  Future<ApiResultModel<AuthUser>> updateProfile({
+    String? name,
+    int? status,
+  }) async {
+    final res = await _remote.updateProfile(
+      ProfileUpdateDto( name: name, status: status),
+    );
 
     return res.when(
       success: (data) {

@@ -463,3 +463,16 @@ const String profileApprovedMessage =
 const String goToDashboard = 'Go to Dashboard';
 const String documentTxt = 'Document';
 const String adminNotes = 'Admin Notes:';
+const String connected = 'Connected';
+const String disconnected = 'Disconnected';
+const String accountDisabled = 'Your account is disabled by admin';
+const String tapToGoOffline = 'Tap to go Offline';
+const String tapToGoOnline = 'Tap to go Online';
+const String goOfflineMsg = 'You will stop receiving new booking requests.';
+const String goOnline = 'Go Online';
+const String goOffline = 'Go Offline';
+const String goOfflineQues = '$goOffline?';
+
+const String goOnlineQues = '$goOnline?';
+
+const String goOnlineMsg = 'You will start receiving booking requests.';
