@@ -237,7 +237,7 @@ class _SubscriptionCarouselState extends State<SubscriptionCarousel> {
                         ),
                         Switch(
                           value: _autoRenew,
-                          activeColor: Colors.greenAccent,
+                          activeThumbColor: Colors.greenAccent,
                           inactiveThumbColor: Colors.grey.shade400,
                           inactiveTrackColor: Colors.white24,
                           onChanged: (value) {

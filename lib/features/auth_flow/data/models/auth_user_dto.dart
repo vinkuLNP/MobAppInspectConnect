@@ -23,6 +23,7 @@ class AuthUserDto {
   final String? stripeAccountId;
   final String? stripeCustomerId;
   final String? authToken;
+  final bool? statusUpdatedByAdmin;
   final String? stripeSubscriptionStatus;
   final CurrentSubscription? currentSubscriptionId;
   final int? currentSubscriptionTrialDays;
@@ -68,6 +69,7 @@ class AuthUserDto {
     this.isTruthfully,
     this.walletId,
     this.stripeAccountId,
+    this.statusUpdatedByAdmin,
     this.stripeCustomerId,
     this.stripeSubscriptionStatus,
     this.currentSubscriptionId,
@@ -117,6 +119,7 @@ class AuthUserDto {
       email: json['email'] ?? '',
       name: json['name'] ?? '',
       profileImage: json['profileImage'],
+      statusUpdatedByAdmin: json['statusUpdatedByAdmin'],
       status: json['status'],
       phoneNumber: json['phoneNumber'],
       countryCode: json['countryCode'],
@@ -174,6 +177,8 @@ class AuthUserDto {
     id: id,
     name: name,
     userId: userId,
+    status: status,
+    statusUpdatedByAdmin: statusUpdatedByAdmin ?? false,
     emailHashed: email,
     authToken: authToken ?? '',
     role: role,

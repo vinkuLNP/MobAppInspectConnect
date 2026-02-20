@@ -20,6 +20,17 @@ class UserProvider extends BaseViewModel {
       _user?.phoneOtpVerified == true;
 
   bool get isUserClient => _user != null && _user?.role == 1;
+  bool get isConnected =>
+      _user != null &&
+      _user?.status == 1 &&
+      _user?.statusUpdatedByAdmin == false;
+
+  bool get isDisConnected =>
+      _user != null &&
+      (_user?.status == 0 || _user?.statusUpdatedByAdmin == true);
+
+  bool get userDisabledByAdmin =>
+      _user != null && _user?.statusUpdatedByAdmin == true;
 
   bool get isUserInspector => _user != null && _user?.role == 2;
 
@@ -60,6 +71,41 @@ class UserProvider extends BaseViewModel {
           notifyListeners();
 
           await locator<AuthLocalDataSource>().saveUser(_user!);
+        },
+        error: (e) {},
+      );
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> updateInspectorStatus(BuildContext context, int status) async {
+    isLoading = true;
+    notifyListeners();
+
+    try {
+      final useCase = locator<UpdateProfileUseCase>();
+
+      final state = await executeParamsUseCase<AuthUser, UpdateProfileParams>(
+        useCase: useCase,
+        query: UpdateProfileParams(status: status),
+        launchLoader: true,
+      );
+
+      state?.when(
+        data: (response) async {
+          _user = _user!.copyWith(
+            status: status,
+            userId: response.userId,
+            statusUpdatedByAdmin: response.statusUpdatedByAdmin,
+          );
+          print("API returned status: ${response.status}");
+
+          await locator<AuthLocalDataSource>().saveUser(_user!);
+          await refreshUserFromServer(context);
+
+          notifyListeners();
         },
         error: (e) {},
       );
