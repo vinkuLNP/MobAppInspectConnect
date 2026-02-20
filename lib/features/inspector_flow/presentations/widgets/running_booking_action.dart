@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/utils/constants/app_strings.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_button.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
-import 'package:inspect_connect/features/inspector_flow/presentations/widgets/show_up_fee_button.dart';
 
 class RunningBookingActions extends StatelessWidget {
   final bool isRunning;

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/basecomponents/base_responsive_widget.dart';
 import 'package:inspect_connect/core/utils/constants/app_assets_constants.dart';
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
+import 'package:inspect_connect/core/utils/constants/app_strings.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/features/auth_flow/data/models/document_model.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/client/widgets/common_auth_bar.dart';
@@ -25,8 +26,8 @@ class ApprovalStatusScreen extends StatelessWidget {
         return Scaffold(
           backgroundColor: Colors.grey.shade100,
           body: CommonAuthBar(
-            title: 'Inspector Profile Status',
-            subtitle: 'Profile Review Status',
+            title: inspectorProfileStatus,
+            subtitle: profileReviewStatus,
             showBackButton: false,
             image: finalImage,
             rc: rc,
@@ -36,6 +37,7 @@ class ApprovalStatusScreen extends StatelessWidget {
               context: context,
               status: provider.reviewStatus,
               rejectedDocuments: provider.rejectedDocuments,
+              reason: provider.rejectedReason,
             ),
           ),
         );
@@ -49,6 +51,7 @@ class ApprovalStatusScreen extends StatelessWidget {
     required ReviewStatus status,
     required BuildContext context,
     required List<UserDocument> rejectedDocuments,
+    String? reason,
   }) {
     late IconData icon;
     late Color mainColor;
@@ -63,12 +66,9 @@ class ApprovalStatusScreen extends StatelessWidget {
         icon = Icons.access_time_rounded;
         mainColor = AppColors.authThemeColor;
         gradientColors = [Colors.orange.shade400, Colors.deepOrange.shade600];
-        title = 'Profile Under Review';
-        message =
-            'Your profile is currently being reviewed by our team.\n'
-            'This may take 48–72 hours.\n\n'
-            'You’ll be notified once approved.';
-        buttonText = 'Check Again';
+        title = profileUnderReview;
+        message = profileUnderReviewMessage;
+        buttonText = checkAgainButton;
         onPressed = () => provider.initializeUserState();
         break;
 
@@ -76,11 +76,9 @@ class ApprovalStatusScreen extends StatelessWidget {
         icon = Icons.cancel_rounded;
         mainColor = Colors.red;
         gradientColors = [Colors.red.shade500, Colors.red.shade700];
-        title = 'Profile Requires Updates';
-        message =
-            'Your profile requires updates before approval.\n\n'
-            'Please review the rejected documents and resubmit.';
-        buttonText = 'Update Profile';
+        title = profileRequiresUpdates;
+        message = '$profileRequiresUpdatesMessage $reason';
+        buttonText = updateProfile;
         onPressed = () {};
         break;
 
@@ -88,11 +86,9 @@ class ApprovalStatusScreen extends StatelessWidget {
         icon = Icons.verified_rounded;
         mainColor = AppColors.authThemeColor;
         gradientColors = [Colors.green.shade500, Colors.teal.shade700];
-        title = 'Profile Approved';
-        message =
-            'Congratulations! Your profile has been approved.\n'
-            'You now have full access to your dashboard.';
-        buttonText = 'Go to Dashboard';
+        title = profileApproved;
+        message = profileApprovedMessage;
+        buttonText = goToDashboard;
         onPressed = () => provider.initializeUserState();
         break;
     }
@@ -191,14 +187,14 @@ class ApprovalStatusScreen extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             textWidget(
-                              text: doc.documentType?.name ?? 'Document',
+                              text: doc.documentType?.name ?? documentTxt,
                               fontWeight: FontWeight.w600,
                               color: Colors.white,
                             ),
                             if (doc.adminNotes != null) ...[
                               const SizedBox(height: 6),
                               textWidget(
-                                text: 'Admin Notes: ${doc.adminNotes}',
+                                text: '$adminNotes ${doc.adminNotes}',
                                 fontSize: 13,
                                 color: Colors.white70,
                               ),

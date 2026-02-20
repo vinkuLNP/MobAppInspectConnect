@@ -57,10 +57,13 @@ class AuthUser {
   final DateTime? updatedAt;
   final DateTime? loginTime;
   final bool? statusUpdatedByAdmin;
-  final bool? docxOk;
+  final int? docxOk;
   final String? documentTypeId;
   final String? documentExpiryDate;
   final String? coiExpiryDate;
+final bool? noRejectedDocx;
+final String? stripeConnectStatus;
+final List<String>? lockedServiceCities;
 
   final List<ServiceArea>? serviceAreas;
   final List<UserDocument>? documents;
@@ -118,6 +121,10 @@ class AuthUser {
     this.coiExpiryDate,
     this.serviceAreas,
     this.documents,
+this.noRejectedDocx,
+this.stripeConnectStatus,
+this.lockedServiceCities,
+
   });
 
   factory AuthUser.fromJson(Map<String, dynamic> json) {
@@ -144,7 +151,9 @@ class AuthUser {
       stripeCustomerId: json['stripeCustomerId'],
       stripeSubscriptionStatus: json['stripeSubscriptionStatus'],
 
-      currentSubscriptionId: json['currentSubscriptionId'] != null && json['currentSubscriptionId'].isNotEmpty
+      currentSubscriptionId:
+          json['currentSubscriptionId'] != null &&
+              json['currentSubscriptionId'].isNotEmpty
           ? CurrentSubscription.fromJson(json['currentSubscriptionId'])
           : null,
 
@@ -173,6 +182,14 @@ class AuthUser {
       referenceDocuments: (json['referenceDocuments'] as List?)
           ?.map((e) => e.toString())
           .toList(),
+
+noRejectedDocx: json['noRejectedDocx'],
+stripeConnectStatus: json['stripeConnectStatus'],
+
+lockedServiceCities:
+    (json['lockedServiceCities'] as List?)
+        ?.map((e) => e.toString())
+        .toList(),
 
       uploadedIdOrLicenseDocument: json['uploadedIdOrLicenseDocument'] != null
           ? UserDocumentDataModel.fromJson(json['uploadedIdOrLicenseDocument'])
@@ -274,6 +291,9 @@ class AuthUser {
 
       'documents': documents?.map((e) => e.toJson()).toList(),
       'serviceAreas': serviceAreas?.map((e) => e.toJson()).toList(),
+'noRejectedDocx': noRejectedDocx,
+'stripeConnectStatus': stripeConnectStatus,
+'lockedServiceCities': lockedServiceCities,
 
       'location': location != null
           ? {
@@ -334,9 +354,6 @@ extension AuthUserMapping on AuthUser {
       state: state,
       city: city,
       zipCode: zip,
-      createdAt: createdAt,
-      updatedAt: updatedAt,
-      loginTime: loginTime,
       certificateTypeId: certificateTypeId,
       certificateAgencyIds: certificateAgencyIds,
       certificateDocuments: certificateDocuments,
@@ -357,6 +374,12 @@ extension AuthUserMapping on AuthUser {
       serviceAreasJson: serviceAreas != null
           ? jsonEncode(serviceAreas!.map((e) => e.toJson()).toList())
           : null,
+noRejectedDocx: noRejectedDocx,
+stripeConnectStatus: stripeConnectStatus,
+lockedServiceCitiesJson: lockedServiceCities != null
+    ? jsonEncode(lockedServiceCities)
+    : null,
+
     );
   }
 }
@@ -400,15 +423,6 @@ extension AuthUserLocalEntityMerge on AuthUserLocalEntity {
       longitude: detail.location?.coordinates?[0] ?? longitude,
       bookingInProgress: detail.bookingInProgress ?? bookingInProgress,
       isDeleted: detail.isDeleted ?? isDeleted,
-      createdAt: detail.createdAt != null
-          ? DateTime.tryParse(detail.createdAt!)
-          : createdAt,
-      updatedAt: detail.updatedAt != null
-          ? DateTime.tryParse(detail.updatedAt!)
-          : updatedAt,
-      loginTime: detail.loginTime != null
-          ? DateTime.tryParse(detail.loginTime!)
-          : loginTime,
       certificateTypeId: detail.certificateTypeId?.id ?? certificateTypeId,
       certificateAgencyIds:
           detail.certificateAgencyIds?.map((e) => e.id ?? '').toList() ??
@@ -434,7 +448,15 @@ extension AuthUserLocalEntityMerge on AuthUserLocalEntity {
       documentsJson: detail.documents != null
           ? jsonEncode(detail.documents)
           : documentsJson,
+
+noRejectedDocx: detail.noRejectedDocx ?? noRejectedDocx,
+stripeConnectStatus:
+    detail.stripeConnectStatus ?? stripeConnectStatus,
+
+lockedServiceCitiesJson: detail.lockedServiceCities != null
+    ? jsonEncode(detail.lockedServiceCities)
+    : lockedServiceCitiesJson,
+
     );
   }
 }
-//  certificateTypeId: {_id: 69156b84aabe487380eadfd5, name: Soils & Foundations, status: 1},from the respons eu can see, certificate type id is not a string isnrtadf a map, sometimes it can be setring but fro this it is map. and need id from that 

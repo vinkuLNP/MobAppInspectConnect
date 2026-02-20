@@ -19,6 +19,7 @@ import 'package:inspect_connect/features/client_flow/presentations/providers/not
 import 'package:inspect_connect/features/client_flow/presentations/providers/session_manager.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/user_provider.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/wallet_provider.dart';
+import 'package:inspect_connect/features/common_features/view_model/common_view_model.dart';
 import 'package:inspect_connect/features/inspector_flow/providers/inspector_main_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -96,7 +97,7 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider.value(
           value: locator<InspectorViewModelProvider>(),
         ),
-
+ ChangeNotifierProvider(create: (_) => locator<CommonViewModel>()),
         ChangeNotifierProvider.value(value: locator<ClientViewModelProvider>()),
         ChangeNotifierProvider.value(
           value: locator<InspectorDashboardProvider>(),

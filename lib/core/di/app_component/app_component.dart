@@ -48,6 +48,12 @@ import 'package:inspect_connect/features/client_flow/presentations/providers/not
 import 'package:inspect_connect/features/client_flow/presentations/providers/session_manager.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/user_provider.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/wallet_provider.dart';
+import 'package:inspect_connect/features/common_features/data/datasources/remote_datasources/common_remote_data_source.dart';
+import 'package:inspect_connect/features/common_features/data/repositories/common_repositoy_impl.dart';
+import 'package:inspect_connect/features/common_features/domain/repositories/common_repository.dart';
+// import 'package:inspect_connect/features/common_features/domain/usecases/certificate_type_usecase.dart';
+import 'package:inspect_connect/features/common_features/domain/usecases/upload_image_usecase.dart';
+import 'package:inspect_connect/features/common_features/view_model/common_view_model.dart';
 import 'package:inspect_connect/features/inspector_flow/data/datasources/remote_datasource/inspector_api_datasource.dart';
 import 'package:inspect_connect/features/inspector_flow/data/repositories/inspector_repository_imp.dart';
 import 'package:inspect_connect/features/inspector_flow/domain/repositories/inspector_repository.dart';
@@ -104,7 +110,22 @@ void setupLocator() {
   locator.registerLazySingleton(() => OnboardingUsecase(locator()));
   locator.registerLazySingleton(() => NotificationUseCase(locator()));
   locator.registerLazySingleton(() => DeductTransferWalletUsecase(locator()));
+  locator.registerLazySingleton(() => CommonUploadImageUseCase(locator()));
 
+  locator.registerLazySingleton<CommonRepository>(
+    () => CommonRepositoryImpl(locator()),
+  );
+
+  locator.registerLazySingleton<CommonViewModel>(
+    () => CommonViewModel(
+      // getCertificateTypeUseCase: locator<GetCertificateTypeUseCase>(),
+      uploadImageUseCase: locator<CommonUploadImageUseCase>(),
+    ),
+  );
+
+  locator.registerLazySingleton<CommonRemoteDataSource>(
+    () => CommonRemoteDataSourceImpl(locator()),
+  );
   locator.registerLazySingleton(
     () => GetUserSubscriptionDetailUseCase(locator()),
   );

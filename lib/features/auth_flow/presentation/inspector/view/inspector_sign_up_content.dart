@@ -89,7 +89,6 @@ class _InspectorSignUpContentState extends State<InspectorSignUpContent> {
           },
         ),
         bottomSection: SignupActionBar(
-          
           vm: vm,
           onNext: () async {
             final key = steps[vm.currentStep].formKey;
@@ -188,7 +187,6 @@ class _InspectorSignUpContentState extends State<InspectorSignUpContent> {
             if (vm.currentStep < steps.length - 1) {
               vm.goNext();
             } else {
-              // await vm.submit();
               final saved = await vm.getSavedData();
               log('final data: ${saved?.toString()}');
               if (context.mounted) {

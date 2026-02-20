@@ -10,16 +10,19 @@ ReviewStatus deriveReviewStatus(AuthUser user) {
   final allDocsApproved =
       documents.isNotEmpty && documents.every((d) => d.adminApproval == 1);
 
-  if (user.certificateApproved == 2 || hasRejectedDocs) {
+  if (user.certificateApproved == 2 || user.docxOk == 2 || hasRejectedDocs) {
     return ReviewStatus.rejected;
   }
 
-  if (user.certificateApproved != 1 ||
-      user.docxOk != true ||
+  if (user.certificateApproved == 0 ||
+      user.docxOk == 0 ||
       hasPendingDocs ||
       !allDocsApproved) {
     return ReviewStatus.pending;
   }
+  if (user.certificateApproved == 1 && user.docxOk == 1) {
+    return ReviewStatus.approved;
+  }
 
-  return ReviewStatus.approved;
+  return ReviewStatus.pending;
 }
