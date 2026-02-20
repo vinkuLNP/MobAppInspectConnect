@@ -51,19 +51,17 @@ class WalletProvider extends BaseViewModel {
     if (user == null) return false;
 
     return user!.stripeAccountId != null &&
-        (user!.stripeTransfersEnabled == true
-        // ||
-        //  user!.stripePayoutsEnabled == true ||
-        //  user!.stripeConnectStatus == 'READY'
-        );
+        (user!.stripeTransfersEnabled == true ||
+            user!.stripePayoutsEnabled == true ||
+            user!.stripeConnectStatus == 'READY');
   }
+
+  bool get isDisConnected => user != null && user?.statusUpdatedByAdmin == true;
 
   bool get isUserClient {
     if (user == null) return false;
 
-    return user!.role != null &&
-        (user!.role == 1
-        );
+    return user!.role != null && (user!.role == 1);
   }
 
   bool isWithdrawing = false;
@@ -82,17 +80,13 @@ class WalletProvider extends BaseViewModel {
     return end.difference(start).inDays;
   }
 
-  bool get isWithdrawButtonVisible {
-    return true;
-    // final trialDays = user?.currentSubscriptionTrialDays ?? 9;
-    // return subscriptionDurationDays > trialDays;
-  }
-
   bool get canWithdraw {
     if (user == null) return false;
 
     if (user!.role == 1) return true;
-    if (user!.role == 2 && isWithdrawButtonVisible) return true;
+    if (user!.role == 2 && !isDisConnected) {
+      return true;
+    }
 
     return false;
   }

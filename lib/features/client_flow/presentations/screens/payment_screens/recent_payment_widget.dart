@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/utils/constants/app_common_card_container.dart';
 import 'package:inspect_connect/core/utils/constants/app_strings.dart';
+import 'package:inspect_connect/core/utils/helpers/app_common_functions/app_common_functions.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/features/client_flow/domain/entities/payment_list_entity.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/wallet_provider.dart';
 import 'package:inspect_connect/features/client_flow/presentations/widgets/payment_tile.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class RecentTransactions extends StatefulWidget {
@@ -104,43 +104,19 @@ class RecentTransactionsState extends State<RecentTransactions> {
                     if (showHeader)
                       Padding(
                         padding: const EdgeInsets.fromLTRB(4, 16, 4, 8),
-                        child: Text(
-                          label,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w700,
-                            fontSize: 14,
-                          ),
+                        child: textWidget(
+                          text: label,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 14,
                         ),
                       ),
                     PaymentTile(txn: txn, index: index),
-                  
                   ],
                 );
               },
             ),
-         
         ],
       ),
     );
   }
-}
-
-bool isToday(DateTime date) {
-  final now = DateTime.now();
-  return date.year == now.year &&
-      date.month == now.month &&
-      date.day == now.day;
-}
-
-bool isYesterday(DateTime date) {
-  final yesterday = DateTime.now().subtract(const Duration(days: 1));
-  return date.year == yesterday.year &&
-      date.month == yesterday.month &&
-      date.day == yesterday.day;
-}
-
-String groupLabel(DateTime date) {
-  if (isToday(date)) return 'Today';
-  if (isYesterday(date)) return 'Yesterday';
-  return DateFormat('dd MMM yyyy').format(date);
 }

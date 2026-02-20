@@ -225,21 +225,36 @@ IconData statusIcon(int status) {
   }
 }
 
-const List<Map<String, dynamic>> statusOptions = [
+List<Map<String, dynamic>> statusOptions = [
   {labelTxt: allLabelTxt, valueTxt: allValueTxt},
-  {labelTxt: awaitingYourApprovalLabelTxt, valueTxt: bookingStatusAwaiting},
-  {labelTxt: acceptedLabelTxt, valueTxt: bookingStatusAccepted},
-  {labelTxt: inspectionStartedLabelTxt, valueTxt: bookingStatusStarted},
+  {
+    labelTxt: awaitingYourApprovalLabelTxt,
+    valueTxt: bookingStatusAwaiting.toString(),
+  },
+  {labelTxt: acceptedLabelTxt, valueTxt: bookingStatusAccepted.toString()},
+  {
+    labelTxt: inspectionStartedLabelTxt,
+    valueTxt: bookingStatusStarted.toString(),
+  },
 
-  {labelTxt: '$inspectionTxt $pausedLabelTxt', valueTxt: bookingStatusPaused},
+  {
+    labelTxt: '$inspectionTxt $pausedLabelTxt',
+    valueTxt: bookingStatusPaused.toString(),
+  },
   {
     labelTxt: '$inspectionTxt $stoppedLabelTxt',
-    valueTxt: bookingStatusStoppped,
+    valueTxt: bookingStatusStoppped.toString(),
   },
-  {labelTxt: pendingLabelTxt, valueTxt: bookingStatusPending},
-  {labelTxt: rejectedLabelTxt, valueTxt: bookingStatusRejected},
-  {labelTxt: completedLabelTxt, valueTxt: bookingStatusCompleted},
-  {labelTxt: cancelledByYouTxt, valueTxt: bookingStatusCancelledByClient},
-  {labelTxt: cancelledByInspTxt, valueTxt: bookingStatusCancelledByInspector},
-  {labelTxt: expiredLabelTxt, valueTxt: bookingStatusExpired},
+  {labelTxt: pendingLabelTxt, valueTxt: bookingStatusPending.toString()},
+  {labelTxt: rejectedLabelTxt, valueTxt: bookingStatusRejected.toString()},
+  {labelTxt: completedLabelTxt, valueTxt: bookingStatusCompleted.toString()},
+  {
+    labelTxt: cancelledByYouTxt,
+    valueTxt: bookingStatusCancelledByClient.toString(),
+  },
+  {
+    labelTxt: cancelledByInspTxt,
+    valueTxt: bookingStatusCancelledByInspector.toString(),
+  },
+  {labelTxt: expiredLabelTxt, valueTxt: bookingStatusExpired.toString()},
 ];

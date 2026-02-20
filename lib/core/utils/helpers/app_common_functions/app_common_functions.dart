@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/utils/constants/app_strings.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/inspector/widgets/pdf_viewer_screen.dart';
+import 'package:intl/intl.dart';
 
 void openPreview(
   BuildContext context, {
@@ -198,4 +199,66 @@ Widget _buildImageWidget(File file) {
     errorBuilder: (_, _, _) =>
         const Center(child: Icon(Icons.broken_image, color: Colors.grey)),
   );
+}
+
+bool isToday(DateTime date) {
+  final now = DateTime.now();
+  return date.year == now.year &&
+      date.month == now.month &&
+      date.day == now.day;
+}
+
+bool isYesterday(DateTime date) {
+  final yesterday = DateTime.now().subtract(const Duration(days: 1));
+  return date.year == yesterday.year &&
+      date.month == yesterday.month &&
+      date.day == yesterday.day;
+}
+
+String groupLabel(DateTime date) {
+  if (isToday(date)) return 'Today';
+  if (isYesterday(date)) return 'Yesterday';
+  return DateFormat('dd MMM yyyy').format(date);
+}
+
+double parseToDouble(dynamic value) {
+  if (value == null) return 0;
+  if (value is num) return value.toDouble();
+  return double.tryParse(value.toString()) ?? 0;
+}
+
+String formatMoney(double amount) {
+  return "\$$amount";
+}
+
+String formatMoneyFromDynamic(dynamic value) {
+  final double amount = parseToDouble(value);
+  if (amount == 0) return "\$0.0";
+  return formatMoney(amount);
+}
+
+String formatDateFlexible(
+  dynamic date, {
+  String dateFormat = 'MMM dd, yyyy',
+  bool toLocal = true,
+  String fallback = 'N/A',
+}) {
+  if (date == null) return fallback;
+
+  try {
+    DateTime parsed;
+
+    if (date is DateTime) {
+      parsed = date;
+    } else if (date is String) {
+      parsed = DateTime.parse(date);
+    } else {
+      return fallback;
+    }
+
+    final resultDate = toLocal ? parsed.toLocal() : parsed;
+    return DateFormat(dateFormat).format(resultDate);
+  } catch (_) {
+    return fallback;
+  }
 }
