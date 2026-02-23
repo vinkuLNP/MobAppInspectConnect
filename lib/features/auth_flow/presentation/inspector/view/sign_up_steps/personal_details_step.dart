@@ -14,7 +14,13 @@ import 'package:provider/provider.dart';
 class PersonalDetailsStep extends StatelessWidget {
   final InspectorViewModelProvider vm;
   final GlobalKey<FormState> formKey;
-  const PersonalDetailsStep(this.vm, this.formKey, {super.key});
+  final bool isAccountScreen;
+  const PersonalDetailsStep(
+    this.vm,
+    this.formKey, {
+    super.key,
+    this.isAccountScreen = false,
+  });
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -50,8 +56,14 @@ class PersonalDetailsStep extends StatelessWidget {
                   style: appTextStyle(fontSize: 12),
                   controller: inspPhoneCtrl,
                   initialCountryCode: 'IN',
+                  readOnly: isAccountScreen,
+                  enabled: !isAccountScreen,
                   decoration: InputDecoration(
                     hintText: phoneNumberLabel,
+                    fillColor: isAccountScreen
+                        ? Colors.grey.shade300
+                        : Colors.white,
+                    filled: isAccountScreen,
                     errorText: fieldState.errorText,
                     counterText: '',
                     hintStyle: appTextStyle(fontSize: 12, color: Colors.grey),
@@ -119,24 +131,27 @@ class PersonalDetailsStep extends StatelessWidget {
           label: emailLabel,
           hint: emailHint,
           controller: inspEmailCtrlSignUp,
+          readOnly: isAccountScreen,
           keyboardType: TextInputType.emailAddress,
           validator: vm.validateEmail,
           onChanged: (_) {
             if (vm.autoValidate) formKey.currentState?.validate();
           },
         ),
-        const SizedBox(height: 10),
-        AppPasswordField(
-          label: passwordLabel,
-          controller: inspPasswordCtrlSignUp,
-          obscure: vm.obscurePassword,
-          onToggle: vm.toggleObscurePassword,
-          validator: vm.validatePassword,
-          onChanged: (_) {
-            if (vm.autoValidate) formKey.currentState?.validate();
-          },
-        ),
-        const SizedBox(height: 6),
+        if (!isAccountScreen) ...[
+          const SizedBox(height: 10),
+          AppPasswordField(
+            label: passwordLabel,
+            controller: inspPasswordCtrlSignUp,
+            obscure: vm.obscurePassword,
+            onToggle: vm.toggleObscurePassword,
+            validator: vm.validatePassword,
+            onChanged: (_) {
+              if (vm.autoValidate) formKey.currentState?.validate();
+            },
+          ),
+          const SizedBox(height: 6),
+        ],
       ],
     );
   }

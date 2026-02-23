@@ -1,13 +1,20 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 
 class PDFViewerScreen extends StatelessWidget {
-  final String url;
+  final String path;
+  final bool isNetwork;
 
-  const PDFViewerScreen({super.key, required this.url});
+  const PDFViewerScreen({
+    super.key,
+    required this.path,
+    required this.isNetwork,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return SfPdfViewer.network(url);
+    return isNetwork ? SfPdfViewer.network(path) : SfPdfViewer.file(File(path));
   }
 }
