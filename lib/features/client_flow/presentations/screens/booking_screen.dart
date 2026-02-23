@@ -300,7 +300,8 @@ class _BookingsScreenState extends State<BookingsScreen> {
                                 elevation: isSelected ? 3 : 0,
                                 onSelected: (selected) {
                                   setState(
-                                    () => selectedStatus = option[valueTxt],
+                                    () => selectedStatus = option[valueTxt]
+                                        .toString(),
                                   );
                                   final provider = context
                                       .read<BookingProvider>();
@@ -645,63 +646,31 @@ class _BookingsScreenState extends State<BookingsScreen> {
                   ),
                   const SizedBox(height: 30),
 
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          AppButton(
-                            width: 120,
-                            pHorizontal: 5,
-                            showIcon: true,
-                            iconLeftMargin: 10,
-                            icon: const Icon(
-                              Icons.close,
-                              size: 18,
-                              color: Colors.red,
-                            ),
-                            text: disagreeTxt,
-                            buttonBackgroundColor: AppColors.backgroundColor,
-                            isBorder: true,
-                            borderColor: Colors.red,
-                            textColor: Colors.red,
-                            onTap: () async {
-                              final user = context.read<UserProvider>().user;
-                              final rootContext = Navigator.of(context).context;
-                              Navigator.pop(context);
-                              await context
-                                  .read<BookingProvider>()
-                                  .disagreeBooking(
-                                    rootContext,
-                                    booking.id,
-                                    user!.userId,
-                                  );
-                            },
-                          ),
-                          const SizedBox(width: 10),
-                          AppButton(
-                            width: 120,
-                            pHorizontal: 5,
-
-                            showIcon: true,
-                            iconLeftMargin: 10,
-                            icon: const Icon(
-                              Icons.cancel_outlined,
-                              size: 18,
-                              color: AppColors.authThemeColor,
-                            ),
-                            buttonBackgroundColor: AppColors.backgroundColor,
-                            isBorder: true,
-                            borderColor: AppColors.authThemeColor,
-                            text: cancelTxt,
-                            textColor: AppColors.authThemeColor,
-                            onTap: () => Navigator.pop(context),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
                       AppButton(
+                        width: MediaQuery.of(context).size.width / 2.8,
+
+                        pHorizontal: 5,
+
+                        showIcon: true,
+                        iconLeftMargin: 10,
+                        icon: const Icon(
+                          Icons.cancel_outlined,
+                          size: 18,
+                          color: AppColors.authThemeColor,
+                        ),
+                        buttonBackgroundColor: AppColors.backgroundColor,
+                        isBorder: true,
+                        borderColor: AppColors.authThemeColor,
+                        text: cancelTxt,
+                        textColor: AppColors.authThemeColor,
+                        onTap: () => Navigator.pop(context),
+                      ),
+                      const SizedBox(width: 16),
+                      AppButton(
+                        width: MediaQuery.of(context).size.width / 2.8,
                         icon: const Icon(
                           Icons.payment,
                           size: 18,

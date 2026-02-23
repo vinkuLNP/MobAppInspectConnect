@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:inspect_connect/core/utils/constants/app_colors.dart';
 import 'package:inspect_connect/core/utils/constants/app_common_card_container.dart';
+import 'package:inspect_connect/core/utils/constants/app_constants.dart';
+import 'package:inspect_connect/core/utils/constants/app_strings.dart';
+import 'package:inspect_connect/core/utils/helpers/app_common_functions/app_common_functions.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:intl/intl.dart';
+import 'package:inspect_connect/features/client_flow/presentations/widgets/booking_preview_screen.dart';
 import 'package:inspect_connect/features/client_flow/data/models/booking_detail_model.dart';
 
 class ViewBookingDetailsScreen extends StatelessWidget {
@@ -27,29 +31,36 @@ class ViewBookingDetailsScreen extends StatelessWidget {
             _imageSection(),
             const SizedBox(height: 20),
             _section(
-              title: "Inspection Information",
+              title: inspectionInfo,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _infoRow(
-                    "Inspection Type",
+                    inspectionType,
                     booking.certificateSubTypes.isNotEmpty
                         ? booking.certificateSubTypes.first.name
                         : "--",
                   ),
-                  _infoRow("Description", booking.description),
-                  _infoRow("Location", booking.bookingLocation),
+                  _infoRow(descriptionTxt, booking.description),
+                  _infoRow(locationTxt, booking.bookingLocation),
+                  _infoRow(
+                    inspectionStatus,
+                    bookingStatusToText(booking.status),
+                  ),
                 ],
               ),
             ),
 
             _section(
-              title: "Booking Schedule",
+              title: bookingSchedule,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _infoRow("Booking Date", _formatDate(booking.bookingDate)),
-                  _infoRow("Time", booking.bookingTime),
+                  _infoRow(
+                    bookingDate,
+                    formatDateFlexible(booking.bookingDate),
+                  ),
+                  _infoRow(bookingTime, booking.bookingTime),
                 ],
               ),
             ),
@@ -59,35 +70,32 @@ class ViewBookingDetailsScreen extends StatelessWidget {
                 : _financialInformationSection(),
             isInspectorView
                 ? _section(
-                    title: "Client Details",
+                    title: clientDetails,
                     child: booking.inspector == null
-                        ? _infoRow("Client", "--")
+                        ? _infoRow(clientTxt, "--")
                         : Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              _infoRow("Client Name", booking.client.name),
-                              _infoRow("Email", booking.client.email),
+                              _infoRow(clientName, booking.client.name),
+                              _infoRow(emailLabel, booking.client.email),
                               _infoRow(
-                                "Phone",
+                                phoneTxt,
                                 "${booking.client.countryCode} ${booking.client.phoneNumber}",
                               ),
                             ],
                           ),
                   )
                 : _section(
-                    title: "Inspector Details",
+                    title: inspectorDetails,
                     child: booking.inspector == null
-                        ? _infoRow("Inspector", "--")
+                        ? _infoRow(inspectorTxt, "--")
                         : Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              _infoRow(inspectorName, booking.inspector!.name),
+                              _infoRow(emailLabel, booking.inspector!.email),
                               _infoRow(
-                                "Inspector Name",
-                                booking.inspector!.name,
-                              ),
-                              _infoRow("Email", booking.inspector!.email),
-                              _infoRow(
-                                "Phone",
+                                phoneTxt,
                                 "${booking.inspector!.countryCode} ${booking.inspector!.phoneNumber}",
                               ),
                             ],
@@ -95,6 +103,20 @@ class ViewBookingDetailsScreen extends StatelessWidget {
                   ),
 
             const SizedBox(height: 20),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.picture_as_pdf),
+              label: textWidget(text: viewReport, color: AppColors.whiteColor),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) =>
+                        BookingReportPreviewScreen(booking: booking),
+                  ),
+                );
+              },
+            ),
+            const SizedBox(height: 50),
           ],
         ),
       ),
@@ -103,39 +125,36 @@ class ViewBookingDetailsScreen extends StatelessWidget {
 
   Widget _financialInformationSection() {
     return _section(
-      title: "Financial Information",
+      title: financialInfo,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           booking.totalBillingAmount != ""
               ? _infoRow(
-                  "Total Billing Amount",
-                  _formatMoneyFromDynamic(booking.totalBillingAmount),
+                  totalBillingAmount,
+                  formatMoneyFromDynamic(booking.totalBillingAmount),
                 )
               : const SizedBox.shrink(),
           booking.showUpFee != ""
               ? _infoRow(
-                  "Show Up Fee",
-                  _formatMoneyFromDynamic(booking.showUpFee),
+                  showUpFeeTxt,
+                  formatMoneyFromDynamic(booking.showUpFee),
                 )
               : const SizedBox.shrink(),
+          _infoRow(platformFeeTxt, formatMoneyFromDynamic(booking.platformFee)),
           _infoRow(
-            "Platform Fee",
-            _formatMoneyFromDynamic(booking.platformFee),
-          ),
-          _infoRow(
-            "Show-Up Fee Applied",
-            booking.showUpFeeApplied ? "Yes" : "No",
+            showUpFeeAppliedTxt,
+            booking.showUpFeeApplied ? yesTxt : noTxt,
           ),
           booking.finalRaisedAmount > 0
               ? _infoRow(
-                  "Raised Amount Applied",
-                  _formatMoneyFromDynamic(booking.finalRaisedAmount),
+                  raisedAmountTxt,
+                  formatMoneyFromDynamic(booking.finalRaisedAmount),
                 )
               : const SizedBox.shrink(),
           _infoRow(
-            "Late Cancellation",
-            booking.lateCancellation ? "Yes" : "No",
+            lateCancellationTxt,
+            booking.lateCancellation ? yesTxt : noTxt,
           ),
         ],
       ),
@@ -143,25 +162,25 @@ class ViewBookingDetailsScreen extends StatelessWidget {
   }
 
   Widget _payoutInformationSection() {
-    final double ratePerHour = _parseToDouble(booking.globalCharge);
+    final double ratePerHour = parseToDouble(booking.globalCharge);
     final double minPayout4h = ratePerHour * 4;
     final double maxPayout8h = ratePerHour * 8;
 
     final String totalPayout =
         (booking.totalPaidToInspector == "" ||
             booking.totalPaidToInspector.toString().isEmpty)
-        ? "N/A"
-        : _formatMoneyFromDynamic(booking.totalPaidToInspector);
+        ? notAvailableTxt
+        : formatMoneyFromDynamic(booking.totalPaidToInspector);
 
     return _section(
-      title: "Payout Information",
+      title: payoutInfo,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _infoRow("Payout Rate (per hour)", _formatMoney(ratePerHour)),
-          _infoRow("Minimum Payout (4 hours)", _formatMoney(minPayout4h)),
-          _infoRow("Maximum Payout (8 hours)", _formatMoney(maxPayout8h)),
-          _infoRow("Total Payout Amount after deductions", totalPayout),
+          _infoRow(payoutRatePerHour, formatMoney(ratePerHour)),
+          _infoRow(minPayout4hTxt, formatMoney(minPayout4h)),
+          _infoRow(maxPayout8hTxt, formatMoney(maxPayout8h)),
+          _infoRow(totalPayoutTxt, totalPayout),
         ],
       ),
     );
@@ -177,7 +196,7 @@ class ViewBookingDetailsScreen extends StatelessWidget {
         ),
         child: Center(
           child: textWidget(
-            text: "No Images",
+            text: noImagesTxt,
             fontSize: 12,
             color: Colors.grey,
           ),
@@ -241,30 +260,5 @@ class ViewBookingDetailsScreen extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  String _formatDate(String date) {
-    try {
-      final d = DateTime.parse(date);
-      return DateFormat("MMM dd, yyyy").format(d);
-    } catch (_) {
-      return date;
-    }
-  }
-
-  double _parseToDouble(dynamic value) {
-    if (value == null) return 0;
-    if (value is num) return value.toDouble();
-    return double.tryParse(value.toString()) ?? 0;
-  }
-
-  String _formatMoney(double amount) {
-    return "\$$amount";
-  }
-
-  String _formatMoneyFromDynamic(dynamic value) {
-    final double amount = _parseToDouble(value);
-    if (amount == 0) return "\$0.0";
-    return _formatMoney(amount);
   }
 }

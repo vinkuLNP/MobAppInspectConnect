@@ -468,7 +468,7 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
           final Map<String, dynamic> body =
               (root['body'] as Map?)?.cast<String, dynamic>() ??
               <String, dynamic>{};
-          final List<dynamic> list = body['users'] ?? [];
+          final List<dynamic> list = body['bookings'] ?? [];
           final List<BookingData> dtoList = list
               .map((e) => BookingData.fromJson(e))
               .toList();

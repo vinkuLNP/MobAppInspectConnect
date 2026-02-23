@@ -1,30 +1,5 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
-
-class PaymentsBodyEntity {
-  final List<PaymentEntity> payments;
-  final int totalCount;
-  final int totalPages;
-  final int currentPage;
-  final int perPageLimit;
-
-  PaymentsBodyEntity({
-    required this.payments,
-    required this.totalCount,
-    required this.totalPages,
-    required this.currentPage,
-    required this.perPageLimit,
-  });
-}
-
-class UserEntity {
-  final String id;
-  final String email;
-  final String name;
-
-  UserEntity({required this.id, required this.email, required this.name});
-}
+import 'package:inspect_connect/features/client_flow/domain/entities/user_entity.dart';
 
 class PaymentEntity {
   final String id;
@@ -67,17 +42,11 @@ class PaymentEntity {
 
   bool get isAdded {
     switch (type.toLowerCase()) {
-      case 'paid':
+      case 'charge':
       case 'wallet_credit':
         return true;
-      case 'pending':
-      case 'wallet_deduct':
-      case 'processing':
-      case 'action_required':
-      case 'failed':
-        return false;
       default:
-        return type == 'charge';
+        return false;
     }
   }
 
@@ -97,113 +66,86 @@ class PaymentEntity {
   }
 
   Color get statusColor {
-    switch (type.toLowerCase()) {
-      case 'paid':
-      case 'wallet_credit':
-        return Colors.green;
+    switch (status.toLowerCase()) {
       case 'succeeded':
-      case 'wallet_deduct':
-        return Colors.red;
+      case 'paid':
+        return Colors.green;
+
       case 'pending':
       case 'processing':
         return Colors.orange;
-      case 'action_required':
-        return Colors.amber;
+
       case 'failed':
-        return Colors.grey;
+        return Colors.red;
+
+      case 'action_required':
+        return Colors.blue;
+
       default:
         return Colors.grey;
     }
   }
 
   String get statusLabel {
-    log('---------type. $type');
-    log('---------status. $status');
+    return status
+        .replaceAll('_', ' ')
+        .split(' ')
+        .map(
+          (word) =>
+              word.isEmpty ? word : word[0].toUpperCase() + word.substring(1),
+        )
+        .join(' ');
+  }
 
-    switch (type.toLowerCase()) {
-      case 'paid':
+  IconData get transactionIcon {
+    final lowerStatus = status.toLowerCase();
+    final lowerType = type.toLowerCase();
+
+    if (lowerStatus == 'failed' || lowerStatus == 'action_required') {
+      return Icons.cancel_rounded;
+    }
+
+    if (lowerStatus == 'pending' || lowerStatus == 'processing') {
+      return Icons.access_time_rounded;
+    }
+
+    if (lowerStatus == 'succeeded' || lowerStatus == 'paid') {
+      return Icons.check_circle_rounded;
+    }
+
+    switch (lowerType) {
+      case 'charge':
+      case 'subscription':
+        return Icons.trending_up;
+
+      case 'refund':
+        return Icons.trending_down;
+
       case 'wallet_credit':
-        return 'Added';
-      case 'succeeded':
-      case 'wallet_deduct':
-        return 'Deducted';
-      case 'pending':
-        return 'Pending';
-      case 'processing':
-        return 'Processing';
-      case 'action_required':
-        return 'Action Required';
-      case 'failed':
-        return 'Failed';
+        return Icons.account_balance_wallet;
+
+      case 'payout':
+        return Icons.account_balance;
+
+      case 'transfer':
+        return Icons.swap_horiz;
       default:
-        return status.toUpperCase();
+        return Icons.attach_money;
     }
   }
-}
 
+  Color get iconColor {
+    final lowerStatus = status.toLowerCase();
 
-/*
-const getStatusColor = (status: string) => {
-    switch (status) {
-      case "succeeded":
-      case "paid":
-        return "success";
-      case "pending":
-      case "processing":
-        return "warning";
-      case "failed":
-      case "action_required":
-        return "error";
-      default:
-        return "default";
+    if (lowerStatus == 'failed') return Colors.red;
+    if (lowerStatus == 'action_required') return Colors.blue;
+    if (lowerStatus == 'pending' || lowerStatus == 'processing') {
+      return Colors.orange;
     }
-  };
+    if (lowerStatus == 'succeeded' || lowerStatus == 'paid') {
+      return Colors.green;
+    }
 
-
-
-
-   const getTransactionIcon = (type: string, status: string) => {
-    if (status === "failed" || status === "action_required")
-      return <XCircle size={16} color="#ef4444" />;
-    if (status === "pending" || status === "processing")
-      return <Clock size={16} color="#f59e0b" />;
-    if (status === "succeeded" || status === "paid")
-      return <CheckCircle size={16} color="#10b981" />;
-    if (type === "charge" || type === "subscription")
-      return <TrendingUp size={16} color="#10b981" />;
-    if (type === "refund") return <TrendingDown size={16} color="#ef4444" />;
-    if (type === "wallet_credit")
-      return <BanknoteArrowUp size={16} color="#10b981" />;
-    if (type === "payout")
-      return <BanknoteArrowDown size={16} color="#ef4444" />;
-    if (type === "transfer") return <TrendingUp size={16} color="#3b82f6" />;
-    return <DollarSign size={16} color="#6b7280" />;
-  };
-   {getTransactionIcon(payment.type, payment.status)}
-                          <Typography
-                            variant="body2"
-                            sx={{ textTransform: "capitalize", fontWeight: 500 }}
-                          >
-                            {payment.type.replace("_", " ")}
-
-
-
-                              {payment.stripePayoutId ||
-                            payment.stripeTransferId ||
-                            payment.stripeChargeId ||
-                            payment.eventId ||
-                            payment.invoiceNumber ||
-                            "N/A"}
-
-
-
-                         
-*/
-
-
-
-
-
-
-
-
+    return Colors.grey;
+  }
+}

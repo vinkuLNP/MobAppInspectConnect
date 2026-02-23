@@ -1,32 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:inspect_connect/core/utils/constants/app_colors.dart';
+import 'package:inspect_connect/core/utils/constants/app_strings.dart';
+import 'package:inspect_connect/core/utils/helpers/app_common_functions/app_common_functions.dart';
+import 'package:inspect_connect/core/utils/helpers/extension_functions/extension_functions.dart';
+import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/features/client_flow/domain/entities/payment_list_entity.dart';
-import 'package:intl/intl.dart';
-
-class _StatusChip extends StatelessWidget {
-  final String label;
-  final Color color;
-
-  const _StatusChip({required this.label, required this.color});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          fontSize: 11,
-          fontWeight: FontWeight.w600,
-          color: color,
-        ),
-      ),
-    );
-  }
-}
+import 'package:inspect_connect/features/client_flow/presentations/widgets/paymnet_status_chip.dart';
 
 class PaymentTile extends StatelessWidget {
   final PaymentEntity txn;
@@ -37,7 +16,9 @@ class PaymentTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isCredit = txn.isAdded;
-    final amountColor = isCredit ? Colors.green : Colors.red;
+    final amountColor = isCredit
+        ? AppColors.successColor
+        : AppColors.errorColor;
     final backgroundColor = index.isEven ? Colors.white : Colors.grey.shade50;
 
     return TweenAnimationBuilder<double>(
@@ -70,12 +51,12 @@ class PaymentTile extends StatelessWidget {
                   width: 44,
                   height: 44,
                   decoration: BoxDecoration(
-                    color: amountColor.withValues(alpha: 0.12),
+                    color: txn.iconColor.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(
-                    isCredit ? Icons.south_west : Icons.north_east,
-                    color: amountColor,
+                    txn.transactionIcon,
+                    color: txn.iconColor,
                     size: 20,
                   ),
                 ),
@@ -86,22 +67,27 @@ class PaymentTile extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        txn.relatedUserId?.name ?? "You",
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 14,
-                        ),
+                      textWidget(
+                        text: txn.relatedUserId?.name ?? youTxt,
+                        maxLine: 1,
+                        textOverflow: TextOverflow.ellipsis,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
                       ),
                       const SizedBox(height: 6),
-                      Text(
-                        _formatDate(txn.createdAt),
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: Colors.grey.shade500,
+                      textWidget(
+                        text:
+                            "$typeTxt - ${txn.type.replaceAll("_", " ").capitalizeEachWord()}",
+                        fontSize: 11,
+                      ),
+                      const SizedBox(height: 6),
+                      textWidget(
+                        text: formatDateFlexible(
+                          txn.createdAt,
+                          dateFormat: dateFormatWithTime,
                         ),
+                        fontSize: 11,
+                        color: Colors.grey.shade500,
                       ),
                     ],
                   ),
@@ -112,17 +98,15 @@ class PaymentTile extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Text(
-                      '${isCredit ? '+' : '-'}\$${txn.amount.toStringAsFixed(2)}',
-                      style: TextStyle(
-                        color: amountColor,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 14,
-                      ),
+                    textWidget(
+                      text:
+                          '${isCredit ? '+' : '-'}\$${txn.amount.toStringAsFixed(2)}',
+                      color: amountColor,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 14,
                     ),
                     const SizedBox(height: 6),
-                    _StatusChip(label: txn.statusLabel, color: txn.statusColor),
-                    
+                    StatusChip(label: txn.statusLabel, color: txn.statusColor),
                   ],
                 ),
               ],
@@ -131,10 +115,5 @@ class PaymentTile extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  String _formatDate(DateTime? date) {
-    if (date == null) return 'N/A';
-    return DateFormat('dd MMM yyyy, hh:mm a').format(date.toLocal());
   }
 }
