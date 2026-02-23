@@ -109,10 +109,11 @@ class InsepctorPersistentDataService {
         (e) => e.id == saved.documentTypeId,
       );
     }
-    provider.referenceLetters = (saved.referenceDocuments ?? [])
-        .where((e) => e != 'null' && e.isNotEmpty)
-        .map((e) => File(e))
+    provider.referenceLettersUrls = (saved.referenceDocuments ?? [])
+        .where((e) => e.isNotEmpty && e != 'null')
         .toList();
+
+    provider.referenceLetters = [];
     inspWorkHistoryController.text = saved.workHistoryDescription ?? '';
     provider.agreedToTerms = saved.agreedToTerms ?? false;
     provider.confirmTruth = saved.isTruthfully ?? false;

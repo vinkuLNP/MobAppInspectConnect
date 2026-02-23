@@ -14,8 +14,14 @@ import 'package:inspect_connect/features/auth_flow/presentation/inspector/inspec
 class AdditionalDetailsStep extends StatefulWidget {
   final InspectorViewModelProvider vm;
   final GlobalKey<FormState> formKey;
+  final bool isAccountScreen;
 
-  const AdditionalDetailsStep(this.vm, this.formKey, {super.key});
+  const AdditionalDetailsStep(
+    this.vm,
+    this.formKey, {
+    super.key,
+    this.isAccountScreen = false,
+  });
 
   @override
   State<AdditionalDetailsStep> createState() => _AdditionalDetailsStepState();
@@ -37,7 +43,6 @@ class _AdditionalDetailsStepState extends State<AdditionalDetailsStep> {
       child: Consumer<InspectorViewModelProvider>(
         builder: (context, prov, _) {
           return SingleChildScrollView(
-            padding: const EdgeInsets.all(12),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -62,7 +67,8 @@ class _AdditionalDetailsStepState extends State<AdditionalDetailsStep> {
                   ),
                 ),
                 _section(
-                  title: uploadIdLicense,
+                  title:
+                      '${widget.isAccountScreen ? '' : uploadtxt} $uploadIdLicense',
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -95,7 +101,8 @@ class _AdditionalDetailsStepState extends State<AdditionalDetailsStep> {
                   ),
                 ),
                 _section(
-                  title: uploadCoiDocument,
+                  title:
+                      '${widget.isAccountScreen ? '' : uploadtxt} $uploadCoiDocument',
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -129,13 +136,18 @@ class _AdditionalDetailsStepState extends State<AdditionalDetailsStep> {
                 ),
 
                 _section(
-                  title: uploadReferenceLetters,
+                  title:
+                      '${widget.isAccountScreen ? '' : uploadtxt} $uploadReferenceLetters',
+
                   child: imageUploader(
                     context: context,
                     files: prov.referenceLetters,
+                    existingUrls: prov.referenceLettersUrls,
                     maxFiles: 5,
                     onAdd: () => prov.pickFile(context, 'ref'),
                     onRemove: (index) => prov.removeReferenceLetterImage(index),
+                    onRemoveExisting: (index) =>
+                        prov.removeReferenceLetterImage(index),
                   ),
                 ),
 
@@ -147,43 +159,44 @@ class _AdditionalDetailsStepState extends State<AdditionalDetailsStep> {
                   maxLines: 4,
                   hint: workHistoryHint,
                 ),
-
-                CheckboxListTile(
-                  value: prov.agreedToTerms,
-                  onChanged: (val) {
-                    prov.toggleTerms(val);
-                    setState(() => prov.showValidationError = false);
-                  },
-                  contentPadding: EdgeInsets.zero,
-                  visualDensity: VisualDensity.compact,
-                  dense: true,
-                  controlAffinity: ListTileControlAffinity.leading,
-                  title: textWidget(
-                    text: agreeToTerms,
-                    fontSize: 12,
-                    color: prov.showValidationError && !prov.agreedToTerms
-                        ? Colors.red
-                        : Colors.black,
+                if (!widget.isAccountScreen) ...[
+                  CheckboxListTile(
+                    value: prov.agreedToTerms,
+                    onChanged: (val) {
+                      prov.toggleTerms(val);
+                      setState(() => prov.showValidationError = false);
+                    },
+                    contentPadding: EdgeInsets.zero,
+                    visualDensity: VisualDensity.compact,
+                    dense: true,
+                    controlAffinity: ListTileControlAffinity.leading,
+                    title: textWidget(
+                      text: agreeToTerms,
+                      fontSize: 12,
+                      color: prov.showValidationError && !prov.agreedToTerms
+                          ? Colors.red
+                          : Colors.black,
+                    ),
                   ),
-                ),
-                CheckboxListTile(
-                  value: prov.confirmTruth,
-                  onChanged: (val) {
-                    prov.toggleTruth(val);
-                    setState(() => prov.showValidationError = false);
-                  },
-                  visualDensity: VisualDensity.compact,
-                  dense: true,
-                  contentPadding: EdgeInsets.zero,
-                  controlAffinity: ListTileControlAffinity.leading,
-                  title: textWidget(
-                    text: informationTruthful,
-                    fontSize: 12,
-                    color: prov.showValidationError && !prov.confirmTruth
-                        ? Colors.red
-                        : Colors.black,
+                  CheckboxListTile(
+                    value: prov.confirmTruth,
+                    onChanged: (val) {
+                      prov.toggleTruth(val);
+                      setState(() => prov.showValidationError = false);
+                    },
+                    visualDensity: VisualDensity.compact,
+                    dense: true,
+                    contentPadding: EdgeInsets.zero,
+                    controlAffinity: ListTileControlAffinity.leading,
+                    title: textWidget(
+                      text: informationTruthful,
+                      fontSize: 12,
+                      color: prov.showValidationError && !prov.confirmTruth
+                          ? Colors.red
+                          : Colors.black,
+                    ),
                   ),
-                ),
+                ],
               ],
             ),
           );

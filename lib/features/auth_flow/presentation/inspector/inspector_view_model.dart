@@ -104,7 +104,7 @@ class InspectorViewModelProvider extends BaseViewModel {
 
   File? coiFile;
   UserDocumentEntity? coiUploadedUrl;
-
+  List<String> referenceLettersUrlsTemp = [];
   List<File> referenceLetters = [];
   List<String> referenceLettersUrls = [];
   void removeIccDoc(String city, String docId) {
@@ -300,10 +300,6 @@ class InspectorViewModelProvider extends BaseViewModel {
     notifyListeners();
   }
 
-  Future<void> submit() async {
-    await Future.delayed(const Duration(milliseconds: 500));
-  }
-
   void toggleTerms(bool? value) {
     agreedToTerms = value ?? false;
     notifyListeners();
@@ -348,8 +344,14 @@ class InspectorViewModelProvider extends BaseViewModel {
     notifyListeners();
   }
 
-  void removeReferenceLetterImage(int i) {
-    referenceLetters.removeAt(i);
+  void removeReferenceLetterImage(int index) {
+    if (index < referenceLettersUrls.length) {
+      referenceLettersUrls.removeAt(index);
+    } else {
+      final newIndex = index - referenceLettersUrls.length;
+      referenceLetters.removeAt(newIndex);
+      referenceLettersUrlsTemp.removeAt(newIndex);
+    }
     notifyListeners();
   }
 
@@ -608,12 +610,11 @@ class InspectorViewModelProvider extends BaseViewModel {
   IccDocumentLocalEntity? coiDoc;
   IccDocumentLocalEntity? idDoc;
 
-
   UserDocument? firstByType(List<UserDocument>? docs, String type) {
     if (docs == null) return null;
 
     for (final d in docs) {
-      if (d.documentType!.name == type) return d;
+      if (d.documentType!.name.toLowerCase() == type.toLowerCase()) return d;
     }
     return null;
   }
@@ -675,7 +676,7 @@ class InspectorViewModelProvider extends BaseViewModel {
 
     uploadedCertificateUrls = user.certificateDocuments ?? [];
     existingDocumentUrls = List.from(uploadedCertificateUrls);
-
+    await fetchInspectorDocumentsType();
     inspWorkHistoryController.text = user.workHistoryDescription ?? '';
 
     agreedToTerms = user.agreedToTerms;

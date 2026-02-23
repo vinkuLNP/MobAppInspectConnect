@@ -1,9 +1,9 @@
-import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/utils/constants/app_assets_constants.dart';
 import 'package:inspect_connect/core/utils/constants/app_common_card_container.dart';
 import 'package:inspect_connect/core/utils/constants/app_strings.dart';
+import 'package:inspect_connect/core/utils/helpers/app_logger/app_logger.dart';
 import 'package:inspect_connect/features/auth_flow/data/models/step_meta_model.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/inspector/view/sign_up_steps/additional_detail.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/inspector/view/sign_up_steps/personal_details_step.dart';
@@ -101,7 +101,6 @@ class _InspectorSignUpContentState extends State<InspectorSignUpContent> {
             switch (vm.currentStep) {
               case 0:
                 await vm.savePersonalStep();
-                log('💾 Personal details saved');
                 break;
               case 1:
                 if (!vm.validateProfessionalDetails()) {
@@ -121,9 +120,6 @@ class _InspectorSignUpContentState extends State<InspectorSignUpContent> {
                 );
                 break;
               case 2:
-                log('ICC Local Files: ${vm.iccLocalFiles}');
-                log('ICC Uploaded URLs: ${vm.iccUploadedUrls}');
-                log('Selected Cities: ${vm.selectedCityNames}');
                 final isValid = vm.validateServiceArea();
                 if (!isValid) return;
                 vm.saveSelectedServiceDataToProvider();
@@ -149,7 +145,6 @@ class _InspectorSignUpContentState extends State<InspectorSignUpContent> {
                 if (!vm.agreedToTerms || !vm.confirmTruth) {
                   return;
                 }
-                log("called");
                 String? getSafePath(dynamic fileOrUrl) {
                   if (fileOrUrl == null) return null;
                   final path = fileOrUrl is File
@@ -165,18 +160,14 @@ class _InspectorSignUpContentState extends State<InspectorSignUpContent> {
 
                 final profilePath = getSafePath(vm.profileImageUrl);
                 final idPath = getSafePath(vm.idDocumentUploadedUrl);
-                final refs = vm.referenceLetters.map((f) {
-                  final path = f.path;
-                  return (path.startsWith(httpProtocol) ||
-                          path.startsWith(httpsProtocol))
-                      ? path
-                      : path;
-                }).toList();
-
+                final allReferenceUrls = [
+                  ...vm.referenceLettersUrls,
+                  ...vm.referenceLettersUrlsTemp,
+                ];
                 await vm.saveAdditionalStep(
                   profileImageUrlOrPath: profilePath.toString(),
                   idLicenseUrlOrPath: idPath,
-                  referenceDocs: refs,
+                  referenceDocs: allReferenceUrls,
                   agreed: vm.agreedToTerms,
                   truthful: vm.confirmTruth,
                   workHistoryDescription: inspWorkHistoryController.text,
@@ -188,7 +179,7 @@ class _InspectorSignUpContentState extends State<InspectorSignUpContent> {
               vm.goNext();
             } else {
               final saved = await vm.getSavedData();
-              log('final data: ${saved?.toString()}');
+              AppLogger.info('final data: ${saved?.toString()}');
               if (context.mounted) {
                 vm.signUp(context: context);
               }

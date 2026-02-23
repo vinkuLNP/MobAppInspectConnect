@@ -7,6 +7,7 @@ import 'package:inspect_connect/core/utils/presentation/app_common_button.dart';
 import 'package:inspect_connect/features/auth_flow/data/datasources/local_datasources/auth_user_local_entity.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/inspector/inspector_view_model.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/inspector/view/sign_up_steps/additional_detail.dart';
+import 'package:inspect_connect/features/auth_flow/presentation/inspector/view/sign_up_steps/personal_details_step.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/inspector/view/sign_up_steps/professional_details.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/inspector/view/sign_up_steps/service_area.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/user_provider.dart';
@@ -60,29 +61,19 @@ class _AccountSettingsViewState extends State<AccountSettingsView> {
         key: _formKey,
         child: Consumer<InspectorViewModelProvider>(
           builder: (_, vm, _) {
-
             return ListView(
               padding: const EdgeInsets.all(16),
               children: [
-                const Divider(height: 32),
+                PersonalDetailsStep(vm, _formKey, isAccountScreen: true),
 
-                ServiceAreaStep(vm, _formKey),
+                ProfessionalDetailsStep(vm, _formKey, isAccountScreen: true),
 
-                const Divider(height: 32),
+                ServiceAreaStep(vm, _formKey, isAccountScreen: true),
 
-                ProfessionalDetailsStep(vm, _formKey),
+                AdditionalDetailsStep(vm, _formKey, isAccountScreen: true),
+                SizedBox(height: 30),
 
-                const Divider(height: 32),
-
-                AdditionalDetailsStep(vm, _formKey),
-
-                const SizedBox(height: 24),
-
-                AppButton(
-                  text: saveChanges,
-                  onTap: () => (),
-                  // onTap: () => _updateAccount(vm),
-                ),
+                AppButton(text: saveChanges, onTap: () => ()),
                 const SizedBox(height: 50),
               ],
             );
