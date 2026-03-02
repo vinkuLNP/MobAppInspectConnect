@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
+import 'package:inspect_connect/core/utils/constants/app_strings.dart';
 import 'package:inspect_connect/core/utils/presentation/app_text_style.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/client/widgets/input_fields.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/inspector/inspector_view_model.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/inspector/widgets/stepper_header.dart';
+import 'package:inspect_connect/features/auth_flow/utils/text_editor_controller.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -12,33 +14,39 @@ import 'package:provider/provider.dart';
 class PersonalDetailsStep extends StatelessWidget {
   final InspectorViewModelProvider vm;
   final GlobalKey<FormState> formKey;
-  const PersonalDetailsStep(this.vm, this.formKey, {super.key});
+  final bool isAccountScreen;
+  const PersonalDetailsStep(
+    this.vm,
+    this.formKey, {
+    super.key,
+    this.isAccountScreen = false,
+  });
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SectionTitle('Personal Details'),
+        const SectionTitle(personalDetails),
         const SizedBox(height: 8),
         AppInputField(
-          label: 'Full Name',
-          hint: 'Full Name',
-          controller: vm.fullNameCtrl,
+          label: fullNameLabel,
+          hint: fullNameHint,
+          controller: inspFullNameCtrl,
           validator: vm.validateRequired,
           onChanged: (_) {
             if (vm.autoValidate) formKey.currentState?.validate();
           },
         ),
         const SizedBox(height: 10),
-        textWidget(text: 'Phone Number', fontWeight: FontWeight.w400),
+        textWidget(text: phoneNumberLabel, fontWeight: FontWeight.w400),
         const SizedBox(height: 8),
 
         Consumer<InspectorViewModelProvider>(
           builder: (_, vm, _) => FormField<String>(
             validator: (_) {
               final p = vm.phoneRaw ?? '';
-              if ((vm.phoneE164 ?? '').isEmpty) return 'Phone is required';
-              if (p.length < 10) return 'Enter a valid phone';
+              if ((vm.phoneE164 ?? '').isEmpty) return phoneRequiredError;
+              if (p.length < 10) return phoneInvalidError;
               return null;
             },
             builder: (fieldState) => Column(
@@ -46,10 +54,16 @@ class PersonalDetailsStep extends StatelessWidget {
               children: [
                 IntlPhoneField(
                   style: appTextStyle(fontSize: 12),
-                  controller: vm.phoneCtrl,
+                  controller: inspPhoneCtrl,
                   initialCountryCode: 'IN',
+                  readOnly: isAccountScreen,
+                  enabled: !isAccountScreen,
                   decoration: InputDecoration(
-                    hintText: 'Phone Number',
+                    hintText: phoneNumberLabel,
+                    fillColor: isAccountScreen
+                        ? Colors.grey.shade300
+                        : Colors.white,
+                    filled: isAccountScreen,
                     errorText: fieldState.errorText,
                     counterText: '',
                     hintStyle: appTextStyle(fontSize: 12, color: Colors.grey),
@@ -114,27 +128,30 @@ class PersonalDetailsStep extends StatelessWidget {
 
         const SizedBox(height: 10),
         AppInputField(
-          label: 'Email',
-          hint: 'Email',
-          controller: vm.emailCtrlSignUp,
+          label: emailLabel,
+          hint: emailHint,
+          controller: inspEmailCtrlSignUp,
+          readOnly: isAccountScreen,
           keyboardType: TextInputType.emailAddress,
           validator: vm.validateEmail,
           onChanged: (_) {
             if (vm.autoValidate) formKey.currentState?.validate();
           },
         ),
-        const SizedBox(height: 10),
-        AppPasswordField(
-          label: 'Password',
-          controller: vm.passwordCtrlSignUp,
-          obscure: vm.obscurePassword,
-          onToggle: vm.toggleObscurePassword,
-          validator: vm.validatePassword,
-          onChanged: (_) {
-            if (vm.autoValidate) formKey.currentState?.validate();
-          },
-        ),
-        const SizedBox(height: 6),
+        if (!isAccountScreen) ...[
+          const SizedBox(height: 10),
+          AppPasswordField(
+            label: passwordLabel,
+            controller: inspPasswordCtrlSignUp,
+            obscure: vm.obscurePassword,
+            onToggle: vm.toggleObscurePassword,
+            validator: vm.validatePassword,
+            onChanged: (_) {
+              if (vm.autoValidate) formKey.currentState?.validate();
+            },
+          ),
+          const SizedBox(height: 6),
+        ],
       ],
     );
   }

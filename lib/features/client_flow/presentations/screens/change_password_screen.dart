@@ -1,7 +1,9 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:inspect_connect/core/utils/constants/app_strings.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_button.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/client/widgets/input_fields.dart';
+import 'package:inspect_connect/features/auth_flow/utils/text_editor_controller.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/client_dashboard_provider.dart';
 import 'package:inspect_connect/features/client_flow/presentations/widgets/common_app_bar.dart';
 import 'package:provider/provider.dart';
@@ -17,7 +19,7 @@ class ChangePasswordView extends StatelessWidget {
       child: Consumer<ChangePasswordViewModel>(
         builder: (context, vm, _) => Scaffold(
           appBar: const CommonAppBar(
-            title: 'Change Password',
+            title: changePassword,
             showLogo: false,
             showBackButton: true,
           ),
@@ -32,8 +34,8 @@ class ChangePasswordView extends StatelessWidget {
                 const SizedBox(height: 8),
 
                 AppPasswordField(
-                  label: 'Old Password',
-                  controller: vm.oldPasswordCtrl,
+                  label: oldPassword,
+                  controller: oldPasswordCtrl,
                   obscure: !vm.showOldPassword,
                   onToggle: vm.toggleOldPasswordVisibility,
                   validator: vm.validatePassword,
@@ -41,8 +43,8 @@ class ChangePasswordView extends StatelessWidget {
                 const SizedBox(height: 8),
 
                 AppPasswordField(
-                  label: 'New Password',
-                  controller: vm.newPasswordCtrl,
+                  label: newPasswordLabel,
+                  controller: newPasswordCtrl,
                   obscure: !vm.showNewPassword,
                   onToggle: vm.toggleNewPasswordVisibility,
                   validator: vm.validatePassword,
@@ -50,8 +52,8 @@ class ChangePasswordView extends StatelessWidget {
                 const SizedBox(height: 8),
 
                 AppPasswordField(
-                  label: 'Confirm Password',
-                  controller: vm.confirmPasswordCtrl,
+                  label: confirmPassword,
+                  controller: confirmPasswordCtrl,
                   obscure: !vm.showConfirmPassword,
                   onToggle: vm.toggleConfirmPasswordVisibility,
                   validator: vm.validateConfirmPassword,
@@ -62,7 +64,7 @@ class ChangePasswordView extends StatelessWidget {
                 AppButton(
                   isLoading: vm.isLoading,
 
-                  text: vm.isLoading ? 'Updating...' : 'Update Password',
+                  text: vm.isLoading ? updating : updatePassword,
                   onTap: vm.isLoading
                       ? null
                       : () async {

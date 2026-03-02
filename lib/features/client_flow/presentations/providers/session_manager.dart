@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/di/app_component/app_component.dart';
+import 'package:inspect_connect/core/utils/constants/app_strings.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/user_provider.dart';
 import 'package:inspect_connect/core/utils/auto_router_setup/auto_router.dart';
@@ -45,9 +46,9 @@ class SessionManager {
         context: navContext,
         barrierDismissible: false,
         builder: (_) => AlertDialog(
-          title:    textWidget(text: 'Session Expired'),
-          content:   textWidget(text: 
-            '${reason ?? 'Your session has expired.'} Please log in again.',
+          title: textWidget(text: sessionExpired),
+          content: textWidget(
+            text: '${reason ?? sessionExpiredMessage} $pleaseLogInAgain',
           ),
           actions: [
             TextButton(
@@ -58,7 +59,7 @@ class SessionManager {
                 Navigator.of(navContext).pop();
                 await _performLogoutSilently();
               },
-              child:    textWidget(text: 'OK'),
+              child: textWidget(text: okTxt),
             ),
           ],
         ),
@@ -90,10 +91,7 @@ class SessionManager {
         log('🔁 [SessionManager] Navigating to OnBoardingRoute...');
         navContext.router.replaceAll([const OnBoardingRoute()]);
       } else {
-
-        log(
-          '⚠️ [SessionManager] Navigation context missing or unmounted.',
-        );
+        log('⚠️ [SessionManager] Navigation context missing or unmounted.');
       }
     } catch (e, st) {
       log('❌ [SessionManager] Logout failed: $e\n$st');

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:inspect_connect/core/utils/constants/app_strings.dart';
 
 const String commonErrorUnexpectedMessage =
     'Something went wrong please try again';
@@ -26,24 +27,32 @@ const String contentTypeValue = 'application/json';
 const String contentMultipartTypeValue = 'multipart/form-data';
 
 ///This is the time limit for every api call
-const Duration timeOutDuration = Duration(seconds: 20);
+const Duration timeOutDuration = Duration(seconds: 60);
 
 ///The app base Url should be provided in this value
-///
-///
-///
-// String devBaseUrl = Platform.isIOS
-//     ? 'http://localhost:5002/api/v1/'
-//     : 'http://10.0.2.2:5002/api/v1/';
-const String devBaseUrl =
+String webViewUrl =
+    "https://inspect-connect-cjdwdhh6b4erb5b8.westus2-01.azurewebsites.net";
+String socketUrl =
+    "https://inspect-connect-api-auakczg0ave2bqex.westus2-01.azurewebsites.net/";
+// Platform.isIOS ? "http://localhost:5002" : "http://10.0.2.2:5002";
+
+String devBaseUrl =
+    // Platform.isIOS
+    // ?
+    // 'http://localhost:5002/api/v1/';
+    // : 'http://10.0.2.2:5002/api/v1/';
+    // "http://192.168.1.8:5002/api/v1/";
     'https://inspect-connect-api-auakczg0ave2bqex.westus2-01.azurewebsites.net/api/v1/';
 
 const String stripePublishableKey =
     "pk_test_51RuoE4A1eZHeCW31LaeAmCLpWw0Zmyme5RfE3HG8Svoum8yGvBmYhm2gatOR6zWhyn0PmQGcJQqE5GtzvEIuAVKN00W26f1it7";
 
-const String prodBaseUrl = '';
-const String qaBaseUrl = '';
-const String uatBaseUrl = '';
+const String prodBaseUrl =
+    'https://inspect-connect-api-auakczg0ave2bqex.westus2-01.azurewebsites.net/api/v1/';
+const String qaBaseUrl =
+    'https://inspect-connect-api-auakczg0ave2bqex.westus2-01.azurewebsites.net/api/v1/';
+const String uatBaseUrl =
+    'https://inspect-connect-api-auakczg0ave2bqex.westus2-01.azurewebsites.net/api/v1/';
 
 /// api keys endpoints
 const String signInEndPoint = 'signIn';
@@ -56,16 +65,21 @@ const String updateUser = 'user';
 const String getCertificateSubTypesEndPoint = 'certificate/subTypes';
 const String getInspectorCertificateTypesEndPoint = 'certificate/types';
 const String getInspectorCertificateTAgenciesEndPoint = 'certificate/agencies';
-
+const String getJurisdictionCitiesEndPoint = 'cities/jurisdictions';
+const String getInspectorDocumentTypeEndPoint = 'document/types';
+const String getSettingsEndPoint = 'settings';
 const String createBookingEndPoint = 'bookings';
-
 const String bookingStatusEndPoint = 'status';
 const String bookingTimerEndPoint = 'timer';
-
 const String uploadImageEndPoint = 'uploads';
-
 const String walletEndPoint = 'wallet';
 const String paymentEndPOint = 'payments';
+const String paymentIntentEndPOint = 'payments/paymentIntent';
+const String onboardingEndPOint = 'payments/onboard';
+const String notificationsEndPoint = 'notifications';
+const String deductAndTransferWalletEndPoint =
+    '$walletEndPoint/deductAndTransferWallet';
+const String withdrawMoneyEndPoint = '$walletEndPoint/withdraw';
 
 const String subscriptionEndPoint = 'subscriptionPlans';
 const String userSubscriptionByIdEndPoint = 'subscriptions';
@@ -94,37 +108,37 @@ const int bookingStatusStoppped = 10;
 String bookingStatusToText(int status) {
   switch (status) {
     case bookingStatusPending:
-      return 'Pending';
+      return pendingLabelTxt;
 
     case bookingStatusAccepted:
-      return 'Accepted';
+      return acceptedLabelTxt;
 
     case bookingStatusRejected:
-      return 'Rejected';
+      return rejectedLabelTxt;
 
     case bookingStatusStarted:
-      return 'Inspection Started';
+      return inspectionStartedLabelTxt;
 
     case bookingStatusStoppped:
-      return 'Stopped';
+      return stoppedLabelTxt;
 
     case bookingStatusCompleted:
-      return 'Completed';
+      return completedLabelTxt;
 
     case bookingStatusCancelledByClient:
-      return 'Cancelled By Client';
+      return cancelledByClientLabelTxt;
 
     case bookingStatusExpired:
-      return 'Expired';
+      return expiredLabelTxt;
 
     case bookingStatusAwaiting:
-      return 'Waiting for Client Approval';
+      return waitingForClientApprovalLabelTxt;
 
     case bookingStatusCancelledByInspector:
-      return 'Cancelled By Inspector';
+      return cancelledByInspectorLabelTxt;
 
     case bookingStatusPaused:
-      return 'Paused';
+      return pausedLabelTxt;
 
     default:
       return 'Other';
@@ -210,3 +224,37 @@ IconData statusIcon(int status) {
       return Icons.info_outline;
   }
 }
+
+List<Map<String, dynamic>> statusOptions = [
+  {labelTxt: allLabelTxt, valueTxt: allValueTxt},
+  {
+    labelTxt: awaitingYourApprovalLabelTxt,
+    valueTxt: bookingStatusAwaiting.toString(),
+  },
+  {labelTxt: acceptedLabelTxt, valueTxt: bookingStatusAccepted.toString()},
+  {
+    labelTxt: inspectionStartedLabelTxt,
+    valueTxt: bookingStatusStarted.toString(),
+  },
+
+  {
+    labelTxt: '$inspectionTxt $pausedLabelTxt',
+    valueTxt: bookingStatusPaused.toString(),
+  },
+  {
+    labelTxt: '$inspectionTxt $stoppedLabelTxt',
+    valueTxt: bookingStatusStoppped.toString(),
+  },
+  {labelTxt: pendingLabelTxt, valueTxt: bookingStatusPending.toString()},
+  {labelTxt: rejectedLabelTxt, valueTxt: bookingStatusRejected.toString()},
+  {labelTxt: completedLabelTxt, valueTxt: bookingStatusCompleted.toString()},
+  {
+    labelTxt: cancelledByYouTxt,
+    valueTxt: bookingStatusCancelledByClient.toString(),
+  },
+  {
+    labelTxt: cancelledByInspTxt,
+    valueTxt: bookingStatusCancelledByInspector.toString(),
+  },
+  {labelTxt: expiredLabelTxt, valueTxt: bookingStatusExpired.toString()},
+];

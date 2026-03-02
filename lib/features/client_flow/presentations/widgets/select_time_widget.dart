@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
+import 'package:inspect_connect/core/utils/constants/app_strings.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/features/client_flow/presentations/widgets/date_time_widget_provider.dart';
 import 'package:intl/intl.dart';
@@ -33,7 +34,9 @@ class _DateTimePickerWidgetState extends State<DateTimePickerWidget> {
   }
 
   Future<void> _pickDateTime(BuildContext context) async {
-    final now = DateTime.now().add(const Duration(days: 1));
+    final now = DateTime.now().add(
+      Duration(days: widget.showTimePicker ? 1 : 30),
+    );
     await showDialog(
       context: context,
       barrierDismissible: false,
@@ -46,53 +49,68 @@ class _DateTimePickerWidgetState extends State<DateTimePickerWidget> {
           child: Consumer<DateTimePickerProvider>(
             builder: (context, provider, _) {
               return AlertDialog(
-                title: textWidget(text: "Select Date & Time"),
+                title: textWidget(text: selectDateTime),
                 content: SizedBox(
                   width: 300,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      SizedBox(
-                        height: 300,
-                        child: CalendarDatePicker(
-                          initialDate: provider.tempDate,
-                          firstDate: now,
-                          lastDate: now.add(const Duration(days: 265)),
-                          onDateChanged: provider.setDate,
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      return ConstrainedBox(
+                        constraints: BoxConstraints(
+                          maxWidth: constraints.maxWidth > 360
+                              ? 360
+                              : constraints.maxWidth,
                         ),
-                      ),
-                      const SizedBox(height: 16),
-                      widget.showTimePicker
-                          ? ElevatedButton.icon(
-                              onPressed: () async {
-                                final picked = await showTimePicker(
-                                  context: context,
-                                  initialTime: provider.tempTime,
-                                );
-                                if (picked != null) provider.setTime(picked);
-                              },
-                              icon: const Icon(Icons.access_time),
-                              label: textWidget(
-                                text: "Pick Time",
-                                color: AppColors.whiteColor,
+                        child: SingleChildScrollView(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              SizedBox(
+                                height: 300,
+                                child: CalendarDatePicker(
+                                  initialDate: provider.tempDate,
+                                  firstDate: now,
+                                  lastDate: now.add(const Duration(days: 265)),
+                                  onDateChanged: provider.setDate,
+                                ),
                               ),
-                            )
-                          : SizedBox.shrink(),
-                      if (provider.errorMessage != null)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 12),
-                          child: textWidget(
-                            text: provider.errorMessage!,
-                            color: Colors.red,
+                              const SizedBox(height: 16),
+                              widget.showTimePicker
+                                  ? ElevatedButton.icon(
+                                      onPressed: () async {
+                                        final picked = await showTimePicker(
+                                          context: context,
+                                          initialTime: provider.tempTime,
+                                        );
+                                        if (picked != null) {
+                                          provider.setTime(picked);
+                                        }
+                                      },
+                                      icon: const Icon(Icons.access_time),
+                                      label: textWidget(
+                                        text: pickTime,
+                                        color: AppColors.whiteColor,
+                                      ),
+                                    )
+                                  : SizedBox.shrink(),
+                              if (provider.errorMessage != null)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 12),
+                                  child: textWidget(
+                                    text: provider.errorMessage!,
+                                    color: Colors.red,
+                                  ),
+                                ),
+                            ],
                           ),
                         ),
-                    ],
+                      );
+                    },
                   ),
                 ),
                 actions: [
                   TextButton(
                     onPressed: () => Navigator.pop(context),
-                    child: textWidget(text: "Cancel"),
+                    child: textWidget(text: cancelTxt),
                   ),
                   ElevatedButton(
                     onPressed: () {
@@ -103,7 +121,7 @@ class _DateTimePickerWidgetState extends State<DateTimePickerWidget> {
                       Navigator.pop(context);
                     },
                     child: textWidget(
-                      text: "Confirm",
+                      text: confirmTxt,
                       color: AppColors.whiteColor,
                     ),
                   ),

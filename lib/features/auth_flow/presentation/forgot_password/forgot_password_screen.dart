@@ -2,6 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:inspect_connect/core/basecomponents/base_responsive_widget.dart';
 import 'package:inspect_connect/core/utils/constants/app_assets_constants.dart';
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
+import 'package:inspect_connect/core/utils/constants/app_strings.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_button.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/client/client_view_model.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/client/widgets/auth_form_switch_row.dart';
@@ -26,9 +27,9 @@ class ForgotpPasswordView extends StatelessWidget {
         final provider = ctx.watch<ClientViewModelProvider>();
 
         return CommonAuthBar(
-          title: 'Forgot Password?',
+          title: forgotPassword,
           showBackButton: showBackButton,
-          subtitle: 'Enter your email \nto receive a reset code',
+          subtitle: forgotPasswordSubtitle,
           image: finalImage,
           rc: rc,
           form: Form(
@@ -40,9 +41,9 @@ class ForgotpPasswordView extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 AppInputField(
-                  label: 'Email',
-                  hint: 'example@gmail.com',
-                  controller: resetEmailCtrl,
+                  label: emailLabel,
+                  hint: emailHint,
+                  controller: cltResetEmailCtrl,
                   keyboardType: TextInputType.emailAddress,
                   validator: (_) => provider.validateEmailOrIntlPhone(),
                   onChanged: (_) {
@@ -56,8 +57,8 @@ class ForgotpPasswordView extends StatelessWidget {
                   buttonBackgroundColor: AppColors.authThemeColor,
                   borderColor: AppColors.authThemeColor,
                   text: provider.isSendingReset
-                      ? 'Sending...'
-                      : 'Send Verification Code',
+                      ? sendingText
+                      : sendVerificationCode,
                   onTap: () async {
                     final isValid = formKey.currentState?.validate() ?? false;
                     if (!isValid) {
@@ -74,8 +75,8 @@ class ForgotpPasswordView extends StatelessWidget {
                 ),
 
                 AuthFormSwitchRow(
-                  question: "Remember your password? ",
-                  actionText: "Sign In",
+                  question: rememberPasswordText,
+                  actionText: signInTitle,
                   onTap: () {
                     context.router.pop();
                   },

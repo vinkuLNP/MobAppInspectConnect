@@ -5,14 +5,10 @@ import 'package:intl/intl.dart';
 
 extension ExtensionsOnString on String {
   Uri parseUri({Map<String, dynamic>? params}) {
-    return Uri.parse(
-      this,
-    ).replace(
+    return Uri.parse(this).replace(
       queryParameters: params?.map(
-        (String key, dynamic value) => MapEntry<String,dynamic>(
-          key,
-          value.toString(),
-        ),
+        (String key, dynamic value) =>
+            MapEntry<String, dynamic>(key, value.toString()),
       ),
     );
   }
@@ -52,5 +48,16 @@ extension ExtensionsOnInt on int? {
 extension ExtensionsOnHttpResponse on Response {
   dynamic decodeJson() {
     return jsonDecode(body);
+  }
+}
+
+extension StringCasingExtension on String {
+  String capitalizeEachWord() {
+    return split(' ')
+        .map(
+          (word) =>
+              word.isEmpty ? word : word[0].toUpperCase() + word.substring(1),
+        )
+        .join(' ');
   }
 }
