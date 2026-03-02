@@ -7,28 +7,19 @@ class AppLogger {
   static void debug(String message, {String tag = "DEBUG"}) {
     if (!_enableLogs) return;
 
-    developer.log(
-      message,
-      name: tag,
-    );
+    developer.log(message, name: tag);
   }
 
   static void info(String message, {String tag = "INFO"}) {
     if (!_enableLogs) return;
 
-    developer.log(
-      message,
-      name: tag,
-    );
+    developer.log(message, name: tag);
   }
 
   static void warning(String message, {String tag = "WARNING"}) {
     if (!_enableLogs) return;
 
-    developer.log(
-      message,
-      name: tag,
-    );
+    developer.log(message, name: tag);
   }
 
   static void error(
@@ -39,11 +30,6 @@ class AppLogger {
   }) {
     if (!_enableLogs) return;
 
-    developer.log(
-      message,
-      name: tag,
-      error: error,
-      stackTrace: stackTrace,
-    );
+    developer.log(message, name: tag, error: error, stackTrace: stackTrace);
   }
 }

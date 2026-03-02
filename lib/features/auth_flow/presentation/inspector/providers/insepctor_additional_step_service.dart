@@ -128,7 +128,7 @@ class InsepctorAdditionalStepService {
               );
             } else if (type == 'ref') {
               provider.referenceLetters.add(file);
-              provider.referenceLettersUrls.add(response.fileUrl);
+              provider.referenceLettersUrlsTemp.add(response.fileUrl);
             } else if (type == 'coi') {
               provider.coiFile = file;
               provider.coiUploadedUrl = UserDocumentDataModel(
@@ -176,7 +176,7 @@ class InsepctorAdditionalStepService {
           ?.toIso8601String()
           .split('T')
           .first,
-      'referenceDocuments': provider.referenceLettersUrls,
+      'referenceDocuments': referenceDocs,
       'uploadedCoiDocument': provider.coiUploadedUrl,
       'coiExpiryDate': provider.coiExpiry?.toIso8601String().split('T').first,
       if (workHistoryDescription != null)

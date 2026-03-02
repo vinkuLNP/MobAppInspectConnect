@@ -16,8 +16,14 @@ import '../../widgets/country_state_cities_dialog.dart';
 class ServiceAreaStep extends StatefulWidget {
   final InspectorViewModelProvider vm;
   final GlobalKey<FormState> formKey;
+  final bool isAccountScreen;
 
-  const ServiceAreaStep(this.vm, this.formKey, {super.key});
+  const ServiceAreaStep(
+    this.vm,
+    this.formKey, {
+    super.key,
+    this.isAccountScreen = false,
+  });
 
   @override
   State<ServiceAreaStep> createState() => _ServiceAreaStepState();
@@ -88,13 +94,14 @@ class _ServiceAreaStepState extends State<ServiceAreaStep> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SectionTitle(addressDetails),
-            const SizedBox(height: 10),
-
-            textWidget(
-              text: selectYourServiceArea,
-              fontSize: 14,
-              fontWeight: FontWeight.w400,
-            ),
+            if (!widget.isAccountScreen) ...[
+              const SizedBox(height: 10),
+              textWidget(
+                text: selectYourServiceArea,
+                fontSize: 14,
+                fontWeight: FontWeight.w400,
+              ),
+            ],
             const SizedBox(height: 12),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -193,7 +200,7 @@ class _ServiceAreaStepState extends State<ServiceAreaStep> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     textWidget(
-                      text: selectCities,
+                      text: widget.isAccountScreen ? citiesText : selectCities,
                       fontWeight: FontWeight.w400,
                       fontSize: 14,
                     ),
@@ -274,7 +281,8 @@ class _ServiceAreaStepState extends State<ServiceAreaStep> {
                       children: [
                         const SizedBox(height: 12),
                         textWidget(
-                          text: "$uploadIccDocumentFor $city",
+                          text:
+                              "${widget.isAccountScreen ? '' : uploadtxt} $iccDocumentFor $city",
                           fontWeight: FontWeight.w500,
                         ),
                         const SizedBox(height: 6),
@@ -330,7 +338,8 @@ class _ServiceAreaStepState extends State<ServiceAreaStep> {
             const SizedBox(height: 12),
 
             AppInputField(
-              label: enterYourMailingAddress,
+              label:
+                  "${widget.isAccountScreen ? '' : enterTxt} $mailingAddress",
               hint: mailingAddress,
               controller: inspMailingAddressController,
               validator: (_) => vm.mailingAddressError,

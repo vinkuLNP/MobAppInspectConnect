@@ -1,20 +1,25 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
 import 'package:inspect_connect/core/utils/constants/app_strings.dart';
+import 'package:inspect_connect/core/utils/helpers/app_common_functions/app_common_functions.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/core/utils/presentation/app_text_style.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/certificate_type_entity.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/inspector/inspector_view_model.dart';
+import 'package:inspect_connect/features/auth_flow/presentation/inspector/widgets/stepper_header.dart';
 import 'package:inspect_connect/features/client_flow/presentations/widgets/select_time_widget.dart';
 import 'package:provider/provider.dart';
 
 class ProfessionalDetailsStep extends StatelessWidget {
   final InspectorViewModelProvider vm;
   final GlobalKey<FormState> formKey;
-
-  const ProfessionalDetailsStep(this.vm, this.formKey, {super.key});
+  final bool isAccountScreen;
+  const ProfessionalDetailsStep(
+    this.vm,
+    this.formKey, {
+    super.key,
+    this.isAccountScreen = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -25,11 +30,7 @@ class ProfessionalDetailsStep extends StatelessWidget {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              textWidget(
-                text: professionalDetails,
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-              ),
+              const SectionTitle(professionalDetails),
               const SizedBox(height: 8),
               _section(
                 title: certificateType,
@@ -52,11 +53,18 @@ class ProfessionalDetailsStep extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 6),
-
-              // CommonUploadField(maxFiles: 4, provider: FileUploadProvider()),
               _section(
-                title: uploadCertificationDocuments,
-                child: _documentGrid(prov, context),
+                title:
+                    '${isAccountScreen ? '' : uploadtxt} $certificationDocuments',
+                child: imageUploader(
+                  context: context,
+                  files: prov.documents,
+                  existingUrls: prov.existingDocumentUrls,
+                  maxFiles: 4,
+                  onAdd: () => prov.uploadDocument(context),
+                  onRemove: (i) => prov.removeDocumentAt(i),
+                  onRemoveExisting: (i) => prov.removeExistingDocumentAt(i),
+                ),
               ),
             ],
           );
@@ -76,37 +84,6 @@ class ProfessionalDetailsStep extends StatelessWidget {
           child,
         ],
       ),
-    );
-  }
-
-  bool _isImage(String path) {
-    final ext = path.split('.').last.toLowerCase();
-    return ['jpg', 'jpeg', 'png', 'webp', 'gif'].contains(ext);
-  }
-
-  Widget _buildImagePreview(File file) {
-    return Image.file(
-      file,
-      fit: BoxFit.cover,
-      width: double.infinity,
-      height: double.infinity,
-      errorBuilder: (_, _, _) =>
-          const Center(child: Icon(Icons.broken_image, color: Colors.grey)),
-    );
-  }
-
-  Widget _buildNetworkImage(String url) {
-    return Image.network(
-      url,
-      fit: BoxFit.cover,
-      width: double.infinity,
-      height: double.infinity,
-      errorBuilder: (_, _, _) =>
-          const Center(child: Icon(Icons.broken_image, color: Colors.grey)),
-      loadingBuilder: (c, w, p) {
-        if (p == null) return w;
-        return const Center(child: CircularProgressIndicator(strokeWidth: 2));
-      },
     );
   }
 
@@ -148,177 +125,4 @@ class ProfessionalDetailsStep extends StatelessWidget {
       borderSide: BorderSide(color: AppColors.authThemeColor),
     ),
   );
-
-  Widget _documentGrid(InspectorViewModelProvider prov, BuildContext context) {
-    final totalDocs = prov.documents.length + prov.existingDocumentUrls.length;
-    final canAddMore = totalDocs < 4;
-
-    if (totalDocs == 0) {
-      return GestureDetector(
-        onTap: () => prov.uploadDocument(context),
-        child: Column(
-          children: [
-            Container(
-              width: double.infinity,
-              height: 100,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.grey.shade300),
-                color: Colors.grey.shade50,
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.upload_file, size: 32, color: Colors.grey),
-                  const SizedBox(height: 8),
-                  textWidget(
-                    text: uploadDocument,
-                    color: Colors.grey,
-                    fontSize: 12,
-                  ),
-                ],
-              ),
-            ),
-            if (prov.errorMessage != null)
-              Padding(
-                padding: const EdgeInsets.only(top: 4),
-                child: Text(
-                  prov.errorMessage!,
-                  style: TextStyle(color: Colors.red, fontSize: 12),
-                ),
-              ),
-          ],
-        ),
-      );
-    }
-    const spacing = 8.0;
-
-    return GridView.builder(
-      padding: EdgeInsets.zero,
-
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        mainAxisSpacing: spacing,
-        crossAxisSpacing: spacing,
-        childAspectRatio: 1.6,
-      ),
-      itemCount: canAddMore ? totalDocs + 1 : totalDocs,
-      itemBuilder: (ctx, i) {
-        if (i < prov.existingDocumentUrls.length) {
-          final url = prov.existingDocumentUrls[i];
-          final name = url.split('/').last;
-
-          if (_isImage(url)) {
-            return _imageTile(
-              child: _buildNetworkImage(url),
-              onDelete: () => prov.removeExistingDocumentAt(i),
-            );
-          }
-
-          return _documentTile(
-            name: name,
-            onDelete: () => prov.removeExistingDocumentAt(i),
-          );
-        }
-        final docIndex = i - prov.existingDocumentUrls.length;
-        if (docIndex < prov.documents.length) {
-          final file = prov.documents[docIndex];
-          final name = file.path.split('/').last;
-
-          if (_isImage(file.path)) {
-            return _imageTile(
-              child: _buildImagePreview(file),
-              onDelete: () => prov.removeDocumentAt(docIndex),
-            );
-          }
-
-          return _documentTile(
-            name: name,
-            onDelete: () => prov.removeDocumentAt(docIndex),
-          );
-        }
-
-        return GestureDetector(
-          onTap: () => prov.uploadDocument(ctx),
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.grey.shade300),
-              color: Colors.grey.shade50,
-            ),
-            child: const Center(
-              child: Icon(Icons.upload_file, size: 28, color: Colors.grey),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _imageTile({required Widget child, required VoidCallback onDelete}) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(12),
-      child: Stack(
-        children: [
-          Container(color: Colors.grey.shade100, child: child),
-          Positioned(
-            top: 4,
-            right: 4,
-            child: GestureDetector(
-              onTap: onDelete,
-              child: Container(
-                padding: const EdgeInsets.all(4),
-                decoration: const BoxDecoration(
-                  color: Colors.black54,
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(Icons.close, color: Colors.white, size: 16),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _documentTile({
-    required String name,
-    VoidCallback? onDelete,
-    VoidCallback? onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey.shade300),
-          color: Colors.white,
-        ),
-        child: Row(
-          children: [
-            const Icon(Icons.insert_drive_file, color: Colors.blueAccent),
-            const SizedBox(width: 8),
-            Expanded(
-              child: textWidget(
-                text: name,
-                fontSize: 13,
-                textOverflow: TextOverflow.ellipsis,
-              ),
-            ),
-            if (onDelete != null)
-              GestureDetector(
-                onTap: onDelete,
-                child: const Padding(
-                  padding: EdgeInsets.only(left: 6),
-                  child: Icon(Icons.close, size: 18, color: Colors.red),
-                ),
-              ),
-          ],
-        ),
-      ),
-    );
-  }
 }

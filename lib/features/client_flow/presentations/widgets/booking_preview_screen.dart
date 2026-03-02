@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:inspect_connect/core/utils/constants/app_colors.dart';
 import 'package:inspect_connect/core/utils/constants/app_strings.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/features/client_flow/data/models/booking_detail_model.dart';
@@ -14,7 +15,7 @@ class BookingReportPreviewScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: textWidget(text: bookingReport),
+        title: textWidget(text: bookingReport, color: AppColors.whiteColor),
         actions: [
           IconButton(
             icon: const Icon(Icons.download),
