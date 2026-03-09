@@ -33,7 +33,7 @@ class OnBoardingWidget extends StatelessWidget {
             children: [
               textWidget(
                 text: title,
-                color: AppColors.themeColor,
+                color: AppColors.authThemeColor,
                 fontWeight: FontWeight.bold,
                 fontSize: 20,
                 alignment: TextAlign.center,

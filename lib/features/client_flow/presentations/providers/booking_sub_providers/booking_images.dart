@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:inspect_connect/core/commondomain/entities/based_api_result/api_result_state.dart';
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
+import 'package:inspect_connect/core/utils/constants/app_strings.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/features/client_flow/domain/entities/upload_image_dto.dart';
 import 'package:inspect_connect/features/client_flow/data/models/upload_image_model.dart';
@@ -32,12 +33,12 @@ class BookingImagesService {
       }
 
       final file = File(picked.path);
-      if (await file.length() > 2 * 1024 * 1024) {
+      if (await file.length() > 4 * maxFileSizeInBytes) {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: textWidget(
-                text: 'File must be under 2 MB',
+                text: fileMstBeUnder2Txt,
                 color: AppColors.backgroundColor,
               ),
             ),
@@ -49,11 +50,12 @@ class BookingImagesService {
 
       final uploadImage = UploadImageDto(filePath: file.path);
       final uploadImageUseCase = locator<UploadImageUseCase>();
-      final result = await provider.executeParamsUseCase<UploadImageResponseModel, UploadImageParams>(
-        useCase: uploadImageUseCase,
-        query: UploadImageParams(filePath: uploadImage),
-        launchLoader: true,
-      );
+      final result = await provider
+          .executeParamsUseCase<UploadImageResponseModel, UploadImageParams>(
+            useCase: uploadImageUseCase,
+            query: UploadImageParams(uploadImageDto: uploadImage),
+            launchLoader: true,
+          );
 
       result?.when(
         data: (response) {
@@ -66,7 +68,7 @@ class BookingImagesService {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: textWidget(
-                  text: e.message ?? 'Image upload failed',
+                  text: e.message ?? imageUploadFailed,
                   color: AppColors.backgroundColor,
                 ),
               ),

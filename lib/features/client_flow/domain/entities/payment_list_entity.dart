@@ -1,33 +1,10 @@
 import 'package:flutter/material.dart';
-
-class PaymentsBodyEntity {
-  final List<PaymentEntity> payments;
-  final int totalCount;
-  final int totalPages;
-  final int currentPage;
-  final int perPageLimit;
-
-  PaymentsBodyEntity({
-    required this.payments,
-    required this.totalCount,
-    required this.totalPages,
-    required this.currentPage,
-    required this.perPageLimit,
-  });
-}
-
-class UserEntity {
-  final String id;
-  final String email;
-  final String name;
-
-  UserEntity({required this.id, required this.email, required this.name});
-}
+import 'package:inspect_connect/features/client_flow/domain/entities/user_entity.dart';
 
 class PaymentEntity {
   final String id;
   final UserEntity user;
-  final String? relatedUserId;
+  final UserEntity? relatedUserId;
   final String? bookingId;
   final String? stripeInvoiceId;
   final String? stripeSubscriptionId;
@@ -64,16 +41,12 @@ class PaymentEntity {
   });
 
   bool get isAdded {
-    switch (status.toLowerCase()) {
-      case 'paid':
+    switch (type.toLowerCase()) {
+      case 'charge':
+      case 'wallet_credit':
         return true;
-      case 'pending':
-      case 'processing':
-      case 'action_required':
-      case 'failed':
-        return false;
       default:
-        return type == 'charge';
+        return false;
     }
   }
 
@@ -82,6 +55,7 @@ class PaymentEntity {
       case 'failed':
       case 'action_required':
       case 'pending':
+      case 'wallet_deduct':
       case 'processing':
         return false;
       case 'succeeded':
@@ -93,38 +67,85 @@ class PaymentEntity {
 
   Color get statusColor {
     switch (status.toLowerCase()) {
+      case 'succeeded':
       case 'paid':
         return Colors.green;
-      case 'succeeded':
-        return Colors.red;
+
       case 'pending':
       case 'processing':
         return Colors.orange;
-      case 'action_required':
-        return Colors.amber;
+
       case 'failed':
-        return Colors.grey;
+        return Colors.red;
+
+      case 'action_required':
+        return Colors.blue;
+
       default:
         return Colors.grey;
     }
   }
 
   String get statusLabel {
-    switch (status.toLowerCase()) {
-      case 'paid':
-        return 'Added';
-      case 'succeeded':
-        return 'Deducted';
-      case 'pending':
-        return 'Pending';
-      case 'processing':
-        return 'Processing';
-      case 'action_required':
-        return 'Action Required';
-      case 'failed':
-        return 'Failed';
-      default:
-        return status.toUpperCase();
+    return status
+        .replaceAll('_', ' ')
+        .split(' ')
+        .map(
+          (word) =>
+              word.isEmpty ? word : word[0].toUpperCase() + word.substring(1),
+        )
+        .join(' ');
+  }
+
+  IconData get transactionIcon {
+    final lowerStatus = status.toLowerCase();
+    final lowerType = type.toLowerCase();
+
+    if (lowerStatus == 'failed' || lowerStatus == 'action_required') {
+      return Icons.cancel_rounded;
     }
+
+    if (lowerStatus == 'pending' || lowerStatus == 'processing') {
+      return Icons.access_time_rounded;
+    }
+
+    if (lowerStatus == 'succeeded' || lowerStatus == 'paid') {
+      return Icons.check_circle_rounded;
+    }
+
+    switch (lowerType) {
+      case 'charge':
+      case 'subscription':
+        return Icons.trending_up;
+
+      case 'refund':
+        return Icons.trending_down;
+
+      case 'wallet_credit':
+        return Icons.account_balance_wallet;
+
+      case 'payout':
+        return Icons.account_balance;
+
+      case 'transfer':
+        return Icons.swap_horiz;
+      default:
+        return Icons.attach_money;
+    }
+  }
+
+  Color get iconColor {
+    final lowerStatus = status.toLowerCase();
+
+    if (lowerStatus == 'failed') return Colors.red;
+    if (lowerStatus == 'action_required') return Colors.blue;
+    if (lowerStatus == 'pending' || lowerStatus == 'processing') {
+      return Colors.orange;
+    }
+    if (lowerStatus == 'succeeded' || lowerStatus == 'paid') {
+      return Colors.green;
+    }
+
+    return Colors.grey;
   }
 }

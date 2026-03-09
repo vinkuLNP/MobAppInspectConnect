@@ -1,13 +1,15 @@
-import 'dart:developer';
-
+import 'dart:io';
+import 'dart:math';
 import 'package:auto_route/auto_route.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/utils/auto_router_setup/auto_router.dart';
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
+import 'package:inspect_connect/core/utils/constants/app_strings.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_button.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
+import 'package:inspect_connect/features/client_flow/domain/entities/booking_list_entity.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/user_provider.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 void showConfirmationDialog({
@@ -51,7 +53,7 @@ void showConfirmationDialog({
                     isBorder: true,
                     borderColor: AppColors.authThemeColor,
                     textColor: AppColors.authThemeColor,
-                    text: "Cancel",
+                    text: cancelTxt,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -77,12 +79,12 @@ void logOutUser(BuildContext context) {
   showDialog(
     context: context,
     builder: (_) => AlertDialog(
-      title: textWidget(text: 'log OUT?'),
-      content: textWidget(text: 'Are you sure you want to logout?'),
+      title: textWidget(text: logOutTxt),
+      content: textWidget(text: logOutMsgTxt),
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: textWidget(text: 'Cancel'),
+          child: textWidget(text: cancelTxt),
         ),
         AppButton(
           width: 120,
@@ -91,7 +93,7 @@ void logOutUser(BuildContext context) {
             if (context.mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: textWidget(text: 'Logged out', color: Colors.white),
+                  content: textWidget(text: loggedOutTxt, color: Colors.white),
                 ),
               );
               context.router.replaceAll([const OnBoardingRoute()]);
@@ -99,7 +101,7 @@ void logOutUser(BuildContext context) {
           },
           buttonBackgroundColor: Colors.redAccent,
           textColor: AppColors.backgroundColor,
-          text: 'log Out',
+          text: logOutTxt,
         ),
       ],
     ),
@@ -127,9 +129,10 @@ void showRaiseAmountSheet({
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text(
-                  "Select Raise Amount",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                textWidget(
+                  text: slctRaiseAmtTxt,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
                 ),
 
                 const SizedBox(height: 20),
@@ -164,13 +167,11 @@ void showRaiseAmountSheet({
                                 : Colors.grey.shade400,
                           ),
                         ),
-                        child: Text(
-                          "\$${amounts[index]}",
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: isSelected ? Colors.white : Colors.black,
-                          ),
+                        child: textWidget(
+                          text: "\$${amounts[index]}",
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: isSelected ? Colors.white : Colors.black,
                         ),
                       ),
                     );
@@ -179,10 +180,11 @@ void showRaiseAmountSheet({
 
                 const SizedBox(height: 15),
 
-                const Text(
-                  "This amount will be added to the booking charge and requires client approval.",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 13, color: Colors.grey),
+                textWidget(
+                  text: slctRaiseAmtMsgTxt,
+                  alignment: TextAlign.center,
+                  fontSize: 13,
+                  color: Colors.grey,
                 ),
 
                 const SizedBox(height: 20),
@@ -190,28 +192,29 @@ void showRaiseAmountSheet({
                 Row(
                   children: [
                     Expanded(
-                      child: OutlinedButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: const Text("Cancel"),
+                      child: AppButton(
+                        onTap: () => Navigator.pop(context),
+                        text: cancelTxt,
+                        textColor: AppColors.black,
+                        buttonBackgroundColor: AppColors.backgroundColor,
+                        borderColor: AppColors.black,
+                        isBorder: true,
                       ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.authThemeColor,
-                        ),
-                        onPressed: () {
+                      child: AppButton(
+                        onTap: () {
                           Navigator.pop(context);
                           onConfirm(selectedAmount);
                         },
-                        child: const Text("Confirm & Raise"),
+                        text: cnfrmRaiseTxt,
                       ),
                     ),
                   ],
                 ),
 
-                const SizedBox(height: 10),
+                const SizedBox(height: 40),
               ],
             ),
           );
@@ -221,59 +224,83 @@ void showRaiseAmountSheet({
   );
 }
 
-Future<void> requestNotificationPermissionIfNeeded() async {
-  final messaging = FirebaseMessaging.instance;
+Future<bool> validateFileSize(File file, BuildContext context) async {
+  if (await file.length() <= maxFileSizeInBytes) return true;
 
-  log('🔔 [FCM] Checking notification permission...');
+  if (context.mounted) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: textWidget(
+          text: fileMstBeUnder2Txt,
+          color: AppColors.backgroundColor,
+        ),
+      ),
+    );
+  }
+  return false;
+}
 
-  final settings = await messaging.getNotificationSettings();
-  log(
-    '🔔 [FCM] Current authorizationStatus: '
-    '${settings.authorizationStatus}',
+void showError(BuildContext context, String message) {
+  if (!context.mounted) return;
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: textWidget(text: message, color: AppColors.backgroundColor),
+    ),
   );
+}
 
-  if (settings.authorizationStatus == AuthorizationStatus.notDetermined) {
-    log('🔔 [FCM] Requesting notification permission...');
+void showShowUpFeeDialog({
+  required BuildContext context,
+  required bool isApplied,
+  required VoidCallback onConfirm,
+}) {
+  showConfirmationDialog(
+    context: context,
+    icon: isApplied ? Icons.undo : Icons.attach_money,
+    confirmColor: AppColors.authThemeColor,
+    title: isApplied ? cancelFeeTxt : applyShowUpFeeTxt,
+    message: isApplied ? cnclShowUpFeeMsgTxt : applyShowUpFeeMsgTxt,
+    confirmText: isApplied ? cancelFeeTxt : applyShowUpFeeTxt,
+    onConfirm: onConfirm,
+  );
+}
 
-    final result = await messaging.requestPermission(
-      alert: true,
-      badge: true,
-      sound: true,
-    );
-
-    log(
-      '🔔 [FCM] Permission request result: '
-      '${result.authorizationStatus}',
-    );
-
-    if (result.authorizationStatus != AuthorizationStatus.authorized) {
-      log('❌ [FCM] User denied notification permission');
-      return;
+DateTime bookingDateTime(BookingListEntity booking) {
+  final date = DateTime.parse(booking.bookingDate);
+  final t = booking.bookingTime.trim().toUpperCase().replaceAll('.', '');
+  try {
+    DateTime time;
+    if (t.contains('AM') || t.contains('PM')) {
+      time = DateFormat('h:mm a').parse(t);
+    } else {
+      time = DateFormat('HH:mm').parse(t);
     }
-  } else if (settings.authorizationStatus ==
-      AuthorizationStatus.denied) {
-    log('⚠️ [FCM] Notification permission previously denied');
-    return;
-  } else if (settings.authorizationStatus ==
-      AuthorizationStatus.authorized) {
-    log('✅ [FCM] Notification permission already granted');
-  } else if (settings.authorizationStatus ==
-      AuthorizationStatus.provisional) {
-    log('🟡 [FCM] Provisional permission granted (iOS)');
+    return DateTime(date.year, date.month, date.day, time.hour, time.minute);
+  } catch (_) {
+    return DateTime(date.year, date.month, date.day, 10, 0);
+  }
+}
+
+void showSnackBar(BuildContext context, {required String message}) {
+  if (!context.mounted) return;
+
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: textWidget(text: message, color: AppColors.backgroundColor),
+    ),
+  );
+}
+
+String generatePrivateTempId({int length = 20}) {
+  const alphanumeric =
+      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+  final random = Random();
+  final buffer = StringBuffer();
+
+  for (int i = 0; i < length; i++) {
+    buffer.write(alphanumeric[random.nextInt(alphanumeric.length)]);
   }
 
-  log('🔔 [FCM] Setting foreground notification presentation options...');
-
-  await FirebaseMessaging.instance
-      .setForegroundNotificationPresentationOptions(
-    alert: true,
-    badge: true,
-    sound: true,
-  );
-
-  log('✅ [FCM] Foreground presentation options set');
-
-  // 🔥 Token check (VERY IMPORTANT FOR DEBUGGING)
-  final token = await messaging.getToken();
-  log('🔑 [FCM] FCM token: $token');
+  return buffer.toString();
 }

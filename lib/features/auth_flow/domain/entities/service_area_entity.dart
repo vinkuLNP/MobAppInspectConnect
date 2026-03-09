@@ -4,11 +4,10 @@ import 'package:objectbox/objectbox.dart';
 @Entity()
 class ServiceAreaLocalEntity {
   int id;
-
   String? countryCode;
   String? stateCode;
   String? cityName;
-
+  String? zipCode;
   String? locationType;
   double? latitude;
   double? longitude;
@@ -20,6 +19,7 @@ class ServiceAreaLocalEntity {
     this.countryCode,
     this.stateCode,
     this.cityName,
+    this.zipCode,
     this.locationType,
     this.latitude,
     this.longitude,

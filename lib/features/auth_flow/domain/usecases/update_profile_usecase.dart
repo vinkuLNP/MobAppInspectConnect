@@ -6,16 +6,18 @@ import 'package:inspect_connect/features/auth_flow/domain/entities/auth_user.dar
 import 'package:inspect_connect/features/auth_flow/domain/repositories/auth_repository.dart';
 
 class UpdateProfileParams extends Equatable {
-  final String name;
+  final String? name;
+  final int? status;
 
 
 
   const UpdateProfileParams({
-    required this.name,
+     this.name,
+     this.status
   });
 
   @override
-  List<Object?> get props => [name, ];
+  List<Object?> get props => [name,status ];
 }
 
 class UpdateProfileUseCase extends BaseParamsUseCase<AuthUser, UpdateProfileParams> {
@@ -25,5 +27,6 @@ class UpdateProfileUseCase extends BaseParamsUseCase<AuthUser, UpdateProfilePara
   @override
   Future<ApiResultModel<AuthUser>> call(UpdateProfileParams? p) => _repo.updateProfile(
         name: p!.name,
+        status: p.status!,
       );
 }

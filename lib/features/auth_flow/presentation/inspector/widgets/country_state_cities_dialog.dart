@@ -1,5 +1,5 @@
-
 import 'package:flutter/material.dart';
+import 'package:inspect_connect/core/utils/constants/app_strings.dart';
 import '../../../utils/text_editor_controller.dart';
 import '../../client/widgets/input_fields.dart';
 
@@ -26,9 +26,9 @@ Future<List<T>> showMultiSelectSearchDialog<T>({
               child: Column(
                 children: [
                   AppInputField(
-                    label: "Search Cities",
-                    hint: "Search Cities",
-                    controller: countrySearchCtrl,
+                    label: searchCities,
+                    hint: searchCities,
+                    controller: inspCountrySearchCtrl,
                     onChanged: (value) {
                       setState(() {
                         filtered = items
@@ -75,16 +75,16 @@ Future<List<T>> showMultiSelectSearchDialog<T>({
               TextButton(
                 onPressed: () {
                   Navigator.pop(context);
-                  countrySearchCtrl.clear();
+                  inspCountrySearchCtrl.clear();
                 },
-                child: const Text("Cancel"),
+                child: const Text(cancelTxt),
               ),
               TextButton(
                 onPressed: () {
                   Navigator.pop(context, selectedItems);
-                  countrySearchCtrl.clear();
+                  inspCountrySearchCtrl.clear();
                 },
-                child: const Text("Done"),
+                child: const Text(doneTxt),
               ),
             ],
           );
@@ -95,7 +95,6 @@ Future<List<T>> showMultiSelectSearchDialog<T>({
 
   return selectedItems;
 }
-
 
 Future<T?> showSearchableListDialog<T>({
   required BuildContext context,
@@ -118,9 +117,9 @@ Future<T?> showSearchableListDialog<T>({
               child: Column(
                 children: [
                   AppInputField(
-                    label: "Search $title",
-                    hint: "Search $title",
-                    controller: countrySearchCtrl,
+                    label: "$searchTxt $title",
+                    hint: "$searchTxt $title",
+                    controller: inspCountrySearchCtrl,
                     onChanged: (value) {
                       setState(() {
                         filtered = items
@@ -143,7 +142,7 @@ Future<T?> showSearchableListDialog<T>({
                           title: Text(itemAsString(item)),
                           onTap: () {
                             Navigator.pop(context, item);
-                            countrySearchCtrl.clear();
+                            inspCountrySearchCtrl.clear();
                           },
                         );
                       },

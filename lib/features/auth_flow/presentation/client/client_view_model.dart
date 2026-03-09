@@ -2,13 +2,13 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
-
 import 'package:auto_route/auto_route.dart';
 import 'package:inspect_connect/core/basecomponents/base_view_model.dart';
 import 'package:inspect_connect/core/commondomain/entities/based_api_result/api_result_state.dart';
 import 'package:inspect_connect/core/di/app_component/app_component.dart';
 import 'package:inspect_connect/core/utils/auto_router_setup/auto_router.dart';
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
+import 'package:inspect_connect/core/utils/constants/app_strings.dart';
 import 'package:inspect_connect/core/utils/helpers/device_helper/device_helper.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/features/auth_flow/data/datasources/local_datasources/auth_local_datasource.dart';
@@ -29,8 +29,6 @@ import 'package:inspect_connect/features/inspector_flow/providers/inspector_main
 import 'package:provider/provider.dart';
 
 class ClientViewModelProvider extends BaseViewModel {
-  void init() {}
-
   bool _obscure = true;
   bool get obscure => _obscure;
   bool _autoValidate = false;
@@ -96,8 +94,11 @@ class ClientViewModelProvider extends BaseViewModel {
 
   String? validateEmail(String? v) {
     if (v == null || v.trim().isEmpty) return 'Email is required';
-    final ok = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(v.trim());
-    return ok ? null : 'Enter a valid email';
+
+    final email = v.trim();
+    final regex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+
+    return regex.hasMatch(email) ? null : 'Enter a valid email';
   }
 
   String? validatePhone(String? v) {
@@ -122,7 +123,7 @@ class ClientViewModelProvider extends BaseViewModel {
 
   String? validateConfirmPassword(String? v) {
     if (v == null || v.isEmpty) return 'Confirm your password';
-    if (v != passwordCtrlSignUp.text) return 'Passwords do not match';
+    if (v != cltPasswordCtrlSignUp.text) return 'Passwords do not match';
     return null;
   }
 
@@ -147,7 +148,7 @@ class ClientViewModelProvider extends BaseViewModel {
     placeType = value["place_type"].toString();
 
     log("FULL ADDRESS → $value");
-    log(addressCtrl.text.toString());
+    log(cltAddressCtrl.text.toString());
     notifyListeners();
   }
 
@@ -160,18 +161,16 @@ class ClientViewModelProvider extends BaseViewModel {
 
   @override
   void dispose() {
-    emailCtrl.clear();
-    passwordCtrl.clear();
-    fullNameCtrl.clear();
-    phoneCtrl.clear();
-    emailCtrlSignUp.clear();
-    addressCtrl.clear();
-    passwordCtrlSignUp.clear();
-    confirmPasswordCtrl.clear();
+    cltEmailCtrlSignUp.clear();
+    cltFullNameCtrl.clear();
+    cltPhoneCtrl.clear();
+    cltCountryCodeCtrl.clear();
+    cltConfirmPasswordCtrl.clear();
+    cltAddressCtrl.clear();
+    cltResetEmailCtrl.clear();
     _timer?.cancel();
     pinController.clear();
     focusNode.dispose();
-    resetEmailCtrl.clear();
     _otpPurpose = null;
     super.dispose();
   }
@@ -202,7 +201,7 @@ class ClientViewModelProvider extends BaseViewModel {
     });
   }
 
-  Future<void> resetPassword({
+  Future<void> clientSignUp({
     required GlobalKey<FormState> formKey,
     required BuildContext context,
   }) async {
@@ -229,23 +228,23 @@ class ClientViewModelProvider extends BaseViewModel {
 
       final params = SignUpParams(
         role: 1,
-        email: emailCtrlSignUp.text.trim(),
-        name: fullNameCtrl.text.trim(),
-        phoneNumber: phoneCtrl.text.trim().toString(),
-        countryCode: countryCodeCtrl.text.trim().toString() != ""
-            ? countryCodeCtrl.text.trim().toString()
+        email: cltEmailCtrlSignUp.text.trim(),
+        name: cltFullNameCtrl.text.trim(),
+        phoneNumber: cltPhoneCtrl.text.trim().toString(),
+        countryCode: cltCountryCodeCtrl.text.trim().toString() != ""
+            ? cltCountryCodeCtrl.text.trim().toString()
             : "+91",
-        password: passwordCtrlSignUp.text.trim(),
+        password: cltPasswordCtrlSignUp.text.trim(),
         deviceToken: deviceToken,
         deviceType: deviceType,
-        mailingAddress: addressCtrl.text.toString(),
+        mailingAddress: cltAddressCtrl.text.toString(),
         zip: pincode.toString(),
         agreedToTerms: true,
         isTruthfully: true,
         location: {
           "type": 'Point',
-          "locationName": placeName,
-          "coordinates": [selectedLat, selectedLng],
+          "locationName": placeName ?? 'unknown',
+          "coordinates": [selectedLat ?? 0.0, selectedLng ?? 0.0],
         },
       );
 
@@ -329,14 +328,14 @@ class ClientViewModelProvider extends BaseViewModel {
 
   Future<void> verify({required BuildContext context}) async {
     if (!canVerify) return;
-
+    setSigningIn(true);
     try {
       log('[VERIFY] Starting verification process...');
 
       final user = await locator<AuthLocalDataSource>().getUser();
       if (user == null) {
         log('[VERIFY] No local user found.');
-        throw Exception('User not found in local storage');
+        throw Exception(userNotFoundInLocal);
       }
 
       log(
@@ -347,8 +346,8 @@ class ClientViewModelProvider extends BaseViewModel {
       final state = await executeParamsUseCase<AuthUser, OtpVerificationParams>(
         useCase: verifyOtpUseCase,
         query: OtpVerificationParams(
-          phoneNumber: user.phoneNumber ?? emailCtrl.text.trim(),
-          countryCode: user.countryCode ?? passwordCtrl.text.trim(),
+          phoneNumber: user.phoneNumber ?? cltEmailCtrl.text.trim(),
+          countryCode: user.countryCode ?? cltPasswordCtrl.text.trim(),
           phoneOtp: pinController.text.trim(),
         ),
         launchLoader: true,
@@ -430,8 +429,9 @@ class ClientViewModelProvider extends BaseViewModel {
       log('[VERIFY] Exception: $e');
       log('[VERIFY] Stacktrace: $s');
     } finally {
-      emailCtrl.clear();
-      passwordCtrl.clear();
+      cltEmailCtrl.clear();
+      cltPasswordCtrl.clear();
+      setSigningIn(false);
       log('[VERIFY] Cleanup complete.');
     }
   }
@@ -441,7 +441,7 @@ class ClientViewModelProvider extends BaseViewModel {
     required BuildContext context,
   }) async {
     log('[FETCH_USER_DETAIL] Fetching user details for userId=${user.id}');
-
+    final userRole = user.role;
     final existingUser = await locator<AuthLocalDataSource>().getUser();
 
     final localUser = user.toLocalEntity();
@@ -491,25 +491,31 @@ class ClientViewModelProvider extends BaseViewModel {
       },
       error: (e) {
         log('[FETCH_USER_DETAIL] Failed to fetch user detail: ${e.message}');
-        context.router.replaceAll([const ClientDashboardRoute()]);
+        context.router.replaceAll([
+          userRole == 1
+              ? const ClientDashboardRoute()
+              : userRole == 2
+              ? const InspectorDashboardRoute()
+              : OnBoardingRoute(),
+        ]);
       },
     );
   }
 
   Future<void> resend({required BuildContext context}) async {
     if (!canResend) return;
-
+    setSigningIn(true);
     try {
       final user = await locator<AuthLocalDataSource>().getUser();
       if (user == null || user.authToken == null) {
-        throw Exception('User not found in local storage');
+        throw Exception(userNotFoundInLocal);
       }
       final resendOtpUseCase = locator<ResendOtpUseCase>();
       final state = await executeParamsUseCase<AuthUser, ResendOtpParams>(
         useCase: resendOtpUseCase,
         query: ResendOtpParams(
-          phoneNumber: user.phoneNumber ?? emailCtrl.text.trim(),
-          countryCode: user.countryCode ?? passwordCtrl.text.trim(),
+          phoneNumber: user.phoneNumber ?? cltEmailCtrl.text.trim(),
+          countryCode: user.countryCode ?? cltPasswordCtrl.text.trim(),
         ),
         launchLoader: true,
       );
@@ -540,8 +546,9 @@ class ClientViewModelProvider extends BaseViewModel {
         },
       );
     } finally {
-      emailCtrl.clear();
-      passwordCtrl.clear();
+      cltEmailCtrl.clear();
+      cltPasswordCtrl.clear();
+      setSigningIn(false);
     }
   }
 
@@ -586,7 +593,7 @@ class ClientViewModelProvider extends BaseViewModel {
   String? get resetTargetLabel => _resetTargetLabel;
 
   String? validateEmailOrIntlPhone() {
-    final email = resetEmailCtrl.text.trim();
+    final email = cltResetEmailCtrl.text.trim();
     final eOk =
         email.isNotEmpty &&
         RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(email);
@@ -605,10 +612,10 @@ class ClientViewModelProvider extends BaseViewModel {
     notifyListeners();
 
     try {
-      final email = resetEmailCtrl.text.trim();
+      final email = cltResetEmailCtrl.text.trim();
       _resetTargetLabel = email;
       startOtpFlow(OtpPurpose.forgotPassword);
-      resetEmailCtrl.clear();
+      cltResetEmailCtrl.clear();
       context.pushRoute(OtpVerificationRoute(addShowButton: true));
     } finally {
       _isSendingReset = false;
@@ -651,8 +658,8 @@ class ClientViewModelProvider extends BaseViewModel {
       final state = await executeParamsUseCase<AuthUser, SignInParams>(
         useCase: signInUseCase,
         query: SignInParams(
-          email: emailCtrl.text.trim(),
-          password: passwordCtrl.text.trim(),
+          email: cltEmailCtrl.text.trim(),
+          password: cltPasswordCtrl.text.trim(),
           deviceToken: deviceToken,
           deviceType: deviceType,
         ),
@@ -692,8 +699,8 @@ class ClientViewModelProvider extends BaseViewModel {
               ),
             ),
           );
-          emailCtrl.clear();
-          passwordCtrl.clear();
+          cltEmailCtrl.clear();
+          cltPasswordCtrl.clear();
 
           if (user.role == 1) {
             log('➡️ Navigating to ClientDashboardRoute');
@@ -742,14 +749,24 @@ class ClientViewModelProvider extends BaseViewModel {
     log('   CurrentSubscriptionId: ${localUser.currentSubscriptionId}');
     log('---------------------------------------------');
 
-    final provider = InspectorDashboardProvider();
+    final provider = context.read<InspectorDashboardProvider>();
 
-    if (context.mounted) await provider.initializeUserState(context);
+    if (context.mounted) await provider.initializeUserState();
 
     log('📊 InspectorDashboardProvider initialized');
     log('🔸 Current status: ${provider.status}');
 
     switch (provider.status) {
+      case InspectorStatus.unverified:
+        log(
+          '➡️ Redirecting: Inspector needs subscription → InspectorDashboardRoute',
+        );
+        if (context.mounted) {
+          context.router.replaceAll([
+            OtpVerificationRoute(addShowButton: false, showSignInText: false),
+          ]);
+        }
+        break;
       case InspectorStatus.needsSubscription:
         log(
           '➡️ Redirecting: Inspector needs subscription → InspectorDashboardRoute',
@@ -808,8 +825,8 @@ class ClientViewModelProvider extends BaseViewModel {
       final state = await executeParamsUseCase<AuthUser, SignInParams>(
         useCase: signInUseCase,
         query: SignInParams(
-          email: emailCtrl.text.trim(),
-          password: passwordCtrl.text.trim(),
+          email: cltEmailCtrl.text.trim(),
+          password: cltPasswordCtrl.text.trim(),
           deviceToken: deviceToken,
           deviceType: deviceType,
         ),
@@ -839,8 +856,8 @@ class ClientViewModelProvider extends BaseViewModel {
         },
       );
     } finally {
-      emailCtrl.clear();
-      passwordCtrl.clear();
+      cltEmailCtrl.clear();
+      cltPasswordCtrl.clear();
       setSigningIn(false);
     }
   }

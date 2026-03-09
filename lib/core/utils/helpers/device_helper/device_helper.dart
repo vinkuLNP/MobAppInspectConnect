@@ -16,22 +16,6 @@ class DeviceInfoHelper {
   static Future<String> getDeviceToken() async {
     try {
       final messaging = FirebaseMessaging.instance;
-
-      // if (Platform.isIOS) {
-      //   final settings = await messaging.requestPermission(
-      //     alert: true,
-      //     badge: true,
-      //     sound: true,
-      //     provisional: false,
-      //   );
-      //   log('[FCM] iOS authorizationStatus: ${settings.authorizationStatus}');
-      //   if (settings.authorizationStatus != AuthorizationStatus.authorized &&
-      //       settings.authorizationStatus != AuthorizationStatus.provisional) {
-      //     log('[FCM] Notifications not allowed — returning empty token');
-      //     return "";
-      //   }
-      // }
-
       final token = await messaging.getToken();
       log('[FCM] FCM token: $token');
       return token ?? "";

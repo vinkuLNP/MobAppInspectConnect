@@ -46,7 +46,7 @@ class CommonAuthBar extends StatelessWidget {
                 ),
                 Container(
                   width: rc.screenWidth,
-                  height: rc.screenHeight * 0.4,
+                  height: (rc.screenHeight * 0.35).clamp(300, double.infinity),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.topCenter,
@@ -91,7 +91,7 @@ class CommonAuthBar extends StatelessWidget {
               ],
             ),
             Padding(
-              padding: const EdgeInsets.only(left: 20,right: 20,bottom: 40),
+              padding: const EdgeInsets.only(left: 20, right: 20, bottom: 40),
               child: form,
             ),
           ],

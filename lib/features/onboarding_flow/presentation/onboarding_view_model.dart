@@ -40,7 +40,6 @@ class OnBoardingProvider extends BaseViewModel {
     }
   }
 
-
   @override
   void onDispose() {
     _timer?.cancel();

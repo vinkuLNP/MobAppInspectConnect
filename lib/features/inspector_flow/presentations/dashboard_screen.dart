@@ -1,7 +1,8 @@
+import 'dart:developer';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
-import 'package:inspect_connect/features/auth_flow/data/datasources/local_datasources/auth_user_local_entity.dart';
+import 'package:inspect_connect/features/auth_flow/presentation/otp_verification/otp_verification.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/user_provider.dart';
 import 'package:inspect_connect/features/inspector_flow/domain/enum/inspector_status.dart';
 import 'package:inspect_connect/features/inspector_flow/presentations/screens/inspector_main_dashboard.dart';
@@ -16,77 +17,107 @@ class InspectorDashboardView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => InspectorDashboardProvider()..initializeUserState(context),
-      child: Consumer<InspectorDashboardProvider>(
-        builder: (context, provider, _) {
-          Widget content = const InspectorMainDashboard();
+    log('📍 [InspectorDashboard] build() called');
 
-          switch (provider.status) {
-            case InspectorStatus.initial:
-              content = Scaffold();
-              break;
-            case InspectorStatus.unverified:
+    return Consumer<InspectorDashboardProvider>(
+      builder: (context, provider, _) {
+        log(
+          '🔁 [InspectorDashboard] status=${provider.status}, '
+          'isLoading=${provider.isLoading}',
+        );
+
+        Widget content = const InspectorMainDashboard();
+
+        switch (provider.status) {
+          case InspectorStatus.initial:
+            log('🟡 [InspectorDashboard] Status: INITIAL');
+            content = const Scaffold();
+            break;
+
+          case InspectorStatus.unverified:
+            log('🔴 [InspectorDashboard] Status: UNVERIFIED');
+            content = OtpVerificationView(
+              addShowButton: false,
+              showSignInText: true,
+            );
+            break;
+
+          case InspectorStatus.needsSubscription:
+            log('💳 [InspectorDashboard] Status: NEEDS_SUBSCRIPTION');
+            content = SubscriptionScreen(provider: provider);
+            break;
+
+          case InspectorStatus.underReview:
+            log('🟠 [InspectorDashboard] Status: UNDER_REVIEW');
+            final user = context.read<UserProvider>().user;
+
+            if (user == null) {
+              log('❌ [InspectorDashboard] UserProvider returned null user');
               content = Scaffold(
-                body: Center(
-                  child: textWidget(
-                    text: 'Please verify your phone number to continue.',
-                  ),
-                ),
+                body: Center(child: textWidget(text: 'User data unavailable')),
               );
-              break;
+            } else {
+              log(
+                '👤 [InspectorDashboard] User loaded → '
+                'ID=${user.id}, Status=UNDER_REVIEW',
+              );
+              content = ApprovalStatusScreen();
+            }
+            break;
 
-            case InspectorStatus.needsSubscription:
-              content = SubscriptionScreen(provider: provider);
-              break;
+          case InspectorStatus.rejected:
+            log('❌ [InspectorDashboard] Status: REJECTED');
+            final user = context.read<UserProvider>().user;
 
-            case InspectorStatus.underReview:
-            case InspectorStatus.rejected:
-              final user = context.read<UserProvider>().user;
-              if (user == null) {
-                content = Scaffold(
-                  body: Center(
-                    child: textWidget(text: 'User data unavailable'),
+            if (user == null) {
+              log('❌ [InspectorDashboard] UserProvider returned null user');
+              content = Scaffold(
+                body: Center(child: textWidget(text: 'User data unavailable')),
+              );
+            } else {
+              log(
+                '👤 [InspectorDashboard] User loaded → '
+                'ID=${user.id}, Status=REJECTED',
+              );
+              content = ApprovalStatusScreen();
+            }
+            break;
+
+          case InspectorStatus.approved:
+            log('✅ [InspectorDashboard] Status: APPROVED');
+            content = const InspectorMainDashboard();
+            break;
+        }
+        log('⏳ [InspectorDashboard] Showing loader');
+
+        return Stack(
+          children: [
+            content,
+            if (provider.isLoading) ...[
+              Center(
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.9),
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.15),
+                        blurRadius: 6,
+                      ),
+                    ],
                   ),
-                );
-              } else {
-                content = ApprovalStatusScreen(user: user.toDomainEntity());
-              }
-              break;
-
-            case InspectorStatus.approved:
-              content = const InspectorMainDashboard();
-              break;
-          }
-
-          return Stack(
-            children: [
-              content,
-              if (provider.isLoading)
-                Center(
-                  child: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.9),
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.15),
-                          blurRadius: 6,
-                        ),
-                      ],
-                    ),
-                    child: const SizedBox(
-                      width: 30,
-                      height: 30,
-                      child: CircularProgressIndicator(),
-                    ),
+                  child: const SizedBox(
+                    width: 30,
+                    height: 30,
+                    child: CircularProgressIndicator(),
                   ),
                 ),
+              ),
             ],
-          );
-        },
-      ),
+          ],
+        );
+      },
     );
   }
 }

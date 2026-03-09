@@ -4,8 +4,8 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:inspect_connect/core/di/app_component/app_component.dart';
-import 'package:inspect_connect/core/di/notifcation_services/app_notification.dart';
-import 'package:inspect_connect/core/di/notifcation_services/firebase_background.dart';
+import 'package:inspect_connect/core/di/services/notifcation_services/app_notification.dart';
+import 'package:inspect_connect/core/di/services/notifcation_services/firebase_background.dart';
 import 'package:inspect_connect/core/utils/auto_router_setup/auto_router.dart';
 import 'package:inspect_connect/core/utils/constants/app_constants.dart';
 import 'package:inspect_connect/core/utils/helpers/app_flavor_helper/app_flavors_helper.dart';
@@ -13,9 +13,13 @@ import 'package:inspect_connect/core/utils/helpers/app_flavor_helper/environment
 import 'package:flutter/material.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/auth_user_provider.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/client/client_view_model.dart';
+import 'package:inspect_connect/features/auth_flow/presentation/inspector/inspector_view_model.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/booking_provider.dart';
+import 'package:inspect_connect/features/client_flow/presentations/providers/notification_provider.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/session_manager.dart';
 import 'package:inspect_connect/features/client_flow/presentations/providers/user_provider.dart';
+import 'package:inspect_connect/features/client_flow/presentations/providers/wallet_provider.dart';
+import 'package:inspect_connect/features/common_features/view_model/common_view_model.dart';
 import 'package:inspect_connect/features/inspector_flow/providers/inspector_main_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -85,11 +89,19 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => UserProvider()),
-        ChangeNotifierProvider(create: (_) => BookingProvider()),
-        ChangeNotifierProvider(create: (_) => AuthFlowProvider()),
-        ChangeNotifierProvider(create: (_) => ClientViewModelProvider()),
-        ChangeNotifierProvider(create: (_) => InspectorDashboardProvider()),
+        ChangeNotifierProvider.value(value: locator<UserProvider>()),
+        ChangeNotifierProvider.value(value: locator<BookingProvider>()),
+        ChangeNotifierProvider.value(value: locator<NotificationProvider>()),
+        ChangeNotifierProvider.value(value: locator<AuthFlowProvider>()),
+        ChangeNotifierProvider.value(value: locator<WalletProvider>()),
+        ChangeNotifierProvider.value(
+          value: locator<InspectorViewModelProvider>(),
+        ),
+ ChangeNotifierProvider(create: (_) => locator<CommonViewModel>()),
+        ChangeNotifierProvider.value(value: locator<ClientViewModelProvider>()),
+        ChangeNotifierProvider.value(
+          value: locator<InspectorDashboardProvider>(),
+        ),
       ],
       child: MaterialApp.router(
         routerConfig: appRouter.config(),
@@ -97,6 +109,13 @@ class _MyAppState extends State<MyApp> {
         theme: ThemeData(
           primaryColor: themeColor,
           scaffoldBackgroundColor: Colors.white,
+          textButtonTheme: TextButtonThemeData(
+            style: TextButton.styleFrom(
+              padding: EdgeInsets.zero,
+              minimumSize: Size.zero,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+          ),
           colorScheme: ColorScheme.fromSwatch().copyWith(
             primary: themeColor,
             secondary: themeColor,

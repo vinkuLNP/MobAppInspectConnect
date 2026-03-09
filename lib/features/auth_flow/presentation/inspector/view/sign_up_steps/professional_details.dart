@@ -1,18 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:inspect_connect/core/utils/constants/app_colors.dart';
+import 'package:inspect_connect/core/utils/constants/app_strings.dart';
+import 'package:inspect_connect/core/utils/helpers/app_common_functions/app_common_functions.dart';
 import 'package:inspect_connect/core/utils/presentation/app_common_text_widget.dart';
 import 'package:inspect_connect/core/utils/presentation/app_text_style.dart';
-import 'package:inspect_connect/features/auth_flow/domain/entities/certificate_agency_entity.dart';
 import 'package:inspect_connect/features/auth_flow/domain/entities/certificate_type_entity.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/inspector/inspector_view_model.dart';
+import 'package:inspect_connect/features/auth_flow/presentation/inspector/widgets/stepper_header.dart';
 import 'package:inspect_connect/features/client_flow/presentations/widgets/select_time_widget.dart';
 import 'package:provider/provider.dart';
 
 class ProfessionalDetailsStep extends StatelessWidget {
   final InspectorViewModelProvider vm;
   final GlobalKey<FormState> formKey;
-
-  const ProfessionalDetailsStep(this.vm, this.formKey, {super.key});
+  final bool isAccountScreen;
+  const ProfessionalDetailsStep(
+    this.vm,
+    this.formKey, {
+    super.key,
+    this.isAccountScreen = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -20,58 +27,45 @@ class ProfessionalDetailsStep extends StatelessWidget {
       value: vm,
       child: Consumer<InspectorViewModelProvider>(
         builder: (context, prov, _) {
-          return Stack(
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              AbsorbPointer(
-                absorbing: prov.isProcessing,
-                child: Opacity(
-                  opacity: prov.isProcessing ? 0.6 : 1.0,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      textWidget(
-                        text: 'Professional Details',
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                      const SizedBox(height: 8),
-                      _section(
-                        title: 'Certificate Type',
-                        child: _inspectionTypeDropdown(prov),
-                      ),
-                      const SizedBox(height: 6),
+              const SectionTitle(professionalDetails),
+              const SizedBox(height: 8),
+              _section(
+                title: certificateType,
+                child: _inspectionTypeDropdown(prov),
+              ),
 
-                      _section(
-                        title: 'Certifying Agencies ',
-                        child: _agencyTypeDropdown(prov),
-                      ),
-                      const SizedBox(height: 6),
+              const SizedBox(height: 6),
 
-                      _section(
-                        title: 'Select Expiration Date',
-                        child: IgnorePointer(
-                          ignoring: false,
-                          child: DateTimePickerWidget(
-                            showTimePicker: false,
-                            initialDateTime: prov.certificateExpiryDateShow,
-                            onDateTimeSelected: (dt) {
-                              prov.setDate(dt);
-                            },
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      _section(
-                        title: 'Upload Certification Documents (max 5)',
-                        child: _documentGrid(prov, context),
-                      ),
-                    ],
+              _section(
+                title: selectExpirationDate,
+                child: IgnorePointer(
+                  ignoring: false,
+                  child: DateTimePickerWidget(
+                    showTimePicker: false,
+                    initialDateTime: prov.certificateExpiryDateShow,
+                    onDateTimeSelected: (dt) {
+                      prov.setDate(dt);
+                    },
                   ),
                 ),
               ),
-
-              if (prov.isProcessing)
-                const Center(child: CircularProgressIndicator()),
+              const SizedBox(height: 6),
+              _section(
+                title:
+                    '${isAccountScreen ? '' : uploadtxt} $certificationDocuments',
+                child: imageUploader(
+                  context: context,
+                  files: prov.documents,
+                  existingUrls: prov.existingDocumentUrls,
+                  maxFiles: 4,
+                  onAdd: () => prov.uploadDocument(context),
+                  onRemove: (i) => prov.removeDocumentAt(i),
+                  onRemoveExisting: (i) => prov.removeExistingDocumentAt(i),
+                ),
+              ),
             ],
           );
         },
@@ -93,27 +87,9 @@ class ProfessionalDetailsStep extends StatelessWidget {
     );
   }
 
-  Widget _agencyTypeDropdown(InspectorViewModelProvider prov) {
-    return DropdownButtonFormField<AgencyEntity>(
-      decoration: _inputDecoration('Select Certifying Agencies'),
-      initialValue: prov.agencyTypeData,
-
-      style: appTextStyle(fontSize: 12),
-      items: prov.agencyType
-          .map(
-            (subType) => DropdownMenuItem<AgencyEntity>(
-              value: subType,
-              child: textWidget(text: subType.name, fontSize: 12),
-            ),
-          )
-          .toList(),
-      onChanged: null,
-    );
-  }
-
   Widget _inspectionTypeDropdown(InspectorViewModelProvider prov) {
     return DropdownButtonFormField<CertificateInspectorTypeEntity>(
-      decoration: _inputDecoration('Select Certificate Type'),
+      decoration: _inputDecoration(selectCertificateType),
       initialValue: prov.certificateInspectorType,
       style: appTextStyle(fontSize: 12),
       items: prov.certificateType
@@ -149,140 +125,4 @@ class ProfessionalDetailsStep extends StatelessWidget {
       borderSide: BorderSide(color: AppColors.authThemeColor),
     ),
   );
-
-  Widget _documentGrid(InspectorViewModelProvider prov, BuildContext context) {
-    final totalDocs = prov.documents.length + prov.existingDocumentUrls.length;
-    final canAddMore = totalDocs < 5;
-
-    if (totalDocs == 0) {
-      return GestureDetector(
-        onTap: () => prov.uploadDocument(context),
-        child: Column(
-          children: [
-            Container(
-              width: double.infinity,
-              height: 100,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.grey.shade300),
-                color: Colors.grey.shade50,
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.upload_file, size: 32, color: Colors.grey),
-                  const SizedBox(height: 8),
-                  textWidget(
-                    text: "Upload Document",
-                    color: Colors.grey,
-                    fontSize: 12,
-                  ),
-                ],
-              ),
-            ),
-            if (prov.errorMessage != null)
-              Padding(
-                padding: const EdgeInsets.only(top: 4),
-                child: Text(
-                  prov.errorMessage!,
-                  style: TextStyle(color: Colors.red, fontSize: 12),
-                ),
-              ),
-          ],
-        ),
-      );
-    }
-    const spacing = 8.0;
-
-    return GridView.builder(
-      padding: EdgeInsets.zero,
-
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        mainAxisSpacing: spacing,
-        crossAxisSpacing: spacing,
-        childAspectRatio: 3,
-      ),
-      itemCount: canAddMore ? totalDocs + 1 : totalDocs,
-      itemBuilder: (ctx, i) {
-        if (i < prov.existingDocumentUrls.length) {
-          final url = prov.existingDocumentUrls[i];
-          final name = url.split('/').last;
-
-          return _documentTile(
-            name: name,
-            onDelete: () => prov.removeExistingDocumentAt(i),
-            onTap: () => prov.openDocument(url),
-          );
-        }
-
-        final docIndex = i - prov.existingDocumentUrls.length;
-        if (docIndex < prov.documents.length) {
-          final file = prov.documents[docIndex];
-          final name = file.path.split('/').last;
-
-          return _documentTile(
-            name: name,
-            onDelete: () => prov.removeDocumentAt(docIndex),
-            onTap: () => prov.openLocalDocument(file),
-          );
-        }
-
-        return GestureDetector(
-          onTap: () => prov.uploadDocument(ctx),
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.grey.shade300),
-              color: Colors.grey.shade50,
-            ),
-            child: const Center(
-              child: Icon(Icons.upload_file, size: 28, color: Colors.grey),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _documentTile({
-    required String name,
-    VoidCallback? onDelete,
-    VoidCallback? onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey.shade300),
-          color: Colors.white,
-        ),
-        child: Row(
-          children: [
-            const Icon(Icons.insert_drive_file, color: Colors.blueAccent),
-            const SizedBox(width: 8),
-            Expanded(
-              child: textWidget(
-                text: name,
-                fontSize: 13,
-                textOverflow: TextOverflow.ellipsis,
-              ),
-            ),
-            if (onDelete != null)
-              GestureDetector(
-                onTap: onDelete,
-                child: const Padding(
-                  padding: EdgeInsets.only(left: 6),
-                  child: Icon(Icons.close, size: 18, color: Colors.red),
-                ),
-              ),
-          ],
-        ),
-      ),
-    );
-  }
 }

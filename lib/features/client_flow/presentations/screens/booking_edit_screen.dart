@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:inspect_connect/core/utils/constants/app_strings.dart';
 import 'package:inspect_connect/features/client_flow/presentations/widgets/common_app_bar.dart';
 import 'package:inspect_connect/features/client_flow/presentations/widgets/booking_form_widget.dart';
 import 'package:inspect_connect/features/client_flow/presentations/widgets/view_booking_screen.dart';
@@ -23,15 +24,19 @@ class BookingEditScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: CommonAppBar(
-        title: isReadOnly ? 'View Booking' : 'Edit Booking',
+        title: isReadOnly ? viewBooking : editBooking,
         showBackButton: true,
         showLogo: false,
       ),
       body: SafeArea(
+        bottom: false,
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: isReadOnly
-              ? ViewBookingDetailsScreen(booking: booking,isInspectorView: isInspectorView,)
+              ? ViewBookingDetailsScreen(
+                  booking: booking,
+                  isInspectorView: isInspectorView,
+                )
               : BookingFormWidget(
                   isEditing: true,
                   isReadOnly: isReadOnly,

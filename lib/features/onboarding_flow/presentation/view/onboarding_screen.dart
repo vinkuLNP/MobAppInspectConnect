@@ -1,5 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:inspect_connect/core/utils/constants/app_assets_constants.dart';
 import 'package:inspect_connect/features/auth_flow/enum/auth_user_enum.dart';
 import 'package:inspect_connect/features/auth_flow/presentation/auth_user_provider.dart';
 import 'package:provider/provider.dart';
@@ -33,7 +34,7 @@ class _OnBoardingPageState extends State<OnBoardingPage>
       vsync: this,
       duration: const Duration(milliseconds: 600),
     );
-    _loadVideo('assets/videos/onboarding_video.mp4');
+    _loadVideo(onBoardingVideo);
   }
 
   bool _isVideoInitialized = false;
@@ -292,12 +293,12 @@ class _OnBoardingPageState extends State<OnBoardingPage>
 
                                 if (_isClient == true) {
                                   authFlow.setUserType(AuthUserType.client);
-                                  context.pushRoute(
+                                  context.replaceRoute(
                                     ClientSignUpRoute(showBackButton: false),
                                   );
                                 } else {
                                   authFlow.setUserType(AuthUserType.inspector);
-                                  context.pushRoute(
+                                  context.replaceRoute(
                                     InspectorSignUpRoute(showBackButton: false),
                                   );
                                 }
@@ -324,7 +325,7 @@ class _OnBoardingPageState extends State<OnBoardingPage>
 
                                     if (_isClient == true) {
                                       authFlow.setUserType(AuthUserType.client);
-                                      context.pushRoute(
+                                      context.replaceRoute(
                                         ClientSignInRoute(
                                           showBackButton: false,
                                         ),
@@ -333,7 +334,7 @@ class _OnBoardingPageState extends State<OnBoardingPage>
                                       authFlow.setUserType(
                                         AuthUserType.inspector,
                                       );
-                                      context.pushRoute(
+                                      context.replaceRoute(
                                         ClientSignInRoute(
                                           showBackButton: false,
                                         ),
